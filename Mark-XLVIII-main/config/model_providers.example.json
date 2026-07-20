@@ -1,0 +1,10 @@
+{
+  "gemini_api_key": "existing Gemini key remains here",
+  "openai_api_key": "optional; prefer OPENAI_API_KEY environment variable",
+  "planner_provider": "openai",
+  "planner_model": "gpt-5.5",
+  "openai_url": "https://api.openai.com/v1",
+  "worker_provider": "lmstudio",
+  "worker_model": "qwen/qwen3-4b",
+  "lmstudio_url": "http://localhost:1234/v1"
+}

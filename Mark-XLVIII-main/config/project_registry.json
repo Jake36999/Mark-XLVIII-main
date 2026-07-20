@@ -1,0 +1,111 @@
+{
+  "version": 1,
+  "bridge": {
+    "host": "127.0.0.1",
+    "port": 8765,
+    "timeout_seconds": 20
+  },
+  "projects": {
+    "quantule_mapper": {
+      "display_name": "Quantule Mapper",
+      "root": "F:\\quantule_mapper",
+      "summary": "Custom physics exploration bench. Mark may orchestrate runtime operations, while scientific analysis remains user-led or Claude-led.",
+      "preferred_agents": {
+        "analysis": "claude",
+        "coding": "codex",
+        "continuity": "openclaw"
+      },
+      "safe_operations": ["list", "status", "scout", "code_map", "handoff", "delegate_openclaw", "logs", "health"],
+      "confirmation_operations": ["launch", "stop", "stage_run", "worker", "long_hunt", "gpu_worker"],
+      "blocked_operations": ["delete_results", "purge_archive", "reset_git"],
+      "safe_commands": [
+        "git status --short --branch",
+        "python -m pytest --collect-only -q"
+      ],
+      "confirmation_commands": [
+        ".\\launch_all.ps1",
+        ".\\stop_all.bat",
+        "python adaptive_hunt_orchestrator.py --config burn_in_config.json",
+        "python worker_daemon.py"
+      ],
+      "notes": [
+        "Do not make final scientific claims from ASTE output.",
+        "Confirm before long hunts, GPU workers, cleanup, archive deletion, or result queue modification."
+      ]
+    },
+    "knowledge_compiler_engine": {
+      "display_name": "Knowledge Compiler Engine",
+      "root": "F:\\knowledge_compiler_engine (DAG Engine)",
+      "summary": "Compute-heavy DAG/data-curation and custom-agent training pipeline.",
+      "preferred_agents": {
+        "analysis": "claude",
+        "coding": "codex",
+        "continuity": "openclaw"
+      },
+      "safe_operations": ["list", "status", "scout", "code_map", "handoff", "delegate_openclaw", "lightweight_check"],
+      "confirmation_operations": ["docker_stack", "heavy_training", "dataset_generation", "model_refinement"],
+      "blocked_operations": ["delete_dataset", "purge_output", "reset_git"],
+      "safe_commands": [
+        "git status --short --branch",
+        "python -m pytest --collect-only -q"
+      ],
+      "confirmation_commands": [
+        "docker compose up",
+        "forge_training.bat",
+        "run_pipeline.bat"
+      ],
+      "notes": [
+        "Heavy training, Docker/Celery launch, dataset generation, and model refinement require confirmation.",
+        "Future lightweight mode should expose a small tool-assist surface first."
+      ]
+    },
+    "mark_platform": {
+      "display_name": "Mark Platform",
+      "root": "F:\\Mark-XLVIII-main",
+      "summary": "Current Mark/Aletheia/ToolSet/OpenClaw integration workspace.",
+      "preferred_agents": {
+        "analysis": "codex",
+        "coding": "codex",
+        "continuity": "openclaw"
+      },
+      "safe_operations": ["list", "status", "scout", "code_map", "handoff", "delegate_openclaw", "health"],
+      "confirmation_operations": ["start_mark", "start_aletheia", "stop_service", "install_dependencies"],
+      "blocked_operations": ["reset_git", "delete_embedded_repo"],
+      "safe_commands": [
+        "git status --short --branch"
+      ],
+      "confirmation_commands": [
+        ".\\scripts\\start-aletheia-operator.ps1",
+        ".\\scripts\\start-mark-operator.ps1"
+      ],
+      "notes": [
+        "Avoid mutating embedded upstream projects unless the task explicitly targets them."
+      ]
+    },
+    "network_management": {
+      "display_name": "Network Management",
+      "root": "F:\\network_management",
+      "summary": "CSI/RF/network management pipeline with locked RF backend invariants.",
+      "preferred_agents": {
+        "analysis": "claude",
+        "coding": "codex",
+        "continuity": "openclaw"
+      },
+      "safe_operations": ["list", "status", "scout", "code_map", "handoff", "delegate_openclaw", "verify_rf_backend"],
+      "confirmation_operations": ["deploy_rf_backend", "stop_rf_backend", "mode_change", "service_restart"],
+      "blocked_operations": ["bypass_invariant", "raw_csi_exfiltration", "reset_git"],
+      "safe_commands": [
+        "git status --short --branch",
+        "powershell -NoProfile -ExecutionPolicy Bypass -File Verify-RfBackend.ps1"
+      ],
+      "confirmation_commands": [
+        "powershell -NoProfile -ExecutionPolicy Bypass -File Deploy-RfBackend.ps1",
+        "powershell -NoProfile -ExecutionPolicy Bypass -File Stop-RfBackend.ps1"
+      ],
+      "notes": [
+        "RF backend safety invariants are authoritative.",
+        "Deploy, stop, service restart, and mode changes require confirmation."
+      ]
+    }
+  }
+}
