@@ -137,6 +137,49 @@ _ROLE_ALIASES = {
 _ROLE_DIRECTIVE_RE = re.compile(r"^\s*(?:type|role)\s*:\s*([a-zA-Z_]+)\s*$", re.IGNORECASE)
 _ROLE_HASHTAG_RE = re.compile(r"#(plan|research|implementation|verification|review|reference)\b", re.IGNORECASE)
 
+# D1 (2026-07-24 planning roadmap): every node is both a workflow step and a
+# self-contained prompt, so its leading lines can declare several directives,
+# not just `role:`. Consecutive `key: value` lines from the top only -- the
+# first line that isn't one of these ends the directive block and everything
+# after is the node's actual prose/instruction. Order among directives does
+# not matter, matching the existing `role:` convention of "first N lines are
+# structure, the rest is the prompt."
+_DIRECTIVE_LINE_RE = re.compile(
+    r"^\s*(role|type|scope|test|project|file|recommended\s+model)\s*:\s*(.*?)\s*$",
+    re.IGNORECASE,
+)
+_DIRECTIVE_ALIASES = {"type": "role", "test": "scope"}
+
+
+def _parse_node_directives(text: str) -> tuple[dict[str, str], str]:
+    """Split a node's leading directive lines from its prose.
+
+    Returns `(directives, remaining_prose)`. Recognised keys: `role`/`type`,
+    `scope`/`test`, `project`, `file`, `recommended model`. A directive with
+    an empty value is dropped rather than stored as `""`.
+    """
+    lines = str(text or "").splitlines()
+    directives: dict[str, str] = {}
+    consumed = 0
+    for line in lines:
+        match = _DIRECTIVE_LINE_RE.match(line)
+        if not match:
+            break
+        key = re.sub(r"\s+", "_", match.group(1).strip().lower())
+        key = _DIRECTIVE_ALIASES.get(key, key)
+        value = match.group(2).strip()
+        if value:
+            directives[key] = value
+        consumed += 1
+    remaining = "\n".join(lines[consumed:]).strip()
+    return directives, remaining
+
+
+def _node_directives(node: dict[str, Any]) -> dict[str, str]:
+    """All of a node's parsed directives (role, scope, project, file, ...)."""
+    directives, _remaining = _parse_node_directives(str(node.get("text") or ""))
+    return directives
+
 
 def node_step_id(node_id: str) -> str:
     """Deterministic, schema-valid (`^[a-z][a-z0-9_]*$`) step id for a canvas node.
@@ -170,12 +213,10 @@ def _resolve_role(node: dict[str, Any]) -> str:
             return role
 
     text = str(node.get("text") or "")
-    first_line = text.splitlines()[0] if text.splitlines() else ""
-    directive = _ROLE_DIRECTIVE_RE.match(first_line)
-    if directive:
-        role = _normalise_role(directive.group(1))
-        if role:
-            return role
+    directives, _remaining = _parse_node_directives(text)
+    role = _normalise_role(directives.get("role", ""))
+    if role:
+        return role
 
     hashtag = _ROLE_HASHTAG_RE.search(text)
     if hashtag:
@@ -189,16 +230,13 @@ def _resolve_role(node: dict[str, Any]) -> str:
 
 
 def _instruction_text(node: dict[str, Any]) -> str:
-    """The node's human instruction, with a leading `role:`/`type:` directive removed."""
+    """The node's human instruction, with any leading directive lines removed."""
     text = str(node.get("text") or "").strip()
     if not text:
         # file/link nodes carry no prose; fall back to their target for context.
         return str(node.get("file") or node.get("url") or "").strip()
-    lines = text.splitlines()
-    if lines and _ROLE_DIRECTIVE_RE.match(lines[0]):
-        lines = lines[1:]
-    cleaned = "\n".join(lines).strip()
-    return cleaned or text
+    _directives, remaining = _parse_node_directives(text)
+    return remaining or text
 
 
 def _sanitise_workflow_id(value: str, fallback: str = "canvas_plan") -> str:
@@ -242,6 +280,32 @@ def compile_canvas(
         if src in node_ids and dst in node_ids and src != dst:
             incoming[dst].append(src)
 
+    # WS1 (2026-07-24 planning roadmap, D2): "one canvas = one plan target" --
+    # an implementation node's `project:` directive is optional because the
+    # canvas's own `plan`-role root node can declare the default for the whole
+    # plan. A node-level `project:` still overrides it.
+    canvas_project_id = ""
+    for node in nodes:
+        if _resolve_role(node) == "plan":
+            candidate = _node_directives(node).get("project", "")
+            if candidate:
+                canvas_project_id = candidate
+                break
+
+    registered_project_ids: set[str] | None = None
+    if canvas_project_id or any(
+        _resolve_role(node) == "implementation" and _node_directives(node).get("project")
+        for node in nodes
+    ):
+        from actions.project_operator import load_registry
+
+        registered_project_ids = set(load_registry().get("projects") or {})
+        if canvas_project_id and canvas_project_id not in registered_project_ids:
+            raise CanvasCompileError(
+                f"Canvas-level project '{canvas_project_id}' is not a registered project. "
+                f"Known projects: {', '.join(sorted(registered_project_ids)) or '(none registered)'}."
+            )
+
     ordered = sorted(nodes, key=lambda n: (layers.get(str(n["id"]), 0), str(n["id"])))
     steps: list[dict[str, Any]] = []
     node_to_step: dict[str, str] = {}
@@ -252,8 +316,31 @@ def compile_canvas(
         step_id = node_step_id(nid)
         node_to_step[nid] = step_id
         description = _instruction_text(node) or f"{role} step"
+        directives = _node_directives(node)
         inputs: dict[str, Any] = {"canvas_role": role, "canvas_node_id": nid}
         inputs.update(spec.get("inputs") or {})
+        if role == "verification" and directives.get("scope"):
+            scope = [item.strip() for item in directives["scope"].split(",") if item.strip()]
+            if scope:
+                inputs["args"] = scope
+        if role == "implementation":
+            project_id = directives.get("project") or canvas_project_id
+            if project_id:
+                if registered_project_ids is not None and project_id not in registered_project_ids:
+                    raise CanvasCompileError(
+                        f"Node '{nid}' declares project '{project_id}', which is not registered. "
+                        f"Known projects: {', '.join(sorted(registered_project_ids)) or '(none registered)'}."
+                    )
+                inputs["project_id"] = project_id
+            # The dual-purpose prose (D1) is the agent's actual task -- forward it
+            # so delegate_openclaw never dispatches with an empty intent.
+            inputs["intent"] = description
+        if directives.get("file"):
+            inputs["file"] = directives["file"]
+        if directives.get("recommended_model"):
+            # Inert for now -- WS4 is what will generate this; WS1 only parses,
+            # threads it through, and surfaces it in the approval preview.
+            inputs["recommended_model"] = directives["recommended_model"]
         step: dict[str, Any] = {
             "step_id": step_id,
             "orchestrator": spec["orchestrator"],
@@ -738,11 +825,19 @@ def run_node_completion_sop(
 # forward-scout context for execution, but must not count as "the plan
 # changed" for re-approval purposes).
 def plan_fingerprint(payload: dict[str, Any]) -> dict[str, Any]:
-    """The narrow projection an approval binds to: role + authored instruction
-    per node, plus edges. Nothing T2 or T3 write (color, `jarvis` metadata, the
-    forward-scout block below its marker) appears here, so neither can ever
-    cause a false "the plan changed" drift signal -- only a human editing a
-    node's role, its authored instruction, or the graph's structure can.
+    """The narrow projection an approval binds to: role + directives +
+    authored instruction per node, plus edges. Nothing T2 or T3 write (color,
+    `jarvis` metadata, the forward-scout block below its marker) appears here,
+    so neither can ever cause a false "the plan changed" drift signal -- only
+    a human editing a node's role, its directives, its authored instruction,
+    or the graph's structure can.
+
+    Directives (`scope:`/`project:`/`file:`/`recommended model:`) are part of
+    what the human authors on the node, not a system write-back, so they must
+    count here: D2 (2026-07-24 planning roadmap) requires that editing a
+    `recommended model:` line re-triggers approval, and leaving it untouched
+    counts as accepting it -- that only works if the fingerprint actually sees
+    the edit.
     """
     nodes = payload.get("nodes") if isinstance(payload, dict) else None
     edges = payload.get("edges") if isinstance(payload, dict) else None
@@ -755,6 +850,7 @@ def plan_fingerprint(payload: dict[str, Any]) -> dict[str, Any]:
             {
                 "node_id": node_id,
                 "role": _resolve_role(node),
+                "directives": _node_directives(node),
                 "instruction": _strip_scout_block(_instruction_text(node)),
             }
         )
@@ -782,14 +878,36 @@ def _canvas_approval_note_path(notes_root: Path, workflow_id: str) -> Path:
     return Path(notes_root) / "Plans" / f"canvas-approval-{_sanitise_workflow_id(workflow_id)}.md"
 
 
+def _resolved_target_summary(item: dict[str, Any]) -> str:
+    """What will actually run, distinct from the node's prose (WS1: the
+    approval preview must not describe an action the compiled step can't
+    actually take -- see the implementation-node live test in
+    Jarvis_notes/Validation/2026-07-24-canvas-node-live-test-and-hardening.md).
+    """
+    inputs = item.get("inputs") or {}
+    role = str(inputs.get("canvas_role") or "")
+    parts: list[str] = []
+    if role == "verification":
+        scope = inputs.get("args")
+        parts.append(f"scope: {', '.join(scope)}" if scope else "⚠ no scope — runs the entire suite")
+    elif role == "implementation":
+        project_id = inputs.get("project_id")
+        parts.append(f"project: {project_id}" if project_id else "⚠ no project target — will not write anything")
+    if inputs.get("file"):
+        parts.append(f"file: {inputs['file']}")
+    if inputs.get("recommended_model"):
+        parts.append(f"recommended model: {inputs['recommended_model']}")
+    return "; ".join(parts).replace("|", "\\|") or "—"
+
+
 def _preview_summary_body(workflow: dict[str, Any], manifest: dict[str, Any]) -> str:
     rows = [
-        "| Order | Step | Type | Resource | Risk | Side effects | Confirm |",
-        "| ---: | --- | --- | --- | --- | --- | --- |",
+        "| Order | Step | Type | Resource | Risk | Side effects | Confirm | Resolved target |",
+        "| ---: | --- | --- | --- | --- | --- | --- | --- |",
     ]
     for item in manifest["items"]:
         rows.append(
-            "| {seq} | {desc} | {step_type} | {rc} | {risk} | {effects} | {confirm} |".format(
+            "| {seq} | {desc} | {step_type} | {rc} | {risk} | {effects} | {confirm} | {target} |".format(
                 seq=item["sequence"],
                 desc=str(item["description"]).replace("|", "\\|")[:200],
                 step_type=item["step_type"],
@@ -797,6 +915,7 @@ def _preview_summary_body(workflow: dict[str, Any], manifest: dict[str, Any]) ->
                 risk=item["risk_tier"],
                 effects=item["side_effects"],
                 confirm="yes" if item["requires_confirmation"] else "no",
+                target=_resolved_target_summary(item),
             )
         )
     workflow_label = str(workflow.get("name") or workflow.get("workflow_id") or "canvas plan")

@@ -193,6 +193,223 @@ class CompileCanvasTests(unittest.TestCase):
             canvas_plan.compile_canvas({"nodes": [], "edges": []}, workflow_id="empty", name="Empty")
 
 
+class NodeDirectiveParsingTests(unittest.TestCase):
+    """WS1 (2026-07-24 planning roadmap, D1): a node's leading `key: value`
+    lines are directives; everything after is the agent's actual prompt."""
+
+    def test_parses_multiple_directives_in_any_order(self):
+        text = (
+            "scope: tests/test_vault_watch.py\n"
+            "role: verification\n"
+            "recommended model: developer (openclaw)\n"
+            "Just that one file, not the whole suite."
+        )
+        directives, remaining = canvas_plan._parse_node_directives(text)
+        self.assertEqual(
+            directives,
+            {
+                "scope": "tests/test_vault_watch.py",
+                "role": "verification",
+                "recommended_model": "developer (openclaw)",
+            },
+        )
+        self.assertEqual(remaining, "Just that one file, not the whole suite.")
+
+    def test_test_and_type_are_aliases_of_scope_and_role(self):
+        directives, _ = canvas_plan._parse_node_directives("type: implementation\ntest: tests/test_foo.py\nDo it.")
+        self.assertEqual(directives["role"], "implementation")
+        self.assertEqual(directives["scope"], "tests/test_foo.py")
+
+    def test_stops_at_the_first_non_directive_line(self):
+        text = "role: research\nThis is prose, project: not a directive here.\nMore prose."
+        directives, remaining = canvas_plan._parse_node_directives(text)
+        self.assertEqual(directives, {"role": "research"})
+        self.assertIn("project: not a directive here.", remaining)
+
+    def test_plain_prose_with_no_directives_is_untouched(self):
+        directives, remaining = canvas_plan._parse_node_directives("Run the test suite and report back.")
+        self.assertEqual(directives, {})
+        self.assertEqual(remaining, "Run the test suite and report back.")
+
+    def test_empty_directive_value_is_dropped(self):
+        directives, _ = canvas_plan._parse_node_directives("project:\nrole: implementation\nDo it.")
+        self.assertNotIn("project", directives)
+        self.assertEqual(directives["role"], "implementation")
+
+
+class CompileCanvasDirectiveWiringTests(unittest.TestCase):
+    """WS1: directives must reach the compiled step's inputs, not just get
+    parsed -- this is what actually fixes the confirmed live-test bugs."""
+
+    def test_verification_scope_directive_becomes_args(self):
+        payload = {
+            "nodes": [_node("v", "role: verification\nscope: tests/test_vault_watch.py\nJust this file.", role="verification")],
+            "edges": [],
+        }
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="scope_test")
+        self.assertEqual(workflow["steps"][0]["inputs"]["args"], ["tests/test_vault_watch.py"])
+
+    def test_verification_scope_directive_supports_multiple_comma_separated_paths(self):
+        payload = {
+            "nodes": [
+                _node(
+                    "v",
+                    "role: verification\nscope: tests/test_a.py, tests/test_b.py\nRun both.",
+                    role="verification",
+                )
+            ],
+            "edges": [],
+        }
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="multi_scope")
+        self.assertEqual(workflow["steps"][0]["inputs"]["args"], ["tests/test_a.py", "tests/test_b.py"])
+
+    def test_verification_without_scope_gets_no_args(self):
+        payload = {"nodes": [_node("v", "role: verification\nRun everything.", role="verification")], "edges": []}
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="no_scope")
+        self.assertNotIn("args", workflow["steps"][0]["inputs"])
+
+    def test_implementation_node_level_project_directive_sets_project_id(self):
+        payload = {
+            "nodes": [
+                _node("i", "role: implementation\nproject: mark_platform\nWrite a script.", role="implementation")
+            ],
+            "edges": [],
+        }
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="node_project")
+        self.assertEqual(workflow["steps"][0]["inputs"]["project_id"], "mark_platform")
+
+    def test_implementation_intent_always_forwards_the_stripped_prose(self):
+        payload = {
+            "nodes": [
+                _node(
+                    "i",
+                    "role: implementation\nproject: mark_platform\nWrite a hello world script.",
+                    role="implementation",
+                )
+            ],
+            "edges": [],
+        }
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="intent_test")
+        self.assertEqual(workflow["steps"][0]["inputs"]["intent"], "Write a hello world script.")
+
+    def test_implementation_without_project_directive_gets_no_project_id(self):
+        """Confirms the live-tested gap: no directive, no canvas-level default
+        -- inputs.project_id is simply absent, matching today's safe no-op
+        rather than guessing a target."""
+        payload = {"nodes": [_node("i", "role: implementation\nDo it.", role="implementation")], "edges": []}
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="no_project")
+        self.assertNotIn("project_id", workflow["steps"][0]["inputs"])
+
+    def test_canvas_level_project_from_plan_root_is_inherited(self):
+        payload = {
+            "nodes": [
+                _node("root", "role: plan\nproject: mark_platform\nOverall goal.", role="plan"),
+                _node("i", "role: implementation\nDo the thing.", role="implementation"),
+            ],
+            "edges": [_edge("e1", "root", "i")],
+        }
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="canvas_project")
+        impl_step = next(s for s in workflow["steps"] if s["inputs"]["canvas_role"] == "implementation")
+        self.assertEqual(impl_step["inputs"]["project_id"], "mark_platform")
+
+    def test_node_level_project_overrides_canvas_level(self):
+        payload = {
+            "nodes": [
+                _node("root", "role: plan\nproject: mark_platform\nOverall goal.", role="plan"),
+                _node(
+                    "i",
+                    "role: implementation\nproject: knowledge_compiler_engine\nDo the thing.",
+                    role="implementation",
+                ),
+            ],
+            "edges": [_edge("e1", "root", "i")],
+        }
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="override_project")
+        impl_step = next(s for s in workflow["steps"] if s["inputs"]["canvas_role"] == "implementation")
+        self.assertEqual(impl_step["inputs"]["project_id"], "knowledge_compiler_engine")
+
+    def test_unregistered_node_level_project_is_refused_at_compile_time(self):
+        payload = {
+            "nodes": [
+                _node("i", "role: implementation\nproject: totally_fake_project\nDo it.", role="implementation")
+            ],
+            "edges": [],
+        }
+        with self.assertRaises(canvas_plan.CanvasCompileError):
+            canvas_plan.compile_canvas(payload, workflow_id="bad_project")
+
+    def test_unregistered_canvas_level_project_is_refused_at_compile_time(self):
+        payload = {
+            "nodes": [_node("root", "role: plan\nproject: totally_fake_project\nGoal.", role="plan")],
+            "edges": [],
+        }
+        with self.assertRaises(canvas_plan.CanvasCompileError):
+            canvas_plan.compile_canvas(payload, workflow_id="bad_canvas_project")
+
+    def test_file_directive_reaches_inputs(self):
+        payload = {
+            "nodes": [_node("r", "role: reference\nfile: scratch/notes.md\nSee this file.", role="reference")],
+            "edges": [],
+        }
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="file_test")
+        self.assertEqual(workflow["steps"][0]["inputs"]["file"], "scratch/notes.md")
+
+    def test_recommended_model_directive_is_threaded_through_but_inert(self):
+        payload = {
+            "nodes": [
+                _node(
+                    "i",
+                    "role: implementation\nproject: mark_platform\nrecommended model: developer (openclaw)\nDo it.",
+                    role="implementation",
+                )
+            ],
+            "edges": [],
+        }
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="recommended_model_test")
+        self.assertEqual(workflow["steps"][0]["inputs"]["recommended_model"], "developer (openclaw)")
+        # Inert: it doesn't change the role, target, or any other compiled field.
+        self.assertEqual(workflow["steps"][0]["target"], "project_operator")
+
+
+class PreviewResolvedTargetTests(unittest.TestCase):
+    """WS1: the approval preview must show what will actually run, not just
+    the node's prose -- the exact gap the implementation-node live test
+    found (preview implied a write that could never happen)."""
+
+    def _manifest_item(self, **inputs) -> dict:
+        return {"inputs": inputs}
+
+    def test_verification_with_scope_shows_it(self):
+        item = self._manifest_item(canvas_role="verification", args=["tests/test_foo.py"])
+        self.assertIn("scope: tests/test_foo.py", canvas_plan._resolved_target_summary(item))
+
+    def test_verification_without_scope_warns_full_suite(self):
+        item = self._manifest_item(canvas_role="verification")
+        summary = canvas_plan._resolved_target_summary(item)
+        self.assertIn("no scope", summary.lower())
+        self.assertIn("entire suite", summary.lower())
+
+    def test_implementation_with_project_shows_it(self):
+        item = self._manifest_item(canvas_role="implementation", project_id="mark_platform")
+        self.assertIn("project: mark_platform", canvas_plan._resolved_target_summary(item))
+
+    def test_implementation_without_project_warns_no_write(self):
+        item = self._manifest_item(canvas_role="implementation")
+        summary = canvas_plan._resolved_target_summary(item)
+        self.assertIn("no project target", summary.lower())
+        self.assertIn("will not write", summary.lower())
+
+    def test_recommended_model_is_surfaced_when_present(self):
+        item = self._manifest_item(
+            canvas_role="implementation", project_id="mark_platform", recommended_model="developer (openclaw)"
+        )
+        self.assertIn("recommended model: developer (openclaw)", canvas_plan._resolved_target_summary(item))
+
+    def test_other_roles_render_an_em_dash(self):
+        item = self._manifest_item(canvas_role="research")
+        self.assertEqual(canvas_plan._resolved_target_summary(item), "—")
+
+
 def _cfg(root: Path) -> dict:
     return {"jarvis_notes_root": str(root), "jarvis_canvas_folder": "Canvases/JARVIS"}
 
@@ -548,6 +765,20 @@ class PlanFingerprintTests(unittest.TestCase):
         payload = self._payload()
         before = canvas_plan.plan_fingerprint(payload)
         payload["edges"] = []
+        after = canvas_plan.plan_fingerprint(payload)
+        self.assertNotEqual(before, after)
+
+    def test_directive_only_edit_changes_fingerprint(self):
+        """D2 (2026-07-24 roadmap): editing a directive (e.g. `recommended
+        model:`) must re-trigger approval even if the prose is untouched --
+        'left unedited = accepted, edited = re-assessed' only holds if the
+        fingerprint actually sees the edit."""
+        payload = {
+            "nodes": [_node("a", "role: implementation\nApply.", role="implementation")],
+            "edges": [],
+        }
+        before = canvas_plan.plan_fingerprint(payload)
+        payload["nodes"][0]["text"] = "role: implementation\nrecommended model: developer (openclaw)\nApply."
         after = canvas_plan.plan_fingerprint(payload)
         self.assertNotEqual(before, after)
 
