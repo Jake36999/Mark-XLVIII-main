@@ -1,0 +1,50 @@
+{
+  "nodes": [
+    {
+      "id": "research_speech",
+      "type": "text",
+      "text": "role: research\nMARK currently uses Vosk for local speech-to-text. Briefly research one realistic local alternative or fallback STT engine MARK could add if Vosk fails to load, and name the single most promising option in one sentence.",
+      "x": 0,
+      "y": 0,
+      "width": 420,
+      "height": 200,
+      "jarvisRole": "research"
+    },
+    {
+      "id": "review_gate",
+      "type": "text",
+      "text": "role: review\nReview the research above: is the suggested fallback STT option genuinely realistic for a local-only Windows desktop assistant, or does it require cloud access / heavy new dependencies?",
+      "x": 600,
+      "y": 0,
+      "width": 420,
+      "height": 200,
+      "jarvisRole": "review"
+    },
+    {
+      "id": "followup",
+      "type": "text",
+      "text": "role: research\nGiven the reviewed finding, name in one sentence what would be needed to actually wire this fallback into MARK's existing speech pipeline.",
+      "x": 1200,
+      "y": 0,
+      "width": 420,
+      "height": 200,
+      "jarvisRole": "research"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "fromNode": "research_speech",
+      "toNode": "review_gate",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "e2",
+      "fromNode": "review_gate",
+      "toNode": "followup",
+      "fromSide": "right",
+      "toSide": "left"
+    }
+  ]
+}

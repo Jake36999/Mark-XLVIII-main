@@ -1,0 +1,11 @@
+{
+  "schema_version": "jarvis_run_bundle/v1",
+  "run_id": "plan-capability-test-vram-admission-v1",
+  "plan_id": "plan-capability-test-vram-admission",
+  "plan_version": 1,
+  "plan_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-24-capability-test-vram-admission.md",
+  "approval_projection_hash": "23320268debeb564a930fe8982fd89c147d102428085a3e2f7cef0bec2ebe0c8",
+  "workflow_hash": "e0947ebf00426a6d6cfb5c66c9b6bd555322ff750ab41ecdfecb7fa1db79b5da",
+  "manifest_hash": "84fe2401432741274d9cd48a31cb1f506a3f11d17c73588c29ebde52c79f4405",
+  "created_at": "2026-07-24T01:41:37Z"
+}

@@ -1,0 +1,639 @@
+{
+  "nodes": [
+    {
+      "id": "jarvis-2da69edcc8a7a93d",
+      "type": "file",
+      "file": "Plans/2026-07-24-capability-test-wifi-csi-research.md",
+      "x": 0,
+      "y": 0,
+      "width": 460,
+      "height": 280,
+      "jarvis": {
+        "layout_profile": "plan",
+        "layout_baseline": {
+          "x": 0,
+          "y": 0,
+          "width": 460,
+          "height": 280
+        }
+      }
+    },
+    {
+      "id": "jarvis-cfb89b4d61eede94",
+      "type": "text",
+      "text": "# Capability Test - WiFi CSI Research\n**Status:** pending_review\n**Approval:** pending_review\n**Execution:** not_started\n**Visible tasks:** 17 of 17\n\n> This Canvas is a rolling view. The linked Markdown plan is authoritative.",
+      "x": 580,
+      "y": 0,
+      "width": 420,
+      "height": 230,
+      "color": "4",
+      "jarvis": {
+        "kind": "status",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-24-capability-test-wifi-csi-research.md",
+        "layout_profile": "plan",
+        "layout_baseline": {
+          "x": 580,
+          "y": 0,
+          "width": 420,
+          "height": 230
+        }
+      }
+    },
+    {
+      "id": "jarvis-f5e942dda292323d",
+      "type": "text",
+      "text": "## [ ] **Approve** — execute the plan exactly as compiled.\n\n`plan-capability-test-wifi-csi-research-169`\n\nSource line 169",
+      "x": 1960,
+      "y": 240,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-capability-test-wifi-csi-research-169",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-24-capability-test-wifi-csi-research.md",
+        "source_line": 169,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "53b0be375345da80e38db625263c48ee1cd2df0411158dcda59c7ccb61c4b087",
+        "layout_profile": "plan",
+        "layout_baseline": {
+          "x": 1960,
+          "y": 240,
+          "width": 350,
+          "height": 170
+        }
+      }
+    },
+    {
+      "id": "jarvis-ca8ef431240efb43",
+      "type": "text",
+      "text": "## [ ] **Correct** — the plan needs changes before it can run.\n\n`plan-capability-test-wifi-csi-research-170`\n\nSource line 170",
+      "x": 1540,
+      "y": 480,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-capability-test-wifi-csi-research-170",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-24-capability-test-wifi-csi-research.md",
+        "source_line": 170,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "4a67c8166580939faedc31463e3aac1e19ce5a26e7fa224082cc4ed89e3bfce5",
+        "layout_profile": "plan",
+        "layout_baseline": {
+          "x": 1540,
+          "y": 480,
+          "width": 350,
+          "height": 170
+        }
+      }
+    },
+    {
+      "id": "jarvis-b09e2d803835f52a",
+      "type": "text",
+      "text": "## [ ] **Deny** — do not execute this plan.\n\n`plan-capability-test-wifi-csi-research-171`\n\nSource line 171",
+      "x": 1540,
+      "y": 0,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-capability-test-wifi-csi-research-171",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-24-capability-test-wifi-csi-research.md",
+        "source_line": 171,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "83a9b9f130f3b286bd46a0c135f2fe0b1b57c20425cab7e894379dcf829fc8b7",
+        "layout_profile": "plan",
+        "layout_baseline": {
+          "x": 1540,
+          "y": 0,
+          "width": 350,
+          "height": 170
+        }
+      }
+    },
+    {
+      "id": "jarvis-d3f6f21fe8cd1832",
+      "type": "text",
+      "text": "## [ ] Approval gates are visible.\n\n`plan-capability-test-wifi-csi-research-51`\n\nSource line 51",
+      "x": 2500,
+      "y": 480,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-capability-test-wifi-csi-research-51",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-24-capability-test-wifi-csi-research.md",
+        "source_line": 51,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "3db7d1c8271e1968b421107a5a3799b9eb95a43809b14ae9019d2eae58dbec58",
+        "layout_profile": "plan",
+        "layout_baseline": {
+          "x": 2500,
+          "y": 480,
+          "width": 350,
+          "height": 170
+        }
+      }
+    },
+    {
+      "id": "jarvis-f45d397b1c5893a6",
+      "type": "text",
+      "text": "## [ ] Blockers and design decision points are explicit.\n\n`plan-capability-test-wifi-csi-research-50`\n\nSource line 50",
+      "x": 2970,
+      "y": 240,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-capability-test-wifi-csi-research-50",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-24-capability-test-wifi-csi-research.md",
+        "source_line": 50,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "a8573b37f17db9ab1513b94a5969bda3c5e2bbb887a62db40d13b9286a09adea",
+        "layout_profile": "plan",
+        "layout_baseline": {
+          "x": 2970,
+          "y": 240,
+          "width": 350,
+          "height": 170
+        }
+      }
+    },
+    {
+      "id": "jarvis-d4cb3986e2040bf5",
+      "type": "text",
+      "text": "## [ ] Completion summary requirements are defined.\n\n`plan-capability-test-wifi-csi-research-52`\n\nSource line 52",
+      "x": 1540,
+      "y": 720,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-capability-test-wifi-csi-research-52",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-24-capability-test-wifi-csi-research.md",
+        "source_line": 52,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "cbe70f4bb52360dd35f74bdf79c8821c9d64fd85cc3a27066987ea68c5b8e7f8",
+        "layout_profile": "plan",
+        "layout_baseline": {
+          "x": 1540,
+          "y": 720,
+          "width": 350,
+          "height": 170
+        }
+      }
+    },
+    {
+      "id": "jarvis-15c94c18db88cd43",
+      "type": "text",
+      "text": "## [ ] Destructive actions explicitly confirmed.\n\n`plan-capability-test-wifi-csi-research-122`\n\nSource line 122",
+      "x": 1120,
+      "y": 240,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-capability-test-wifi-csi-research-122",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-24-capability-test-wifi-csi-research.md",
+        "source_line": 122,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "4903cb7a0bc008e68a6c8e757ea67f179875ac29be9ec7a76a1f8315de1f9b87",
+        "layout_profile": "plan",
+        "layout_baseline": {
+          "x": 1120,
+          "y": 240,
+          "width": 350,
+          "height": 170
+        }
+      }
+    },
+    {
+      "id": "jarvis-58e15e5523503068",
+      "type": "text",
+      "text": "## [ ] Execution milestones are ordered.\n\n`plan-capability-test-wifi-csi-research-49`\n\nSource line 49",
+      "x": 1120,
+      "y": 720,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-capability-test-wifi-csi-research-49",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-24-capability-test-wifi-csi-research.md",
+        "source_line": 49,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "7f4c137231ce0641757e8fc62b129a51dcc09af5dc0b6a5309f3a47df7d693e2",
+        "layout_profile": "plan",
+        "layout_baseline": {
+          "x": 1120,
+          "y": 720,
+          "width": 350,
+          "height": 170
+        }
+      }
+    },
+    {
+      "id": "jarvis-e96a571296eae482",
+      "type": "text",
+      "text": "## [ ] High-cost model use approved when needed.\n\n`plan-capability-test-wifi-csi-research-123`\n\nSource line 123",
+      "x": 1540,
+      "y": 960,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-capability-test-wifi-csi-research-123",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-24-capability-test-wifi-csi-research.md",
+        "source_line": 123,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "cb1fbd40ab4f4925cf2414e5b8d39f955bf96b9a3b840c3e307d726d4a4848af",
+        "layout_profile": "plan",
+        "layout_baseline": {
+          "x": 1540,
+          "y": 960,
+          "width": 350,
+          "height": 170
+        }
+      }
+    },
+    {
+      "id": "jarvis-bd47591bbb5c5db9",
+      "type": "text",
+      "text": "## [ ] JARVIS creates a summary or blocker note after execution starts.\n\n`plan-capability-test-wifi-csi-research-131`\n\nSource line 131",
+      "x": 2970,
+      "y": 0,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-capability-test-wifi-csi-research-131",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-24-capability-test-wifi-csi-research.md",
+        "source_line": 131,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "a232ce6cd8ad42a309ed3525be63864bcded4308b38d83145f9e44092f636992",
+        "layout_profile": "plan",
+        "layout_baseline": {
+          "x": 2970,
+          "y": 0,
+          "width": 350,
+          "height": 170
+        }
+      }
+    },
+    {
+      "id": "jarvis-bef9ff1bde316a77",
+      "type": "text",
+      "text": "## [ ] JARVIS updates the plan if the goal changes.\n\n`plan-capability-test-wifi-csi-research-130`\n\nSource line 130",
+      "x": 1540,
+      "y": 240,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-capability-test-wifi-csi-research-130",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-24-capability-test-wifi-csi-research.md",
+        "source_line": 130,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "2968a645bf76ac79ae078b2d974bce4cec26574ef36da21a3782a30d9401c292",
+        "layout_profile": "plan",
+        "layout_baseline": {
+          "x": 1540,
+          "y": 240,
+          "width": 350,
+          "height": 170
+        }
+      }
+    },
+    {
+      "id": "jarvis-6aa4cb8ca3a4754f",
+      "type": "text",
+      "text": "## [ ] Plan approved by user.\n\n`plan-capability-test-wifi-csi-research-121`\n\nSource line 121",
+      "x": 1120,
+      "y": 960,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-capability-test-wifi-csi-research-121",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-24-capability-test-wifi-csi-research.md",
+        "source_line": 121,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "af466f708b8c947dad485e4d7ff17ad6d77749b1e0d0969b1d3b677d55eee78a",
+        "layout_profile": "plan",
+        "layout_baseline": {
+          "x": 1120,
+          "y": 960,
+          "width": 350,
+          "height": 170
+        }
+      }
+    },
+    {
+      "id": "jarvis-3dd74b89d28c11cd",
+      "type": "text",
+      "text": "## [ ] Plan reviewed in Obsidian.\n\n`plan-capability-test-wifi-csi-research-47`\n\nSource line 47",
+      "x": 2500,
+      "y": 0,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-capability-test-wifi-csi-research-47",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-24-capability-test-wifi-csi-research.md",
+        "source_line": 47,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "adae1169b554eb59572186679fb8518d493edd52d059cb194deeb335e7a0dda0",
+        "layout_profile": "plan",
+        "layout_baseline": {
+          "x": 2500,
+          "y": 0,
+          "width": 350,
+          "height": 170
+        }
+      }
+    },
+    {
+      "id": "jarvis-f503cf8754c797ee",
+      "type": "text",
+      "text": "## [ ] Scope and out-of-scope items are clear.\n\n`plan-capability-test-wifi-csi-research-48`\n\nSource line 48",
+      "x": 1960,
+      "y": 0,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-capability-test-wifi-csi-research-48",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-24-capability-test-wifi-csi-research.md",
+        "source_line": 48,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "3438169b8e51a2a2b8c274d8841930ff0abea85f9703b80fdc572f7044aa5d9c",
+        "layout_profile": "plan",
+        "layout_baseline": {
+          "x": 1960,
+          "y": 0,
+          "width": 350,
+          "height": 170
+        }
+      }
+    },
+    {
+      "id": "jarvis-23ec55eca00fab7d",
+      "type": "text",
+      "text": "## [ ] Subagent delegation approved when needed.\n\n`plan-capability-test-wifi-csi-research-124`\n\nSource line 124",
+      "x": 1120,
+      "y": 480,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-capability-test-wifi-csi-research-124",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-24-capability-test-wifi-csi-research.md",
+        "source_line": 124,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "a9ca1fff6403f3766620c83047f90bd3a33782a930ba5b61ee73297d07c127a9",
+        "layout_profile": "plan",
+        "layout_baseline": {
+          "x": 1120,
+          "y": 480,
+          "width": 350,
+          "height": 170
+        }
+      }
+    },
+    {
+      "id": "jarvis-09986f3bcbf44c74",
+      "type": "text",
+      "text": "## [ ] User requests edits or approves execution.\n\n`plan-capability-test-wifi-csi-research-129`\n\nSource line 129",
+      "x": 1120,
+      "y": 0,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-capability-test-wifi-csi-research-129",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-24-capability-test-wifi-csi-research.md",
+        "source_line": 129,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "8babd3bfeeed7cb5348043a77739c48b64ecde547230dd521e0a24f0cce3f6e4",
+        "layout_profile": "plan",
+        "layout_baseline": {
+          "x": 1120,
+          "y": 0,
+          "width": 350,
+          "height": 170
+        }
+      }
+    },
+    {
+      "id": "jarvis-53fc91bd75cc42eb",
+      "type": "text",
+      "text": "## [ ] User reviews this plan in Obsidian.\n\n`plan-capability-test-wifi-csi-research-128`\n\nSource line 128",
+      "x": 2500,
+      "y": 240,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-capability-test-wifi-csi-research-128",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-24-capability-test-wifi-csi-research.md",
+        "source_line": 128,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "848c22a9e1b0205223f112a58ede4c90683cf0f780158f0993ac2321b9054be7",
+        "layout_profile": "plan",
+        "layout_baseline": {
+          "x": 2500,
+          "y": 240,
+          "width": 350,
+          "height": 170
+        }
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "jarvis-1b92102df4836b5b",
+      "fromNode": "jarvis-2da69edcc8a7a93d",
+      "fromSide": "right",
+      "toNode": "jarvis-cfb89b4d61eede94",
+      "toSide": "left",
+      "label": "current state"
+    },
+    {
+      "id": "jarvis-babd9868f9cc6e3d",
+      "fromNode": "jarvis-cfb89b4d61eede94",
+      "fromSide": "right",
+      "toNode": "jarvis-f5e942dda292323d",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-d067902245c18b27",
+      "fromNode": "jarvis-cfb89b4d61eede94",
+      "fromSide": "right",
+      "toNode": "jarvis-ca8ef431240efb43",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-166ba9bdd82b5628",
+      "fromNode": "jarvis-cfb89b4d61eede94",
+      "fromSide": "right",
+      "toNode": "jarvis-b09e2d803835f52a",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-393cb73e78100e5d",
+      "fromNode": "jarvis-cfb89b4d61eede94",
+      "fromSide": "right",
+      "toNode": "jarvis-d3f6f21fe8cd1832",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-d16d7e7088ec73d5",
+      "fromNode": "jarvis-cfb89b4d61eede94",
+      "fromSide": "right",
+      "toNode": "jarvis-f45d397b1c5893a6",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-e96c84ac8c13ffa2",
+      "fromNode": "jarvis-cfb89b4d61eede94",
+      "fromSide": "right",
+      "toNode": "jarvis-d4cb3986e2040bf5",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-54a7940d6583db95",
+      "fromNode": "jarvis-cfb89b4d61eede94",
+      "fromSide": "right",
+      "toNode": "jarvis-15c94c18db88cd43",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-ec1a03a5935690df",
+      "fromNode": "jarvis-cfb89b4d61eede94",
+      "fromSide": "right",
+      "toNode": "jarvis-58e15e5523503068",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-62acd21d70424e75",
+      "fromNode": "jarvis-cfb89b4d61eede94",
+      "fromSide": "right",
+      "toNode": "jarvis-e96a571296eae482",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-ce186e209b541272",
+      "fromNode": "jarvis-cfb89b4d61eede94",
+      "fromSide": "right",
+      "toNode": "jarvis-bd47591bbb5c5db9",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-49a9030bc312ff7d",
+      "fromNode": "jarvis-cfb89b4d61eede94",
+      "fromSide": "right",
+      "toNode": "jarvis-bef9ff1bde316a77",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-711defc040bbce2c",
+      "fromNode": "jarvis-cfb89b4d61eede94",
+      "fromSide": "right",
+      "toNode": "jarvis-6aa4cb8ca3a4754f",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-ab68015714c38986",
+      "fromNode": "jarvis-cfb89b4d61eede94",
+      "fromSide": "right",
+      "toNode": "jarvis-3dd74b89d28c11cd",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-170c2204556b493f",
+      "fromNode": "jarvis-cfb89b4d61eede94",
+      "fromSide": "right",
+      "toNode": "jarvis-f503cf8754c797ee",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-51c9b7763ba02876",
+      "fromNode": "jarvis-cfb89b4d61eede94",
+      "fromSide": "right",
+      "toNode": "jarvis-23ec55eca00fab7d",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-214fa8548c05f95b",
+      "fromNode": "jarvis-cfb89b4d61eede94",
+      "fromSide": "right",
+      "toNode": "jarvis-09986f3bcbf44c74",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-b15f6e63126a6c2c",
+      "fromNode": "jarvis-cfb89b4d61eede94",
+      "fromSide": "right",
+      "toNode": "jarvis-53fc91bd75cc42eb",
+      "toSide": "left"
+    }
+  ],
+  "jarvis": {
+    "view_kind": "plan",
+    "title": "Capability Test - WiFi CSI Research",
+    "source_notes": [
+      "Plans/2026-07-24-capability-test-wifi-csi-research.md"
+    ],
+    "plan_id": "plan-capability-test-wifi-csi-research"
+  }
+}

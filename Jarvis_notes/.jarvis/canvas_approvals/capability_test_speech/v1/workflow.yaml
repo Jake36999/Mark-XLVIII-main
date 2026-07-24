@@ -1,0 +1,72 @@
+schema_version: jarvis_dual_orchestrator/v1
+workflow_id: capability_test_speech
+version: canvas-1
+name: Capability Test - Speech Fallback
+description: Compiled from an Obsidian Canvas graph (Mode 2 planning).
+max_steps: 3
+variables:
+  source: canvas
+  node_step_ids:
+    research_speech: research_speech_36b98e
+    review_gate: review_gate_a88a6c
+    followup: followup_f169ac
+steps:
+- step_id: research_speech_36b98e
+  orchestrator: cognitive
+  step_type: model_reasoning
+  target: reasoning
+  description: MARK currently uses Vosk for local speech-to-text. Briefly research
+    one realistic local alternative or fallback STT engine MARK could add if Vosk
+    fails to load, and name the single most promising option in one sentence.
+  risk_tier: T1
+  side_effects: none
+  depends_on: []
+  inputs:
+    canvas_role: research
+    canvas_node_id: research_speech
+  outputs:
+    result: result.research_speech_36b98e
+  acceptance_criteria:
+    required: true
+- step_id: review_gate_a88a6c
+  orchestrator: cognitive
+  step_type: review
+  target: reviewer
+  description: 'Review the research above: is the suggested fallback STT option genuinely
+    realistic for a local-only Windows desktop assistant, or does it require cloud
+    access / heavy new dependencies?'
+  risk_tier: T1
+  side_effects: none
+  depends_on:
+  - research_speech_36b98e
+  inputs:
+    canvas_role: review
+    canvas_node_id: review_gate
+    evidence:
+    - bind:
+        from_step: research_speech_36b98e
+        path: result.summary
+  outputs:
+    result: result.review_gate_a88a6c
+  acceptance_criteria:
+    required: true
+  retry_policy:
+    safe: true
+    max_attempts: 3
+- step_id: followup_f169ac
+  orchestrator: cognitive
+  step_type: model_reasoning
+  target: reasoning
+  description: Given the reviewed finding, name in one sentence what would be needed
+    to actually wire this fallback into MARK's existing speech pipeline.
+  risk_tier: T1
+  side_effects: none
+  depends_on:
+  - review_gate_a88a6c
+  inputs:
+    canvas_role: research
+    canvas_node_id: followup
+  outputs:
+    result: result.followup_f169ac
+  acceptance_criteria:
+    required: true

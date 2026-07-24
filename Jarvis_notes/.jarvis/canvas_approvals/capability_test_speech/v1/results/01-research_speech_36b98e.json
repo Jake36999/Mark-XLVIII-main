@@ -1,0 +1,59 @@
+{
+  "schema_version": "jarvis_work_result/v1",
+  "run_id": "capability_test_speech-v1",
+  "item_id": "research_speech_36b98e",
+  "verdict": "ESCALATE",
+  "defects": [
+    "reviewer_unavailable:RuntimeError"
+  ],
+  "result": {
+    "ok": true,
+    "text": "A realistic local fallback speech-to-text alternative is Mozilla's DeepSpeech, which offers open-source, on-device speech recognition with decent accuracy and minimal dependencies, making it a promising option when Vosk fails to load.",
+    "summary": "A realistic local fallback speech-to-text alternative is Mozilla's DeepSpeech, which offers open-source, on-device speech recognition with decent accuracy and minimal dependencies, making it a promising option when Vosk fails to load.",
+    "model_provenance": {
+      "provider": "lmstudio",
+      "model": "qwen/qwen3-4b-2507",
+      "role": "worker",
+      "fallback_reason": "",
+      "preferred_model_unavailable": false,
+      "metrics": {
+        "lease_id": "5e26329aac9f4fe59c5148d22a7e026e",
+        "instance_id": "qwen/qwen3-4b-2507",
+        "route": "reasoning",
+        "queue_wait_seconds": 0.0,
+        "load_time_seconds": null,
+        "streaming": false,
+        "duration_seconds": 3.656,
+        "completion_tokens": 44,
+        "tokens_per_second": 12.035,
+        "first_token_seconds": null,
+        "finish_reason": "stop",
+        "reasoning_tokens": 0
+      },
+      "recorded_at": 1784857661.4351954
+    }
+  },
+  "model_provenance": {
+    "provider": "lmstudio",
+    "model": "qwen/qwen3-4b-2507",
+    "role": "worker",
+    "fallback_reason": "",
+    "preferred_model_unavailable": false,
+    "metrics": {
+      "lease_id": "5e26329aac9f4fe59c5148d22a7e026e",
+      "instance_id": "qwen/qwen3-4b-2507",
+      "route": "reasoning",
+      "queue_wait_seconds": 0.0,
+      "load_time_seconds": null,
+      "streaming": false,
+      "duration_seconds": 3.656,
+      "completion_tokens": 44,
+      "tokens_per_second": 12.035,
+      "first_token_seconds": null,
+      "finish_reason": "stop",
+      "reasoning_tokens": 0
+    },
+    "recorded_at": 1784857661.4351954
+  },
+  "completed_at": "2026-07-24T01:49:51Z"
+}

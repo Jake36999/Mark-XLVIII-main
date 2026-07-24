@@ -1,0 +1,26 @@
+{
+  "frontmatter": {
+    "id": "plan-capability-test-wifi-csi-research",
+    "title": "Capability Test - WiFi CSI Research",
+    "type": "plan",
+    "workflow_id": "long_form_plan_execution",
+    "plan_version": 1,
+    "original_prompt": "Research WiFi CSI-based presence and room-occupancy detection approaches for a local always-on assistant, and write a report with cited sources on the best current options.",
+    "agent_permission": "propose",
+    "decision_gates": []
+  },
+  "sections": {
+    "Summary": "> [!abstract] Plan summary\n> Draft long-form plan for: Research WiFi CSI-based presence and room-occupancy detection approaches for a local alway.\n\nThis plan is pending user review. It was generated from 5 local context result(s) and 5 cited web source(s).",
+    "Desired Outcome": "> [!success] Desired outcome\n> A reviewed, executable plan with clear scope, milestones, gates, and summary expectations.",
+    "Definition Of Done": "- [ ] Plan reviewed in Obsidian.\n- [ ] Scope and out-of-scope items are clear.\n- [ ] Execution milestones are ordered.\n- [ ] Blockers and design decision points are explicit.\n- [ ] Approval gates are visible.\n- [ ] Completion summary requirements are defined.",
+    "Scope": "### In scope\n\n- Read-only research and context gathering.\n- Plan, task, workflow, and delegation design.\n- Vault note creation and local RAG indexing.\n- Gated execution after user approval.\n\n### Out of scope\n\n- Destructive actions without confirmation.\n- Heavy compute jobs without explicit approval.\n- Treating generated plans as final user decisions.",
+    "Task Ownership Assessment": "> [!note] Ownership assessment\n> No canonical Markdown task note was supplied for read-only classification.",
+    "Milestones": "| Milestone | Owner | Status | Evidence |\n| --- | --- | --- | --- |\n| Research and context | JARVIS/User | Not started | |\n| Plan review | JARVIS/User | Not started | |\n| Approved execution | JARVIS/User | Not started | |\n| Validation | JARVIS/User | Not started | |\n| Summary and handoff | JARVIS/User | Not started | |",
+    "Workflow Plan": "1. Delegate the approved development objective to OpenClaw in the registered project: Research WiFi CSI-based presence and room-occupancy detection approaches for a local always-on assistant, and write a report with cited sources on the best current options.\n2. Review the OpenClaw result against the approved scope, tests, and completion criteria.\n3. Record project artifacts, test evidence, blockers, and reproduction instructions in the vault.",
+    "Decision Points": "- Which parts of the plan are in scope for automated execution?\n- Which project or folder is authoritative for implementation work?\n- Which tasks require local-only models, high-tier models, or human review?\n- What should stop execution and return to the user?",
+    "Approval Gates": "> [!danger] Stop before\n> Delete, overwrite, move, broad refactors, browser submissions, purchases, account changes, heavy compute jobs, or multi-agent delegation.\n\n- [ ] Plan approved by user.\n- [ ] Destructive actions explicitly confirmed.\n- [ ] High-cost model use approved when needed.\n- [ ] Subagent delegation approved when needed.",
+    "Executable Work Items": "| ID | Sequence | Action | Target | Risk | Side effects | Depends on |\n| --- | ---: | --- | --- | --- | --- | --- |\n| p01 | 1 | Delegate the approved development objective to OpenClaw in the registered project: Research WiFi CSI-based presence and room-occupancy detection approaches for a local always-on assistant, and write a report with cited sources on the best current options | `registered_project_required` | T1 | none | none |\n| p02 | 2 | Review the OpenClaw result against the approved scope, tests, and completion criteria | `local_worker` | T1 | none | p01 |\n| p03 | 3 | Record project artifacts, test evidence, blockers, and reproduction instructions in the vault | `vault_create_note` | T2 | local_write | p02 |\n\n> [!warning] Approval boundary\n> Only the IDs shown in this table may be dispatched. New child work requires a visible plan revision and renewed approval.",
+    "Next Actions": "- [ ] User reviews this plan in Obsidian.\n- [ ] User requests edits or approves execution.\n- [ ] JARVIS updates the plan if the goal changes.\n- [ ] JARVIS creates a summary or blocker note after execution starts.",
+    "Revision Request": ""
+  }
+}

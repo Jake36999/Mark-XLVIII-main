@@ -164,6 +164,17 @@ class VaultWatcher:
                 baseline_vault(self.root)
                 activity = {"ok": True, "event_ids": [], "changed_paths": [], "deleted_paths": []}
 
+            if not startup and activity.get("changed_paths"):
+                # Skipped on startup reconciliation: a box left checked from a
+                # prior session should not make MARK start talking the moment
+                # it boots. Failures here must never break vault reindexing.
+                try:
+                    from actions.tts_read_trigger import check_tts_read_triggers
+
+                    check_tts_read_triggers(activity.get("changed_paths") or [])
+                except Exception:
+                    pass
+
             if activity.get("changed_paths") or activity.get("deleted_paths"):
                 result = reindex_paths_local(
                     activity.get("changed_paths") or [],

@@ -1,0 +1,118 @@
+{
+  "created_at": "2026-07-24T01:47:35Z",
+  "items": [
+    {
+      "acceptance_criteria": {
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [],
+      "description": "MARK currently uses Vosk for local speech-to-text. Briefly research one realistic local alternative or fallback STT engine MARK could add if Vosk fails to load, and name the single most promising option in one sentence.",
+      "id": "research_speech_36b98e",
+      "idempotency_key": "959b2f4ea29c05a03f9bad459e7bff29ab83af65f418bbb8249812e2bc71b4d7",
+      "inputs": {
+        "canvas_node_id": "research_speech",
+        "canvas_role": "research"
+      },
+      "max_attempts": 1,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "cognitive",
+      "outputs": {
+        "result": "result.research_speech_36b98e"
+      },
+      "required_outputs": [],
+      "requires_confirmation": false,
+      "resource_class": "model",
+      "retry_safe": true,
+      "risk_tier": "T1",
+      "sequence": 1,
+      "side_effects": "none",
+      "step_type": "model_reasoning",
+      "target": "reasoning"
+    },
+    {
+      "acceptance_criteria": {
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [
+        "research_speech_36b98e"
+      ],
+      "description": "Review the research above: is the suggested fallback STT option genuinely realistic for a local-only Windows desktop assistant, or does it require cloud access / heavy new dependencies?",
+      "id": "review_gate_a88a6c",
+      "idempotency_key": "146c924a0ed6aa9ef00cd7f61386fccf5b7a2e69524a30190e2c407ec3e2c3b5",
+      "inputs": {
+        "canvas_node_id": "review_gate",
+        "canvas_role": "review",
+        "evidence": [
+          {
+            "bind": {
+              "from_step": "research_speech_36b98e",
+              "path": "result.summary"
+            }
+          }
+        ]
+      },
+      "max_attempts": 3,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "cognitive",
+      "outputs": {
+        "result": "result.review_gate_a88a6c"
+      },
+      "required_outputs": [],
+      "requires_confirmation": false,
+      "resource_class": "model",
+      "retry_safe": true,
+      "risk_tier": "T1",
+      "sequence": 2,
+      "side_effects": "none",
+      "step_type": "review",
+      "target": "reviewer"
+    },
+    {
+      "acceptance_criteria": {
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [
+        "review_gate_a88a6c"
+      ],
+      "description": "Given the reviewed finding, name in one sentence what would be needed to actually wire this fallback into MARK's existing speech pipeline.",
+      "id": "followup_f169ac",
+      "idempotency_key": "06ad313e7d864da820908f9a51310da1868c4da492c850b22bf9f7bec6fd4117",
+      "inputs": {
+        "canvas_node_id": "followup",
+        "canvas_role": "research"
+      },
+      "max_attempts": 1,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "cognitive",
+      "outputs": {
+        "result": "result.followup_f169ac"
+      },
+      "required_outputs": [],
+      "requires_confirmation": false,
+      "resource_class": "model",
+      "retry_safe": true,
+      "risk_tier": "T1",
+      "sequence": 3,
+      "side_effects": "none",
+      "step_type": "model_reasoning",
+      "target": "reasoning"
+    }
+  ],
+  "manifest_hash": "63fb340f3d2f042e9498968a357ee93bdd2b17a6796b8e2ddb2f4ce4de3058f8",
+  "preflight": {
+    "checked_at": "2026-07-24T01:47:35Z",
+    "checks": [],
+    "ok": true
+  },
+  "preview_only": false,
+  "schema_version": "jarvis_work_manifest/v1",
+  "workflow_hash": "29fd34add706da6ef4695485fd2ca4e7e47586538dba5ff8ce3ac8a2df7a07a0",
+  "workflow_id": "capability_test_speech",
+  "workflow_version": "canvas-1"
+}

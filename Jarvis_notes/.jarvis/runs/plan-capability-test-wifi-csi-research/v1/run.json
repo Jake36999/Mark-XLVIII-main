@@ -1,0 +1,11 @@
+{
+  "schema_version": "jarvis_run_bundle/v1",
+  "run_id": "plan-capability-test-wifi-csi-research-v1",
+  "plan_id": "plan-capability-test-wifi-csi-research",
+  "plan_version": 1,
+  "plan_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-24-capability-test-wifi-csi-research.md",
+  "approval_projection_hash": "9271dddbbeaee0fb113f63321a236feddd8479c1e053cdf1c132fffea9d17b6c",
+  "workflow_hash": "0b2b069bcf2f760dd474fe2ca75ef8efac1502c0a7b7a80335ab1100afec5c54",
+  "manifest_hash": "aeabd520e806fb98131ab068fbd7bd1736058be5268907c85ba2a833f5dd067e",
+  "created_at": "2026-07-24T01:43:32Z"
+}
