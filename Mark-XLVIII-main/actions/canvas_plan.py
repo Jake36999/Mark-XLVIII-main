@@ -1393,3 +1393,60 @@ def execute_canvas_plan(
         "execution_state": execution_state,
         "run_status": run_status,
     }
+
+
+def canvas_plan(
+    parameters: dict[str, Any] | None = None,
+    response=None,
+    player=None,
+    session_memory=None,
+    speak=None,
+) -> str:
+    """The tool-dispatcher entry point for Mode 2 (Canvas) planning.
+
+    Exposes the lifecycle already built and tested as plain functions:
+    `propose` -> `propose_canvas_plan`, `evaluate_approval` -> `evaluate_canvas_approval`,
+    `verify_approval` -> `verify_canvas_plan_approval`, `execute` -> `execute_canvas_plan`.
+    This function only routes; every safety property (least-privileged role
+    defaults, the drift-immune approval fingerprint, the human review gate, the
+    frozen-bundle execution contract) lives in those functions already and is
+    unchanged by being reachable through the dispatcher.
+    """
+    from core.process_events import emit_process_event
+
+    params = dict(parameters or {})
+    cfg = params.pop("_config", None)
+    operation = str(params.get("operation") or "health").strip().lower()
+    note_path = str(params.get("note_path") or params.get("path") or "")
+    canvas_path = str(params.get("canvas_path") or params.get("path") or "")
+    try:
+        emit_process_event(
+            category="canvas_plan", source="canvas_plan", summary=f"Canvas plan operation {operation} started.", state="running"
+        )
+        if operation == "health":
+            result = {"ok": True, "operation": "health"}
+        elif operation == "propose":
+            result = propose_canvas_plan(
+                canvas_path,
+                workflow_id=params.get("workflow_id") or None,
+                name=params.get("name") or None,
+                cfg=cfg,
+            )
+        elif operation == "evaluate_approval":
+            result = evaluate_canvas_approval(note_path, cfg=cfg)
+        elif operation == "verify_approval":
+            result = verify_canvas_plan_approval(note_path, cfg=cfg)
+        elif operation == "execute":
+            result = execute_canvas_plan(note_path, cfg=cfg, worker_id=str(params.get("worker_id") or "canvas-plan-driver"))
+        else:
+            result = {"ok": False, "error": f"Unknown canvas_plan operation: {operation}"}
+    except Exception as exc:
+        result = {"ok": False, "operation": operation, "error": str(exc)}
+    emit_process_event(
+        category="canvas_plan",
+        source="canvas_plan",
+        summary=f"Canvas plan operation {operation} " + ("completed." if result.get("ok") else "did not complete."),
+        state="completed" if result.get("ok") else "failed",
+        severity="info" if result.get("ok") else "warning",
+    )
+    return json.dumps(result, ensure_ascii=False, indent=2)

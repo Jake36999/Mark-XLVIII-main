@@ -1123,5 +1123,58 @@ class ExecuteCanvasPlanTests(unittest.TestCase):
             self.assertEqual(doc_note_count(), 3)
 
 
+class CanvasPlanDispatcherTests(unittest.TestCase):
+    """The tool-dispatcher entry point: pure routing onto the tested functions."""
+
+    def _payload(self) -> dict:
+        return {
+            "nodes": [
+                _node("a", "role: research\nInvestigate.", role="research"),
+                _node("b", "role: implementation\nApply.", role="implementation"),
+            ],
+            "edges": [_edge("e1", "a", "b")],
+        }
+
+    def test_health(self):
+        payload = json.loads(canvas_plan.canvas_plan({"operation": "health"}))
+        self.assertTrue(payload["ok"])
+
+    def test_unknown_operation_is_refused(self):
+        payload = json.loads(canvas_plan.canvas_plan({"operation": "not_a_real_operation"}))
+        self.assertFalse(payload["ok"])
+        self.assertIn("Unknown canvas_plan operation", payload["error"])
+
+    def test_propose_and_evaluate_approval_through_the_dispatcher(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            cfg = _cfg(root)
+            path = root / "Canvases" / "JARVIS" / "plan.canvas"
+            canvas.write_canvas(path, self._payload())
+
+            proposed = json.loads(
+                canvas_plan.canvas_plan(
+                    {"operation": "propose", "canvas_path": str(path), "workflow_id": "dispatch", "name": "Dispatch", "_config": cfg}
+                )
+            )
+            self.assertTrue(proposed["ok"])
+            note_path = proposed["note_path"]
+            _check_option(Path(note_path), "Approve")
+
+            evaluated = json.loads(
+                canvas_plan.canvas_plan({"operation": "evaluate_approval", "note_path": note_path, "_config": cfg})
+            )
+            self.assertTrue(evaluated["ok"])
+            self.assertEqual(evaluated["status"], "approved")
+
+            verified = json.loads(
+                canvas_plan.canvas_plan({"operation": "verify_approval", "note_path": note_path, "_config": cfg})
+            )
+            self.assertTrue(verified["ok"])
+
+    def test_missing_note_path_is_a_clean_error_not_a_crash(self):
+        payload = json.loads(canvas_plan.canvas_plan({"operation": "evaluate_approval", "_config": {}}))
+        self.assertFalse(payload["ok"])
+
+
 if __name__ == "__main__":
     unittest.main()
