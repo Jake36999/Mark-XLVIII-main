@@ -96,6 +96,19 @@ _ROLE_SPECS: dict[str, dict[str, Any]] = {
         # OpenClaw isolation is only reached via project_operator's delegate_openclaw
         # operation (the `openclaw` resource class); a plain command step would land
         # in the wrong class and bypass the sandbox the plan's security note requires.
+        #
+        # CONFIRMED LIVE (2026-07-24, see the canvas-implementation-node live test in
+        # Jarvis_notes): this step never actually reaches delegate_openclaw. Nothing
+        # here (or in compile_canvas below) sets `project_id`, and project_operator()
+        # treats a missing project_id as `operation=list` and returns the registered
+        # project list -- a harmless but silent no-op that reports ok:true. The node's
+        # authored instruction is never forwarded as `intent`/`task` either, so even a
+        # correctly-targeted call would arrive with an empty task. A real fix needs a
+        # deliberate design decision (e.g. a `project:` canvas directive mirroring
+        # `role:`/`type:`) rather than a default project_id here -- defaulting this to
+        # e.g. this codebase's own project id would silently authorise OpenClaw to
+        # write to the live repo the moment a human approves the plan, which is a much
+        # bigger blast-radius change than the current no-op and needs its own sign-off.
         "orchestrator": "deterministic",
         "step_type": "tool",
         "target": "project_operator",

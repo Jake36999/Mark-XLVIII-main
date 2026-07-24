@@ -692,6 +692,62 @@ class RouterModeSttRecoveryTests(unittest.IsolatedAsyncioTestCase):
         jarvis.ui.write_log.assert_called_once()
         sleep.assert_awaited_once_with(1.0)
 
+    async def test_router_stt_dedupes_identical_errors_once_backoff_hits_ceiling(self):
+        """An unplugged mic used to log two lines every retry cycle forever.
+
+        Backoff ramps 1/2/4/8/15s then holds at the 15s ceiling; once there,
+        an unchanged error should log only every 20th cycle instead of every
+        cycle, so the activity log doesn't flood indefinitely.
+        """
+        import main
+
+        jarvis = main.JarvisLive.__new__(main.JarvisLive)
+        jarvis.ui = mock.Mock()
+        jarvis.ui.muted = False
+        jarvis._reset_router_stt = mock.Mock()
+        same_error = TimeoutError("no microphone audio callbacks for 18s")
+        jarvis._listen_router_stt_once = mock.AsyncMock(
+            side_effect=[same_error] * 24 + [asyncio.CancelledError()]
+        )
+
+        async def fake_sleep(_seconds):
+            return None
+
+        with mock.patch("main.sd", object()), mock.patch("asyncio.sleep", side_effect=fake_sleep):
+            with self.assertRaises(asyncio.CancelledError):
+                await jarvis._listen_router_stt()
+
+        self.assertEqual(jarvis._listen_router_stt_once.await_count, 25)
+        # 4 logs while backoff ramps (1/2/4/8s) + 1 more at the 20th ceiling repeat.
+        self.assertEqual(jarvis.ui.write_log.call_count, 5)
+
+    async def test_router_stt_logs_immediately_when_the_error_changes_at_ceiling(self):
+        import main
+
+        jarvis = main.JarvisLive.__new__(main.JarvisLive)
+        jarvis.ui = mock.Mock()
+        jarvis.ui.muted = False
+        jarvis._reset_router_stt = mock.Mock()
+        jarvis._listen_router_stt_once = mock.AsyncMock(
+            side_effect=(
+                [TimeoutError("no microphone audio callbacks for 18s")] * 5
+                + [OSError("Error querying device -1")]
+                + [asyncio.CancelledError()]
+            )
+        )
+
+        async def fake_sleep(_seconds):
+            return None
+
+        with mock.patch("main.sd", object()), mock.patch("asyncio.sleep", side_effect=fake_sleep):
+            with self.assertRaises(asyncio.CancelledError):
+                await jarvis._listen_router_stt()
+
+        # 4 logs during ramp-up (backoff 1/2/4/8s), the 5th call lands at the 15s
+        # ceiling with an unchanged message so it's suppressed, then the error
+        # changes on the 6th call and logs immediately despite still being at ceiling.
+        self.assertEqual(jarvis.ui.write_log.call_count, 5)
+
 
 class InputDeviceSelectionTests(unittest.TestCase):
     def test_named_input_prefers_wasapi_over_mme(self):

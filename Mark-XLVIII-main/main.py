@@ -141,12 +141,21 @@ def _build_tool_summary_prompt(user_text: str, tool_results: list[dict]) -> str:
             "read by the scout from Markdown notes indexed by the vault RAG service."
         ),
     )
+    tools_called = ", ".join(dict.fromkeys(str(item.get("tool") or "unknown") for item in tool_results)) or "none"
     return (
         "The user asked:\n"
         f"{user_text}\n\n"
         f"{block}\n\n"
+        f"Tools actually called this turn: {tools_called}. No other tool ran — in particular, "
+        "no test suite, build, or code-verification step ran unless one of the tools above is a "
+        "test runner and its result explicitly contains a pass/fail outcome. "
         "Answer the user concisely in English. Mention confirmation gates, blocked actions, "
-        "or failed tools only when they are actually present in the tool results."
+        "or failed tools only when they are actually present in the tool results. Never state "
+        "that a test suite passed, a build succeeded, or a confirmation/completion gate was "
+        "satisfied unless the tool result above explicitly contains that specific outcome — a "
+        "generic 'ok: true' status on an unrelated operation is not evidence of that. If the "
+        "tools called do not actually address what the user asked, say so plainly instead of "
+        "inferring success."
     )
 
 
@@ -456,7 +465,13 @@ TOOL_DECLARATIONS = [
     },
     {
         "name": "code_helper",
-        "description": "Writes, edits, explains, runs, or builds code files.",
+        "description": (
+            "Writes, edits, explains, runs, or builds code files. To run or check a specific "
+            "test file (e.g. \"run tests/test_foo.py\", \"confirm this test file passes\"), use "
+            "action=run with file_path set to that test file — it executes the file directly and "
+            "returns real pass/fail output. project_operator does not run tests; do not use it for "
+            "test-running requests."
+        ),
         "parameters": {
             "type": "OBJECT",
             "properties": {
@@ -492,7 +507,10 @@ TOOL_DECLARATIONS = [
             "Operates the user's registered development projects through the Mark/Aletheia control plane. "
             "Use this for project status, scouting, read-only repository learning, handoffs, code maps, safe checks, and gated operator actions. "
             "Projects: quantule_mapper, knowledge_compiler_engine, mark_platform, network_management. "
-            "Do not use code_helper or dev_agent for these existing projects unless the user asks for direct coding."
+            "Do not use code_helper or dev_agent for these existing projects unless the user asks for direct coding. "
+            "This does NOT run or verify a test suite, pytest, or a build for any project — no operation here executes "
+            "tests. If the user asks to run or confirm tests, do not call this tool as a substitute; state plainly "
+            "that no test-running capability is available from chat for that request."
         ),
         "parameters": {
             "type": "OBJECT",
@@ -2719,15 +2737,27 @@ class JarvisLive:
             self.ui.write_log("STT: sounddevice unavailable; microphone input disabled.")
             return
         backoff = 1.0
+        last_logged_message = ""
+        ceiling_repeats = 0
         while True:
             try:
                 await self._listen_router_stt_once()
                 backoff = 1.0
+                last_logged_message = ""
+                ceiling_repeats = 0
             except asyncio.CancelledError:
                 raise
             except Exception as exc:
                 message = str(exc)[:160] or type(exc).__name__
-                self.ui.write_log(f"STT: Microphone stream interrupted - {message}. Retrying in {backoff:.0f}s.")
+                at_ceiling = backoff >= 15.0
+                repeat = at_ceiling and message == last_logged_message
+                ceiling_repeats = ceiling_repeats + 1 if repeat else 0
+                # Once retries settle at the ceiling with an unchanged error (e.g. no
+                # mic ever plugged in), log every 20th cycle (~5 min) instead of every
+                # 15s -- still visible in the activity log without flooding it forever.
+                if not repeat or ceiling_repeats % 20 == 0:
+                    self.ui.write_log(f"STT: Microphone stream interrupted - {message}. Retrying in {backoff:.0f}s.")
+                last_logged_message = message
                 print(f"[JARVIS] Router STT mic restart after error: {exc}")
                 try:
                     self._reset_router_stt()
@@ -2838,7 +2868,9 @@ class JarvisLive:
         except asyncio.CancelledError:
             raise
         except Exception as exc:
-            self.ui.write_log(f"STT: Microphone stream unavailable - {str(exc)[:160]}")
+            # No separate write_log here: _listen_router_stt's retry wrapper logs
+            # this same exception (with a more useful retry countdown) once it's
+            # re-raised, and de-duplicates repeats itself once backoff settles.
             print(f"[JARVIS] Router STT mic error: {exc}")
             raise
 

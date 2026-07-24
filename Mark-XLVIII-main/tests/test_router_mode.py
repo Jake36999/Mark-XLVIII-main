@@ -668,6 +668,48 @@ class RouterToolCallingTests(unittest.TestCase):
         jarvis.ui.write_log.assert_any_call("TOOL: plan_workflow")
 
 
+class ToolSummaryGroundingTests(unittest.TestCase):
+    """Regression coverage for a live-tested finding: a chat request to run a
+    specific test file got routed to project_operator (an unrelated project's
+    generic status), and the summary step then fabricated a 'test suite passed,
+    proceeding with feature closure' narrative from that status. The prompt must
+    name exactly which tools ran and explicitly forbid claiming a test/build/gate
+    outcome that isn't actually present in the tool result."""
+
+    def test_summary_prompt_lists_the_tools_actually_called(self):
+        import main
+
+        prompt = main._build_tool_summary_prompt(
+            "Run the tests and confirm this feature is done.",
+            [{"tool": "project_operator", "arguments": {}, "result": '{"ok": true}'}],
+        )
+
+        self.assertIn("Tools actually called this turn: project_operator", prompt)
+
+    def test_summary_prompt_forbids_unfounded_test_or_gate_claims(self):
+        import main
+
+        prompt = main._build_tool_summary_prompt("Run the tests.", [])
+
+        self.assertIn("Tools actually called this turn: none", prompt)
+        self.assertIn("Never state", prompt)
+        self.assertIn("test suite", prompt.lower())
+
+    def test_summary_prompt_dedupes_repeated_tool_names(self):
+        import main
+
+        prompt = main._build_tool_summary_prompt(
+            "Do a thing twice.",
+            [
+                {"tool": "project_operator", "arguments": {}, "result": "{}"},
+                {"tool": "project_operator", "arguments": {}, "result": "{}"},
+            ],
+        )
+
+        self.assertIn("Tools actually called this turn: project_operator", prompt)
+        self.assertNotIn("project_operator, project_operator", prompt)
+
+
 class RepositoryLearningRouterTests(unittest.TestCase):
     def test_repository_learning_routes_before_generic_topic_learning(self):
         import main

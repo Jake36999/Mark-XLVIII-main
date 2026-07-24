@@ -39,6 +39,7 @@
 - **Why dedicated:** progressive disclosure already narrows this; a small selector could replace part of the planner's tool-routing for common requests, cheaply and fast.
 - **Signal already present:** `main.py` hard-routing tables + every successful tool dispatch (request → tool → outcome) in the run history.
 - **Confidence:** medium-high. Bounded label set (the registered tool list), lots of dispatch history.
+- **2026-07-24 update:** a live, owner-run test caught a concrete failure of exactly this kind — "run the test suite and confirm tests/test_tts_read_trigger.py passes" matched the `_router_tool_names_for_text` keyword rule for `("test", "build", ...)`, which offers `code_helper`, `dev_agent`, and `project_operator` as candidates. The model picked `project_operator` against an unrelated registered project and returned a generic status; `code_helper`'s `action=run` was the correct choice and was available in the same candidate set. Hardened the two tools' descriptions as a cheap mitigation (see `Jarvis_notes/Validation/2026-07-24-canvas-node-live-test-and-hardening.md`), but the underlying selection is still keyword-based, not learned — this is now a labeled (prompt → wrong tool chosen → correct tool available) example worth keeping if this is ever built.
 
 ---
 
@@ -55,6 +56,7 @@
 - **Why dedicated:** the live test captured two real instances of exactly this failure mode in one session — a JSON parse error during evidence normalization (graceful deterministic fallback) and a transient `RuntimeError` from the independent-reviewer role (worked fine calling the same role again in isolation seconds later). Right now both are handled by a blanket escalate/fallback with no attempt to distinguish "will probably work on retry" from "will not."
 - **Signal already present:** the two captured failures above are the first literal labeled examples (failure text + immediate-retry outcome). Worth preserving verbatim if this is ever built.
 - **Confidence:** medium — only two data points so far; the pattern is real but the dataset doesn't exist yet.
+- **2026-07-24 update:** a third occurrence, in a third distinct context — the canvas implementation-node live test hit `reviewer_unavailable:RuntimeError` on `_default_model_review`'s independent-review call for all 3 test items (see `Jarvis_notes/Validation/2026-07-24-canvas-node-live-test-and-hardening.md`). Same failure shape as the two prior instances (transient, role-agnostic, not reproduced on a bare retry in isolation elsewhere in the same session). Three independent occurrences across three different roles/sessions is a real pattern, not noise — worth raising this candidate's priority over the other still-medium-confidence entries.
 
 ### 8. Citation-format normalizer
 - **Task:** normalize a model's own citation references (`file:x` vs `[file:x]`, near-duplicate URLs, bare non-file tokens like a stray `git`) into the canonical form the quality gate expects, before validation runs.

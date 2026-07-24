@@ -225,14 +225,20 @@ class _SysMetrics:
         self._last_net   = nc
         self._last_net_t = now
 
-        gpu = self._get_gpu()
-
-        tmp = self._get_temp()
-
+        # Publish the cheap, always-fast psutil metrics before touching the GPU/
+        # temperature sensors below: those go through pynvml/wmi/ctypes, which can
+        # slow down or stall under heavy GPU load (e.g. local model inference) —
+        # if that happens, CPU/MEM/NET should keep updating live instead of the
+        # whole sys-monitor panel appearing frozen until the sensor call returns.
         with self._lock:
             self.cpu = cpu
             self.mem = mem
             self.net = net
+
+        gpu = self._get_gpu()
+        tmp = self._get_temp()
+
+        with self._lock:
             self.gpu = gpu
             self.tmp = tmp
 
