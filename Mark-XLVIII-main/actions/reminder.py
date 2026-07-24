@@ -1,4 +1,6 @@
 import json
+import csv
+import io
 import os
 import platform
 import shutil
@@ -6,6 +8,7 @@ import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
+from core.runtime_config import load_runtime_config
 
 _CNW: dict = (
     {"creationflags": subprocess.CREATE_NO_WINDOW}
@@ -19,13 +22,7 @@ def _base_dir() -> Path:
 
 
 def _get_os() -> str:
-    try:
-        cfg = json.loads(
-            (_base_dir() / "config" / "api_keys.json").read_text(encoding="utf-8")
-        )
-        return cfg.get("os_system", "windows").lower()
-    except Exception:
-        return "windows"
+    return str(load_runtime_config().get("os_system") or "windows").lower()
 
 
 def _scripts_dir() -> Path:
@@ -285,12 +282,75 @@ def _schedule_linux(target_dt: datetime, task_name: str,
     print("[Reminder] ❌ Neither systemd-run nor at found on this Linux system.")
     return ""
 
+
+def _valid_task_name(value: str) -> str:
+    task_name = str(value or "").strip().lstrip("\\")
+    if not task_name.startswith("JARVISReminder_") or not all(char.isalnum() or char == "_" for char in task_name):
+        return ""
+    return task_name
+
+
+def _cancel_reminder(task_name: str, os_name: str) -> str:
+    task_name = _valid_task_name(task_name)
+    if not task_name:
+        return "A valid JARVIS reminder ID is required."
+    if os_name == "windows":
+        result = subprocess.run(
+            ["schtasks", "/Delete", "/TN", task_name, "/F"],
+            capture_output=True,
+            text=True,
+            **_CNW,
+        )
+        if result.returncode != 0:
+            detail = (result.stderr or result.stdout).strip()
+            return f"Could not cancel reminder {task_name}: {detail}"
+    elif os_name == "mac":
+        label = f"com.jarvis.reminder.{task_name}"
+        plist = Path.home() / "Library" / "LaunchAgents" / f"{label}.plist"
+        subprocess.run(["launchctl", "unload", str(plist)], capture_output=True, text=True)
+        plist.unlink(missing_ok=True)
+    else:
+        subprocess.run(["systemctl", "--user", "stop", f"{task_name}.timer"], capture_output=True, text=True)
+        subprocess.run(["systemctl", "--user", "reset-failed", task_name], capture_output=True, text=True)
+    (_scripts_dir() / f"{task_name}.py").unlink(missing_ok=True)
+    return f"Reminder cancelled: {task_name}."
+
+
+def _list_reminders(os_name: str) -> str:
+    if os_name == "windows":
+        result = subprocess.run(
+            ["schtasks", "/Query", "/FO", "CSV", "/NH"],
+            capture_output=True,
+            text=True,
+            **_CNW,
+        )
+        if result.returncode != 0:
+            return f"Could not list reminders: {(result.stderr or result.stdout).strip()}"
+        found = []
+        for row in csv.reader(io.StringIO(result.stdout)):
+            if row and "JARVISReminder_" in row[0]:
+                found.append(row[0].lstrip("\\"))
+    else:
+        found = sorted(path.stem for path in _scripts_dir().glob("JARVISReminder_*.py"))
+    if not found:
+        return "No active JARVIS reminders."
+    return "Active JARVIS reminders:\n" + "\n".join(f"- {item}" for item in sorted(set(found)))
+
 def reminder(
     parameters: dict,
     response=None,
     player=None,
     session_memory=None,
 ) -> str:
+
+    operation = str(parameters.get("operation") or parameters.get("action") or "create").strip().lower()
+    os_name = _get_os()
+    if operation in {"cancel", "delete", "remove"}:
+        return _cancel_reminder(str(parameters.get("task_name") or parameters.get("reminder_id") or ""), os_name)
+    if operation in {"list", "status"}:
+        return _list_reminders(os_name)
+    if operation not in {"create", "set"}:
+        return f"Unknown reminder operation: {operation}."
 
     date_str = parameters.get("date", "").strip()
     time_str = parameters.get("time", "").strip()
@@ -307,7 +367,6 @@ def reminder(
     if target_dt <= datetime.now():
         return "That time has already passed — I can't set a reminder in the past."
 
-    os_name    = _get_os()
     safe_msg   = _sanitise(message)
     task_name  = f"JARVISReminder_{target_dt.strftime('%Y%m%d_%H%M%S')}"
 
@@ -335,4 +394,4 @@ def reminder(
         player.write_log(f"[Reminder] ✅ {date_str} {time_str} — {safe_msg[:40]}")
 
     friendly_time = target_dt.strftime("%B %d at %I:%M %p")
-    return f"Reminder set for {friendly_time}."
+    return f"Reminder set for {friendly_time}. ID: {task_name}."

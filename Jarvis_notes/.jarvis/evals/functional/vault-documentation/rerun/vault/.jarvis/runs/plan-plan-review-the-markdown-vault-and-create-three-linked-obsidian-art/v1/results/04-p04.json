@@ -1,0 +1,52 @@
+{
+  "schema_version": "jarvis_work_result/v1",
+  "run_id": "plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-art-v1",
+  "item_id": "p04",
+  "verdict": "ACCEPT",
+  "defects": [],
+  "result": {
+    "ok": true,
+    "local_written": true,
+    "path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\vault-documentation\\rerun\\vault\\Reports\\2026-07-21-workflow-evidence-plan-plan-review-the-markdown-vault-and-create-three-linked-ob.md",
+    "metadata": {
+      "id": "jarvis-20260721T163417Z-10d9f3fb",
+      "title": "Workflow Evidence - plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-artifact - p04",
+      "type": "report",
+      "status": "draft",
+      "created": "2026-07-21T16:34:17Z",
+      "updated": "2026-07-21T16:34:17Z",
+      "project_id": "jarvis_notes",
+      "source": "dual_orchestrator",
+      "tags": [
+        "workflow-evidence",
+        "completion-evidence"
+      ],
+      "sync_state": "local_only",
+      "index_state": "index_pending",
+      "remember_note_id": "",
+      "rag_index": true,
+      "sensitivity": "internal",
+      "confidence": 0.5,
+      "valid_from": "2026-07-21T16:34:17Z",
+      "review_after": "",
+      "source_version": 1,
+      "supersedes": [],
+      "contradicts": [],
+      "depends_on": [],
+      "depended_on_by": [],
+      "extends": [],
+      "extended_by": [],
+      "implements": [],
+      "implemented_by": [],
+      "consumes": [],
+      "consumed_by": [],
+      "related": [],
+      "deleted": false,
+      "deleted_at": "",
+      "content_hash": "9916c297bfb170dea83bf21cb0ff1e24cffd062695bb9a15859a3099cadac7dc"
+    },
+    "sync": null
+  },
+  "model_provenance": null,
+  "completed_at": "2026-07-21T16:34:17Z"
+}

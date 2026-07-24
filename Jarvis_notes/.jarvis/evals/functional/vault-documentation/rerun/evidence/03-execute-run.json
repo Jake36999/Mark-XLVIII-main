@@ -1,0 +1,280 @@
+{
+  "ok": true,
+  "run": {
+    "run_id": "plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-art-v1",
+    "plan_id": "plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-artifact",
+    "plan_version": 1,
+    "status": "COMPLETED",
+    "bundle_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\vault-documentation\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-art\\v1",
+    "manifest_hash": "2513b4e51ee79e53d523ccc89492129414d19c830167e23ba3748a4bd06a9506",
+    "approval_projection_hash": "d9dcc9af349142084a1d13ac9c9b12f83b13702c8e76d443559c4af27ebc36af",
+    "workflow_hash": "835ddf91b857a7f7bbf8d7fa1c607af1288de0254609c5acf6440d3ec7997a17",
+    "cancel_requested": 0,
+    "created_at": "2026-07-21T16:34:17Z",
+    "updated_at": "2026-07-21T16:34:17Z"
+  },
+  "items": [
+    {
+      "item_id": "p01",
+      "state": "ACCEPTED",
+      "attempt": 1,
+      "repair_count": 0,
+      "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\vault-documentation\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-art\\v1\\results\\01-p01.json",
+      "error": null
+    },
+    {
+      "item_id": "p02",
+      "state": "ACCEPTED",
+      "attempt": 1,
+      "repair_count": 0,
+      "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\vault-documentation\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-art\\v1\\results\\02-p02.json",
+      "error": null
+    },
+    {
+      "item_id": "p03",
+      "state": "ACCEPTED",
+      "attempt": 1,
+      "repair_count": 0,
+      "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\vault-documentation\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-art\\v1\\results\\03-p03.json",
+      "error": null
+    },
+    {
+      "item_id": "p04",
+      "state": "ACCEPTED",
+      "attempt": 1,
+      "repair_count": 0,
+      "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\vault-documentation\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-art\\v1\\results\\04-p04.json",
+      "error": null
+    }
+  ],
+  "events": [
+    {
+      "item_id": null,
+      "event_type": "run_registered",
+      "details_json": "{\"item_count\": 4}",
+      "created_at": "2026-07-21T16:34:17Z",
+      "details": {
+        "item_count": 4
+      }
+    },
+    {
+      "item_id": null,
+      "event_type": "run_approved",
+      "details_json": "{}",
+      "created_at": "2026-07-21T16:34:17Z",
+      "details": {}
+    },
+    {
+      "item_id": "p01",
+      "event_type": "item_started",
+      "details_json": "{\"worker_id\": \"jarvis-local-worker\"}",
+      "created_at": "2026-07-21T16:34:17Z",
+      "details": {
+        "worker_id": "jarvis-local-worker"
+      }
+    },
+    {
+      "item_id": "p01",
+      "event_type": "item_reviewed",
+      "details_json": "{\"defects\": [], \"verdict\": \"ACCEPT\"}",
+      "created_at": "2026-07-21T16:34:17Z",
+      "details": {
+        "defects": [],
+        "verdict": "ACCEPT"
+      }
+    },
+    {
+      "item_id": "p02",
+      "event_type": "item_started",
+      "details_json": "{\"worker_id\": \"jarvis-local-worker\"}",
+      "created_at": "2026-07-21T16:34:17Z",
+      "details": {
+        "worker_id": "jarvis-local-worker"
+      }
+    },
+    {
+      "item_id": "p02",
+      "event_type": "item_reviewed",
+      "details_json": "{\"defects\": [], \"verdict\": \"ACCEPT\"}",
+      "created_at": "2026-07-21T16:34:17Z",
+      "details": {
+        "defects": [],
+        "verdict": "ACCEPT"
+      }
+    },
+    {
+      "item_id": "p03",
+      "event_type": "item_started",
+      "details_json": "{\"worker_id\": \"jarvis-local-worker\"}",
+      "created_at": "2026-07-21T16:34:17Z",
+      "details": {
+        "worker_id": "jarvis-local-worker"
+      }
+    },
+    {
+      "item_id": "p03",
+      "event_type": "item_reviewed",
+      "details_json": "{\"defects\": [], \"verdict\": \"ACCEPT\"}",
+      "created_at": "2026-07-21T16:34:17Z",
+      "details": {
+        "defects": [],
+        "verdict": "ACCEPT"
+      }
+    },
+    {
+      "item_id": "p04",
+      "event_type": "item_started",
+      "details_json": "{\"worker_id\": \"jarvis-local-worker\"}",
+      "created_at": "2026-07-21T16:34:17Z",
+      "details": {
+        "worker_id": "jarvis-local-worker"
+      }
+    },
+    {
+      "item_id": "p04",
+      "event_type": "item_reviewed",
+      "details_json": "{\"defects\": [], \"verdict\": \"ACCEPT\"}",
+      "created_at": "2026-07-21T16:34:17Z",
+      "details": {
+        "defects": [],
+        "verdict": "ACCEPT"
+      }
+    },
+    {
+      "item_id": null,
+      "event_type": "run_finished",
+      "details_json": "{\"status\": \"COMPLETED\"}",
+      "created_at": "2026-07-21T16:34:17Z",
+      "details": {
+        "status": "COMPLETED"
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "item_id": "p01",
+      "phase": "before_dispatch",
+      "idempotency_key": "c9961b8f0978105c30c2f12e272a089d5b7723b907d11cf1a3d82411a15ab25e",
+      "details_json": "{\"side_effects\": \"local_read\"}",
+      "created_at": "2026-07-21T16:34:17Z",
+      "details": {
+        "side_effects": "local_read"
+      }
+    },
+    {
+      "item_id": "p01",
+      "phase": "result_written",
+      "idempotency_key": "c9961b8f0978105c30c2f12e272a089d5b7723b907d11cf1a3d82411a15ab25e",
+      "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\evals\\\\functional\\\\vault-documentation\\\\rerun\\\\vault\\\\.jarvis\\\\runs\\\\plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-art\\\\v1\\\\results\\\\01-p01.json\", \"verdict\": \"ACCEPT\"}",
+      "created_at": "2026-07-21T16:34:17Z",
+      "details": {
+        "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\vault-documentation\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-art\\v1\\results\\01-p01.json",
+        "verdict": "ACCEPT"
+      }
+    },
+    {
+      "item_id": "p01",
+      "phase": "committed",
+      "idempotency_key": "c9961b8f0978105c30c2f12e272a089d5b7723b907d11cf1a3d82411a15ab25e",
+      "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\evals\\\\functional\\\\vault-documentation\\\\rerun\\\\vault\\\\.jarvis\\\\runs\\\\plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-art\\\\v1\\\\results\\\\01-p01.json\"}",
+      "created_at": "2026-07-21T16:34:17Z",
+      "details": {
+        "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\vault-documentation\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-art\\v1\\results\\01-p01.json"
+      }
+    },
+    {
+      "item_id": "p02",
+      "phase": "before_dispatch",
+      "idempotency_key": "43ff6e77e3215d4bef62b66babac7cb1ce26196ad8ad674b57a365b8334fc910",
+      "details_json": "{\"side_effects\": \"local_write\"}",
+      "created_at": "2026-07-21T16:34:17Z",
+      "details": {
+        "side_effects": "local_write"
+      }
+    },
+    {
+      "item_id": "p02",
+      "phase": "result_written",
+      "idempotency_key": "43ff6e77e3215d4bef62b66babac7cb1ce26196ad8ad674b57a365b8334fc910",
+      "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\evals\\\\functional\\\\vault-documentation\\\\rerun\\\\vault\\\\.jarvis\\\\runs\\\\plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-art\\\\v1\\\\results\\\\02-p02.json\", \"verdict\": \"ACCEPT\"}",
+      "created_at": "2026-07-21T16:34:17Z",
+      "details": {
+        "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\vault-documentation\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-art\\v1\\results\\02-p02.json",
+        "verdict": "ACCEPT"
+      }
+    },
+    {
+      "item_id": "p02",
+      "phase": "committed",
+      "idempotency_key": "43ff6e77e3215d4bef62b66babac7cb1ce26196ad8ad674b57a365b8334fc910",
+      "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\evals\\\\functional\\\\vault-documentation\\\\rerun\\\\vault\\\\.jarvis\\\\runs\\\\plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-art\\\\v1\\\\results\\\\02-p02.json\"}",
+      "created_at": "2026-07-21T16:34:17Z",
+      "details": {
+        "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\vault-documentation\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-art\\v1\\results\\02-p02.json"
+      }
+    },
+    {
+      "item_id": "p03",
+      "phase": "before_dispatch",
+      "idempotency_key": "7dc9476d3b9e493c2c9da10b69e778e9aea7b0a9b075ac00415e0592de77354f",
+      "details_json": "{\"side_effects\": \"local_read\"}",
+      "created_at": "2026-07-21T16:34:17Z",
+      "details": {
+        "side_effects": "local_read"
+      }
+    },
+    {
+      "item_id": "p03",
+      "phase": "result_written",
+      "idempotency_key": "7dc9476d3b9e493c2c9da10b69e778e9aea7b0a9b075ac00415e0592de77354f",
+      "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\evals\\\\functional\\\\vault-documentation\\\\rerun\\\\vault\\\\.jarvis\\\\runs\\\\plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-art\\\\v1\\\\results\\\\03-p03.json\", \"verdict\": \"ACCEPT\"}",
+      "created_at": "2026-07-21T16:34:17Z",
+      "details": {
+        "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\vault-documentation\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-art\\v1\\results\\03-p03.json",
+        "verdict": "ACCEPT"
+      }
+    },
+    {
+      "item_id": "p03",
+      "phase": "committed",
+      "idempotency_key": "7dc9476d3b9e493c2c9da10b69e778e9aea7b0a9b075ac00415e0592de77354f",
+      "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\evals\\\\functional\\\\vault-documentation\\\\rerun\\\\vault\\\\.jarvis\\\\runs\\\\plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-art\\\\v1\\\\results\\\\03-p03.json\"}",
+      "created_at": "2026-07-21T16:34:17Z",
+      "details": {
+        "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\vault-documentation\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-art\\v1\\results\\03-p03.json"
+      }
+    },
+    {
+      "item_id": "p04",
+      "phase": "before_dispatch",
+      "idempotency_key": "8080ba323ea6a3122adcbe466e3d47d85c041b3c8062a367f46242c0e893e7c0",
+      "details_json": "{\"side_effects\": \"local_write\"}",
+      "created_at": "2026-07-21T16:34:17Z",
+      "details": {
+        "side_effects": "local_write"
+      }
+    },
+    {
+      "item_id": "p04",
+      "phase": "result_written",
+      "idempotency_key": "8080ba323ea6a3122adcbe466e3d47d85c041b3c8062a367f46242c0e893e7c0",
+      "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\evals\\\\functional\\\\vault-documentation\\\\rerun\\\\vault\\\\.jarvis\\\\runs\\\\plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-art\\\\v1\\\\results\\\\04-p04.json\", \"verdict\": \"ACCEPT\"}",
+      "created_at": "2026-07-21T16:34:17Z",
+      "details": {
+        "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\vault-documentation\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-art\\v1\\results\\04-p04.json",
+        "verdict": "ACCEPT"
+      }
+    },
+    {
+      "item_id": "p04",
+      "phase": "committed",
+      "idempotency_key": "8080ba323ea6a3122adcbe466e3d47d85c041b3c8062a367f46242c0e893e7c0",
+      "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\evals\\\\functional\\\\vault-documentation\\\\rerun\\\\vault\\\\.jarvis\\\\runs\\\\plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-art\\\\v1\\\\results\\\\04-p04.json\"}",
+      "created_at": "2026-07-21T16:34:17Z",
+      "details": {
+        "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\vault-documentation\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-art\\v1\\results\\04-p04.json"
+      }
+    }
+  ],
+  "summary_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\vault-documentation\\rerun\\vault\\Summaries\\2026-07-21-completed-plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-a.md"
+}

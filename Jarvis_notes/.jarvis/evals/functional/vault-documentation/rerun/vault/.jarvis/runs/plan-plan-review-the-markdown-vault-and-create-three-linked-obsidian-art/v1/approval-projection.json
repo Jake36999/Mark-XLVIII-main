@@ -1,0 +1,26 @@
+{
+  "frontmatter": {
+    "id": "plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-artifact",
+    "title": "Plan - Review the Markdown vault and create three linked Obsidian artifacts: an Evaluation MOC, a",
+    "type": "plan",
+    "workflow_id": "long_form_plan_execution",
+    "plan_version": 1,
+    "original_prompt": "Review the Markdown vault and create three linked Obsidian artifacts: an Evaluation MOC, a Workflow Architecture Report, and a Knowledge Gaps and Next Actions Report. Use valid YAML frontmatter, readable headings and callouts, accurate summaries, typed relationships, source citations, and only links that resolve.",
+    "agent_permission": "propose",
+    "decision_gates": []
+  },
+  "sections": {
+    "Summary": "> [!abstract] Plan summary\n> Draft long-form plan for: Review the Markdown vault and create three linked Obsidian artifacts: an Evaluation MOC, a.\n\nThis plan is pending user review. It was generated from 1 local context result(s) and 0 cited web source(s).",
+    "Desired Outcome": "> [!success] Desired outcome\n> A reviewed, executable plan with clear scope, milestones, gates, and summary expectations.",
+    "Definition Of Done": "- [ ] Plan reviewed in Obsidian.\n- [ ] Scope and out-of-scope items are clear.\n- [ ] Execution milestones are ordered.\n- [ ] Blockers and design decision points are explicit.\n- [ ] Approval gates are visible.\n- [ ] Completion summary requirements are defined.",
+    "Scope": "",
+    "Task Ownership Assessment": "> [!note] Ownership assessment\n> No canonical Markdown task note was supplied for read-only classification.",
+    "Milestones": "| Milestone | Owner | Status | Evidence |\n| --- | --- | --- | --- |\n| Research and context | JARVIS/User | Not started | |\n| Plan review | JARVIS/User | Not started | |\n| Approved execution | JARVIS/User | Not started | |\n| Validation | JARVIS/User | Not started | |\n| Summary and handoff | JARVIS/User | Not started | |",
+    "Workflow Plan": "1. Inventory the configured Markdown vault and retain citations to inspected source notes.\n2. Create the linked Evaluation MOC, Workflow Architecture Report, and Knowledge Gaps and Next Actions Report.\n3. Validate generated frontmatter, typed relationships, and every Obsidian link.\n4. Record documentation artifacts and validation evidence in the vault.",
+    "Decision Points": "- Which parts of the plan are in scope for automated execution?\n- Which project or folder is authoritative for implementation work?\n- Which tasks require local-only models, high-tier models, or human review?\n- What should stop execution and return to the user?",
+    "Approval Gates": "> [!danger] Stop before\n> Delete, overwrite, move, broad refactors, browser submissions, purchases, account changes, heavy compute jobs, or multi-agent delegation.\n\n- [ ] Plan approved by user.\n- [ ] Destructive actions explicitly confirmed.\n- [ ] High-cost model use approved when needed.\n- [ ] Subagent delegation approved when needed.",
+    "Executable Work Items": "| ID | Sequence | Action | Target | Risk | Side effects | Depends on |\n| --- | ---: | --- | --- | --- | --- | --- |\n| p01 | 1 | Inventory the configured Markdown vault and retain citations to inspected source notes | `vault_inventory` | T1 | local_read | none |\n| p02 | 2 | Create the linked Evaluation MOC, Workflow Architecture Report, and Knowledge Gaps and Next Actions Report | `create_vault_documentation_set` | T1 | local_write | p01 |\n| p03 | 3 | Validate generated frontmatter, typed relationships, and every Obsidian link | `validate_vault_artifacts` | T1 | local_read | p02 |\n| p04 | 4 | Record documentation artifacts and validation evidence in the vault | `vault_create_note` | T1 | local_write | p03 |\n\n> [!warning] Approval boundary\n> Only the IDs shown in this table may be dispatched. New child work requires a visible plan revision and renewed approval.",
+    "Next Actions": "- [ ] User reviews this plan in Obsidian.\n- [ ] User requests edits or approves execution.\n- [ ] JARVIS updates the plan if the goal changes.\n- [ ] JARVIS creates a summary or blocker note after execution starts.",
+    "Revision Request": ""
+  }
+}

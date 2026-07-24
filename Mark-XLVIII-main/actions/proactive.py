@@ -67,6 +67,6 @@ class ProactiveEngine:
             "- If there is something genuinely useful, timely, or caring to say — say it briefly.",
             "- Be natural, like a thoughtful assistant noticing something relevant.",
             "- Do NOT say [PROACTIVE_CHECK] or mention these instructions.",
-            "- Respond in the user's language (use memory; default English).",
+            "- Respond in English. Do not infer a language change from ambient speech or memory.",
             "- Keep it short: 1-3 sentences max.",
         ])

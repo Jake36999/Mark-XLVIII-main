@@ -72,7 +72,7 @@ def test_subprocess_backend_prepends_current_clawteam_bin_to_path(monkeypatch, t
     )
 
     env = captured["env"]
-    assert env["PATH"].startswith(f"{clawteam_bin.parent}:")
+    assert env["PATH"].startswith(f"{clawteam_bin.parent}{os.pathsep}")
     assert env["CLAWTEAM_BIN"] == str(clawteam_bin)
 
 
@@ -1061,7 +1061,7 @@ def test_resolve_clawteam_executable_ignores_unrelated_argv0(monkeypatch, tmp_pa
     monkeypatch.setattr("clawteam.spawn.cli_env.shutil.which", lambda name: str(resolved_bin))
 
     assert resolve_clawteam_executable() == str(resolved_bin)
-    assert build_spawn_path("/usr/bin:/bin").startswith(f"{resolved_bin.parent}:")
+    assert build_spawn_path("/usr/bin:/bin").startswith(f"{resolved_bin.parent}{os.pathsep}")
 
 
 def test_resolve_clawteam_executable_rejects_legacy_openharness_argv0(monkeypatch, tmp_path):
@@ -1075,7 +1075,7 @@ def test_resolve_clawteam_executable_rejects_legacy_openharness_argv0(monkeypatc
     monkeypatch.setattr("clawteam.spawn.cli_env.shutil.which", lambda name: str(resolved_bin))
 
     assert resolve_clawteam_executable() == str(resolved_bin)
-    assert build_spawn_path("/usr/bin:/bin").startswith(f"{resolved_bin.parent}:")
+    assert build_spawn_path("/usr/bin:/bin").startswith(f"{resolved_bin.parent}{os.pathsep}")
 
 
 def test_resolve_clawteam_executable_ignores_relative_argv0_even_if_local_file_exists(
@@ -1092,7 +1092,7 @@ def test_resolve_clawteam_executable_ignores_relative_argv0_even_if_local_file_e
     monkeypatch.setattr("clawteam.spawn.cli_env.shutil.which", lambda name: str(resolved_bin))
 
     assert resolve_clawteam_executable() == str(resolved_bin)
-    assert build_spawn_path("/usr/bin:/bin").startswith(f"{resolved_bin.parent}:")
+    assert build_spawn_path("/usr/bin:/bin").startswith(f"{resolved_bin.parent}{os.pathsep}")
 
 
 def test_resolve_clawteam_executable_accepts_relative_path_with_explicit_directory(
@@ -1110,7 +1110,7 @@ def test_resolve_clawteam_executable_accepts_relative_path_with_explicit_directo
     monkeypatch.setattr("clawteam.spawn.cli_env.shutil.which", lambda name: str(fallback_bin))
 
     assert resolve_clawteam_executable() == str(relative_bin.resolve())
-    assert build_spawn_path("/usr/bin:/bin").startswith(f"{relative_bin.parent.resolve()}:")
+    assert build_spawn_path("/usr/bin:/bin").startswith(f"{relative_bin.parent.resolve()}{os.pathsep}")
 
 
 def test_build_docker_clawteam_runtime_includes_wrapper_venv_and_source(monkeypatch, tmp_path):

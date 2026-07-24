@@ -1,0 +1,11 @@
+{
+  "schema_version": "jarvis_run_bundle/v1",
+  "run_id": "plan-plan-search-online-and-find-potential-resources-for-analysing-intel-v1",
+  "plan_id": "plan-plan-search-online-and-find-potential-resources-for-analysing-intel-5300",
+  "plan_version": 1,
+  "plan_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-21-plan-search-online-and-find-potential-resources-for-analysing-intel-5300-csi-pac.md",
+  "approval_projection_hash": "d3c47fb9990814deae45f0b602468d77d9001dda8881978af66f271aecec9efe",
+  "workflow_hash": "386edb6546238cc27f4476c9c675cdbbe5374784c81101d71c9ad5f09ed82ab5",
+  "manifest_hash": "caeb4c8c520cb1b967839feba1728b063405f98524dc2745b7faa5466dc18f96",
+  "created_at": "2026-07-21T23:43:41Z"
+}

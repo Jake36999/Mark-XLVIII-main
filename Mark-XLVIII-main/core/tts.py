@@ -10,10 +10,13 @@ from __future__ import annotations
 import asyncio
 import os
 import queue as _queue
+import re
 import subprocess
 import sys
 import threading
-from typing import Callable, Optional
+import time
+from pathlib import Path
+from typing import Any, Callable, Optional
 
 import numpy as np
 import sounddevice as sd
@@ -26,6 +29,200 @@ import sounddevice as sd
 # classes to vanish from the public namespace.  Auto-detection is reliable.
 os.environ.setdefault("USE_TF",                 "0")
 os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
+
+_ORPHEUS_START_LOCK = threading.Lock()
+_ORPHEUS_PROCESS: subprocess.Popen | None = None
+_ORPHEUS_LAST_START = 0.0
+_ORPHEUS_WARM_LOCK = threading.Lock()
+_ORPHEUS_WARM_EVENT = threading.Event()
+_ORPHEUS_WARM_THREAD: threading.Thread | None = None
+_ORPHEUS_LAST_WARM = 0.0
+_ORPHEUS_WARM_STATE: dict[str, Any] = {
+    "warming": False,
+    "ready": False,
+    "error": "",
+    "model": "orpeus_text_to_speech",
+}
+
+
+def _orpheus_health_url(base_url: str) -> str:
+    root = (base_url or "http://127.0.0.1:5006/v1").rstrip("/")
+    if root.lower().endswith("/v1"):
+        root = root[:-3]
+    return f"{root}/health"
+
+
+def _endpoint_reachable(base_url: str, timeout: float = 1.0) -> bool:
+    try:
+        import requests
+
+        response = requests.get(_orpheus_health_url(base_url), timeout=max(0.2, timeout))
+        return response.status_code < 500
+    except Exception:
+        return False
+
+
+def _tts_model_loaded(config: dict[str, Any]) -> bool:
+    model = str(config.get("tts_lmstudio_model") or "orpeus_text_to_speech").lower()
+    try:
+        from actions.model_lifecycle import status
+
+        payload = status(config)
+        loaded = payload.get("loaded") or []
+        aliases = {model, model.replace("orpheus", "orpeus"), model.replace("orpeus", "orpheus")}
+        return any(
+            any(alias in str(item.get("model_key") or item.get("instance_id") or "").lower() for alias in aliases)
+            for item in loaded
+        )
+    except Exception:
+        return False
+
+
+def warm_local_tts_service(config: dict[str, Any], *, wait_seconds: float = 0.0) -> dict[str, Any]:
+    """Start the bridge and load one baseline Orpheus instance in the background."""
+    engine = str(config.get("tts_engine") or "").strip().lower()
+    if engine not in {"orpheus", "lmstudio_tts", "openai_compatible", "openai_tts"}:
+        return {"ok": True, "engine": engine, "ready": True, "warming": False}
+
+    ensure_local_tts_service(config)
+    if _endpoint_reachable(str(config.get("tts_url") or config.get("tts_base_url") or "")) and _tts_model_loaded(config):
+        with _ORPHEUS_WARM_LOCK:
+            _ORPHEUS_WARM_STATE.update({"warming": False, "ready": True, "error": ""})
+            _ORPHEUS_WARM_EVENT.set()
+            return dict(_ORPHEUS_WARM_STATE)
+
+    global _ORPHEUS_WARM_THREAD, _ORPHEUS_LAST_WARM
+    retry_seconds = max(10.0, float(config.get("tts_warm_retry_seconds", 60.0)))
+    with _ORPHEUS_WARM_LOCK:
+        thread_running = _ORPHEUS_WARM_THREAD is not None and _ORPHEUS_WARM_THREAD.is_alive()
+        retry_ready = time.monotonic() - _ORPHEUS_LAST_WARM >= retry_seconds
+        if not thread_running and retry_ready:
+            model = str(config.get("tts_lmstudio_model") or "orpeus_text_to_speech").strip()
+            _ORPHEUS_WARM_EVENT.clear()
+            _ORPHEUS_WARM_STATE.update({"warming": True, "ready": False, "error": "", "model": model})
+            _ORPHEUS_LAST_WARM = time.monotonic()
+
+            def _warm() -> None:
+                error = ""
+                try:
+                    from actions.model_lifecycle import ensure_model_loaded
+
+                    loaded = ensure_model_loaded(
+                        model,
+                        route="speech",
+                        cfg=config,
+                        timeout=int(config.get("tts_model_load_timeout_seconds", 180)),
+                    )
+                    if not loaded.get("ok"):
+                        raise RuntimeError(str(loaded.get("error") or "Orpheus model load failed."))
+                    bridge_timeout = max(1.0, float(config.get("tts_bridge_startup_seconds", 30.0)))
+                    deadline = time.monotonic() + bridge_timeout
+                    base_url = str(config.get("tts_url") or config.get("tts_base_url") or "")
+                    while not _endpoint_reachable(base_url) and time.monotonic() < deadline:
+                        time.sleep(0.25)
+                    if not _endpoint_reachable(base_url):
+                        raise RuntimeError("Orpheus bridge did not become ready before the startup deadline.")
+                except Exception as exc:
+                    error = str(exc)
+                finally:
+                    ready = not error and _tts_model_loaded(config)
+                    with _ORPHEUS_WARM_LOCK:
+                        _ORPHEUS_WARM_STATE.update(
+                            {"warming": False, "ready": ready, "error": error if not ready else ""}
+                        )
+                        _ORPHEUS_WARM_EVENT.set()
+
+            _ORPHEUS_WARM_THREAD = threading.Thread(target=_warm, name="jarvis-orpheus-warm", daemon=True)
+            _ORPHEUS_WARM_THREAD.start()
+
+    if wait_seconds > 0:
+        _ORPHEUS_WARM_EVENT.wait(timeout=max(0.0, float(wait_seconds)))
+    with _ORPHEUS_WARM_LOCK:
+        return dict(_ORPHEUS_WARM_STATE)
+
+
+def ensure_local_tts_service(config: dict[str, Any]) -> dict[str, Any]:
+    """Start the local Orpheus bridge once; callers can use SAPI while it warms."""
+    engine = str(config.get("tts_engine") or "").strip().lower()
+    if engine not in {"orpheus", "lmstudio_tts", "openai_compatible", "openai_tts"}:
+        return {"ok": True, "engine": engine, "reachable": True, "started": False}
+    base_url = str(config.get("tts_url") or config.get("tts_base_url") or "http://127.0.0.1:5006/v1")
+    reachable = _endpoint_reachable(base_url)
+    if reachable or not bool(config.get("tts_auto_start_bridge", True)):
+        return {"ok": reachable, "engine": engine, "reachable": reachable, "started": False}
+
+    global _ORPHEUS_PROCESS, _ORPHEUS_LAST_START
+    with _ORPHEUS_START_LOCK:
+        if _endpoint_reachable(base_url):
+            return {"ok": True, "engine": engine, "reachable": True, "started": False}
+        if _ORPHEUS_PROCESS is not None and _ORPHEUS_PROCESS.poll() is None:
+            return {"ok": False, "engine": engine, "reachable": False, "started": False, "starting": True}
+        if time.monotonic() - _ORPHEUS_LAST_START < 30.0:
+            return {"ok": False, "engine": engine, "reachable": False, "started": False, "starting": True}
+
+        repo_root = Path(__file__).resolve().parent.parent
+        script = repo_root / "scripts" / "start-orpheus-tts-bridge.ps1"
+        if not script.exists() or sys.platform != "win32":
+            return {
+                "ok": False,
+                "engine": engine,
+                "reachable": False,
+                "started": False,
+                "error": f"Orpheus bridge launcher was not found: {script}",
+            }
+        logs = repo_root / "runtime_logs"
+        logs.mkdir(parents=True, exist_ok=True)
+        stamp = time.strftime("%Y%m%d-%H%M%S")
+        stdout_path = logs / f"orpheus-auto-{stamp}.out.log"
+        stderr_path = logs / f"orpheus-auto-{stamp}.err.log"
+        stdout_handle = stdout_path.open("ab")
+        stderr_handle = stderr_path.open("ab")
+        try:
+            kwargs: dict[str, Any] = {
+                "cwd": str(repo_root),
+                "stdout": stdout_handle,
+                "stderr": stderr_handle,
+            }
+            if sys.platform == "win32":
+                kwargs["creationflags"] = subprocess.CREATE_NO_WINDOW
+            _ORPHEUS_PROCESS = subprocess.Popen(
+                ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", str(script)],
+                **kwargs,
+            )
+            _ORPHEUS_LAST_START = time.monotonic()
+        finally:
+            stdout_handle.close()
+            stderr_handle.close()
+        return {
+            "ok": False,
+            "engine": engine,
+            "reachable": False,
+            "started": True,
+            "starting": True,
+            "pid": _ORPHEUS_PROCESS.pid,
+            "stdout": str(stdout_path),
+            "stderr": str(stderr_path),
+        }
+
+
+def tts_runtime_status(config: dict[str, Any]) -> dict[str, Any]:
+    engine = str(config.get("tts_engine") or "").strip().lower()
+    if engine not in {"orpheus", "lmstudio_tts", "openai_compatible", "openai_tts"}:
+        return {"engine": engine, "primary_ready": True, "fallback": ""}
+    base_url = str(config.get("tts_url") or config.get("tts_base_url") or "http://127.0.0.1:5006/v1")
+    bridge_ready = _endpoint_reachable(base_url)
+    model_ready = _tts_model_loaded(config)
+    with _ORPHEUS_WARM_LOCK:
+        warm_state = dict(_ORPHEUS_WARM_STATE)
+    return {
+        "engine": engine,
+        "bridge_ready": bridge_ready,
+        "model_ready": model_ready,
+        "primary_ready": bridge_ready and model_ready,
+        "fallback": "windows",
+        "warming": bool(warm_state.get("warming")),
+        "warm_error": str(warm_state.get("error") or ""),
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -100,6 +297,52 @@ def _play_audio_bytes(audio_bytes: bytes) -> None:
     sd.wait()
 
 
+def _split_text_for_tts(text: str, max_chars: int = 260) -> list[str]:
+    """Split text into ordered speech chunks without duplicating the full reply."""
+    text = re.sub(r"\s+", " ", (text or "").strip())
+    if not text:
+        return []
+    max_chars = max(80, int(max_chars or 260))
+    if len(text) <= max_chars:
+        return [text]
+
+    parts = re.split(r"(?<=[.!?;:])\s+", text)
+    chunks: list[str] = []
+    current = ""
+
+    def _push(value: str) -> None:
+        value = value.strip()
+        if value:
+            chunks.append(value)
+
+    for part in parts:
+        part = part.strip()
+        if not part:
+            continue
+        if len(part) > max_chars:
+            _push(current)
+            current = ""
+            words = part.split()
+            line = ""
+            for word in words:
+                candidate = f"{line} {word}".strip()
+                if len(candidate) <= max_chars:
+                    line = candidate
+                else:
+                    _push(line)
+                    line = word
+            current = line
+            continue
+        candidate = f"{current} {part}".strip()
+        if len(candidate) <= max_chars:
+            current = candidate
+        else:
+            _push(current)
+            current = part
+    _push(current)
+    return chunks
+
+
 # ---------------------------------------------------------------------------
 # Engines
 # ---------------------------------------------------------------------------
@@ -153,6 +396,53 @@ class WindowsSapiTTSEngine:
         if result.returncode != 0:
             stderr = result.stderr.decode(errors="replace").strip()
             raise RuntimeError(f"System.Speech fallback failed: {stderr[:200]}")
+
+
+class ResilientTTSEngine:
+    """Use neural speech only when its bridge and model are ready; otherwise speak immediately with SAPI."""
+
+    def __init__(self, primary: Any, fallback: Any, config: dict[str, Any]):
+        self.primary = primary
+        self.fallback = fallback
+        self.config = dict(config)
+        self.last_backend = ""
+        self.last_error = ""
+        self._primary_retry_after = 0.0
+
+    def speak(self, text: str) -> None:
+        status = tts_runtime_status(self.config)
+        now = time.monotonic()
+        if not status.get("primary_ready") and now >= self._primary_retry_after:
+            warm = warm_local_tts_service(
+                self.config,
+                wait_seconds=float(self.config.get("tts_orpheus_first_turn_wait_seconds", 12.0)),
+            )
+            status = tts_runtime_status(self.config)
+            if warm.get("error"):
+                self.last_error = str(warm["error"])
+        if status.get("primary_ready"):
+            try:
+                self.last_backend = "orpheus"
+                self.primary.speak(text)
+                self.last_error = ""
+                self._primary_retry_after = 0.0
+                return
+            except Exception as exc:
+                self.last_error = str(exc)
+                self._primary_retry_after = time.monotonic() + max(
+                    10.0, float(self.config.get("tts_primary_failure_backoff_seconds", 60.0))
+                )
+                print(f"[TTS] Orpheus failed; using Windows fallback: {exc}")
+        else:
+            warm_local_tts_service(self.config, wait_seconds=0.0)
+        self.last_backend = "windows"
+        self.fallback.speak(text)
+
+    def cancel(self) -> None:
+        for engine in (self.primary, self.fallback):
+            cancel = getattr(engine, "cancel", None)
+            if callable(cancel):
+                cancel()
 
 class EdgeTTSEngine:
     """Microsoft EdgeTTS – free, requires internet."""
@@ -443,6 +733,11 @@ class OpenAICompatibleTTSEngine:
         response_format: str = "wav",
         speed: float = 1.0,
         api_key: str | None = None,
+        chunk_chars: int = 260,
+        chunk_workers: int = 1,
+        chunking_enabled: bool = True,
+        request_timeout_seconds: float = 240.0,
+        lifecycle_config: dict | None = None,
     ):
         self.base_url = (base_url or "http://localhost:5005/v1").rstrip("/")
         self.model = model or "orpheus"
@@ -450,13 +745,41 @@ class OpenAICompatibleTTSEngine:
         self.response_format = response_format or "wav"
         self.speed = float(speed)
         self.api_key = api_key or ""
+        self.chunk_chars = max(80, int(chunk_chars or 260))
+        # LM Studio's parallel slots are shared by every local model. Speech uses
+        # one generation at a time and overlaps only decoding/playback with the
+        # next chunk; parallel HTTP synthesis caused duplicate and stale voices.
+        self.chunk_workers = 1
+        self.requested_chunk_workers = max(1, min(4, int(chunk_workers or 1)))
+        self.chunking_enabled = bool(chunking_enabled)
+        self.request_timeout_seconds = max(30.0, float(request_timeout_seconds or 240.0))
+        self.lifecycle_config = dict(lifecycle_config or {})
+        self._synth_lock = threading.Lock()
+        self._turn_lock = threading.Lock()
+        self._cancel_lock = threading.Lock()
+        self._cancel_epoch = 0
 
-    def speak(self, text: str) -> None:
+    def _begin_turn(self) -> int:
+        with self._cancel_lock:
+            self._cancel_epoch += 1
+            return self._cancel_epoch
+
+    def _turn_is_current(self, turn_id: int) -> bool:
+        with self._cancel_lock:
+            return turn_id == self._cancel_epoch
+
+    def cancel(self) -> None:
+        """Cancel playback and prevent stale chunks from being submitted."""
+        with self._cancel_lock:
+            self._cancel_epoch += 1
+        sd.stop()
+
+    def _synth_chunk(self, text: str) -> bytes:
         import requests
 
         text = (text or "").strip()
         if not text:
-            return
+            return b""
 
         headers = {"Content-Type": "application/json"}
         if self.api_key:
@@ -472,7 +795,7 @@ class OpenAICompatibleTTSEngine:
                 "speed": self.speed,
             },
             headers=headers,
-            timeout=120,
+            timeout=self.request_timeout_seconds,
         )
         resp.raise_for_status()
         content_type = (resp.headers.get("content-type") or "").lower()
@@ -480,7 +803,119 @@ class OpenAICompatibleTTSEngine:
             raise RuntimeError(f"TTS endpoint returned JSON instead of audio: {resp.text[:300]}")
         if not resp.content:
             raise RuntimeError("TTS endpoint returned no audio.")
-        _play_audio_bytes(resp.content)
+        return resp.content
+
+    def _synth_for_turn(self, text: str, turn_id: int) -> bytes:
+        # A cancelled request may still be draining inside requests/LM Studio.
+        # Holding this lock until it returns prevents the replacement turn from
+        # occupying another model slot in the meantime.
+        with self._synth_lock:
+            if not self._turn_is_current(turn_id):
+                return b""
+            if not self.lifecycle_config:
+                audio = self._synth_chunk(text)
+                return audio if self._turn_is_current(turn_id) else b""
+            lease_id = ""
+            lifecycle = None
+            lease_outcome = "completed"
+            try:
+                from actions import model_lifecycle as lifecycle
+
+                lease = lifecycle.acquire_generation_lease(
+                    "orpeus_text_to_speech",
+                    route="speech",
+                    cfg=self.lifecycle_config,
+                    wait_seconds=float(self.lifecycle_config.get("tts_generation_wait_seconds", 900.0)),
+                )
+                if not lease.get("ok"):
+                    raise RuntimeError(lease.get("error") or "TTS generation lease unavailable.")
+                lease_id = str(lease.get("lease_id") or "")
+                lifecycle.update_generation_lease(
+                    lease_id,
+                    state="GENERATING",
+                    instance_id="orpeus_text_to_speech",
+                    cfg=self.lifecycle_config,
+                    details={"component": "tts", "turn_id": turn_id},
+                )
+                audio = self._synth_chunk(text)
+                return audio if self._turn_is_current(turn_id) else b""
+            except Exception:
+                lease_outcome = "failed"
+                raise
+            finally:
+                if lifecycle is not None and lease_id:
+                    if lease_outcome == "completed" and not self._turn_is_current(turn_id):
+                        lease_outcome = "cancelled"
+                    lifecycle.release_generation_lease(
+                        lease_id,
+                        cfg=self.lifecycle_config,
+                        outcome=lease_outcome,
+                    )
+
+    def speak(self, text: str) -> None:
+        text = (text or "").strip()
+        if not text:
+            return
+
+        with self._turn_lock:
+            if self.lifecycle_config and self.lifecycle_config.get(
+                "tts_release_idle_task_models", True
+            ):
+                try:
+                    from actions import model_lifecycle
+
+                    # Speech is latency-sensitive. Release a specialist that is
+                    # merely warm, while lifecycle leases protect active work.
+                    model_lifecycle.unload_non_baseline(
+                        self.lifecycle_config,
+                        timeout=10,
+                        force=False,
+                    )
+                except Exception as exc:
+                    print(f"[TTS] Idle task-model cleanup skipped: {exc}")
+            turn_id = self._begin_turn()
+            chunks = _split_text_for_tts(text, self.chunk_chars) if self.chunking_enabled else [text]
+            audio_q: "_queue.Queue[bytes | object]" = _queue.Queue(maxsize=1)
+            sentinel = object()
+
+            def _produce() -> None:
+                try:
+                    for chunk in chunks:
+                        if not self._turn_is_current(turn_id):
+                            break
+                        audio = self._synth_for_turn(chunk, turn_id)
+                        if not audio or not self._turn_is_current(turn_id):
+                            break
+                        while self._turn_is_current(turn_id):
+                            try:
+                                audio_q.put(audio, timeout=0.1)
+                                break
+                            except _queue.Full:
+                                continue
+                finally:
+                    try:
+                        audio_q.put_nowait(sentinel)
+                    except _queue.Full:
+                        pass
+
+            producer = threading.Thread(target=_produce, name="jarvis-tts-synth", daemon=True)
+            producer.start()
+            try:
+                while self._turn_is_current(turn_id):
+                    try:
+                        item = audio_q.get(timeout=0.1)
+                    except _queue.Empty:
+                        if not producer.is_alive():
+                            break
+                        continue
+                    if item is sentinel:
+                        break
+                    if self._turn_is_current(turn_id):
+                        _play_audio_bytes(item)
+            finally:
+                # On cancellation the in-flight HTTP request drains under
+                # _synth_lock; it is intentionally not orphaned into a new slot.
+                producer.join(timeout=0.25)
 
 
 # ---------------------------------------------------------------------------
@@ -493,40 +928,109 @@ class TTSPlayer:
     meant to be called from a dedicated background thread.
     """
 
-    def __init__(self, engine):
+    def __init__(
+        self,
+        engine,
+        duplicate_window_seconds: float = 20.0,
+        max_pending_utterances: int = 1,
+    ):
         self._engine  = engine
         self._playing = False
-        self._lock    = threading.Lock()
+        self._play_lock = threading.Lock()
+        self._state_lock = threading.Lock()
+        self._active_text = ""
+        self._pending_texts: dict[int, str] = {}
+        self._active_ticket = 0
+        self._next_ticket = 0
+        self._cancelled_through = 0
+        self._max_pending_utterances = max(0, int(max_pending_utterances))
+        self._last_text = ""
+        self._last_done_at = 0.0
+        self._duplicate_window_seconds = max(0.0, float(duplicate_window_seconds))
+        self.last_error = ""
 
     @property
     def is_playing(self) -> bool:
-        return self._playing
+        with self._state_lock:
+            return self._playing
+
+    def _claim_utterance(self, text: str) -> int | None:
+        now = time.monotonic()
+        with self._state_lock:
+            duplicate_active = text == self._active_text or text in self._pending_texts.values()
+            duplicate_recent = (
+                text == self._last_text
+                and self._duplicate_window_seconds > 0
+                and now - self._last_done_at <= self._duplicate_window_seconds
+            )
+            if duplicate_active or duplicate_recent:
+                print("[TTS] Suppressed duplicate utterance.")
+                return None
+            if self._playing and len(self._pending_texts) >= self._max_pending_utterances:
+                print("[TTS] Suppressed utterance because the bounded speech queue is full.")
+                return None
+            if not self._playing and self._pending_texts:
+                print("[TTS] Suppressed utterance because speech startup is already queued.")
+                return None
+            self._next_ticket += 1
+            ticket = self._next_ticket
+            self._pending_texts[ticket] = text
+            return ticket
 
     def speak(
         self,
         text:     str,
         on_start: Optional[Callable] = None,
         on_done:  Optional[Callable] = None,
+        on_error: Optional[Callable[[str], None]] = None,
     ) -> None:
         """Synthesise and play text. BLOCKING – call from a dedicated thread."""
-        try:
-            with self._lock:
+        text = (text or "").strip()
+        ticket = self._claim_utterance(text) if text else None
+        if ticket is None:
+            return
+        with self._play_lock:
+            with self._state_lock:
+                if ticket <= self._cancelled_through or self._pending_texts.get(ticket) != text:
+                    self._pending_texts.pop(ticket, None)
+                    return
+                self._pending_texts.pop(ticket, None)
+                self._active_ticket = ticket
+                self._active_text = text
                 self._playing = True
-            if on_start:
-                on_start()
-            self._engine.speak(text)
-        except Exception as e:
-            print(f"[TTS] Error: {e}")
-        finally:
-            with self._lock:
-                self._playing = False
-            if on_done:
-                on_done()
+            try:
+                if on_start:
+                    on_start()
+                self._engine.speak(text)
+            except Exception as e:
+                self.last_error = str(e)
+                print(f"[TTS] Error: {e}")
+                if on_error:
+                    on_error(str(e))
+            finally:
+                with self._state_lock:
+                    if self._active_ticket == ticket:
+                        self._playing = False
+                        self._active_ticket = 0
+                        self._active_text = ""
+                        self._last_text = text
+                        self._last_done_at = time.monotonic()
+                # Keep this callback inside _play_lock so an older turn cannot
+                # reopen the microphone after a replacement turn has started.
+                if on_done:
+                    on_done()
 
     def stop(self) -> None:
+        cancel = getattr(self._engine, "cancel", None)
+        if callable(cancel):
+            cancel()
         sd.stop()
-        with self._lock:
+        with self._state_lock:
+            self._cancelled_through = self._next_ticket
             self._playing = False
+            self._active_ticket = 0
+            self._active_text = ""
+            self._pending_texts.clear()
 
 
 # ---------------------------------------------------------------------------
@@ -550,15 +1054,31 @@ def create_tts_player(config: dict) -> TTSPlayer:
         voice_id = config.get("tts_voice", "pNInz6obpgDQGcFmaJgB")
         engine   = ElevenLabsTTSEngine(api_key=api_key, voice_id=voice_id)
     elif engine_name in ("openai_compatible", "openai_tts", "lmstudio_tts", "orpheus"):
-        engine = OpenAICompatibleTTSEngine(
+        primary = OpenAICompatibleTTSEngine(
             base_url=config.get("tts_url") or config.get("tts_base_url") or config.get("orpheus_tts_url", ""),
             model=config.get("tts_model", "orpheus"),
             voice=config.get("tts_voice", "tara"),
             response_format=config.get("tts_response_format", "wav"),
             speed=float(config.get("tts_speed", 1.0)),
             api_key=config.get("tts_api_key", ""),
+            chunk_chars=int(config.get("tts_chunk_chars", 260)),
+            chunk_workers=int(config.get("tts_chunk_workers", 1)),
+            chunking_enabled=bool(config.get("tts_chunking_enabled", True)),
+            request_timeout_seconds=float(config.get("tts_request_timeout_seconds", 240.0)),
+            lifecycle_config=config,
         )
+        fallback = WindowsSapiTTSEngine(
+            voice=config.get("tts_fallback_voice", ""),
+            rate=int(config.get("tts_fallback_rate", config.get("tts_rate", 0))),
+            volume=int(config.get("tts_volume", 100)),
+        )
+        warm_local_tts_service(config, wait_seconds=0.0)
+        engine = ResilientTTSEngine(primary, fallback, config)
     else:   # edgetts (default)
         voice  = config.get("tts_voice", "en-US-GuyNeural")
         engine = EdgeTTSEngine(voice=voice)
-    return TTSPlayer(engine)
+    return TTSPlayer(
+        engine,
+        duplicate_window_seconds=float(config.get("tts_duplicate_window_seconds", 20.0)),
+        max_pending_utterances=int(config.get("tts_max_pending_utterances", 1)),
+    )

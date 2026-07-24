@@ -1,0 +1,104 @@
+{
+  "ok": true,
+  "mode": "research",
+  "query": "Assess reliable mixed-vendor dual-GPU local-model orchestration with LM Studio and llama.cpp. Cover memory allocation, concurrency, model loading, telemetry, failure recovery, and practical recommendations. Use current primary sources, preserve uncertainty, consolidate duplicate findings, and keep high-contrast findings separate.",
+  "effective_query": "Assess reliable mixed-vendor dual-GPU local-model orchestration with LM Studio and llama.cpp. Cover memory allocation, concurrency, model loading, telemetry, failure recovery, and practical recommendations. Use current primary sources, preserve uncertainty, consolidate duplicate findings, and keep high-contrast findings separate.",
+  "date_from": "",
+  "date_to": "",
+  "retrieved_at": "2026-07-21T16:43:29Z",
+  "require_citations": true,
+  "results": [
+    {
+      "title": "Split Large Models Across GPUs: LM Studio Multi-GPU Setup 2026",
+      "snippet": "Configure LM Studio multi- GPU to split Llama 3.3 70B, Mixtral, and DeepSeek across 2-4 GPUs . Layer-splitting, VRAM balancing, and GPU offload settings explained.",
+      "url": "https://markaicode.com/lm-studio-multi-gpu-split-large-models/",
+      "source": "markaicode.com",
+      "published_at": "",
+      "retrieved_at": "2026-07-21T16:43:29Z",
+      "backend": "ddg_html"
+    },
+    {
+      "title": "LM Studio Production Architecture: Reliable Local LLM Inference",
+      "snippet": "Design a production-grade local AI inference architecture with LM Studio : multi-node scaling, observability, and failure mitigation for senior developers.",
+      "url": "https://markaicode.com/architecture/lm-studio-local-ai-architecture/",
+      "source": "markaicode.com",
+      "published_at": "",
+      "retrieved_at": "2026-07-21T16:43:29Z",
+      "backend": "ddg_html"
+    },
+    {
+      "title": "Best Dual-GPU Local AI Setup: RTX 3090, 5060 Ti (2026)",
+      "snippet": "Dual RTX 3090, 2x RTX 5060 Ti, 2x 2080 Ti modded, mixed setups: real configs for Qwen 3.6, MoE, 70B. Tensor vs pipeline parallelism, llama.cpp/vLLM.",
+      "url": "https://insiderllm.com/guides/multi-gpu-local-ai/",
+      "source": "insiderllm.com",
+      "published_at": "",
+      "retrieved_at": "2026-07-21T16:43:29Z",
+      "backend": "ddg_html"
+    },
+    {
+      "title": "LM Studio 0.3.14: Multi-GPU Controls ️",
+      "snippet": "Advanced controls for multi- GPU setups: enable/disable specific GPUs , choose allocation strategy, limit model weight to dedicated GPU memory , and more.",
+      "url": "https://lmstudio.ai/blog/lmstudio-v0.3.14",
+      "source": "lmstudio.ai",
+      "published_at": "",
+      "retrieved_at": "2026-07-21T16:43:29Z",
+      "backend": "ddg_html"
+    },
+    {
+      "title": "Local LLM Inference Optimization: The Complete Guide",
+      "snippet": "A practical guide to hardware, OS, and llama.cpp tuning, built from a year of experiments on a single consumer CUDA workstation.",
+      "url": "https://carteakey.dev/blog/local-inference/local-llm-optimization/",
+      "source": "carteakey.dev",
+      "published_at": "",
+      "retrieved_at": "2026-07-21T16:43:29Z",
+      "backend": "ddg_html"
+    },
+    {
+      "title": "Accelerate Larger LLMs Locally on RTX With LM Studio | NVIDIA Blog",
+      "snippet": "How to Accelerate Larger LLMs Locally on RTX With LM Studio GPU offloading makes massive models accessible on local RTX AI PCs and workstations.",
+      "url": "https://blogs.nvidia.com/blog/ai-decoded-lm-studio/",
+      "source": "blogs.nvidia.com",
+      "published_at": "",
+      "retrieved_at": "2026-07-21T16:43:29Z",
+      "backend": "ddg_html"
+    },
+    {
+      "title": "Multi-GPU Local LLMs 2026: Dual RTX 4090 for 70B at 100 tok/s",
+      "snippet": "Dual RTX 4090s (48 GB combined) run Llama 3.3 70B at ~100 tok/sec — only 5-10% slower than a theoretical single 48 GB GPU . This is the most cost-effective multi- GPU setup for 70B models in 2026.",
+      "url": "https://www.promptquorum.com/local-llms/multi-gpu-local-llms",
+      "source": "promptquorum.com",
+      "published_at": "",
+      "retrieved_at": "2026-07-21T16:43:29Z",
+      "backend": "ddg_html"
+    },
+    {
+      "title": "Run any LLM on Distributed Multiple GPUs Locally Using Llama_cpp",
+      "snippet": "In this tutorial, we will explore the efficient utilization of the Llama.cpp library to run fine-tuned LLMs on distributed multiple GPUs , unlocking ultra-fast performance.",
+      "url": "https://medium.com/@yash9439/run-any-llm-on-distributed-multiple-gpus-locally-using-llama-cpp-2ff478a0dc3c",
+      "source": "medium.com",
+      "published_at": "",
+      "retrieved_at": "2026-07-21T16:43:29Z",
+      "backend": "ddg_html"
+    },
+    {
+      "title": "Splitting LLMs Across Multiple GPUs: Techniques, Tools, and Best ...",
+      "snippet": "Learn how to split large language models (LLMs) across multiple GPUs using top techniques, tools, and best practices for efficient distributed training.",
+      "url": "https://www.digitalocean.com/community/tutorials/splitting-llms-across-multiple-gpus",
+      "source": "digitalocean.com",
+      "published_at": "",
+      "retrieved_at": "2026-07-21T16:43:29Z",
+      "backend": "ddg_html"
+    },
+    {
+      "title": "Local LLM Deployment with Ollama and llama.cpp: A Comprehensive Guide",
+      "snippet": "Learn how to deploy and optimize large language models locally using Ollama and llama.cpp. This guide covers installation, model customization with Modelfiles, and performance optimization through quantization for efficient GPU inference.",
+      "url": "https://dasroot.net/posts/2026/01/local-llm-deployment-ollama-llama.cpp/",
+      "source": "dasroot.net",
+      "published_at": "",
+      "retrieved_at": "2026-07-21T16:43:29Z",
+      "backend": "ddg_html"
+    }
+  ],
+  "text": "Search results: Assess reliable mixed-vendor dual-GPU local-model orchestration with LM Studio and llama.cpp. Cover memory allocation, concurrency, model loading, telemetry, failure recovery, and practical recommendations. Use current primary sources, preserve uncertainty, consolidate duplicate findings, and keep high-contrast findings separate.\n\n1. Split Large Models Across GPUs: LM Studio Multi-GPU Setup 2026 [markaicode.com]\n   Configure LM Studio multi- GPU to split Llama 3.3 70B, Mixtral, and DeepSeek across 2-4 GPUs . Layer-splitting, VRAM balancing, and GPU offload settings explained.\n   Source: https://markaicode.com/lm-studio-multi-gpu-split-large-models/\n\n2. LM Studio Production Architecture: Reliable Local LLM Inference [markaicode.com]\n   Design a production-grade local AI inference architecture with LM Studio : multi-node scaling, observability, and failure mitigation for senior developers.\n   Source: https://markaicode.com/architecture/lm-studio-local-ai-architecture/\n\n3. Best Dual-GPU Local AI Setup: RTX 3090, 5060 Ti (2026) [insiderllm.com]\n   Dual RTX 3090, 2x RTX 5060 Ti, 2x 2080 Ti modded, mixed setups: real configs for Qwen 3.6, MoE, 70B. Tensor vs pipeline parallelism, llama.cpp/vLLM.\n   Source: https://insiderllm.com/guides/multi-gpu-local-ai/\n\n4. LM Studio 0.3.14: Multi-GPU Controls ️ [lmstudio.ai]\n   Advanced controls for multi- GPU setups: enable/disable specific GPUs , choose allocation strategy, limit model weight to dedicated GPU memory , and more.\n   Source: https://lmstudio.ai/blog/lmstudio-v0.3.14\n\n5. Local LLM Inference Optimization: The Complete Guide [carteakey.dev]\n   A practical guide to hardware, OS, and llama.cpp tuning, built from a year of experiments on a single consumer CUDA workstation.\n   Source: https://carteakey.dev/blog/local-inference/local-llm-optimization/\n\n6. Accelerate Larger LLMs Locally on RTX With LM Studio | NVIDIA Blog [blogs.nvidia.com]\n   How to Accelerate Larger LLMs Locally on RTX With LM Studio GPU offloading makes massive models accessible on local RTX AI PCs and workstations.\n   Source: https://blogs.nvidia.com/blog/ai-decoded-lm-studio/\n\n7. Multi-GPU Local LLMs 2026: Dual RTX 4090 for 70B at 100 tok/s [promptquorum.com]\n   Dual RTX 4090s (48 GB combined) run Llama 3.3 70B at ~100 tok/sec — only 5-10% slower than a theoretical single 48 GB GPU . This is the most cost-effective multi- GPU setup for 70B models in 2026.\n   Source: https://www.promptquorum.com/local-llms/multi-gpu-local-llms\n\n8. Run any LLM on Distributed Multiple GPUs Locally Using Llama_cpp [medium.com]\n   In this tutorial, we will explore the efficient utilization of the Llama.cpp library to run fine-tuned LLMs on distributed multiple GPUs , unlocking ultra-fast performance.\n   Source: https://medium.com/@yash9439/run-any-llm-on-distributed-multiple-gpus-locally-using-llama-cpp-2ff478a0dc3c\n\n9. Splitting LLMs Across Multiple GPUs: Techniques, Tools, and Best ... [digitalocean.com]\n   Learn how to split large language models (LLMs) across multiple GPUs using top techniques, tools, and best practices for efficient distributed training.\n   Source: https://www.digitalocean.com/community/tutorials/splitting-llms-across-multiple-gpus\n\n10. Local LLM Deployment with Ollama and llama.cpp: A Comprehensive Guide [dasroot.net]\n   Learn how to deploy and optimize large language models locally using Ollama and llama.cpp. This guide covers installation, model customization with Modelfiles, and performance optimization through quantization for efficient GPU inference.\n   Source: https://dasroot.net/posts/2026/01/local-llm-deployment-ollama-llama.cpp/",
+  "message": ""
+}

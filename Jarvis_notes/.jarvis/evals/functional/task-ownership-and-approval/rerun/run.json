@@ -1,0 +1,760 @@
+{
+  "schema_version": "jarvis_functional_eval_run/v1",
+  "run_id": "functional-productivity-rerun-20260721-215542",
+  "scenario": "productivity",
+  "round": "rerun",
+  "started_at": "2026-07-21T20:55:42Z",
+  "completed_at": "2026-07-21T20:55:44Z",
+  "provider": [
+    "deterministic"
+  ],
+  "model": [],
+  "route": [
+    "plan_workflow/create_plan",
+    "plan_workflow/start_plan",
+    "plan_workflow/dispatch"
+  ],
+  "tools": [
+    "dual_orchestrator",
+    "jarvis_memory",
+    "plan_workflow"
+  ],
+  "duration_seconds": 1.769,
+  "artifacts": [
+    "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\v1",
+    "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\v1\\work-items.json",
+    "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\v1\\workflow.yaml",
+    "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Plans\\2026-07-21-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-ownersh.md",
+    "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Summaries\\2026-07-21-completed-plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-function.md",
+    "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Summaries\\2026-07-21-execution-run-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functiona.md"
+  ],
+  "fallback_reason": [],
+  "steps": [
+    {
+      "step_id": "create-plan",
+      "route": "plan_workflow/create_plan",
+      "tools": [
+        "plan_workflow",
+        "jarvis_memory"
+      ],
+      "started_at": "2026-07-21T20:55:42Z",
+      "completed_at": "2026-07-21T20:55:42Z",
+      "duration_seconds": 0.186,
+      "ok": true,
+      "provider": "deterministic",
+      "model": "",
+      "role": "",
+      "fallback_reason": "",
+      "artifacts": [
+        "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\v1\\work-items.json",
+        "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\v1\\workflow.yaml",
+        "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Plans\\2026-07-21-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-ownersh.md"
+      ],
+      "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\evidence\\01-create-plan.json",
+      "error": ""
+    },
+    {
+      "step_id": "approve-and-queue",
+      "route": "plan_workflow/start_plan",
+      "tools": [
+        "plan_workflow",
+        "dual_orchestrator"
+      ],
+      "started_at": "2026-07-21T20:55:42Z",
+      "completed_at": "2026-07-21T20:55:42Z",
+      "duration_seconds": 0.176,
+      "ok": true,
+      "provider": "deterministic",
+      "model": "",
+      "role": "",
+      "fallback_reason": "",
+      "artifacts": [
+        "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\v1",
+        "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Plans\\2026-07-21-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-ownersh.md",
+        "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Summaries\\2026-07-21-execution-run-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functiona.md"
+      ],
+      "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\evidence\\02-approve-and-queue.json",
+      "error": ""
+    },
+    {
+      "step_id": "execute-run",
+      "route": "plan_workflow/dispatch",
+      "tools": [
+        "plan_workflow",
+        "dual_orchestrator"
+      ],
+      "started_at": "2026-07-21T20:55:42Z",
+      "completed_at": "2026-07-21T20:55:44Z",
+      "duration_seconds": 1.407,
+      "ok": true,
+      "provider": "deterministic",
+      "model": "",
+      "role": "",
+      "fallback_reason": "",
+      "artifacts": [
+        "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Summaries\\2026-07-21-completed-plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-function.md"
+      ],
+      "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\evidence\\03-execute-run.json",
+      "error": ""
+    }
+  ],
+  "validators": [
+    {
+      "id": "no-preapproval-mutation",
+      "passed": true,
+      "critical": true,
+      "score": 4.0,
+      "evidence": {
+        "before_hash": -6256538746763896377,
+        "after_hash": -6256538746763896377
+      }
+    },
+    {
+      "id": "user-ownership-preserved",
+      "passed": true,
+      "critical": true,
+      "score": 4.0,
+      "evidence": {
+        "path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Progress\\2026-07-21-evaluation-sample-project.md",
+        "owner": "user"
+      }
+    },
+    {
+      "id": "ownership-classified",
+      "passed": true,
+      "critical": true,
+      "score": 4.0,
+      "evidence": [
+        "| `task-user-router` | User connected the test router. | advice-only | propose | Clarify ownership before action |",
+        "| `task-user-antenna` | User: choose the final antenna position. | user-owned | advice-only | None unless the user asks for advice |",
+        "| `task-shared-outline` | Shared: agree on the report outline. | shared | confirmation-required | Ask the user to agree the division of work |",
+        "| `task-agent-inventory` | Agent: draft a Markdown inventory from supplied facts. | agent-owned | confirmation-required | Offer a bounded execution plan |"
+      ]
+    },
+    {
+      "id": "approval-visible",
+      "passed": true,
+      "critical": false,
+      "score": 4.0,
+      "evidence": {
+        "ok": true,
+        "path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Plans\\2026-07-21-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-ownersh.md",
+        "title": "Plan - Review F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approv",
+        "status": "queued",
+        "approval_state": "approved",
+        "execution_state": "queued",
+        "run_id": "plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-v1",
+        "bundle_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\v1",
+        "execution_summary_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Summaries\\2026-07-21-execution-run-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functiona.md",
+        "packets": [
+          {
+            "id": "p01",
+            "task": "Classify canonical task IDs by ownership and permission without changing the user note",
+            "worker": "productivity_assessment",
+            "step_type": "python_hook",
+            "depends_on": []
+          },
+          {
+            "id": "p02",
+            "task": "Pause at the approval gate before any agent-owned or shared action",
+            "worker": "approval_gate",
+            "step_type": "gate",
+            "depends_on": [
+              "p01"
+            ]
+          },
+          {
+            "id": "p03",
+            "task": "Create a bounded task-assessment artifact with progress and completion-evidence requirements",
+            "worker": "vault_create_note",
+            "step_type": "artifact",
+            "depends_on": [
+              "p02"
+            ]
+          }
+        ],
+        "agent_count": 1,
+        "reindex": {
+          "ok": true,
+          "backend": "local_sqlite",
+          "index_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\.jarvis\\memory.sqlite",
+          "indexed_notes": 3,
+          "excluded_notes": 0,
+          "superseded_notes": 0,
+          "deduplicated_notes": 0,
+          "changed_notes": 1,
+          "unchanged_notes": 2,
+          "removed_notes": 0,
+          "embedding": {
+            "ok": false,
+            "status": "unsupported_provider"
+          }
+        },
+        "message": "Plan approved and queued. Execution starts after the current JARVIS speech turn completes.",
+        "canvas": {
+          "ok": true,
+          "operation": "sync_plan",
+          "path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Canvases\\JARVIS\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task.canvas",
+          "plan_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Plans\\2026-07-21-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-ownersh.md",
+          "node_count": 16,
+          "edge_count": 15,
+          "active_task_count": 14,
+          "completed_task_count": 0,
+          "rolling_limit": 24,
+          "canonical_source": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Plans\\2026-07-21-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-ownersh.md",
+          "archived_snapshot": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\.jarvis\\canvas_history\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task\\20260721-215542.canvas"
+        }
+      }
+    },
+    {
+      "id": "completion-evidence",
+      "passed": true,
+      "critical": false,
+      "score": 4.0,
+      "evidence": {
+        "status": "COMPLETED",
+        "summary_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Summaries\\2026-07-21-completed-plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-function.md"
+      }
+    }
+  ],
+  "average_score": 4.0,
+  "critical_failures": [],
+  "passed": true,
+  "outputs": {
+    "sample_note": {
+      "ok": true,
+      "local_written": true,
+      "path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Progress\\2026-07-21-evaluation-sample-project.md",
+      "metadata": {
+        "id": "jarvis-20260721T205542Z-39cedcd1",
+        "title": "Evaluation Sample Project",
+        "type": "progress_tracker",
+        "status": "active",
+        "created": "2026-07-21T20:55:42Z",
+        "updated": "2026-07-21T20:55:42Z",
+        "project_id": "functional_eval_productivity",
+        "source": "user",
+        "tags": [
+          "evaluation",
+          "tasks"
+        ],
+        "sync_state": "local_only",
+        "index_state": "indexed_local",
+        "remember_note_id": "",
+        "rag_index": true,
+        "sensitivity": "internal",
+        "confidence": 0.5,
+        "valid_from": "2026-07-21T20:55:42Z",
+        "review_after": "",
+        "source_version": 1,
+        "content_hash": "41710d446753f696eb8f935a16f299f7a78f76f79e8fdd3e10f5ec522c0cf2cb",
+        "supersedes": [],
+        "contradicts": [],
+        "depends_on": [],
+        "depended_on_by": [],
+        "extends": [],
+        "extended_by": [],
+        "implements": [],
+        "implemented_by": [],
+        "consumes": [],
+        "consumed_by": [],
+        "related": [],
+        "deleted": false,
+        "deleted_at": "",
+        "agent_permission": "propose",
+        "owner": "user"
+      },
+      "sync": null,
+      "reindex": {
+        "ok": true,
+        "backend": "local_sqlite",
+        "index_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\.jarvis\\memory.sqlite",
+        "indexed_notes": 1,
+        "excluded_notes": 0,
+        "superseded_notes": 0,
+        "deduplicated_notes": 0,
+        "changed_notes": 1,
+        "unchanged_notes": 0,
+        "removed_notes": 0,
+        "embedding": {
+          "ok": false,
+          "status": "unsupported_provider"
+        }
+      }
+    },
+    "plan": {
+      "ok": true,
+      "local_written": true,
+      "path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Plans\\2026-07-21-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-ownersh.md",
+      "metadata": {
+        "id": "plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task",
+        "title": "Plan - Review F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approv",
+        "type": "plan",
+        "status": "pending_review",
+        "created": "2026-07-21T20:55:42Z",
+        "updated": "2026-07-21T20:55:42Z",
+        "project_id": "functional_eval_productivity",
+        "source": "jarvis",
+        "tags": [
+          "plan",
+          "workflow",
+          "pending-approval"
+        ],
+        "sync_state": "local_only",
+        "index_state": "indexed_local",
+        "remember_note_id": "",
+        "rag_index": true,
+        "sensitivity": "internal",
+        "confidence": 0.5,
+        "valid_from": "2026-07-21T20:55:42Z",
+        "review_after": "",
+        "source_version": 1,
+        "content_hash": "8945741f5ff6126e4bd787ebe1d8b91adb03bd045846fbcb4916d40ba190ef85",
+        "supersedes": [],
+        "contradicts": [],
+        "depends_on": [],
+        "depended_on_by": [],
+        "extends": [],
+        "extended_by": [],
+        "implements": [],
+        "implemented_by": [],
+        "consumes": [],
+        "consumed_by": [],
+        "related": [],
+        "deleted": false,
+        "deleted_at": "",
+        "agent_permission": "propose",
+        "approval_state": "pending_review",
+        "decision_gates": [],
+        "execution_state": "not_started",
+        "local_context_count": 1,
+        "original_prompt": "Review F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Progress\\2026-07-21-evaluation-sample-project.md. Classify each task as user-owned, agent-owned, shared, advice-only, confirmation-required, or blocked. Offer bounded help and prepare a plan, but do not start agent work before approval. Track progress and require completion evidence. Never reassign the user's physical antenna choice.",
+        "plan_version": 1,
+        "research_state": "complete",
+        "schema_version": "jarvis_plan/v1",
+        "web_source_count": 0,
+        "workflow_id": "long_form_plan_execution"
+      },
+      "sync": null,
+      "reindex": {
+        "ok": true,
+        "backend": "local_sqlite",
+        "index_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\.jarvis\\memory.sqlite",
+        "indexed_notes": 2,
+        "excluded_notes": 0,
+        "superseded_notes": 0,
+        "deduplicated_notes": 0,
+        "changed_notes": 1,
+        "unchanged_notes": 1,
+        "removed_notes": 0,
+        "embedding": {
+          "ok": false,
+          "status": "unsupported_provider"
+        }
+      },
+      "run_id": "plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-v1",
+      "run_bundle": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\v1",
+      "workflow_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\v1\\workflow.yaml",
+      "manifest_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\v1\\work-items.json",
+      "work_item_count": 3,
+      "plan_status": "pending_review",
+      "local_context_count": 1,
+      "web_source_count": 0,
+      "canvas": {
+        "ok": true,
+        "operation": "sync_plan",
+        "path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Canvases\\JARVIS\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task.canvas",
+        "plan_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Plans\\2026-07-21-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-ownersh.md",
+        "node_count": 16,
+        "edge_count": 15,
+        "active_task_count": 14,
+        "completed_task_count": 0,
+        "rolling_limit": 24,
+        "canonical_source": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Plans\\2026-07-21-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-ownersh.md",
+        "archived_snapshot": ""
+      },
+      "message": "Plan, workflow YAML, and immutable work manifest created. Awaiting user review or approval."
+    },
+    "start": {
+      "ok": true,
+      "path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Plans\\2026-07-21-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-ownersh.md",
+      "title": "Plan - Review F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approv",
+      "status": "queued",
+      "approval_state": "approved",
+      "execution_state": "queued",
+      "run_id": "plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-v1",
+      "bundle_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\v1",
+      "execution_summary_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Summaries\\2026-07-21-execution-run-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functiona.md",
+      "packets": [
+        {
+          "id": "p01",
+          "task": "Classify canonical task IDs by ownership and permission without changing the user note",
+          "worker": "productivity_assessment",
+          "step_type": "python_hook",
+          "depends_on": []
+        },
+        {
+          "id": "p02",
+          "task": "Pause at the approval gate before any agent-owned or shared action",
+          "worker": "approval_gate",
+          "step_type": "gate",
+          "depends_on": [
+            "p01"
+          ]
+        },
+        {
+          "id": "p03",
+          "task": "Create a bounded task-assessment artifact with progress and completion-evidence requirements",
+          "worker": "vault_create_note",
+          "step_type": "artifact",
+          "depends_on": [
+            "p02"
+          ]
+        }
+      ],
+      "agent_count": 1,
+      "reindex": {
+        "ok": true,
+        "backend": "local_sqlite",
+        "index_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\.jarvis\\memory.sqlite",
+        "indexed_notes": 3,
+        "excluded_notes": 0,
+        "superseded_notes": 0,
+        "deduplicated_notes": 0,
+        "changed_notes": 1,
+        "unchanged_notes": 2,
+        "removed_notes": 0,
+        "embedding": {
+          "ok": false,
+          "status": "unsupported_provider"
+        }
+      },
+      "message": "Plan approved and queued. Execution starts after the current JARVIS speech turn completes.",
+      "canvas": {
+        "ok": true,
+        "operation": "sync_plan",
+        "path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Canvases\\JARVIS\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task.canvas",
+        "plan_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Plans\\2026-07-21-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-ownersh.md",
+        "node_count": 16,
+        "edge_count": 15,
+        "active_task_count": 14,
+        "completed_task_count": 0,
+        "rolling_limit": 24,
+        "canonical_source": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Plans\\2026-07-21-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-ownersh.md",
+        "archived_snapshot": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\.jarvis\\canvas_history\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task\\20260721-215542.canvas"
+      }
+    },
+    "execution": {
+      "ok": true,
+      "run": {
+        "run_id": "plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-v1",
+        "plan_id": "plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task",
+        "plan_version": 1,
+        "status": "COMPLETED",
+        "bundle_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\v1",
+        "manifest_hash": "08a45114e2d6179429a356da5b2e0bc8a17dd20371fb657102818214a22e086d",
+        "approval_projection_hash": "490e30aeba5254993980129b60d9f5a8bb1441568a5fc9fc8d97d806723a2abf",
+        "workflow_hash": "3b19f61383f14ccc07665258bd4d85a7b0281f34b0d71166ba1e109ee811c32e",
+        "cancel_requested": 0,
+        "created_at": "2026-07-21T20:55:42Z",
+        "updated_at": "2026-07-21T20:55:44Z"
+      },
+      "items": [
+        {
+          "item_id": "p01",
+          "state": "ACCEPTED",
+          "attempt": 1,
+          "repair_count": 0,
+          "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\v1\\results\\01-p01.json",
+          "error": null
+        },
+        {
+          "item_id": "p02",
+          "state": "ACCEPTED",
+          "attempt": 1,
+          "repair_count": 0,
+          "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\v1\\results\\02-p02.json",
+          "error": null
+        },
+        {
+          "item_id": "p03",
+          "state": "ACCEPTED",
+          "attempt": 1,
+          "repair_count": 0,
+          "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\v1\\results\\03-p03.json",
+          "error": null
+        }
+      ],
+      "events": [
+        {
+          "item_id": null,
+          "event_type": "run_registered",
+          "details_json": "{\"item_count\": 3}",
+          "created_at": "2026-07-21T20:55:42Z",
+          "details": {
+            "item_count": 3
+          }
+        },
+        {
+          "item_id": null,
+          "event_type": "run_approved",
+          "details_json": "{}",
+          "created_at": "2026-07-21T20:55:42Z",
+          "details": {}
+        },
+        {
+          "item_id": "p01",
+          "event_type": "item_started",
+          "details_json": "{\"worker_id\": \"jarvis-local-worker:p01:f030fdc9\"}",
+          "created_at": "2026-07-21T20:55:43Z",
+          "details": {
+            "worker_id": "jarvis-local-worker:p01:f030fdc9"
+          }
+        },
+        {
+          "item_id": "p01",
+          "event_type": "item_reviewed",
+          "details_json": "{\"defects\": [], \"verdict\": \"ACCEPT\"}",
+          "created_at": "2026-07-21T20:55:43Z",
+          "details": {
+            "defects": [],
+            "verdict": "ACCEPT"
+          }
+        },
+        {
+          "item_id": "p02",
+          "event_type": "item_started",
+          "details_json": "{\"worker_id\": \"jarvis-local-worker:p02:ab2a74ef\"}",
+          "created_at": "2026-07-21T20:55:43Z",
+          "details": {
+            "worker_id": "jarvis-local-worker:p02:ab2a74ef"
+          }
+        },
+        {
+          "item_id": "p02",
+          "event_type": "item_reviewed",
+          "details_json": "{\"defects\": [], \"verdict\": \"ACCEPT\"}",
+          "created_at": "2026-07-21T20:55:43Z",
+          "details": {
+            "defects": [],
+            "verdict": "ACCEPT"
+          }
+        },
+        {
+          "item_id": "p03",
+          "event_type": "item_started",
+          "details_json": "{\"worker_id\": \"jarvis-local-worker:p03:75b63f69\"}",
+          "created_at": "2026-07-21T20:55:43Z",
+          "details": {
+            "worker_id": "jarvis-local-worker:p03:75b63f69"
+          }
+        },
+        {
+          "item_id": "p03",
+          "event_type": "item_reviewed",
+          "details_json": "{\"defects\": [], \"verdict\": \"ACCEPT\"}",
+          "created_at": "2026-07-21T20:55:44Z",
+          "details": {
+            "defects": [],
+            "verdict": "ACCEPT"
+          }
+        },
+        {
+          "item_id": null,
+          "event_type": "run_finished",
+          "details_json": "{\"status\": \"COMPLETED\"}",
+          "created_at": "2026-07-21T20:55:44Z",
+          "details": {
+            "status": "COMPLETED"
+          }
+        }
+      ],
+      "checkpoints": [
+        {
+          "item_id": "p01",
+          "phase": "side_effect_prepared",
+          "idempotency_key": "d644fcc5398c18ddef6aed19439dd68a08882de0d9201786c44c38a56d21585d",
+          "details_json": "{\"side_effects\": \"local_write\"}",
+          "created_at": "2026-07-21T20:55:43Z",
+          "details": {
+            "side_effects": "local_write"
+          }
+        },
+        {
+          "item_id": "p01",
+          "phase": "before_dispatch",
+          "idempotency_key": "d644fcc5398c18ddef6aed19439dd68a08882de0d9201786c44c38a56d21585d",
+          "details_json": "{\"side_effects\": \"local_write\"}",
+          "created_at": "2026-07-21T20:55:43Z",
+          "details": {
+            "side_effects": "local_write"
+          }
+        },
+        {
+          "item_id": "p01",
+          "phase": "side_effect_started",
+          "idempotency_key": "d644fcc5398c18ddef6aed19439dd68a08882de0d9201786c44c38a56d21585d",
+          "details_json": "{\"resource_class\": \"io\"}",
+          "created_at": "2026-07-21T20:55:43Z",
+          "details": {
+            "resource_class": "io"
+          }
+        },
+        {
+          "item_id": "p01",
+          "phase": "result_written",
+          "idempotency_key": "d644fcc5398c18ddef6aed19439dd68a08882de0d9201786c44c38a56d21585d",
+          "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\evals\\\\functional\\\\task-ownership-and-approval\\\\rerun\\\\vault\\\\.jarvis\\\\runs\\\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\\\v1\\\\results\\\\01-p01.json\", \"verdict\": \"ACCEPT\"}",
+          "created_at": "2026-07-21T20:55:43Z",
+          "details": {
+            "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\v1\\results\\01-p01.json",
+            "verdict": "ACCEPT"
+          }
+        },
+        {
+          "item_id": "p01",
+          "phase": "side_effect_committed",
+          "idempotency_key": "d644fcc5398c18ddef6aed19439dd68a08882de0d9201786c44c38a56d21585d",
+          "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\evals\\\\functional\\\\task-ownership-and-approval\\\\rerun\\\\vault\\\\.jarvis\\\\runs\\\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\\\v1\\\\results\\\\01-p01.json\"}",
+          "created_at": "2026-07-21T20:55:43Z",
+          "details": {
+            "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\v1\\results\\01-p01.json"
+          }
+        },
+        {
+          "item_id": "p01",
+          "phase": "committed",
+          "idempotency_key": "d644fcc5398c18ddef6aed19439dd68a08882de0d9201786c44c38a56d21585d",
+          "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\evals\\\\functional\\\\task-ownership-and-approval\\\\rerun\\\\vault\\\\.jarvis\\\\runs\\\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\\\v1\\\\results\\\\01-p01.json\"}",
+          "created_at": "2026-07-21T20:55:43Z",
+          "details": {
+            "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\v1\\results\\01-p01.json"
+          }
+        },
+        {
+          "item_id": "p02",
+          "phase": "side_effect_prepared",
+          "idempotency_key": "8422386ea3bd92237e6a39c4cf4195e29e10ac380816e0845b67d56523b5ddab",
+          "details_json": "{\"side_effects\": \"none\"}",
+          "created_at": "2026-07-21T20:55:43Z",
+          "details": {
+            "side_effects": "none"
+          }
+        },
+        {
+          "item_id": "p02",
+          "phase": "before_dispatch",
+          "idempotency_key": "8422386ea3bd92237e6a39c4cf4195e29e10ac380816e0845b67d56523b5ddab",
+          "details_json": "{\"side_effects\": \"none\"}",
+          "created_at": "2026-07-21T20:55:43Z",
+          "details": {
+            "side_effects": "none"
+          }
+        },
+        {
+          "item_id": "p02",
+          "phase": "side_effect_started",
+          "idempotency_key": "8422386ea3bd92237e6a39c4cf4195e29e10ac380816e0845b67d56523b5ddab",
+          "details_json": "{\"resource_class\": \"io\"}",
+          "created_at": "2026-07-21T20:55:43Z",
+          "details": {
+            "resource_class": "io"
+          }
+        },
+        {
+          "item_id": "p02",
+          "phase": "result_written",
+          "idempotency_key": "8422386ea3bd92237e6a39c4cf4195e29e10ac380816e0845b67d56523b5ddab",
+          "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\evals\\\\functional\\\\task-ownership-and-approval\\\\rerun\\\\vault\\\\.jarvis\\\\runs\\\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\\\v1\\\\results\\\\02-p02.json\", \"verdict\": \"ACCEPT\"}",
+          "created_at": "2026-07-21T20:55:43Z",
+          "details": {
+            "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\v1\\results\\02-p02.json",
+            "verdict": "ACCEPT"
+          }
+        },
+        {
+          "item_id": "p02",
+          "phase": "side_effect_committed",
+          "idempotency_key": "8422386ea3bd92237e6a39c4cf4195e29e10ac380816e0845b67d56523b5ddab",
+          "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\evals\\\\functional\\\\task-ownership-and-approval\\\\rerun\\\\vault\\\\.jarvis\\\\runs\\\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\\\v1\\\\results\\\\02-p02.json\"}",
+          "created_at": "2026-07-21T20:55:43Z",
+          "details": {
+            "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\v1\\results\\02-p02.json"
+          }
+        },
+        {
+          "item_id": "p02",
+          "phase": "committed",
+          "idempotency_key": "8422386ea3bd92237e6a39c4cf4195e29e10ac380816e0845b67d56523b5ddab",
+          "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\evals\\\\functional\\\\task-ownership-and-approval\\\\rerun\\\\vault\\\\.jarvis\\\\runs\\\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\\\v1\\\\results\\\\02-p02.json\"}",
+          "created_at": "2026-07-21T20:55:43Z",
+          "details": {
+            "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\v1\\results\\02-p02.json"
+          }
+        },
+        {
+          "item_id": "p03",
+          "phase": "side_effect_prepared",
+          "idempotency_key": "c3c118e14a12b658968a0bfaa7f5791f981c080c5b01b77b259c17ee9e1f4653",
+          "details_json": "{\"side_effects\": \"local_write\"}",
+          "created_at": "2026-07-21T20:55:43Z",
+          "details": {
+            "side_effects": "local_write"
+          }
+        },
+        {
+          "item_id": "p03",
+          "phase": "before_dispatch",
+          "idempotency_key": "c3c118e14a12b658968a0bfaa7f5791f981c080c5b01b77b259c17ee9e1f4653",
+          "details_json": "{\"side_effects\": \"local_write\"}",
+          "created_at": "2026-07-21T20:55:43Z",
+          "details": {
+            "side_effects": "local_write"
+          }
+        },
+        {
+          "item_id": "p03",
+          "phase": "side_effect_started",
+          "idempotency_key": "c3c118e14a12b658968a0bfaa7f5791f981c080c5b01b77b259c17ee9e1f4653",
+          "details_json": "{\"resource_class\": \"io\"}",
+          "created_at": "2026-07-21T20:55:43Z",
+          "details": {
+            "resource_class": "io"
+          }
+        },
+        {
+          "item_id": "p03",
+          "phase": "result_written",
+          "idempotency_key": "c3c118e14a12b658968a0bfaa7f5791f981c080c5b01b77b259c17ee9e1f4653",
+          "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\evals\\\\functional\\\\task-ownership-and-approval\\\\rerun\\\\vault\\\\.jarvis\\\\runs\\\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\\\v1\\\\results\\\\03-p03.json\", \"verdict\": \"ACCEPT\"}",
+          "created_at": "2026-07-21T20:55:44Z",
+          "details": {
+            "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\v1\\results\\03-p03.json",
+            "verdict": "ACCEPT"
+          }
+        },
+        {
+          "item_id": "p03",
+          "phase": "side_effect_committed",
+          "idempotency_key": "c3c118e14a12b658968a0bfaa7f5791f981c080c5b01b77b259c17ee9e1f4653",
+          "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\evals\\\\functional\\\\task-ownership-and-approval\\\\rerun\\\\vault\\\\.jarvis\\\\runs\\\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\\\v1\\\\results\\\\03-p03.json\"}",
+          "created_at": "2026-07-21T20:55:44Z",
+          "details": {
+            "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\v1\\results\\03-p03.json"
+          }
+        },
+        {
+          "item_id": "p03",
+          "phase": "committed",
+          "idempotency_key": "c3c118e14a12b658968a0bfaa7f5791f981c080c5b01b77b259c17ee9e1f4653",
+          "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\evals\\\\functional\\\\task-ownership-and-approval\\\\rerun\\\\vault\\\\.jarvis\\\\runs\\\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\\\v1\\\\results\\\\03-p03.json\"}",
+          "created_at": "2026-07-21T20:55:44Z",
+          "details": {
+            "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\v1\\results\\03-p03.json"
+          }
+        }
+      ],
+      "summary_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Summaries\\2026-07-21-completed-plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-function.md"
+    }
+  }
+}

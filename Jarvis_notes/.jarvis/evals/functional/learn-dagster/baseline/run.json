@@ -1,0 +1,816 @@
+{
+  "schema_version": "jarvis_functional_eval_run/v1",
+  "run_id": "functional-learning-baseline-20260721-165946",
+  "scenario": "learning",
+  "round": "baseline",
+  "started_at": "2026-07-21T15:59:46Z",
+  "completed_at": "2026-07-21T15:59:48Z",
+  "provider": [
+    "deterministic"
+  ],
+  "model": [],
+  "route": [
+    "capability_registry/workflows/plan",
+    "web_search/research",
+    "jarvis_memory/learn_topic",
+    "jarvis_memory/query_local"
+  ],
+  "tools": [
+    "capability_registry",
+    "jarvis_memory",
+    "web_search"
+  ],
+  "duration_seconds": 1.393,
+  "artifacts": [
+    "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\learn-dagster\\baseline\\vault\\Deep Research\\2026-07-21-learning-report-dagster.md",
+    "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\learn-dagster\\baseline\\vault\\Memories\\learned_topics\\dagster.md"
+  ],
+  "fallback_reason": [],
+  "steps": [
+    {
+      "step_id": "workflow-plan",
+      "route": "capability_registry/workflows/plan",
+      "tools": [
+        "capability_registry"
+      ],
+      "started_at": "2026-07-21T15:59:46Z",
+      "completed_at": "2026-07-21T15:59:46Z",
+      "duration_seconds": 0.003,
+      "ok": true,
+      "provider": "deterministic",
+      "model": "",
+      "role": "",
+      "fallback_reason": "",
+      "artifacts": [],
+      "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\learn-dagster\\baseline\\evidence\\01-workflow-plan.json",
+      "error": ""
+    },
+    {
+      "step_id": "source-gathering",
+      "route": "web_search/research",
+      "tools": [
+        "web_search"
+      ],
+      "started_at": "2026-07-21T15:59:46Z",
+      "completed_at": "2026-07-21T15:59:48Z",
+      "duration_seconds": 1.315,
+      "ok": true,
+      "provider": "deterministic",
+      "model": "",
+      "role": "",
+      "fallback_reason": "",
+      "artifacts": [],
+      "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\learn-dagster\\baseline\\evidence\\02-source-gathering.json",
+      "error": ""
+    },
+    {
+      "step_id": "learning-set",
+      "route": "jarvis_memory/learn_topic",
+      "tools": [
+        "jarvis_memory"
+      ],
+      "started_at": "2026-07-21T15:59:48Z",
+      "completed_at": "2026-07-21T15:59:48Z",
+      "duration_seconds": 0.071,
+      "ok": true,
+      "provider": "deterministic",
+      "model": "",
+      "role": "",
+      "fallback_reason": "",
+      "artifacts": [
+        "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\learn-dagster\\baseline\\vault\\Deep Research\\2026-07-21-learning-report-dagster.md",
+        "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\learn-dagster\\baseline\\vault\\Memories\\learned_topics\\dagster.md"
+      ],
+      "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\learn-dagster\\baseline\\evidence\\03-learning-set.json",
+      "error": ""
+    },
+    {
+      "step_id": "rag-recall",
+      "route": "jarvis_memory/query_local",
+      "tools": [
+        "jarvis_memory"
+      ],
+      "started_at": "2026-07-21T15:59:48Z",
+      "completed_at": "2026-07-21T15:59:48Z",
+      "duration_seconds": 0.004,
+      "ok": true,
+      "provider": "deterministic",
+      "model": "",
+      "role": "",
+      "fallback_reason": "",
+      "artifacts": [],
+      "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\learn-dagster\\baseline\\evidence\\04-rag-recall.json",
+      "error": ""
+    }
+  ],
+  "validators": [
+    {
+      "id": "learning-set-created",
+      "passed": false,
+      "critical": true,
+      "score": 0.0,
+      "evidence": [
+        "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\learn-dagster\\baseline\\vault\\Deep Research\\2026-07-21-learning-report-dagster.md",
+        "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\learn-dagster\\baseline\\vault\\Memories\\learned_topics\\dagster.md"
+      ]
+    },
+    {
+      "id": "primary-dagster-citations",
+      "passed": true,
+      "critical": true,
+      "score": 4.0,
+      "evidence": [
+        "https://docs.dagster.io/",
+        "https://docs.dagster.io/api/dagster/schedules-sensors",
+        "https://docs.dagster.io/getting-started/concepts",
+        "https://docs.dagster.io/guides/automate/asset-sensors",
+        "https://docs.dagster.io/guides/automate/schedules",
+        "https://docs.dagster.io/guides/automate/schedules/constructing-schedules-for-partitioned-assets-and-jobs",
+        "https://docs.dagster.io/guides/automate/sensors",
+        "https://docs.dagster.io/guides/build/jobs",
+        "https://docs.dagster.io/guides/build/jobs/asset-jobs",
+        "https://docs.dagster.io/guides/build/partitions-and-backfills/partitioning-assets"
+      ]
+    },
+    {
+      "id": "learning-components",
+      "passed": false,
+      "critical": true,
+      "score": 0.0,
+      "evidence": {
+        "learning_plan": false,
+        "definitions": true,
+        "source_notes": true,
+        "applications": false,
+        "exercises": false,
+        "gaps": true,
+        "review": true
+      }
+    },
+    {
+      "id": "crosslinks",
+      "passed": true,
+      "critical": false,
+      "score": 4.0,
+      "evidence": "wikilinks present"
+    },
+    {
+      "id": "compact-rag",
+      "passed": false,
+      "critical": false,
+      "score": 0.0,
+      "evidence": {
+        "count": 0
+      }
+    },
+    {
+      "id": "rag-backlinks",
+      "passed": false,
+      "critical": false,
+      "score": 0.0,
+      "evidence": []
+    }
+  ],
+  "average_score": 1.33,
+  "critical_failures": [
+    "learning-set-created",
+    "learning-components"
+  ],
+  "passed": false,
+  "outputs": {
+    "plan": {
+      "ok": true,
+      "query": "Learn Dagster from current primary documentation. Build a linked learning set with a learning plan, core definitions, source notes, applications in machine learning, optimisation, and data processing, exercises, knowledge gaps, and a learning review. Store only verified compact takeaways and report backlinks in RAG.",
+      "workflow_id": "learn_topic_memory",
+      "workflow": {
+        "name": "learn_topic_memory",
+        "workflow_id": "learn_topic_memory",
+        "kind": "workflow",
+        "title": "Learn Topic Memory",
+        "summary": "Research a topic, create a cited report, store key points as a learned-topic memory note, and reindex local RAG.",
+        "categories": [
+          "workflow",
+          "learning",
+          "research",
+          "memory",
+          "rag"
+        ],
+        "keywords": [
+          "learn",
+          "learn about",
+          "learn topic",
+          "teach yourself",
+          "study topic",
+          "knowledge",
+          "rag memory",
+          "deep research",
+          "cited sources"
+        ],
+        "details": "Use when the user asks JARVIS to learn about a topic. The workflow must gather cited sources first, then call jarvis_memory.learn_topic so the readable report and compact RAG memory are both created from the same provenance.",
+        "triggers": [
+          "learn about",
+          "could you learn about",
+          "teach yourself about",
+          "study the topic of",
+          "build your knowledge on"
+        ],
+        "steps": [
+          {
+            "id": "plan_learning",
+            "tool": "capability_registry",
+            "operation": "plan",
+            "requires": [
+              "topic"
+            ],
+            "produces": [
+              "workflow_plan"
+            ],
+            "summary": "plan",
+            "progress_text": "plan"
+          },
+          {
+            "id": "research_topic",
+            "tool": "web_search",
+            "operation": "research",
+            "requires": [
+              "topic",
+              "require_citations"
+            ],
+            "produces": [
+              "structured_sources"
+            ],
+            "summary": "research",
+            "progress_text": "research"
+          },
+          {
+            "id": "persist_learning",
+            "tool": "jarvis_memory",
+            "operation": "learn_topic",
+            "requires": [
+              "topic",
+              "structured_sources"
+            ],
+            "produces": [
+              "deep_research_report",
+              "learned_topic_memory"
+            ],
+            "summary": "learn topic",
+            "progress_text": "learn topic"
+          },
+          {
+            "id": "index_learning",
+            "tool": "jarvis_memory",
+            "operation": "reindex_local",
+            "produces": [
+              "local_rag_index"
+            ],
+            "summary": "reindex local",
+            "requires": [],
+            "progress_text": "reindex local"
+          }
+        ],
+        "invokes": [
+          "capability_registry",
+          "web_search",
+          "jarvis_memory"
+        ],
+        "produces": [
+          "workflow_plan",
+          "structured_sources",
+          "deep_research_report",
+          "learned_topic_memory",
+          "local_rag_index"
+        ],
+        "artifacts": [
+          "Jarvis_notes/Deep Research/*.md",
+          "Jarvis_notes/Memories/learned_topics/*.md",
+          "Jarvis_notes/.jarvis/memory.sqlite"
+        ],
+        "examples": [
+          "learn about WiFi sensing datasets",
+          "teach yourself about local RAG indexing",
+          "study the topic of CSI analysis open-source tools"
+        ],
+        "safety": "Read-only web research plus local Markdown vault writes. It should fail clearly when cited sources are not available.",
+        "risk_level": "low",
+        "requires_confirmation": false,
+        "confirmation_rules": "Read-only web research plus local Markdown vault writes. It should fail clearly when cited sources are not available.",
+        "success_statuses": [
+          "sources_validated",
+          "report_created",
+          "memory_note_created",
+          "indexed_local"
+        ],
+        "block_statuses": [
+          "no_cited_sources",
+          "not_enough_sources",
+          "quality_validation_failed"
+        ],
+        "progress": [
+          "Planning learning route",
+          "Researching cited sources",
+          "Writing report and memory note",
+          "Indexing vault"
+        ],
+        "available": false
+      },
+      "candidates": [
+        {
+          "name": "learn_topic_memory",
+          "title": "Learn Topic Memory",
+          "summary": "Research a topic, create a cited report, store key points as a learned-topic memory note, and reindex local RAG.",
+          "categories": [
+            "workflow",
+            "learning",
+            "research",
+            "memory",
+            "rag"
+          ],
+          "available": false,
+          "kind": "workflow",
+          "score": 66
+        },
+        {
+          "name": "long_form_plan_execution",
+          "title": "Long-Form Plan Execution",
+          "summary": "Create a researched plan note, wait for user review, revise or start it, then execute milestones through guarded tools/subagents and finish with a summary or blocker note.",
+          "categories": [
+            "workflow",
+            "planning",
+            "obsidian",
+            "subagents"
+          ],
+          "available": false,
+          "kind": "workflow",
+          "score": 53
+        },
+        {
+          "name": "current_news_report",
+          "title": "Current News Report",
+          "summary": "Search current news with exact date context, validate cited sources, and save a populated Obsidian report.",
+          "categories": [
+            "workflow",
+            "news",
+            "web",
+            "memory"
+          ],
+          "available": false,
+          "kind": "workflow",
+          "score": 48
+        }
+      ],
+      "match_reason": "Matched workflow 'learn_topic_memory' from request terms and workflow triggers.",
+      "invokes": [
+        "capability_registry",
+        "web_search",
+        "jarvis_memory"
+      ],
+      "requires_confirmation": false,
+      "risk_level": "low",
+      "expected_artifacts": [
+        "Jarvis_notes/Deep Research/*.md",
+        "Jarvis_notes/Memories/learned_topics/*.md",
+        "Jarvis_notes/.jarvis/memory.sqlite"
+      ],
+      "steps": [
+        {
+          "id": "plan_learning",
+          "tool": "capability_registry",
+          "operation": "plan",
+          "requires": [
+            "topic"
+          ],
+          "produces": [
+            "workflow_plan"
+          ],
+          "summary": "plan",
+          "progress_text": "plan"
+        },
+        {
+          "id": "research_topic",
+          "tool": "web_search",
+          "operation": "research",
+          "requires": [
+            "topic",
+            "require_citations"
+          ],
+          "produces": [
+            "structured_sources"
+          ],
+          "summary": "research",
+          "progress_text": "research"
+        },
+        {
+          "id": "persist_learning",
+          "tool": "jarvis_memory",
+          "operation": "learn_topic",
+          "requires": [
+            "topic",
+            "structured_sources"
+          ],
+          "produces": [
+            "deep_research_report",
+            "learned_topic_memory"
+          ],
+          "summary": "learn topic",
+          "progress_text": "learn topic"
+        },
+        {
+          "id": "index_learning",
+          "tool": "jarvis_memory",
+          "operation": "reindex_local",
+          "produces": [
+            "local_rag_index"
+          ],
+          "summary": "reindex local",
+          "requires": [],
+          "progress_text": "reindex local"
+        }
+      ],
+      "progress": [
+        "Planning learning route",
+        "Researching cited sources",
+        "Writing report and memory note",
+        "Indexing vault"
+      ],
+      "success_statuses": [
+        "sources_validated",
+        "report_created",
+        "memory_note_created",
+        "indexed_local"
+      ],
+      "block_statuses": [
+        "no_cited_sources",
+        "not_enough_sources",
+        "quality_validation_failed"
+      ],
+      "identity": {
+        "assistant_name": "JARVIS",
+        "platform_name": "MARK XLVIII",
+        "summary": "JARVIS is the assistant. MARK XLVIII is the local platform and shell."
+      }
+    },
+    "search_result_count": 10,
+    "learned": {
+      "ok": true,
+      "workflow_id": "learn_topic_memory",
+      "topic": "Dagster",
+      "report_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\learn-dagster\\baseline\\vault\\Deep Research\\2026-07-21-learning-report-dagster.md",
+      "memory_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\learn-dagster\\baseline\\vault\\Memories\\learned_topics\\dagster.md",
+      "report_title": "Learning Report - Dagster",
+      "memory_title": "Learned Topic: Dagster",
+      "source_count": 10,
+      "retrieved_at": "2026-07-21T15:59:46Z",
+      "key_points": [
+        "1. Concepts - Dagster Docs: A ResourceDefinition is a way to make external resources (like database or API connections) available to Dagster entities (like assets , schedules , or sensors ) during job execution, and to clean up after execution resolves. [1]",
+        "2. Partitioning assets - Dagster Docs: In Dagster , partitioning is a powerful technique for managing large datasets, improving pipeline performance, and enabling incremental processing. This guide will help you understand how to implement data partitioning in your Dagster projects. There are se... [2]",
+        "3. Jobs - Dagster Docs: When a job begins, it kicks off a run. A run is a single execution of a job in Dagster . Runs can be launched and viewed in the Dagster UI. Benefits Using jobs provides the following benefits: Automation: With schedules and sensors , jobs can be used to aut... [3]",
+        "4. Constructing schedules from partitioned assets and jobs - Dagster: In this guide, we'll walk you through how to construct schedules from partitioned assets and jobs . By the end, you'll be able to: Construct a schedule for a time-partitioned job Customize a partitioned job's starting time Customize the most recent partitio... [4]",
+        "5. Asset jobs - Dagster Docs: An asset job is a type of Dagster job that targets a selection of assets and can be launched manually from the UI, or programmatically by schedules or sensors . [5]",
+        "6. Schedules - Dagster Docs: Schedules Schedules enable automated execution of jobs at specified intervals. These intervals can range from common frequencies like hourly, daily, or weekly, to more complex patterns defined using cron expressions. Basic schedule A basic schedule is defin... [6]",
+        "7. Schedules and sensors - Dagster Docs: Schedules and sensors Dagster offers several ways to run data pipelines without manual intervention, including traditional scheduling and event-based triggers. Automating your Dagster pipelines can boost efficiency and ensure that data is produced consisten... [7]",
+        "8. Asset sensors - Dagster Docs: Asset sensors Asset sensors in Dagster allow you to monitor asset materializations and trigger downstream computations or notifications (e.g. launch a job imperatively or send a Slack message) based on those events. This guide covers the most common use cas... [8]"
+      ],
+      "sources": [
+        {
+          "title": "Concepts - Dagster Docs",
+          "snippet": "A ResourceDefinition is a way to make external resources (like database or API connections) available to Dagster entities (like assets , schedules , or sensors ) during job execution, and to clean up after execution resolves.",
+          "url": "https://docs.dagster.io/getting-started/concepts",
+          "source": "docs.dagster.io",
+          "published_at": "",
+          "retrieved_at": "2026-07-21T15:59:47Z",
+          "backend": "ddg_html"
+        },
+        {
+          "title": "Partitioning assets - Dagster Docs",
+          "snippet": "In Dagster , partitioning is a powerful technique for managing large datasets, improving pipeline performance, and enabling incremental processing. This guide will help you understand how to implement data partitioning in your Dagster projects. There are several ways to partition your data in Dagster : Time-based partitioning, for processing data in specific time intervals Static partitioning ...",
+          "url": "https://docs.dagster.io/guides/build/partitions-and-backfills/partitioning-assets",
+          "source": "docs.dagster.io",
+          "published_at": "",
+          "retrieved_at": "2026-07-21T15:59:47Z",
+          "backend": "ddg_html"
+        },
+        {
+          "title": "Jobs - Dagster Docs",
+          "snippet": "When a job begins, it kicks off a run. A run is a single execution of a job in Dagster . Runs can be launched and viewed in the Dagster UI. Benefits Using jobs provides the following benefits: Automation: With schedules and sensors , jobs can be used to automate the execution of your Dagster pipelines . Refer to the Automation guide for more info.",
+          "url": "https://docs.dagster.io/guides/build/jobs",
+          "source": "docs.dagster.io",
+          "published_at": "",
+          "retrieved_at": "2026-07-21T15:59:47Z",
+          "backend": "ddg_html"
+        },
+        {
+          "title": "Constructing schedules from partitioned assets and jobs - Dagster",
+          "snippet": "In this guide, we'll walk you through how to construct schedules from partitioned assets and jobs . By the end, you'll be able to: Construct a schedule for a time-partitioned job Customize a partitioned job's starting time Customize the most recent partition in a set Construct a schedule for a statically-partitioned job Working with time-based ...",
+          "url": "https://docs.dagster.io/guides/automate/schedules/constructing-schedules-for-partitioned-assets-and-jobs",
+          "source": "docs.dagster.io",
+          "published_at": "",
+          "retrieved_at": "2026-07-21T15:59:47Z",
+          "backend": "ddg_html"
+        },
+        {
+          "title": "Asset jobs - Dagster Docs",
+          "snippet": "An asset job is a type of Dagster job that targets a selection of assets and can be launched manually from the UI, or programmatically by schedules or sensors .",
+          "url": "https://docs.dagster.io/guides/build/jobs/asset-jobs",
+          "source": "docs.dagster.io",
+          "published_at": "",
+          "retrieved_at": "2026-07-21T15:59:47Z",
+          "backend": "ddg_html"
+        },
+        {
+          "title": "Schedules - Dagster Docs",
+          "snippet": "Schedules Schedules enable automated execution of jobs at specified intervals. These intervals can range from common frequencies like hourly, daily, or weekly, to more complex patterns defined using cron expressions. Basic schedule A basic schedule is defined by a JobDefinition and a cron_schedule using the ScheduleDefinition class. A job can be thought of as a selection of assets or ...",
+          "url": "https://docs.dagster.io/guides/automate/schedules",
+          "source": "docs.dagster.io",
+          "published_at": "",
+          "retrieved_at": "2026-07-21T15:59:47Z",
+          "backend": "ddg_html"
+        },
+        {
+          "title": "Schedules and sensors - Dagster Docs",
+          "snippet": "Schedules and sensors Dagster offers several ways to run data pipelines without manual intervention, including traditional scheduling and event-based triggers. Automating your Dagster pipelines can boost efficiency and ensure that data is produced consistently and reliably.",
+          "url": "https://docs.dagster.io/api/dagster/schedules-sensors",
+          "source": "docs.dagster.io",
+          "published_at": "",
+          "retrieved_at": "2026-07-21T15:59:47Z",
+          "backend": "ddg_html"
+        },
+        {
+          "title": "Asset sensors - Dagster Docs",
+          "snippet": "Asset sensors Asset sensors in Dagster allow you to monitor asset materializations and trigger downstream computations or notifications (e.g. launch a job imperatively or send a Slack message) based on those events. This guide covers the most common use cases for asset sensors , such as defining cross- job and cross-code location dependencies.",
+          "url": "https://docs.dagster.io/guides/automate/asset-sensors",
+          "source": "docs.dagster.io",
+          "published_at": "",
+          "retrieved_at": "2026-07-21T15:59:47Z",
+          "backend": "ddg_html"
+        },
+        {
+          "title": "Overview | Dagster Docs",
+          "snippet": "Dagster is a data orchestrator built for data engineers, with integrated lineage, observability, a declarative programming model, and best-in-class testability.",
+          "url": "https://docs.dagster.io/",
+          "source": "docs.dagster.io",
+          "published_at": "",
+          "retrieved_at": "2026-07-21T15:59:47Z",
+          "backend": "ddg_html"
+        },
+        {
+          "title": "Sensors - Dagster Docs",
+          "snippet": "Sensors enable you to take action in response to events that occur either internally within Dagster or in external systems by checking for events at regular intervals and either performing an action or providing an explanation for why the action was skipped.",
+          "url": "https://docs.dagster.io/guides/automate/sensors",
+          "source": "docs.dagster.io",
+          "published_at": "",
+          "retrieved_at": "2026-07-21T15:59:47Z",
+          "backend": "ddg_html"
+        }
+      ],
+      "quality": {
+        "ok": true,
+        "errors": [],
+        "source_urls": [
+          "https://docs.dagster.io/getting-started/concepts",
+          "https://docs.dagster.io/guides/build/partitions-and-backfills/partitioning-assets",
+          "https://docs.dagster.io/guides/build/jobs",
+          "https://docs.dagster.io/guides/automate/schedules/constructing-schedules-for-partitioned-assets-and-jobs",
+          "https://docs.dagster.io/guides/build/jobs/asset-jobs",
+          "https://docs.dagster.io/guides/automate/schedules",
+          "https://docs.dagster.io/api/dagster/schedules-sensors",
+          "https://docs.dagster.io/guides/automate/asset-sensors",
+          "https://docs.dagster.io/",
+          "https://docs.dagster.io/guides/automate/sensors"
+        ]
+      },
+      "reindex": {
+        "ok": true,
+        "backend": "local_sqlite",
+        "index_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\learn-dagster\\baseline\\vault\\.jarvis\\memory.sqlite",
+        "indexed_notes": 0,
+        "excluded_notes": 0,
+        "superseded_notes": 0,
+        "deduplicated_notes": 0
+      },
+      "report": {
+        "ok": true,
+        "local_written": true,
+        "path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\learn-dagster\\baseline\\vault\\Deep Research\\2026-07-21-learning-report-dagster.md",
+        "metadata": {
+          "id": "jarvis-20260721T155948Z-13d4efc3",
+          "title": "Learning Report - Dagster",
+          "type": "deep_research_report",
+          "status": "draft",
+          "created": "2026-07-21T15:59:48Z",
+          "updated": "2026-07-21T15:59:48Z",
+          "project_id": "functional_eval_learning",
+          "source": "daemon",
+          "tags": [
+            "learning",
+            "learned-topic",
+            "rag",
+            "dagster",
+            "research-report"
+          ],
+          "sync_state": "local_only",
+          "index_state": "index_pending",
+          "remember_note_id": "",
+          "rag_index": true,
+          "sensitivity": "internal",
+          "confidence": 0.5,
+          "valid_from": "2026-07-21T15:59:48Z",
+          "review_after": "",
+          "source_version": 1,
+          "content_hash": "3e215332879485684c2731d61828ad142ea6f7d043b619a690b3757c0c12d278",
+          "supersedes": [],
+          "contradicts": [],
+          "depends_on": [],
+          "depended_on_by": [],
+          "extends": [],
+          "extended_by": [],
+          "implements": [],
+          "implemented_by": [],
+          "consumes": [],
+          "consumed_by": [],
+          "related": [],
+          "deleted": false,
+          "deleted_at": "",
+          "learning_state": "report_created",
+          "quality_state": "validated",
+          "retrieved_at": "2026-07-21T15:59:46Z",
+          "search_mode": "research",
+          "source_count": 10,
+          "sync_error": "",
+          "topic": "Dagster",
+          "workflow_id": "learn_topic_memory"
+        },
+        "sync": {
+          "ok": true,
+          "skipped": true,
+          "reason": "remember_me_disabled",
+          "path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\learn-dagster\\baseline\\vault\\Deep Research\\2026-07-21-learning-report-dagster.md",
+          "metadata": {
+            "id": "jarvis-20260721T155948Z-13d4efc3",
+            "title": "Learning Report - Dagster",
+            "type": "deep_research_report",
+            "status": "draft",
+            "created": "2026-07-21T15:59:48Z",
+            "updated": "2026-07-21T15:59:48Z",
+            "project_id": "functional_eval_learning",
+            "source": "daemon",
+            "tags": [
+              "learning",
+              "learned-topic",
+              "rag",
+              "dagster",
+              "research-report"
+            ],
+            "sync_state": "local_only",
+            "index_state": "index_pending",
+            "remember_note_id": "",
+            "rag_index": true,
+            "sensitivity": "internal",
+            "confidence": 0.5,
+            "valid_from": "2026-07-21T15:59:48Z",
+            "review_after": "",
+            "source_version": 1,
+            "content_hash": "3e215332879485684c2731d61828ad142ea6f7d043b619a690b3757c0c12d278",
+            "supersedes": [],
+            "contradicts": [],
+            "depends_on": [],
+            "depended_on_by": [],
+            "extends": [],
+            "extended_by": [],
+            "implements": [],
+            "implemented_by": [],
+            "consumes": [],
+            "consumed_by": [],
+            "related": [],
+            "deleted": false,
+            "deleted_at": "",
+            "learning_state": "report_created",
+            "quality_state": "validated",
+            "retrieved_at": "2026-07-21T15:59:46Z",
+            "search_mode": "research",
+            "source_count": 10,
+            "topic": "Dagster",
+            "workflow_id": "learn_topic_memory",
+            "sync_error": ""
+          }
+        }
+      },
+      "memory": {
+        "ok": true,
+        "local_written": true,
+        "path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\learn-dagster\\baseline\\vault\\Memories\\learned_topics\\dagster.md",
+        "metadata": {
+          "id": "memory-learned-topics-dagster",
+          "title": "Learned Topic: Dagster",
+          "type": "memory",
+          "status": "draft",
+          "created": "2026-07-21T15:59:48Z",
+          "updated": "2026-07-21T15:59:48Z",
+          "project_id": "functional_eval_learning",
+          "source": "daemon",
+          "tags": [
+            "learning",
+            "learned-topic",
+            "rag",
+            "dagster"
+          ],
+          "sync_state": "local_only",
+          "index_state": "index_pending",
+          "remember_note_id": "",
+          "rag_index": true,
+          "sensitivity": "internal",
+          "confidence": 0.5,
+          "valid_from": "2026-07-21T15:59:48Z",
+          "review_after": "",
+          "source_version": 1,
+          "content_hash": "2f1178e5dae0d1c382f8d33740d5cc4c74f0b2c864f63e2ccbe033370fbd0e33",
+          "supersedes": [],
+          "contradicts": [],
+          "depends_on": [],
+          "depended_on_by": [],
+          "extends": [],
+          "extended_by": [],
+          "implements": [],
+          "implemented_by": [],
+          "consumes": [],
+          "consumed_by": [],
+          "related": [],
+          "deleted": false,
+          "deleted_at": "",
+          "learning_state": "memory_created",
+          "report_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\learn-dagster\\baseline\\vault\\Deep Research\\2026-07-21-learning-report-dagster.md",
+          "report_title": "Learning Report - Dagster",
+          "retrieved_at": "2026-07-21T15:59:46Z",
+          "source_count": 10,
+          "sync_error": "",
+          "topic": "Dagster",
+          "workflow_id": "learn_topic_memory"
+        },
+        "sync": {
+          "ok": true,
+          "skipped": true,
+          "reason": "remember_me_disabled",
+          "path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\learn-dagster\\baseline\\vault\\Memories\\learned_topics\\dagster.md",
+          "metadata": {
+            "id": "memory-learned-topics-dagster",
+            "title": "Learned Topic: Dagster",
+            "type": "memory",
+            "status": "draft",
+            "created": "2026-07-21T15:59:48Z",
+            "updated": "2026-07-21T15:59:48Z",
+            "project_id": "functional_eval_learning",
+            "source": "daemon",
+            "tags": [
+              "learning",
+              "learned-topic",
+              "rag",
+              "dagster"
+            ],
+            "sync_state": "local_only",
+            "index_state": "index_pending",
+            "remember_note_id": "",
+            "rag_index": true,
+            "sensitivity": "internal",
+            "confidence": 0.5,
+            "valid_from": "2026-07-21T15:59:48Z",
+            "review_after": "",
+            "source_version": 1,
+            "content_hash": "2f1178e5dae0d1c382f8d33740d5cc4c74f0b2c864f63e2ccbe033370fbd0e33",
+            "supersedes": [],
+            "contradicts": [],
+            "depends_on": [],
+            "depended_on_by": [],
+            "extends": [],
+            "extended_by": [],
+            "implements": [],
+            "implemented_by": [],
+            "consumes": [],
+            "consumed_by": [],
+            "related": [],
+            "deleted": false,
+            "deleted_at": "",
+            "learning_state": "memory_created",
+            "report_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\learn-dagster\\baseline\\vault\\Deep Research\\2026-07-21-learning-report-dagster.md",
+            "report_title": "Learning Report - Dagster",
+            "retrieved_at": "2026-07-21T15:59:46Z",
+            "source_count": 10,
+            "topic": "Dagster",
+            "workflow_id": "learn_topic_memory",
+            "sync_error": ""
+          }
+        }
+      }
+    },
+    "rag": {
+      "ok": true,
+      "backend": "local_sqlite",
+      "query": "Dagster assets resources orchestration",
+      "filters": {
+        "project_id": "",
+        "note_types": [],
+        "tags": []
+      },
+      "results": []
+    }
+  }
+}

@@ -1,0 +1,106 @@
+{
+  "ok": true,
+  "path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\baseline\\vault\\Plans\\2026-07-21-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-under-f-mark-xlvi.md",
+  "title": "Plan - Plan and build an isolated modular Python job-runner demo under F:\\Mark-XLVIII-main\\Jarvis",
+  "status": "queued",
+  "approval_state": "approved",
+  "execution_state": "queued",
+  "run_id": "plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde-v1",
+  "bundle_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\baseline\\vault\\.jarvis\\runs\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde\\v1",
+  "execution_summary_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\baseline\\vault\\Summaries\\2026-07-21-execution-run-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-und.md",
+  "packets": [
+    {
+      "id": "p01",
+      "task": "Confirm objective, constraints, and success criteria with the user",
+      "worker": "local_worker",
+      "step_type": "model_reasoning",
+      "depends_on": []
+    },
+    {
+      "id": "p02",
+      "task": "Collect read-only local context from the vault, relevant files, project registry, and capability manifest",
+      "worker": "local_worker",
+      "step_type": "model_reasoning",
+      "depends_on": [
+        "p01"
+      ]
+    },
+    {
+      "id": "p03",
+      "task": "Collect cited web research when the task depends on current or external information",
+      "worker": "web_search",
+      "step_type": "tool",
+      "depends_on": [
+        "p02"
+      ]
+    },
+    {
+      "id": "p04",
+      "task": "Draft the plan as an Obsidian Markdown artifact and wait for review",
+      "worker": "local_worker",
+      "step_type": "model_reasoning",
+      "depends_on": [
+        "p03"
+      ]
+    },
+    {
+      "id": "p05",
+      "task": "Revise the plan until scope, risks, and decision points are clear",
+      "worker": "local_worker",
+      "step_type": "model_reasoning",
+      "depends_on": [
+        "p04"
+      ]
+    },
+    {
+      "id": "p06",
+      "task": "After approval, execute one milestone at a time using existing guarded tools and subagent delegation only when useful",
+      "worker": "local_worker",
+      "step_type": "model_reasoning",
+      "depends_on": [
+        "p05"
+      ]
+    },
+    {
+      "id": "p07",
+      "task": "Update the plan when the goal changes, blockers appear, or major design choices are made",
+      "worker": "local_worker",
+      "step_type": "model_reasoning",
+      "depends_on": [
+        "p06"
+      ]
+    },
+    {
+      "id": "p08",
+      "task": "Create an execution summary note when the work is complete or blocked",
+      "worker": "local_worker",
+      "step_type": "model_reasoning",
+      "depends_on": [
+        "p07"
+      ]
+    }
+  ],
+  "agent_count": 1,
+  "reindex": {
+    "ok": true,
+    "backend": "local_sqlite",
+    "index_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\baseline\\vault\\.jarvis\\memory.sqlite",
+    "indexed_notes": 0,
+    "excluded_notes": 0,
+    "superseded_notes": 0,
+    "deduplicated_notes": 0
+  },
+  "message": "Plan approved and queued. Execution starts after the current JARVIS speech turn completes.",
+  "canvas": {
+    "ok": true,
+    "operation": "sync_plan",
+    "path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\baseline\\vault\\Canvases\\JARVIS\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-under-f-m.canvas",
+    "plan_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\baseline\\vault\\Plans\\2026-07-21-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-under-f-mark-xlvi.md",
+    "node_count": 16,
+    "edge_count": 15,
+    "active_task_count": 14,
+    "completed_task_count": 0,
+    "rolling_limit": 24,
+    "canonical_source": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\baseline\\vault\\Plans\\2026-07-21-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-under-f-mark-xlvi.md"
+  }
+}

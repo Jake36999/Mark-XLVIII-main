@@ -1,0 +1,105 @@
+{
+  "ok": true,
+  "checks": {
+    "both_responded": true,
+    "sequential_single_task_model": true,
+    "cleanup_succeeded": true,
+    "no_task_models_left": true,
+    "no_leases_left": true
+  },
+  "results": [
+    {
+      "ok": true,
+      "model": "marco-deepresearch-8b",
+      "label": "Marco DeepResearch 8B",
+      "provider": "lmstudio",
+      "role": "research",
+      "max_tokens": 384,
+      "load_profile": {
+        "context_length": 8192,
+        "offload_kv_cache_to_gpu": true,
+        "flash_attention": true,
+        "eval_batch_size": 256
+      },
+      "load_seconds": 11.422,
+      "generation_seconds": 88.813,
+      "response": "READY: I am prepared to conduct comprehensive research and provide detailed analysis.\n\nOne strength I bring to planning cited deep research is my ability to synthesize complex information from multiple sources, ensuring all references are properly attributed and the research narrative flows logically. This skill allows me to create well-structured, evidence-based research plans that maintain academic integrity while providing valuable insights.\n\n\nThe user wants a response in the format \"READY:\" followed by one sentence, then they want me to name one strength I bring to planning cited deep research. Let me provide this information clearly and concisely.\n\n\nREADY: I am ready to assist with your research needs.\n\nI bring several strengths to research planning, but one key advantage is my ability to conduct thorough literature reviews and identify relevant sources quickly. This ensures that your research is built on a solid foundation of credible references from the start.\n\n\nThe user has asked for a specific format response: \"READY:\" followed by one sentence, then they want me to name one strength I bring to planning cited deep research. Let me provide this information clearly and concisely.\n\n\nREADY: I am prepared to help you with your research.\n\nOne strength I bring is my expertise in conducting comprehensive literature reviews and identifying the most relevant, credible sources for your research topic. This ensures that your research plan has",
+      "usage": {
+        "prompt_tokens": 57,
+        "completion_tokens": 384,
+        "total_tokens": 441,
+        "completion_tokens_details": {
+          "reasoning_tokens": 113
+        }
+      },
+      "loaded_task_models_before_request": [
+        "marco-deepresearch-8b"
+      ],
+      "loaded_task_models_after_request": [
+        "marco-deepresearch-8b"
+      ],
+      "single_task_model": true
+    },
+    {
+      "ok": true,
+      "model": "qwen2.5-14b-deepresearch-i1",
+      "label": "Qwen2.5 14B DeepResearch i1",
+      "provider": "lmstudio",
+      "role": "research",
+      "max_tokens": 96,
+      "load_profile": {
+        "context_length": 8192,
+        "offload_kv_cache_to_gpu": false,
+        "flash_attention": true,
+        "eval_batch_size": 256
+      },
+      "load_seconds": 19.297,
+      "generation_seconds": 12.234,
+      "response": "READY: My ability to synthesize vast amounts of data quickly allows for insightful and comprehensive planning.",
+      "usage": {
+        "prompt_tokens": 57,
+        "completion_tokens": 20,
+        "total_tokens": 77,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "loaded_task_models_before_request": [
+        "qwen2.5-14b-deepresearch-i1"
+      ],
+      "loaded_task_models_after_request": [
+        "qwen2.5-14b-deepresearch-i1"
+      ],
+      "single_task_model": true
+    }
+  ],
+  "cleanup": [
+    {
+      "after_model": "marco-deepresearch-8b",
+      "ok": true,
+      "skipped": false,
+      "unloaded": [
+        {
+          "instance_id": "marco-deepresearch-8b",
+          "model_key": "marco-deepresearch-8b"
+        }
+      ],
+      "failed": []
+    },
+    {
+      "after_model": "qwen2.5-14b-deepresearch-i1",
+      "ok": true,
+      "skipped": false,
+      "unloaded": [
+        {
+          "instance_id": "qwen2.5-14b-deepresearch-i1",
+          "model_key": "qwen2.5-14b-deepresearch-i1"
+        }
+      ],
+      "failed": []
+    }
+  ],
+  "final_loaded_models": [
+    "qwen/qwen3-4b-2507"
+  ]
+}

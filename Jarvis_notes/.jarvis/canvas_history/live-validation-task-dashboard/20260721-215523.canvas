@@ -1,0 +1,1439 @@
+{
+  "nodes": [
+    {
+      "id": "jarvis-4ed0f193612e35f5",
+      "type": "text",
+      "text": "# JARVIS Task Dashboard\n**Active:** 36\n**Overdue:** 0\n**Stale:** 0\n**Visible:** 49 of 49\n\n> Markdown checkboxes are authoritative. Re-sync replaces this rolling view.",
+      "x": 0,
+      "y": 0,
+      "width": 430,
+      "height": 240,
+      "color": "4"
+    },
+    {
+      "id": "jarvis-70884bb83bebd02e",
+      "type": "file",
+      "file": "Progress/2026-07-21-jarvis-implementation-progress-report.md",
+      "x": 560,
+      "y": 0,
+      "width": 390,
+      "height": 250
+    },
+    {
+      "id": "jarvis-65c73fcf1311b9a4",
+      "type": "text",
+      "text": "## [ ] Apply a Canvas task proposal to a disposable Markdown task note after confirmation.\n\n`task-3410be814686`\n\nowner: user",
+      "x": 1040,
+      "y": 0,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-3410be814686",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Progress\\2026-07-21-jarvis-implementation-progress-report.md",
+        "source_line": 84,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "a5087a3d893f8665349072565dd5e71b177504d445af1cb9809e5d9a7b4de38e"
+      }
+    },
+    {
+      "id": "jarvis-4efbcc857d39a649",
+      "type": "file",
+      "file": "Plans/2026-07-21-plan-create-a.md",
+      "x": 560,
+      "y": 310,
+      "width": 390,
+      "height": 250
+    },
+    {
+      "id": "jarvis-e985f6e9ce5fede9",
+      "type": "text",
+      "text": "## [ ] Approval gates are visible.\n\n`task-e3c87a2b53ef`\n\nowner: user",
+      "x": 1430,
+      "y": 0,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-e3c87a2b53ef",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-21-plan-create-a.md",
+        "source_line": 51,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "3db7d1c8271e1968b421107a5a3799b9eb95a43809b14ae9019d2eae58dbec58"
+      }
+    },
+    {
+      "id": "jarvis-0f5949aa5b994695",
+      "type": "text",
+      "text": "## [ ] Blockers and design decision points are explicit.\n\n`task-45883393db34`\n\nowner: user",
+      "x": 1040,
+      "y": 210,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-45883393db34",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-21-plan-create-a.md",
+        "source_line": 50,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "a8573b37f17db9ab1513b94a5969bda3c5e2bbb887a62db40d13b9286a09adea"
+      }
+    },
+    {
+      "id": "jarvis-da0f31b472aba845",
+      "type": "text",
+      "text": "## [ ] Completion summary requirements are defined.\n\n`task-6daa316e4388`\n\nowner: user",
+      "x": 1430,
+      "y": 210,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-6daa316e4388",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-21-plan-create-a.md",
+        "source_line": 52,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "cbe70f4bb52360dd35f74bdf79c8821c9d64fd85cc3a27066987ea68c5b8e7f8"
+      }
+    },
+    {
+      "id": "jarvis-3073ea20d307edf5",
+      "type": "text",
+      "text": "## [ ] Confirm model provenance, quality floors, fallback reasons, TTL cleanup, and specialist unloading.\n\n`task-4b604e974be3`\n\nowner: user",
+      "x": 1040,
+      "y": 420,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-4b604e974be3",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Progress\\2026-07-21-jarvis-implementation-progress-report.md",
+        "source_line": 74,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "c7c19af196f650b63f8753be5a037c1141da890e882ecd836f7779480eb355f4"
+      }
+    },
+    {
+      "id": "jarvis-8dae84f43d401447",
+      "type": "text",
+      "text": "## [ ] Confirm STT allows a complete spoken turn without splitting words or injecting ambient language changes.\n\n`task-cd4389aaf18d`\n\nowner: user",
+      "x": 1430,
+      "y": 420,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-cd4389aaf18d",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Progress\\2026-07-21-jarvis-implementation-progress-report.md",
+        "source_line": 77,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "a410b2d48fa9b2b8a312afa064e2c13e29ae9ddf485032815947c07ade63c231"
+      }
+    },
+    {
+      "id": "jarvis-3f52f19217b575cb",
+      "type": "text",
+      "text": "## [ ] Confirm TTS chunks play once, in order, without overlapping voices.\n\n`task-6166d5fcaaca`\n\nowner: user",
+      "x": 1040,
+      "y": 630,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-6166d5fcaaca",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Progress\\2026-07-21-jarvis-implementation-progress-report.md",
+        "source_line": 76,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "b106b3a19400d621f0329319331de4e1b5b7cc7a2419fb99e50beb5984f1b37b"
+      }
+    },
+    {
+      "id": "jarvis-c47686f828516210",
+      "type": "text",
+      "text": "## [ ] Confirm two independent non-model steps overlap while model generations remain serialized.\n\n`task-7526b89d47cc`\n\nowner: user",
+      "x": 1430,
+      "y": 630,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-7526b89d47cc",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Progress\\2026-07-21-jarvis-implementation-progress-report.md",
+        "source_line": 65,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "d70c537cf750e2a02bdba95e7d5a0876b169d7d409e5674696b30041667312a8"
+      }
+    },
+    {
+      "id": "jarvis-632182f013f91326",
+      "type": "text",
+      "text": "## [ ] Create a plan, review its Markdown/YAML/JSON parity, approve it, and execute a bounded read-only run.\n\n`task-8e91fa832e35`\n\nowner: user",
+      "x": 1040,
+      "y": 840,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-8e91fa832e35",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Progress\\2026-07-21-jarvis-implementation-progress-report.md",
+        "source_line": 64,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "55528106b21ff29b951cb744f5b535df671fcbca4a2fac454b0ba49a041778c4"
+      }
+    },
+    {
+      "id": "jarvis-d3dbba66860e6abc",
+      "type": "text",
+      "text": "## [ ] Create and cancel a temporary reminder.\n\n`task-c191fec3f545`\n\nowner: user",
+      "x": 1430,
+      "y": 840,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-c191fec3f545",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Progress\\2026-07-21-jarvis-implementation-progress-report.md",
+        "source_line": 82,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "61120c7839672f658ffadf2547e49c165fd8443888149d943c5991dcaa3f3930"
+      }
+    },
+    {
+      "id": "jarvis-8ad4bc827bfd17c3",
+      "type": "text",
+      "text": "## [ ] Create, reindex, and retrieve a real vault note through conversational routing.\n\n`task-0a14beeb1613`\n\nowner: user",
+      "x": 1040,
+      "y": 1050,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-0a14beeb1613",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Progress\\2026-07-21-jarvis-implementation-progress-report.md",
+        "source_line": 63,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "42c53d31b5bae5d529304e9c8719178d7fbd036d73be0603ad8fe9cb7123f467"
+      }
+    },
+    {
+      "id": "jarvis-edc640c53a6f9c75",
+      "type": "text",
+      "text": "## [ ] Destructive actions explicitly confirmed.\n\n`task-f512ef99843f`\n\nowner: user",
+      "x": 1430,
+      "y": 1050,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-f512ef99843f",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-21-plan-create-a.md",
+        "source_line": 122,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "4903cb7a0bc008e68a6c8e757ea67f179875ac29be9ec7a76a1f8315de1f9b87"
+      }
+    },
+    {
+      "id": "jarvis-b9c157172f8eeb5c",
+      "type": "text",
+      "text": "## [ ] Execution milestones are ordered.\n\n`task-764d0bbccbee`\n\nowner: user",
+      "x": 1040,
+      "y": 1260,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-764d0bbccbee",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-21-plan-create-a.md",
+        "source_line": 49,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "7f4c137231ce0641757e8fc62b129a51dcc09af5dc0b6a5309f3a47df7d693e2"
+      }
+    },
+    {
+      "id": "jarvis-e46087b771c7aafc",
+      "type": "text",
+      "text": "## [ ] High-cost model use approved when needed.\n\n`task-97635443b3e3`\n\nowner: user",
+      "x": 1430,
+      "y": 1260,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-97635443b3e3",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-21-plan-create-a.md",
+        "source_line": 123,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "cb1fbd40ab4f4925cf2414e5b8d39f955bf96b9a3b840c3e307d726d4a4848af"
+      }
+    },
+    {
+      "id": "jarvis-830b87284fb0b1cd",
+      "type": "text",
+      "text": "## [ ] Interrupt a running safe workflow and verify lease release, checkpointing, cancellation, and recovery.\n\n`task-89a905415040`\n\nowner: user",
+      "x": 1040,
+      "y": 1470,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-89a905415040",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Progress\\2026-07-21-jarvis-implementation-progress-report.md",
+        "source_line": 67,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "c31ad952de28b974dc566def80bb2d1c3de3ba0f8834e86ca4aafe5c1c4b7caa"
+      }
+    },
+    {
+      "id": "jarvis-eb4487ec4766a241",
+      "type": "text",
+      "text": "## [ ] JARVIS creates a summary or blocker note after execution starts.\n\n`task-c7e3ef17d555`\n\nowner: user",
+      "x": 1430,
+      "y": 1470,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-c7e3ef17d555",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-21-plan-create-a.md",
+        "source_line": 131,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "a232ce6cd8ad42a309ed3525be63864bcded4308b38d83145f9e44092f636992"
+      }
+    },
+    {
+      "id": "jarvis-458cfdbe06bbe228",
+      "type": "text",
+      "text": "## [ ] JARVIS updates the plan if the goal changes.\n\n`task-466154e7dd69`\n\nowner: user",
+      "x": 1040,
+      "y": 1680,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-466154e7dd69",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-21-plan-create-a.md",
+        "source_line": 130,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "2968a645bf76ac79ae078b2d974bce4cec26574ef36da21a3782a30d9401c292"
+      }
+    },
+    {
+      "id": "jarvis-3056bd8018924f95",
+      "type": "text",
+      "text": "## [ ] Load a Nomic embedding model in LM Studio and run a live semantic retrieval comparison.\n\n`task-0b9e1588f6b0`\n\nowner: user",
+      "x": 1430,
+      "y": 1680,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-0b9e1588f6b0",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Progress\\2026-07-21-jarvis-implementation-progress-report.md",
+        "source_line": 91,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "3f2b772f5811bde7df7e30210fdf51d29b94f962f6a2862c6394f277e5dffd6e"
+      }
+    },
+    {
+      "id": "jarvis-4ad309e7f9426af0",
+      "type": "text",
+      "text": "## [ ] Locate or install `ffmpeg` and `ffprobe` before audio/video file workflow validation.\n\n`task-197a3f76fcb3`\n\nowner: user",
+      "x": 1040,
+      "y": 1890,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-197a3f76fcb3",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Progress\\2026-07-21-jarvis-implementation-progress-report.md",
+        "source_line": 90,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "1b95c82d4f6226b5444240303a4e12f04b8c79d752d56cfd3851f4d775f974b5"
+      }
+    },
+    {
+      "id": "jarvis-056e7461d87fdcac",
+      "type": "text",
+      "text": "## [ ] Measure synthesis and TTS latency under realistic response lengths.\n\n`task-4a96878740ec`\n\nowner: user",
+      "x": 1430,
+      "y": 1890,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-4a96878740ec",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Progress\\2026-07-21-jarvis-implementation-progress-report.md",
+        "source_line": 75,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "5c13d82f38225135ba194164a523757cdb9d3fc3a86a79f42b846a72d104fff3"
+      }
+    },
+    {
+      "id": "jarvis-08f2df45a12a302f",
+      "type": "text",
+      "text": "## [ ] Navigate and read a harmless browser page, then test one confirmed browser write action.\n\n`task-5495827869b1`\n\nowner: user",
+      "x": 1040,
+      "y": 2100,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-5495827869b1",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Progress\\2026-07-21-jarvis-implementation-progress-report.md",
+        "source_line": 83,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "9ba788d080f61ef0a4066db060064f72822f0dd789e546ad7581f3ce2b73e66d"
+      }
+    },
+    {
+      "id": "jarvis-020c3d7ca78ca18b",
+      "type": "text",
+      "text": "## [ ] Plan approved by user.\n\n`task-bf1fa4e92136`\n\nowner: user",
+      "x": 1430,
+      "y": 2100,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-bf1fa4e92136",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-21-plan-create-a.md",
+        "source_line": 121,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "af466f708b8c947dad485e4d7ff17ad6d77749b1e0d0969b1d3b677d55eee78a"
+      }
+    },
+    {
+      "id": "jarvis-89838e8e506d46f8",
+      "type": "text",
+      "text": "## [ ] Plan reviewed in Obsidian.\n\n`task-4848d5c5e884`\n\nowner: user",
+      "x": 1040,
+      "y": 2310,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-4848d5c5e884",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-21-plan-create-a.md",
+        "source_line": 47,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "adae1169b554eb59572186679fb8518d493edd52d059cb194deeb335e7a0dda0"
+      }
+    },
+    {
+      "id": "jarvis-ef4d0fa58669d88b",
+      "type": "text",
+      "text": "## [ ] Query the capability registry and inspect health from the JARVIS UI.\n\n`task-c858fd10a817`\n\nowner: user",
+      "x": 1430,
+      "y": 2310,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-c858fd10a817",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Progress\\2026-07-21-jarvis-implementation-progress-report.md",
+        "source_line": 62,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "97cf4239bcf283bad22f3c87d497a8ac423775e3ef3d18ea5407d839cb8657d5"
+      }
+    },
+    {
+      "id": "jarvis-a8ce2a36fe1dcef7",
+      "type": "text",
+      "text": "## [ ] Run a cited current-news report from search through Obsidian persistence and RAG retrieval.\n\n`task-620fdce1646f`\n\nowner: user",
+      "x": 1040,
+      "y": 2520,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-620fdce1646f",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Progress\\2026-07-21-jarvis-implementation-progress-report.md",
+        "source_line": 72,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "e202ae3963797c5ebb69ffbb29b29c0838092e8dba2a2b4f92147316da1ba7f5"
+      }
+    },
+    {
+      "id": "jarvis-1747203ba7e9ddd2",
+      "type": "text",
+      "text": "## [ ] Run an independent reviewer and exercise one bounded repair cycle.\n\n`task-81878fd93d32`\n\nowner: user",
+      "x": 1430,
+      "y": 2520,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-81878fd93d32",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Progress\\2026-07-21-jarvis-implementation-progress-report.md",
+        "source_line": 66,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "dcfbed751bcd6e270f3aaf62fd30fa7a5ce22b9ea3ad6cd3680dd37c96503c37"
+      }
+    },
+    {
+      "id": "jarvis-963503be971a51dc",
+      "type": "text",
+      "text": "## [ ] Run one OpenClaw coding scout against a disposable test project and verify its handoff note.\n\n`task-394e4ad8b2e0`\n\nowner: user",
+      "x": 1040,
+      "y": 2730,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-394e4ad8b2e0",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Progress\\2026-07-21-jarvis-implementation-progress-report.md",
+        "source_line": 81,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "0f20bd399126452bb4a689836128fce4e8cc75ff18e5b432d40d05b332a1b878"
+      }
+    },
+    {
+      "id": "jarvis-f6c9af9c819b578f",
+      "type": "text",
+      "text": "## [ ] Scope and out-of-scope items are clear.\n\n`task-3d9eb3571a5e`\n\nowner: user",
+      "x": 1430,
+      "y": 2730,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-3d9eb3571a5e",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-21-plan-create-a.md",
+        "source_line": 48,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "3438169b8e51a2a2b8c274d8841930ff0abea85f9703b80fdc572f7044aa5d9c"
+      }
+    },
+    {
+      "id": "jarvis-b30e1c5cfb26c03d",
+      "type": "text",
+      "text": "## [ ] Start and test the optional Aletheia bridge on port `8765`, or formally retain MCP-only operation.\n\n`task-a537d216e675`\n\nowner: user",
+      "x": 1040,
+      "y": 2940,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-a537d216e675",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Progress\\2026-07-21-jarvis-implementation-progress-report.md",
+        "source_line": 89,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "54660e3b9f1a3102bcdc9187b599d65b4b7fbda0108e84c15819e82f26b6ffd1"
+      }
+    },
+    {
+      "id": "jarvis-69bbff7302a056f6",
+      "type": "text",
+      "text": "## [ ] Start the standalone MCP server and call read-only tools from an external MCP client.\n\n`task-c8aa39dd32ca`\n\nowner: user",
+      "x": 1430,
+      "y": 2940,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-c8aa39dd32ca",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Progress\\2026-07-21-jarvis-implementation-progress-report.md",
+        "source_line": 68,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "e10f61361109aeaf0bec9d47fb4844f520a1eee00446636b629a7f265adfadc0"
+      }
+    },
+    {
+      "id": "jarvis-244b832038518260",
+      "type": "text",
+      "text": "## [ ] Subagent delegation approved when needed.\n\n`task-232ec9cacc9f`\n\nowner: user",
+      "x": 1040,
+      "y": 3150,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-232ec9cacc9f",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-21-plan-create-a.md",
+        "source_line": 124,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "a9ca1fff6403f3766620c83047f90bd3a33782a930ba5b61ee73297d07c127a9"
+      }
+    },
+    {
+      "id": "jarvis-9cc0b1edb9345131",
+      "type": "text",
+      "text": "## [ ] User requests edits or approves execution.\n\n`task-2474c2f44ca8`\n\nowner: user",
+      "x": 1430,
+      "y": 3150,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-2474c2f44ca8",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-21-plan-create-a.md",
+        "source_line": 129,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "8babd3bfeeed7cb5348043a77739c48b64ecde547230dd521e0a24f0cce3f6e4"
+      }
+    },
+    {
+      "id": "jarvis-ffdc435b87fd177b",
+      "type": "text",
+      "text": "## [ ] User reviews this plan in Obsidian.\n\n`task-dc85b2cdf1f4`\n\nowner: user",
+      "x": 1040,
+      "y": 3360,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-dc85b2cdf1f4",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-21-plan-create-a.md",
+        "source_line": 128,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "848c22a9e1b0205223f112a58ede4c90683cf0f780158f0993ac2321b9054be7"
+      }
+    },
+    {
+      "id": "jarvis-2bce5ec165cb03f2",
+      "type": "text",
+      "text": "## [ ] Validate file write, conflict detection, and permission revocation in a temporary vault folder.\n\n`task-12096178ef30`\n\nowner: user",
+      "x": 1430,
+      "y": 3360,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-12096178ef30",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Progress\\2026-07-21-jarvis-implementation-progress-report.md",
+        "source_line": 85,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "8db2f2ff2bb573813a746e903f6f55e9cb55cabaacf60c234223ac237a947fcd"
+      }
+    },
+    {
+      "id": "jarvis-f338a90e71e1d195",
+      "type": "file",
+      "file": "Validation/2026-07-21-live-vault-roundtrip.md",
+      "x": 560,
+      "y": 620,
+      "width": 390,
+      "height": 250
+    },
+    {
+      "id": "jarvis-b9e63a248ec0953c",
+      "type": "text",
+      "text": "## [x] Validate gated Canvas synchronization [task:live-validation-vault-roundtrip] owner:agent permission:execute\n\n`live-validation-vault-roundtrip`\n\nowner: agent",
+      "x": 1040,
+      "y": 3570,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "live-validation-vault-roundtrip",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Validation\\2026-07-21-live-vault-roundtrip.md",
+        "source_line": 3,
+        "source_done": false,
+        "source_permission": "execute",
+        "source_run_id": "",
+        "source_hash": "0709fbc2b58848d943a0dd97b5068abf44a91cfe77655e334e31da0a819af25c"
+      }
+    },
+    {
+      "id": "jarvis-f7b331f11476db87",
+      "type": "text",
+      "text": "## [ ] Validate Marco DeepResearch 8B, then Qwen2.5 14B DeepResearch, without concurrent requests.\n\n`task-ac4228813103`\n\nowner: user",
+      "x": 1430,
+      "y": 3570,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-ac4228813103",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Progress\\2026-07-21-jarvis-implementation-progress-report.md",
+        "source_line": 73,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "e78de7e5efff1af322ad178fdc529f799dcbb1e4e729de5d79b71b2508da8cee"
+      }
+    },
+    {
+      "id": "jarvis-ce53974e9452868f",
+      "type": "text",
+      "text": "## [x] Add crash recovery, idempotency, side-effect checkpoints, compensation metadata, and `UNKNOWN_OUTCOME` handling.\n\n`task-3b93814214b6`\n\nowner: user",
+      "x": 1040,
+      "y": 3780,
+      "width": 350,
+      "height": 170,
+      "color": "5",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-3b93814214b6",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Progress\\2026-07-21-jarvis-implementation-progress-report.md",
+        "source_line": 36,
+        "source_done": true,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "7944099d5894c89f207eba39bde48e45423d7cae6e9cd358e4d6a390a09e917e"
+      }
+    },
+    {
+      "id": "jarvis-9b7df03bf494bff1",
+      "type": "text",
+      "text": "## [x] Add hybrid local memory retrieval and automatic Obsidian vault indexing.\n\n`task-3989bfdade1c`\n\nowner: user",
+      "x": 1430,
+      "y": 3780,
+      "width": 350,
+      "height": 170,
+      "color": "5",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-3989bfdade1c",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Progress\\2026-07-21-jarvis-implementation-progress-report.md",
+        "source_line": 39,
+        "source_done": true,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "db5411ba273f74b09b27a07ce829eb6fe4f9f449de0693d9b75543e31ce858d0"
+      }
+    },
+    {
+      "id": "jarvis-26a9251bd27c462a",
+      "type": "text",
+      "text": "## [x] Add independent review outcomes: `ACCEPT`, `REPAIR`, `REJECT_REPLAN`, and `ESCALATE`.\n\n`task-f897afc77024`\n\nowner: user",
+      "x": 1040,
+      "y": 3990,
+      "width": 350,
+      "height": 170,
+      "color": "5",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-f897afc77024",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Progress\\2026-07-21-jarvis-implementation-progress-report.md",
+        "source_line": 35,
+        "source_done": true,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "f0e96998bbf1adf84d27ed04bde6b56c022eb2b9bb3801387becdacf21757350"
+      }
+    },
+    {
+      "id": "jarvis-de9308a7cb87eb18",
+      "type": "text",
+      "text": "## [x] Add installable, versioned, approval-gated JARVIS skills.\n\n`task-8876853c71ee`\n\nowner: user",
+      "x": 1430,
+      "y": 3990,
+      "width": 350,
+      "height": 170,
+      "color": "5",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-8876853c71ee",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Progress\\2026-07-21-jarvis-implementation-progress-report.md",
+        "source_line": 38,
+        "source_done": true,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "4e1508791fa695a9e594f03a4b6902ec83742d27623be5fcb81e0bb2470b1cf9"
+      }
+    },
+    {
+      "id": "jarvis-4c0902bea334a7d0",
+      "type": "text",
+      "text": "## [x] Add task, graph, Canvas, document, folder, and native-tool workflow support.\n\n`task-592e815749ec`\n\nowner: user",
+      "x": 1040,
+      "y": 4200,
+      "width": 350,
+      "height": 170,
+      "color": "5",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-592e815749ec",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Progress\\2026-07-21-jarvis-implementation-progress-report.md",
+        "source_line": 40,
+        "source_done": true,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "51056087f389fe3706f1a7470e164740decbe54fb309c7696297888690e1f6a2"
+      }
+    },
+    {
+      "id": "jarvis-e50b054c4241f654",
+      "type": "text",
+      "text": "## [x] Bind plan approval to plan, workflow, manifest, and action hashes.\n\n`task-9de35b5865f2`\n\nowner: user",
+      "x": 1430,
+      "y": 4200,
+      "width": 350,
+      "height": 170,
+      "color": "5",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-9de35b5865f2",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Progress\\2026-07-21-jarvis-implementation-progress-report.md",
+        "source_line": 31,
+        "source_done": true,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "bd5ea8599882f00a44f812f7e58cc746695340bf4b348273dadf64c708ca5270"
+      }
+    },
+    {
+      "id": "jarvis-4c3efa4d04bb94f1",
+      "type": "text",
+      "text": "## [x] Compile read-only plans into strict `jarvis_dual_orchestrator/v1` YAML and immutable JSON work items.\n\n`task-6ce8ece29e91`\n\nowner: user",
+      "x": 1040,
+      "y": 4410,
+      "width": 350,
+      "height": 170,
+      "color": "5",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-6ce8ece29e91",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Progress\\2026-07-21-jarvis-implementation-progress-report.md",
+        "source_line": 30,
+        "source_done": true,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "3337615ed3912264f2de0379de6f472ad4c448ae097879c219f678c8420427f9"
+      }
+    },
+    {
+      "id": "jarvis-9bf4002847c5d1b9",
+      "type": "text",
+      "text": "## [x] Enforce visible work-item parity and prevent hidden child-task dispatch.\n\n`task-6ebb2a937fe3`\n\nowner: user",
+      "x": 1430,
+      "y": 4410,
+      "width": 350,
+      "height": 170,
+      "color": "5",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-6ebb2a937fe3",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Progress\\2026-07-21-jarvis-implementation-progress-report.md",
+        "source_line": 32,
+        "source_done": true,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "369876891a5cce01a30185054c9ff0b3c64cd9402b700ed9d3c28c5da1bfde00"
+      }
+    },
+    {
+      "id": "jarvis-ff96e6f24688b946",
+      "type": "text",
+      "text": "## [x] Expose progressive capability cards, manifests, workflows, schemas, health, and guarded calls through MCP-style methods.\n\n`task-5dbab310072c`\n\nowner: user",
+      "x": 1040,
+      "y": 4620,
+      "width": 350,
+      "height": 170,
+      "color": "5",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-5dbab310072c",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Progress\\2026-07-21-jarvis-implementation-progress-report.md",
+        "source_line": 37,
+        "source_done": true,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "6e79b494f00afd4fd8e9c0f857feaf039e5a800c26e9d9eaf3a92b865f9436e3"
+      }
+    },
+    {
+      "id": "jarvis-1e490c9c3d5fe6b2",
+      "type": "text",
+      "text": "## [x] Reduce LM Studio idle state to the baseline LLM and Orpheus TTS only.\n\n`task-91fb6fbc0fa8`\n\nowner: user",
+      "x": 1430,
+      "y": 4620,
+      "width": 350,
+      "height": 170,
+      "color": "5",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-91fb6fbc0fa8",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Progress\\2026-07-21-jarvis-implementation-progress-report.md",
+        "source_line": 42,
+        "source_done": true,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "5fc92c8d879586fa770fde3dd0ddc1ae9e334a7a02f001430c7a0f197d228fe2"
+      }
+    },
+    {
+      "id": "jarvis-63b3a49d6bd0ce58",
+      "type": "text",
+      "text": "## [x] Restart MARK with local Vosk STT online and dashboards listening on ports `8000` and `8001`.\n\n`task-9f7546617042`\n\nowner: user",
+      "x": 1040,
+      "y": 4830,
+      "width": 350,
+      "height": 170,
+      "color": "5",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-9f7546617042",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Progress\\2026-07-21-jarvis-implementation-progress-report.md",
+        "source_line": 41,
+        "source_done": true,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "172b141c8efd52427ad58bda9280af17f396b791d367859bc1e2728482b808c9"
+      }
+    },
+    {
+      "id": "jarvis-8e16d673f1c7fcf8",
+      "type": "text",
+      "text": "## [x] Route development delegation to one OpenClaw worker by default.\n\n`task-c0095df83454`\n\nowner: user",
+      "x": 1430,
+      "y": 4830,
+      "width": 350,
+      "height": 170,
+      "color": "5",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-c0095df83454",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Progress\\2026-07-21-jarvis-implementation-progress-report.md",
+        "source_line": 34,
+        "source_done": true,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "74c6cc67f7fe99663dafaa130e4bffd812606ed2a7f30e0ee8b0fe5c39f1dfd9"
+      }
+    },
+    {
+      "id": "jarvis-a7e30ec028177dbf",
+      "type": "text",
+      "text": "## [x] Run independent tasks concurrently while keeping LM Studio generation single-flight.\n\n`task-4ba540e7c10d`\n\nowner: user",
+      "x": 1040,
+      "y": 5040,
+      "width": 350,
+      "height": 170,
+      "color": "5",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "task-4ba540e7c10d",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Progress\\2026-07-21-jarvis-implementation-progress-report.md",
+        "source_line": 33,
+        "source_done": true,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "f676b7e22b56158f76b0d339a006e1911dfd98834a297f8523555e3432a800bd"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "jarvis-20570c4dc63713cd",
+      "fromNode": "jarvis-4ed0f193612e35f5",
+      "fromSide": "right",
+      "toNode": "jarvis-70884bb83bebd02e",
+      "toSide": "left",
+      "label": "source"
+    },
+    {
+      "id": "jarvis-86edbdcfca78780d",
+      "fromNode": "jarvis-70884bb83bebd02e",
+      "fromSide": "right",
+      "toNode": "jarvis-65c73fcf1311b9a4",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-e6eeec6cad034711",
+      "fromNode": "jarvis-4ed0f193612e35f5",
+      "fromSide": "right",
+      "toNode": "jarvis-4efbcc857d39a649",
+      "toSide": "left",
+      "label": "source"
+    },
+    {
+      "id": "jarvis-2c545fe42a401625",
+      "fromNode": "jarvis-4efbcc857d39a649",
+      "fromSide": "right",
+      "toNode": "jarvis-e985f6e9ce5fede9",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-9346b90566a6006b",
+      "fromNode": "jarvis-4efbcc857d39a649",
+      "fromSide": "right",
+      "toNode": "jarvis-0f5949aa5b994695",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-e87e3fe3015b5019",
+      "fromNode": "jarvis-4efbcc857d39a649",
+      "fromSide": "right",
+      "toNode": "jarvis-da0f31b472aba845",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-72df69a51bd7f27d",
+      "fromNode": "jarvis-70884bb83bebd02e",
+      "fromSide": "right",
+      "toNode": "jarvis-3073ea20d307edf5",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-d170e126236d0fed",
+      "fromNode": "jarvis-70884bb83bebd02e",
+      "fromSide": "right",
+      "toNode": "jarvis-8dae84f43d401447",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-1a3e829afe3ccad7",
+      "fromNode": "jarvis-70884bb83bebd02e",
+      "fromSide": "right",
+      "toNode": "jarvis-3f52f19217b575cb",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-3ffb25b219d35f57",
+      "fromNode": "jarvis-70884bb83bebd02e",
+      "fromSide": "right",
+      "toNode": "jarvis-c47686f828516210",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-5e06b476dbd1e8dd",
+      "fromNode": "jarvis-70884bb83bebd02e",
+      "fromSide": "right",
+      "toNode": "jarvis-632182f013f91326",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-44950b92736af2aa",
+      "fromNode": "jarvis-70884bb83bebd02e",
+      "fromSide": "right",
+      "toNode": "jarvis-d3dbba66860e6abc",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-09e3ec5c1a7635ef",
+      "fromNode": "jarvis-70884bb83bebd02e",
+      "fromSide": "right",
+      "toNode": "jarvis-8ad4bc827bfd17c3",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-c7739d239da71966",
+      "fromNode": "jarvis-4efbcc857d39a649",
+      "fromSide": "right",
+      "toNode": "jarvis-edc640c53a6f9c75",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-41a4979ec9d5d5a9",
+      "fromNode": "jarvis-4efbcc857d39a649",
+      "fromSide": "right",
+      "toNode": "jarvis-b9c157172f8eeb5c",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-0735df2f0969a6f7",
+      "fromNode": "jarvis-4efbcc857d39a649",
+      "fromSide": "right",
+      "toNode": "jarvis-e46087b771c7aafc",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-d22c1ab0e6112c51",
+      "fromNode": "jarvis-70884bb83bebd02e",
+      "fromSide": "right",
+      "toNode": "jarvis-830b87284fb0b1cd",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-4bc55446787102d0",
+      "fromNode": "jarvis-4efbcc857d39a649",
+      "fromSide": "right",
+      "toNode": "jarvis-eb4487ec4766a241",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-404b8fc0d78242e8",
+      "fromNode": "jarvis-4efbcc857d39a649",
+      "fromSide": "right",
+      "toNode": "jarvis-458cfdbe06bbe228",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-d98f956a6df81191",
+      "fromNode": "jarvis-70884bb83bebd02e",
+      "fromSide": "right",
+      "toNode": "jarvis-3056bd8018924f95",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-b198aac216c0fccc",
+      "fromNode": "jarvis-70884bb83bebd02e",
+      "fromSide": "right",
+      "toNode": "jarvis-4ad309e7f9426af0",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-937e56818bf5cba9",
+      "fromNode": "jarvis-70884bb83bebd02e",
+      "fromSide": "right",
+      "toNode": "jarvis-056e7461d87fdcac",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-1ac48d34d2872d18",
+      "fromNode": "jarvis-70884bb83bebd02e",
+      "fromSide": "right",
+      "toNode": "jarvis-08f2df45a12a302f",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-a9a6e95a2e57bd6b",
+      "fromNode": "jarvis-4efbcc857d39a649",
+      "fromSide": "right",
+      "toNode": "jarvis-020c3d7ca78ca18b",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-45a3201edf5c5aea",
+      "fromNode": "jarvis-4efbcc857d39a649",
+      "fromSide": "right",
+      "toNode": "jarvis-89838e8e506d46f8",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-24a5e288192b043d",
+      "fromNode": "jarvis-70884bb83bebd02e",
+      "fromSide": "right",
+      "toNode": "jarvis-ef4d0fa58669d88b",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-9f34ee7840cba854",
+      "fromNode": "jarvis-70884bb83bebd02e",
+      "fromSide": "right",
+      "toNode": "jarvis-a8ce2a36fe1dcef7",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-6158ab2903bba257",
+      "fromNode": "jarvis-70884bb83bebd02e",
+      "fromSide": "right",
+      "toNode": "jarvis-1747203ba7e9ddd2",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-3dca8f7b388a124d",
+      "fromNode": "jarvis-70884bb83bebd02e",
+      "fromSide": "right",
+      "toNode": "jarvis-963503be971a51dc",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-4fe9348529264b1a",
+      "fromNode": "jarvis-4efbcc857d39a649",
+      "fromSide": "right",
+      "toNode": "jarvis-f6c9af9c819b578f",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-70e62bf7be2fbd78",
+      "fromNode": "jarvis-70884bb83bebd02e",
+      "fromSide": "right",
+      "toNode": "jarvis-b30e1c5cfb26c03d",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-cde9e00fbb27881c",
+      "fromNode": "jarvis-70884bb83bebd02e",
+      "fromSide": "right",
+      "toNode": "jarvis-69bbff7302a056f6",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-c239585456f8ae38",
+      "fromNode": "jarvis-4efbcc857d39a649",
+      "fromSide": "right",
+      "toNode": "jarvis-244b832038518260",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-f14d36e549b26dd9",
+      "fromNode": "jarvis-4efbcc857d39a649",
+      "fromSide": "right",
+      "toNode": "jarvis-9cc0b1edb9345131",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-522ec4a26b226c73",
+      "fromNode": "jarvis-4efbcc857d39a649",
+      "fromSide": "right",
+      "toNode": "jarvis-ffdc435b87fd177b",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-a585c142b553f7b6",
+      "fromNode": "jarvis-70884bb83bebd02e",
+      "fromSide": "right",
+      "toNode": "jarvis-2bce5ec165cb03f2",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-dc9dae873d59609d",
+      "fromNode": "jarvis-4ed0f193612e35f5",
+      "fromSide": "right",
+      "toNode": "jarvis-f338a90e71e1d195",
+      "toSide": "left",
+      "label": "source"
+    },
+    {
+      "id": "jarvis-c5a547aeccfcb08d",
+      "fromNode": "jarvis-f338a90e71e1d195",
+      "fromSide": "right",
+      "toNode": "jarvis-b9e63a248ec0953c",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-4abd3a7cb1f9704a",
+      "fromNode": "jarvis-70884bb83bebd02e",
+      "fromSide": "right",
+      "toNode": "jarvis-f7b331f11476db87",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-090933d42f75714e",
+      "fromNode": "jarvis-70884bb83bebd02e",
+      "fromSide": "right",
+      "toNode": "jarvis-ce53974e9452868f",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-5037f880891f3a3d",
+      "fromNode": "jarvis-70884bb83bebd02e",
+      "fromSide": "right",
+      "toNode": "jarvis-9b7df03bf494bff1",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-ba52a8c97cd15ac7",
+      "fromNode": "jarvis-70884bb83bebd02e",
+      "fromSide": "right",
+      "toNode": "jarvis-26a9251bd27c462a",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-f8ee078191286cad",
+      "fromNode": "jarvis-70884bb83bebd02e",
+      "fromSide": "right",
+      "toNode": "jarvis-de9308a7cb87eb18",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-ed3783184727173b",
+      "fromNode": "jarvis-70884bb83bebd02e",
+      "fromSide": "right",
+      "toNode": "jarvis-4c0902bea334a7d0",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-7dba3c39440a4d5f",
+      "fromNode": "jarvis-70884bb83bebd02e",
+      "fromSide": "right",
+      "toNode": "jarvis-e50b054c4241f654",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-fd86ffb2ea997fb5",
+      "fromNode": "jarvis-70884bb83bebd02e",
+      "fromSide": "right",
+      "toNode": "jarvis-4c3efa4d04bb94f1",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-48f5d7d797a141d0",
+      "fromNode": "jarvis-70884bb83bebd02e",
+      "fromSide": "right",
+      "toNode": "jarvis-9bf4002847c5d1b9",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-652317420a98e5bf",
+      "fromNode": "jarvis-70884bb83bebd02e",
+      "fromSide": "right",
+      "toNode": "jarvis-ff96e6f24688b946",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-808d180e5e5821d0",
+      "fromNode": "jarvis-70884bb83bebd02e",
+      "fromSide": "right",
+      "toNode": "jarvis-1e490c9c3d5fe6b2",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-7f72af9c061999f7",
+      "fromNode": "jarvis-70884bb83bebd02e",
+      "fromSide": "right",
+      "toNode": "jarvis-63b3a49d6bd0ce58",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-f289240d1c5c7e94",
+      "fromNode": "jarvis-70884bb83bebd02e",
+      "fromSide": "right",
+      "toNode": "jarvis-8e16d673f1c7fcf8",
+      "toSide": "left",
+      "label": "contains"
+    },
+    {
+      "id": "jarvis-1864a1aa5e123db8",
+      "fromNode": "jarvis-70884bb83bebd02e",
+      "fromSide": "right",
+      "toNode": "jarvis-a7e30ec028177dbf",
+      "toSide": "left",
+      "label": "contains"
+    }
+  ]
+}

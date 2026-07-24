@@ -1,0 +1,1284 @@
+Starting Orpheus TTS bridge on http://127.0.0.1:5006 ...
+Python: F:\network_management\Wi-Fi Sensing & CSI Data Extraction\Model_training\.venv-gtx1080\Scripts\python.exe
+CUDA_VISIBLE_DEVICES: 0
+LM Studio completions: http://127.0.0.1:1234/v1/completions
+LM Studio TTS model: orpeus_text_to_speech
+Synthesis concurrency: 1
+Starting Orpheus-FASTAPI Server
+INFO:     127.0.0.1:57867 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55392 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52017 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52021 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52022 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52025 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52027 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57974 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57975 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57979 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57982 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55159 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50214 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50215 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50219 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50223 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50665 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53728 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60520 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60524 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65284 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65287 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61997 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62002 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62014 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62015 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61462 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61466 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56305 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61399 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55686 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55690 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55716 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55720 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54387 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54388 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54392 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54404 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54405 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54408 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49904 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49905 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49909 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49920 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49921 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49925 - "GET /health HTTP/1.1" 200 OK
+Starting speech generation for 'Orpheus speech is online, and the microphone will ...'
+Using voice: tara, GPU acceleration: Yes
+Generating speech for: <|audio|>tara: Orpheus speech is online, and the microphone will wait until this turn is finished.<|eot_id|>
+Progress: 11.5 tokens/sec, est. 0.0s audio generated, 24 tokens, 0 chunks in 2.1s
+Processing buffer with 28 tokens, total collected: 28
+PyTorch 2.0+ detected, torch.compile is available
+CUDA graphs support is available
+Using device: cuda
+Using standard PyTorch optimizations (torch.compile disabled)
+Using CUDA stream for parallel processing
+Progress: 5.4 tokens/sec, est. 0.1s audio generated, 32 tokens, 1 chunks in 5.9s
+Audio generation rate: 0.15 chunks/second
+Token processing rate: 4.3 tokens/second
+Processing buffer with 28 tokens, total collected: 56
+Progress: 10.5 tokens/sec, est. 0.7s audio generated, 84 tokens, 8 chunks in 8.0s
+Processing buffer with 28 tokens, total collected: 84
+Audio generation rate: 0.90 chunks/second
+Progress: 10.4 tokens/sec, est. 0.9s audio generated, 105 tokens, 10 chunks in 10.1s
+Progress: 10.3 tokens/sec, est. 1.0s audio generated, 125 tokens, 12 chunks in 12.1s
+Token processing rate: 8.3 tokens/second
+Processing buffer with 28 tokens, total collected: 112
+Audio generation rate: 0.98 chunks/second
+Progress: 10.1 tokens/sec, est. 1.2s audio generated, 143 tokens, 14 chunks in 14.1s
+Processing buffer with 28 tokens, total collected: 140
+Progress: 9.8 tokens/sec, est. 1.4s audio generated, 158 tokens, 17 chunks in 16.1s
+Audio generation rate: 1.04 chunks/second
+Token processing rate: 8.3 tokens/second
+Processing buffer with 28 tokens, total collected: 168
+Progress: 9.7 tokens/sec, est. 1.8s audio generated, 177 tokens, 21 chunks in 18.2s
+Audio generation rate: 1.07 chunks/second
+Progress: 9.7 tokens/sec, est. 2.0s audio generated, 197 tokens, 24 chunks in 20.2s
+Processing buffer with 28 tokens, total collected: 196
+Progress: 9.7 tokens/sec, est. 2.2s audio generated, 217 tokens, 26 chunks in 22.3s
+Audio generation rate: 1.13 chunks/second
+Progress: 9.7 tokens/sec, est. 2.4s audio generated, 237 tokens, 28 chunks in 24.4s
+Token processing rate: 8.7 tokens/second
+Processing buffer with 28 tokens, total collected: 224
+Progress: 9.7 tokens/sec, est. 2.6s audio generated, 256 tokens, 30 chunks in 26.4s
+Audio generation rate: 1.14 chunks/second
+Processing buffer with 28 tokens, total collected: 252
+Progress: 9.7 tokens/sec, est. 3.0s audio generated, 275 tokens, 35 chunks in 28.4s
+Token processing rate: 8.8 tokens/second
+Audio generation rate: 1.17 chunks/second
+Processing buffer with 28 tokens, total collected: 280
+Progress: 9.6 tokens/sec, est. 3.1s audio generated, 294 tokens, 37 chunks in 30.5s
+Progress: 9.6 tokens/sec, est. 3.4s audio generated, 313 tokens, 40 chunks in 32.5s
+Processing buffer with 28 tokens, total collected: 308
+Audio generation rate: 1.20 chunks/second
+Progress: 9.6 tokens/sec, est. 3.6s audio generated, 332 tokens, 42 chunks in 34.6s
+Token processing rate: 8.9 tokens/second
+Progress: 9.6 tokens/sec, est. 3.7s audio generated, 351 tokens, 44 chunks in 36.7s
+Processing buffer with 28 tokens, total collected: 336
+Audio generation rate: 1.20 chunks/second
+Processing buffer with 28 tokens, total collected: 364
+Progress: 9.6 tokens/sec, est. 4.2s audio generated, 370 tokens, 49 chunks in 38.7s
+Token processing rate: 8.9 tokens/second
+Audio generation rate: 1.21 chunks/second
+Progress: 9.5 tokens/sec, est. 4.3s audio generated, 388 tokens, 51 chunks in 40.7s
+Processing buffer with 28 tokens, total collected: 392
+Progress: 9.4 tokens/sec, est. 4.5s audio generated, 406 tokens, 53 chunks in 43.3s
+Audio generation rate: 1.20 chunks/second
+Token generation complete: 423 tokens in 45.26s (9.3 tokens/sec)
+Generated 54 audio segments
+Generated 4.61 seconds of audio in 45.26 seconds
+Realtime factor: 0.10x
+Warning: Generation is slower than realtime
+Total speech generation completed in 45.26 seconds
+INFO:     127.0.0.1:49928 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50352 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50353 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50357 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57341 - "GET /health HTTP/1.1" 200 OK
+Starting speech generation for 'Huh? It seems like you're not sure about what you ...'
+Using voice: tara, GPU acceleration: Yes
+Generating speech for: <|audio|>tara: Huh? It seems like you're not sure about what you want—maybe I can help clarify that! Let me know if you have a specific question or request.<|eot_id|>
+Progress: 11.2 tokens/sec, est. 0.0s audio generated, 23 tokens, 0 chunks in 2.0s
+Processing buffer with 28 tokens, total collected: 28
+Audio generation rate: 0.27 chunks/second
+Progress: 10.8 tokens/sec, est. 0.1s audio generated, 44 tokens, 1 chunks in 4.1s
+Token processing rate: 5.7 tokens/second
+Progress: 10.5 tokens/sec, est. 0.3s audio generated, 64 tokens, 4 chunks in 6.1s
+Audio generation rate: 0.58 chunks/second
+Processing buffer with 28 tokens, total collected: 56
+Progress: 10.4 tokens/sec, est. 0.7s audio generated, 85 tokens, 8 chunks in 8.2s
+Processing buffer with 28 tokens, total collected: 84
+Audio generation rate: 0.89 chunks/second
+Progress: 10.3 tokens/sec, est. 0.9s audio generated, 106 tokens, 10 chunks in 10.3s
+Token processing rate: 8.1 tokens/second
+Progress: 10.2 tokens/sec, est. 1.0s audio generated, 126 tokens, 12 chunks in 12.3s
+Processing buffer with 28 tokens, total collected: 112
+Audio generation rate: 0.98 chunks/second
+Processing buffer with 28 tokens, total collected: 140
+Progress: 10.2 tokens/sec, est. 1.4s audio generated, 146 tokens, 17 chunks in 14.3s
+Audio generation rate: 1.09 chunks/second
+Progress: 10.1 tokens/sec, est. 1.6s audio generated, 166 tokens, 19 chunks in 16.4s
+Token processing rate: 8.7 tokens/second
+Processing buffer with 28 tokens, total collected: 168
+Progress: 10.1 tokens/sec, est. 1.8s audio generated, 186 tokens, 21 chunks in 18.5s
+Audio generation rate: 1.10 chunks/second
+Progress: 10.0 tokens/sec, est. 2.0s audio generated, 206 tokens, 24 chunks in 20.5s
+Processing buffer with 28 tokens, total collected: 196
+Token processing rate: 8.9 tokens/second
+Audio generation rate: 1.16 chunks/second
+Progress: 10.0 tokens/sec, est. 2.4s audio generated, 226 tokens, 28 chunks in 22.6s
+Processing buffer with 28 tokens, total collected: 224
+Progress: 9.9 tokens/sec, est. 2.6s audio generated, 246 tokens, 30 chunks in 24.7s
+Audio generation rate: 1.16 chunks/second
+Processing buffer with 28 tokens, total collected: 252
+Progress: 9.9 tokens/sec, est. 2.8s audio generated, 265 tokens, 33 chunks in 26.8s
+Token processing rate: 9.0 tokens/second
+Progress: 9.9 tokens/sec, est. 3.0s audio generated, 284 tokens, 35 chunks in 28.8s
+Audio generation rate: 1.20 chunks/second
+Processing buffer with 28 tokens, total collected: 280
+Progress: 9.8 tokens/sec, est. 3.1s audio generated, 303 tokens, 37 chunks in 30.8s
+Token processing rate: 9.0 tokens/second
+Processing buffer with 28 tokens, total collected: 308
+Audio generation rate: 1.22 chunks/second
+Progress: 9.8 tokens/sec, est. 3.6s audio generated, 322 tokens, 42 chunks in 32.9s
+Progress: 9.8 tokens/sec, est. 3.7s audio generated, 341 tokens, 44 chunks in 34.9s
+Processing buffer with 28 tokens, total collected: 336
+Audio generation rate: 1.22 chunks/second
+Progress: 9.7 tokens/sec, est. 3.9s audio generated, 360 tokens, 46 chunks in 37.0s
+Token processing rate: 9.0 tokens/second
+Processing buffer with 28 tokens, total collected: 364
+Progress: 9.7 tokens/sec, est. 4.2s audio generated, 379 tokens, 49 chunks in 39.1s
+Audio generation rate: 1.23 chunks/second
+Progress: 9.7 tokens/sec, est. 4.3s audio generated, 397 tokens, 51 chunks in 41.1s
+Processing buffer with 28 tokens, total collected: 392
+Progress: 9.6 tokens/sec, est. 4.5s audio generated, 413 tokens, 53 chunks in 43.1s
+INFO:     127.0.0.1:50095 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50096 - "GET /health HTTP/1.1" 200 OK
+Token processing rate: 9.0 tokens/second
+Audio generation rate: 1.21 chunks/second
+Progress: 9.4 tokens/sec, est. 4.8s audio generated, 426 tokens, 56 chunks in 45.2s
+INFO:     127.0.0.1:50100 - "GET /health HTTP/1.1" 200 OK
+Processing buffer with 28 tokens, total collected: 420
+Progress: 9.3 tokens/sec, est. 4.9s audio generated, 439 tokens, 58 chunks in 47.3s
+Token processing rate: 8.7 tokens/second
+Audio generation rate: 1.19 chunks/second
+Progress: 9.1 tokens/sec, est. 5.1s audio generated, 451 tokens, 60 chunks in 49.3s
+Progress: 9.0 tokens/sec, est. 5.1s audio generated, 463 tokens, 60 chunks in 51.3s
+Processing buffer with 28 tokens, total collected: 448
+Progress: 8.9 tokens/sec, est. 5.3s audio generated, 475 tokens, 62 chunks in 53.4s
+Token processing rate: 8.4 tokens/second
+Audio generation rate: 1.14 chunks/second
+Processing buffer with 28 tokens, total collected: 476
+Progress: 8.8 tokens/sec, est. 5.5s audio generated, 488 tokens, 65 chunks in 55.4s
+Progress: 8.7 tokens/sec, est. 5.7s audio generated, 503 tokens, 67 chunks in 57.6s
+Audio generation rate: 1.14 chunks/second
+Processing buffer with 28 tokens, total collected: 504
+Progress: 8.7 tokens/sec, est. 5.9s audio generated, 518 tokens, 69 chunks in 59.7s
+Token processing rate: 8.2 tokens/second
+Progress: 8.6 tokens/sec, est. 6.1s audio generated, 532 tokens, 72 chunks in 61.7s
+Processing buffer with 28 tokens, total collected: 532
+Audio generation rate: 1.14 chunks/second
+Progress: 8.6 tokens/sec, est. 6.3s audio generated, 546 tokens, 74 chunks in 63.7s
+Progress: 8.5 tokens/sec, est. 6.3s audio generated, 560 tokens, 74 chunks in 65.7s
+Progress: 8.5 tokens/sec, est. 6.5s audio generated, 574 tokens, 76 chunks in 67.8s
+Token processing rate: 8.1 tokens/second
+Processing buffer with 28 tokens, total collected: 560
+Audio generation rate: 1.12 chunks/second
+Progress: 8.4 tokens/sec, est. 6.6s audio generated, 588 tokens, 78 chunks in 69.9s
+Processing buffer with 28 tokens, total collected: 588
+Progress: 8.4 tokens/sec, est. 6.9s audio generated, 602 tokens, 81 chunks in 71.9s
+Audio generation rate: 1.11 chunks/second
+Progress: 8.3 tokens/sec, est. 7.1s audio generated, 616 tokens, 83 chunks in 74.0s
+Token processing rate: 8.0 tokens/second
+Processing buffer with 28 tokens, total collected: 616
+Progress: 8.3 tokens/sec, est. 7.2s audio generated, 630 tokens, 85 chunks in 76.1s
+Audio generation rate: 1.10 chunks/second
+Progress: 8.2 tokens/sec, est. 7.5s audio generated, 644 tokens, 88 chunks in 78.2s
+Processing buffer with 28 tokens, total collected: 644
+Progress: 8.2 tokens/sec, est. 7.7s audio generated, 658 tokens, 90 chunks in 80.3s
+Progress: 8.2 tokens/sec, est. 7.7s audio generated, 672 tokens, 90 chunks in 82.4s
+Token processing rate: 7.9 tokens/second
+Audio generation rate: 1.09 chunks/second
+Progress: 8.1 tokens/sec, est. 7.8s audio generated, 686 tokens, 92 chunks in 84.6s
+Processing buffer with 28 tokens, total collected: 672
+Progress: 8.1 tokens/sec, est. 8.0s audio generated, 700 tokens, 94 chunks in 86.7s
+Audio generation rate: 1.08 chunks/second
+Processing buffer with 28 tokens, total collected: 700
+Progress: 8.0 tokens/sec, est. 8.2s audio generated, 714 tokens, 97 chunks in 88.9s
+Token processing rate: 7.7 tokens/second
+Progress: 8.0 tokens/sec, est. 8.4s audio generated, 726 tokens, 99 chunks in 91.0s
+Audio generation rate: 1.07 chunks/second
+Processing buffer with 28 tokens, total collected: 728
+Progress: 7.9 tokens/sec, est. 8.6s audio generated, 737 tokens, 101 chunks in 93.1s
+Progress: 7.9 tokens/sec, est. 8.6s audio generated, 751 tokens, 101 chunks in 95.2s
+Token processing rate: 7.6 tokens/second
+Progress: 7.9 tokens/sec, est. 8.8s audio generated, 764 tokens, 104 chunks in 97.3s
+Processing buffer with 28 tokens, total collected: 756
+Audio generation rate: 1.06 chunks/second
+Progress: 7.8 tokens/sec, est. 9.0s audio generated, 777 tokens, 106 chunks in 99.3s
+Token processing rate: 7.6 tokens/second
+Progress: 7.8 tokens/sec, est. 9.2s audio generated, 789 tokens, 108 chunks in 101.3s
+Progress: 7.7 tokens/sec, est. 9.2s audio generated, 800 tokens, 108 chunks in 103.4s
+Processing buffer with 28 tokens, total collected: 784
+Audio generation rate: 1.05 chunks/second
+Token generation complete: 805 tokens in 104.17s (7.7 tokens/sec)
+Generated 109 audio segments
+Generated 9.30 seconds of audio in 104.17 seconds
+Realtime factor: 0.09x
+Warning: Generation is slower than realtime
+Total speech generation completed in 104.17 seconds
+INFO:     127.0.0.1:57345 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49670 - "GET /health HTTP/1.1" 200 OK
+Starting speech generation for 'I completed the read-only repository learning pass...'
+Using voice: tara, GPU acceleration: Yes
+Generating speech for: <|audio|>tara: I completed the read-only repository learning pass, sir. No project files were changed. Project root: F:\network_management Files inventoried: 711 Files read: 36 Project brief:<|eot_id|>
+Progress: 9.1 tokens/sec, est. 0.0s audio generated, 19 tokens, 0 chunks in 2.1s
+Processing buffer with 28 tokens, total collected: 28
+Audio generation rate: 0.20 chunks/second
+Progress: 8.7 tokens/sec, est. 0.1s audio generated, 36 tokens, 1 chunks in 4.1s
+Token processing rate: 4.2 tokens/second
+Progress: 8.1 tokens/sec, est. 0.3s audio generated, 51 tokens, 3 chunks in 6.3s
+Audio generation rate: 0.44 chunks/second
+Processing buffer with 28 tokens, total collected: 56
+Progress: 8.1 tokens/sec, est. 0.4s audio generated, 68 tokens, 5 chunks in 8.4s
+Progress: 8.1 tokens/sec, est. 0.7s audio generated, 85 tokens, 8 chunks in 10.5s
+Token processing rate: 6.0 tokens/second
+Processing buffer with 28 tokens, total collected: 84
+Audio generation rate: 0.69 chunks/second
+Progress: 8.1 tokens/sec, est. 0.9s audio generated, 102 tokens, 10 chunks in 12.6s
+Progress: 8.1 tokens/sec, est. 1.0s audio generated, 118 tokens, 12 chunks in 14.6s
+Processing buffer with 28 tokens, total collected: 112
+Audio generation rate: 0.76 chunks/second
+Progress: 8.1 tokens/sec, est. 1.2s audio generated, 134 tokens, 14 chunks in 16.6s
+Token processing rate: 6.6 tokens/second
+Processing buffer with 28 tokens, total collected: 140
+Progress: 8.1 tokens/sec, est. 1.4s audio generated, 150 tokens, 17 chunks in 18.6s
+Audio generation rate: 0.85 chunks/second
+Progress: 8.0 tokens/sec, est. 1.6s audio generated, 166 tokens, 19 chunks in 20.6s
+Processing buffer with 28 tokens, total collected: 168
+Progress: 8.1 tokens/sec, est. 1.8s audio generated, 183 tokens, 21 chunks in 22.7s
+Token processing rate: 6.9 tokens/second
+Audio generation rate: 0.88 chunks/second
+Progress: 8.0 tokens/sec, est. 2.0s audio generated, 199 tokens, 24 chunks in 24.8s
+Processing buffer with 28 tokens, total collected: 196
+Progress: 8.0 tokens/sec, est. 2.2s audio generated, 215 tokens, 26 chunks in 26.8s
+Audio generation rate: 0.92 chunks/second
+Progress: 8.0 tokens/sec, est. 2.4s audio generated, 231 tokens, 28 chunks in 28.9s
+Token processing rate: 7.1 tokens/second
+Processing buffer with 28 tokens, total collected: 224
+Progress: 8.0 tokens/sec, est. 2.6s audio generated, 247 tokens, 30 chunks in 31.0s
+Audio generation rate: 0.93 chunks/second
+Processing buffer with 28 tokens, total collected: 252
+Progress: 7.9 tokens/sec, est. 2.8s audio generated, 263 tokens, 33 chunks in 33.1s
+Progress: 7.9 tokens/sec, est. 3.0s audio generated, 279 tokens, 35 chunks in 35.3s
+Token processing rate: 7.2 tokens/second
+Audio generation rate: 0.96 chunks/second
+Processing buffer with 28 tokens, total collected: 280
+Progress: 7.9 tokens/sec, est. 3.1s audio generated, 295 tokens, 37 chunks in 37.4s
+Progress: 7.9 tokens/sec, est. 3.4s audio generated, 311 tokens, 40 chunks in 39.5s
+Processing buffer with 28 tokens, total collected: 308
+Audio generation rate: 0.98 chunks/second
+Progress: 7.9 tokens/sec, est. 3.6s audio generated, 327 tokens, 42 chunks in 41.6s
+Token processing rate: 7.2 tokens/second
+Progress: 7.8 tokens/sec, est. 3.7s audio generated, 343 tokens, 44 chunks in 43.8s
+Processing buffer with 28 tokens, total collected: 336
+Audio generation rate: 0.97 chunks/second
+Progress: 7.8 tokens/sec, est. 3.9s audio generated, 358 tokens, 46 chunks in 45.8s
+Processing buffer with 28 tokens, total collected: 364
+Progress: 7.8 tokens/sec, est. 4.2s audio generated, 373 tokens, 49 chunks in 47.8s
+Token processing rate: 7.2 tokens/second
+Audio generation rate: 0.99 chunks/second
+Progress: 7.8 tokens/sec, est. 4.3s audio generated, 388 tokens, 51 chunks in 49.9s
+Processing buffer with 28 tokens, total collected: 392
+Progress: 7.7 tokens/sec, est. 4.5s audio generated, 403 tokens, 53 chunks in 52.0s
+Audio generation rate: 0.98 chunks/second
+Progress: 7.7 tokens/sec, est. 4.8s audio generated, 418 tokens, 56 chunks in 54.1s
+Token processing rate: 7.2 tokens/second
+Processing buffer with 28 tokens, total collected: 420
+Progress: 7.7 tokens/sec, est. 4.9s audio generated, 433 tokens, 58 chunks in 56.2s
+Progress: 7.7 tokens/sec, est. 4.9s audio generated, 448 tokens, 58 chunks in 58.2s
+Audio generation rate: 0.99 chunks/second
+Progress: 7.7 tokens/sec, est. 5.1s audio generated, 463 tokens, 60 chunks in 60.3s
+Processing buffer with 28 tokens, total collected: 448
+Progress: 7.7 tokens/sec, est. 5.3s audio generated, 478 tokens, 62 chunks in 62.5s
+Token processing rate: 7.2 tokens/second
+Audio generation rate: 0.98 chunks/second
+Processing buffer with 28 tokens, total collected: 476
+Progress: 7.6 tokens/sec, est. 5.5s audio generated, 493 tokens, 65 chunks in 64.5s
+Progress: 7.6 tokens/sec, est. 5.7s audio generated, 508 tokens, 67 chunks in 66.7s
+Audio generation rate: 0.99 chunks/second
+Processing buffer with 28 tokens, total collected: 504
+Progress: 7.6 tokens/sec, est. 5.9s audio generated, 523 tokens, 69 chunks in 68.7s
+Token processing rate: 7.2 tokens/second
+Progress: 7.6 tokens/sec, est. 6.1s audio generated, 538 tokens, 72 chunks in 70.8s
+Processing buffer with 28 tokens, total collected: 532
+Audio generation rate: 1.00 chunks/second
+Progress: 7.6 tokens/sec, est. 6.3s audio generated, 553 tokens, 74 chunks in 73.0s
+Progress: 7.6 tokens/sec, est. 6.5s audio generated, 568 tokens, 76 chunks in 75.1s
+Token processing rate: 7.2 tokens/second
+Processing buffer with 28 tokens, total collected: 560
+Audio generation rate: 0.99 chunks/second
+Progress: 7.5 tokens/sec, est. 6.6s audio generated, 583 tokens, 78 chunks in 77.2s
+Progress: 7.5 tokens/sec, est. 6.6s audio generated, 598 tokens, 78 chunks in 79.4s
+Processing buffer with 28 tokens, total collected: 588
+Progress: 7.5 tokens/sec, est. 6.6s audio generated, 612 tokens, 78 chunks in 81.4s
+Token processing rate: 7.1 tokens/second
+Audio generation rate: 0.94 chunks/second
+Progress: 7.5 tokens/sec, est. 6.8s audio generated, 626 tokens, 80 chunks in 83.4s
+Progress: 7.5 tokens/sec, est. 6.8s audio generated, 640 tokens, 80 chunks in 85.5s
+Processing buffer with 28 tokens, total collected: 616
+Progress: 7.5 tokens/sec, est. 7.1s audio generated, 654 tokens, 83 chunks in 87.5s
+Audio generation rate: 0.94 chunks/second
+Processing buffer with 28 tokens, total collected: 644
+Progress: 7.5 tokens/sec, est. 7.2s audio generated, 668 tokens, 85 chunks in 89.6s
+Token processing rate: 7.1 tokens/second
+Progress: 7.4 tokens/sec, est. 7.4s audio generated, 682 tokens, 87 chunks in 91.6s
+Audio generation rate: 0.94 chunks/second
+Processing buffer with 28 tokens, total collected: 672
+Progress: 7.4 tokens/sec, est. 7.6s audio generated, 696 tokens, 89 chunks in 93.7s
+Progress: 7.4 tokens/sec, est. 7.8s audio generated, 710 tokens, 92 chunks in 95.8s
+Token processing rate: 7.1 tokens/second
+Processing buffer with 28 tokens, total collected: 700
+Audio generation rate: 0.94 chunks/second
+Progress: 7.4 tokens/sec, est. 8.0s audio generated, 724 tokens, 94 chunks in 97.9s
+Progress: 7.4 tokens/sec, est. 8.0s audio generated, 736 tokens, 94 chunks in 100.1s
+Progress: 7.3 tokens/sec, est. 8.2s audio generated, 749 tokens, 96 chunks in 102.1s
+Token processing rate: 7.0 tokens/second
+Processing buffer with 28 tokens, total collected: 728
+Audio generation rate: 0.93 chunks/second
+Progress: 7.3 tokens/sec, est. 8.4s audio generated, 763 tokens, 99 chunks in 104.2s
+Processing buffer with 28 tokens, total collected: 756
+Progress: 7.3 tokens/sec, est. 8.6s audio generated, 777 tokens, 101 chunks in 106.4s
+Audio generation rate: 0.94 chunks/second
+Progress: 7.3 tokens/sec, est. 8.8s audio generated, 791 tokens, 103 chunks in 108.5s
+Token processing rate: 7.0 tokens/second
+Processing buffer with 28 tokens, total collected: 784
+Progress: 7.3 tokens/sec, est. 8.9s audio generated, 805 tokens, 105 chunks in 110.6s
+Audio generation rate: 0.93 chunks/second
+Progress: 7.3 tokens/sec, est. 9.2s audio generated, 819 tokens, 108 chunks in 112.7s
+Processing buffer with 28 tokens, total collected: 812
+Progress: 7.3 tokens/sec, est. 9.3s audio generated, 832 tokens, 109 chunks in 114.7s
+Progress: 7.2 tokens/sec, est. 9.4s audio generated, 846 tokens, 110 chunks in 116.8s
+Token processing rate: 7.0 tokens/second
+Audio generation rate: 0.94 chunks/second
+Progress: 7.2 tokens/sec, est. 9.5s audio generated, 859 tokens, 112 chunks in 118.8s
+Processing buffer with 28 tokens, total collected: 840
+Progress: 7.2 tokens/sec, est. 9.8s audio generated, 873 tokens, 115 chunks in 120.9s
+Audio generation rate: 0.94 chunks/second
+Processing buffer with 28 tokens, total collected: 868
+Progress: 7.2 tokens/sec, est. 9.9s audio generated, 886 tokens, 117 chunks in 123.0s
+Token processing rate: 6.9 tokens/second
+Progress: 7.2 tokens/sec, est. 10.1s audio generated, 899 tokens, 119 chunks in 125.0s
+Progress: 7.2 tokens/sec, est. 10.1s audio generated, 912 tokens, 119 chunks in 127.1s
+Audio generation rate: 0.93 chunks/second
+Processing buffer with 28 tokens, total collected: 896
+Progress: 7.2 tokens/sec, est. 10.3s audio generated, 925 tokens, 121 chunks in 129.2s
+Token processing rate: 6.9 tokens/second
+Progress: 7.1 tokens/sec, est. 10.5s audio generated, 938 tokens, 124 chunks in 131.3s
+Processing buffer with 28 tokens, total collected: 924
+Audio generation rate: 0.94 chunks/second
+Progress: 7.1 tokens/sec, est. 10.7s audio generated, 951 tokens, 126 chunks in 133.4s
+Token processing rate: 6.9 tokens/second
+Progress: 7.1 tokens/sec, est. 10.9s audio generated, 964 tokens, 128 chunks in 135.5s
+Processing buffer with 28 tokens, total collected: 952
+Audio generation rate: 0.93 chunks/second
+Progress: 7.1 tokens/sec, est. 11.1s audio generated, 977 tokens, 131 chunks in 137.6s
+Progress: 7.1 tokens/sec, est. 11.1s audio generated, 990 tokens, 131 chunks in 139.8s
+Token processing rate: 6.8 tokens/second
+Processing buffer with 28 tokens, total collected: 980
+Progress: 7.1 tokens/sec, est. 11.3s audio generated, 1003 tokens, 133 chunks in 141.9s
+Audio generation rate: 0.93 chunks/second
+Progress: 7.1 tokens/sec, est. 11.5s audio generated, 1016 tokens, 135 chunks in 144.0s
+Token processing rate: 6.8 tokens/second
+Processing buffer with 28 tokens, total collected: 1008
+Progress: 7.0 tokens/sec, est. 11.6s audio generated, 1028 tokens, 137 chunks in 146.0s
+Progress: 7.0 tokens/sec, est. 11.6s audio generated, 1039 tokens, 137 chunks in 148.2s
+Audio generation rate: 0.92 chunks/second
+Progress: 7.0 tokens/sec, est. 11.9s audio generated, 1050 tokens, 140 chunks in 150.2s
+Token processing rate: 6.8 tokens/second
+Processing buffer with 28 tokens, total collected: 1036
+Progress: 7.0 tokens/sec, est. 12.1s audio generated, 1063 tokens, 142 chunks in 152.4s
+Audio generation rate: 0.92 chunks/second
+Progress: 7.0 tokens/sec, est. 12.2s audio generated, 1076 tokens, 144 chunks in 154.6s
+Token processing rate: 6.7 tokens/second
+Processing buffer with 28 tokens, total collected: 1064
+Progress: 6.9 tokens/sec, est. 12.3s audio generated, 1088 tokens, 145 chunks in 156.6s
+Progress: 6.9 tokens/sec, est. 12.5s audio generated, 1101 tokens, 147 chunks in 158.7s
+Audio generation rate: 0.92 chunks/second
+Processing buffer with 28 tokens, total collected: 1092
+Progress: 6.9 tokens/sec, est. 12.7s audio generated, 1113 tokens, 149 chunks in 160.7s
+Token processing rate: 6.7 tokens/second
+Progress: 6.9 tokens/sec, est. 12.8s audio generated, 1125 tokens, 151 chunks in 162.8s
+Audio generation rate: 0.92 chunks/second
+Processing buffer with 28 tokens, total collected: 1120
+Progress: 6.9 tokens/sec, est. 13.0s audio generated, 1137 tokens, 153 chunks in 164.8s
+Progress: 6.9 tokens/sec, est. 13.0s audio generated, 1150 tokens, 153 chunks in 166.9s
+Token processing rate: 6.7 tokens/second
+Progress: 6.9 tokens/sec, est. 13.3s audio generated, 1162 tokens, 156 chunks in 168.9s
+Processing buffer with 28 tokens, total collected: 1148
+Audio generation rate: 0.92 chunks/second
+Progress: 6.9 tokens/sec, est. 13.4s audio generated, 1174 tokens, 158 chunks in 171.0s
+Token processing rate: 6.7 tokens/second
+Progress: 6.9 tokens/sec, est. 13.6s audio generated, 1186 tokens, 160 chunks in 173.1s
+Progress: 6.8 tokens/sec, est. 13.6s audio generated, 1198 tokens, 160 chunks in 175.1s
+Processing buffer with 28 tokens, total collected: 1176
+Audio generation rate: 0.91 chunks/second
+Progress: 6.8 tokens/sec, est. 13.9s audio generated, 1210 tokens, 163 chunks in 177.2s
+Token processing rate: 6.6 tokens/second
+Processing buffer with 28 tokens, total collected: 1204
+Progress: 6.8 tokens/sec, est. 14.0s audio generated, 1222 tokens, 165 chunks in 179.3s
+Audio generation rate: 0.91 chunks/second
+Progress: 6.8 tokens/sec, est. 14.2s audio generated, 1234 tokens, 167 chunks in 181.4s
+Progress: 6.8 tokens/sec, est. 14.2s audio generated, 1246 tokens, 167 chunks in 183.5s
+Token processing rate: 6.6 tokens/second
+Processing buffer with 28 tokens, total collected: 1232
+Progress: 6.8 tokens/sec, est. 14.4s audio generated, 1258 tokens, 169 chunks in 185.6s
+Audio generation rate: 0.90 chunks/second
+Progress: 6.8 tokens/sec, est. 14.6s audio generated, 1270 tokens, 172 chunks in 187.9s
+Token processing rate: 6.6 tokens/second
+Processing buffer with 28 tokens, total collected: 1260
+Progress: 6.8 tokens/sec, est. 14.8s audio generated, 1283 tokens, 174 chunks in 190.0s
+Progress: 6.7 tokens/sec, est. 14.8s audio generated, 1295 tokens, 174 chunks in 192.1s
+Audio generation rate: 0.90 chunks/second
+Progress: 6.7 tokens/sec, est. 15.0s audio generated, 1307 tokens, 176 chunks in 194.3s
+Token processing rate: 6.5 tokens/second
+Processing buffer with 28 tokens, total collected: 1288
+Audio generation rate: 0.90 chunks/second
+Progress: 6.7 tokens/sec, est. 15.2s audio generated, 1317 tokens, 179 chunks in 196.3s
+Processing buffer with 28 tokens, total collected: 1316
+Progress: 6.7 tokens/sec, est. 15.4s audio generated, 1329 tokens, 181 chunks in 198.4s
+Progress: 6.7 tokens/sec, est. 15.4s audio generated, 1341 tokens, 181 chunks in 200.6s
+Token processing rate: 6.5 tokens/second
+Audio generation rate: 0.90 chunks/second
+Progress: 6.7 tokens/sec, est. 15.6s audio generated, 1353 tokens, 183 chunks in 202.7s
+Processing buffer with 28 tokens, total collected: 1344
+Progress: 6.7 tokens/sec, est. 15.7s audio generated, 1365 tokens, 185 chunks in 204.9s
+Token processing rate: 6.5 tokens/second
+Audio generation rate: 0.89 chunks/second
+Progress: 6.6 tokens/sec, est. 15.9s audio generated, 1376 tokens, 187 chunks in 206.9s
+Progress: 6.6 tokens/sec, est. 16.0s audio generated, 1388 tokens, 188 chunks in 209.1s
+Processing buffer with 28 tokens, total collected: 1372
+Progress: 6.6 tokens/sec, est. 16.2s audio generated, 1400 tokens, 190 chunks in 211.3s
+Token processing rate: 6.5 tokens/second
+Audio generation rate: 0.89 chunks/second
+Progress: 6.6 tokens/sec, est. 16.3s audio generated, 1411 tokens, 192 chunks in 213.3s
+Progress: 6.6 tokens/sec, est. 16.3s audio generated, 1422 tokens, 192 chunks in 215.3s
+Processing buffer with 28 tokens, total collected: 1400
+Progress: 6.6 tokens/sec, est. 16.6s audio generated, 1433 tokens, 195 chunks in 217.3s
+Token processing rate: 6.4 tokens/second
+Audio generation rate: 0.89 chunks/second
+Processing buffer with 28 tokens, total collected: 1428
+Progress: 6.6 tokens/sec, est. 16.7s audio generated, 1444 tokens, 197 chunks in 219.3s
+Progress: 6.6 tokens/sec, est. 16.7s audio generated, 1455 tokens, 197 chunks in 221.4s
+Progress: 6.5 tokens/sec, est. 16.9s audio generated, 1463 tokens, 199 chunks in 223.7s
+Token processing rate: 6.4 tokens/second
+Audio generation rate: 0.88 chunks/second
+Token generation complete: 1479 tokens in 226.64s (6.5 tokens/sec)
+Generated 200 audio segments
+Generated 17.07 seconds of audio in 226.64 seconds
+Realtime factor: 0.08x
+Warning: Generation is slower than realtime
+Total speech generation completed in 226.64 seconds
+INFO:     127.0.0.1:49675 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+Starting speech generation for 'F:\Mark-XLVIII-main\Jarvis_notes\Projects\network-...'
+Using voice: tara, GPU acceleration: Yes
+Generating speech for: <|audio|>tara: F:\Mark-XLVIII-main\Jarvis_notes\Projects\network-management\Project Brief.md Compact RAG memory: F:\Mark-XLVIII-main\Jarvis_notes\Projects\network-management\Project Memory.md The vault index has been refreshed.<|eot_id|>
+Progress: 9.3 tokens/sec, est. 0.0s audio generated, 19 tokens, 0 chunks in 2.0s
+Processing buffer with 28 tokens, total collected: 28
+Audio generation rate: 0.20 chunks/second
+Progress: 8.7 tokens/sec, est. 0.1s audio generated, 36 tokens, 1 chunks in 4.2s
+Token processing rate: 4.3 tokens/second
+Progress: 8.5 tokens/sec, est. 0.3s audio generated, 53 tokens, 3 chunks in 6.3s
+Audio generation rate: 0.45 chunks/second
+Processing buffer with 28 tokens, total collected: 56
+Progress: 8.4 tokens/sec, est. 0.4s audio generated, 70 tokens, 5 chunks in 8.4s
+Progress: 8.3 tokens/sec, est. 0.7s audio generated, 87 tokens, 8 chunks in 10.5s
+Token processing rate: 6.1 tokens/second
+Processing buffer with 28 tokens, total collected: 84
+Audio generation rate: 0.70 chunks/second
+Progress: 8.3 tokens/sec, est. 0.9s audio generated, 104 tokens, 10 chunks in 12.6s
+Progress: 8.2 tokens/sec, est. 1.0s audio generated, 120 tokens, 12 chunks in 14.7s
+Processing buffer with 28 tokens, total collected: 112
+Audio generation rate: 0.75 chunks/second
+Progress: 8.0 tokens/sec, est. 1.2s audio generated, 134 tokens, 14 chunks in 16.7s
+Token processing rate: 6.5 tokens/second
+Processing buffer with 28 tokens, total collected: 140
+Progress: 8.0 tokens/sec, est. 1.4s audio generated, 150 tokens, 17 chunks in 18.8s
+Audio generation rate: 0.84 chunks/second
+Progress: 8.0 tokens/sec, est. 1.6s audio generated, 166 tokens, 19 chunks in 20.8s
+Processing buffer with 28 tokens, total collected: 168
+Progress: 7.9 tokens/sec, est. 1.8s audio generated, 182 tokens, 21 chunks in 22.9s
+Token processing rate: 6.8 tokens/second
+Audio generation rate: 0.86 chunks/second
+Progress: 7.9 tokens/sec, est. 2.0s audio generated, 198 tokens, 24 chunks in 25.0s
+Processing buffer with 28 tokens, total collected: 196
+Progress: 7.9 tokens/sec, est. 2.2s audio generated, 214 tokens, 26 chunks in 27.0s
+Audio generation rate: 0.91 chunks/second
+Progress: 7.9 tokens/sec, est. 2.4s audio generated, 230 tokens, 28 chunks in 29.1s
+Token processing rate: 7.0 tokens/second
+Processing buffer with 28 tokens, total collected: 224
+Progress: 7.9 tokens/sec, est. 2.6s audio generated, 246 tokens, 30 chunks in 31.2s
+Audio generation rate: 0.92 chunks/second
+Processing buffer with 28 tokens, total collected: 252
+Progress: 7.9 tokens/sec, est. 2.8s audio generated, 262 tokens, 33 chunks in 33.3s
+Progress: 7.9 tokens/sec, est. 3.0s audio generated, 278 tokens, 35 chunks in 35.4s
+Token processing rate: 7.1 tokens/second
+Audio generation rate: 0.95 chunks/second
+Processing buffer with 28 tokens, total collected: 280
+Progress: 7.8 tokens/sec, est. 3.1s audio generated, 293 tokens, 37 chunks in 37.4s
+Progress: 7.8 tokens/sec, est. 3.4s audio generated, 308 tokens, 40 chunks in 39.4s
+Processing buffer with 28 tokens, total collected: 308
+Audio generation rate: 0.97 chunks/second
+Progress: 7.8 tokens/sec, est. 3.6s audio generated, 323 tokens, 42 chunks in 41.4s
+Token processing rate: 7.2 tokens/second
+Progress: 7.8 tokens/sec, est. 3.7s audio generated, 338 tokens, 44 chunks in 43.4s
+Processing buffer with 28 tokens, total collected: 336
+Audio generation rate: 0.97 chunks/second
+Progress: 7.8 tokens/sec, est. 3.9s audio generated, 354 tokens, 46 chunks in 45.6s
+Processing buffer with 28 tokens, total collected: 364
+Progress: 7.7 tokens/sec, est. 4.2s audio generated, 369 tokens, 49 chunks in 47.6s
+Progress: 7.7 tokens/sec, est. 4.2s audio generated, 384 tokens, 49 chunks in 49.7s
+Token processing rate: 7.2 tokens/second
+Audio generation rate: 0.98 chunks/second
+Progress: 7.7 tokens/sec, est. 4.3s audio generated, 399 tokens, 51 chunks in 51.7s
+Processing buffer with 28 tokens, total collected: 392
+Progress: 7.7 tokens/sec, est. 4.5s audio generated, 414 tokens, 53 chunks in 53.8s
+Audio generation rate: 0.97 chunks/second
+Progress: 7.7 tokens/sec, est. 4.8s audio generated, 429 tokens, 56 chunks in 55.9s
+Token processing rate: 7.2 tokens/second
+Processing buffer with 28 tokens, total collected: 420
+Progress: 7.6 tokens/sec, est. 4.9s audio generated, 444 tokens, 58 chunks in 58.0s
+Audio generation rate: 0.98 chunks/second
+Progress: 7.6 tokens/sec, est. 5.1s audio generated, 457 tokens, 60 chunks in 60.1s
+Processing buffer with 28 tokens, total collected: 448
+Progress: 7.6 tokens/sec, est. 5.3s audio generated, 470 tokens, 62 chunks in 62.1s
+Token processing rate: 7.1 tokens/second
+Audio generation rate: 0.97 chunks/second
+Processing buffer with 28 tokens, total collected: 476
+Progress: 7.5 tokens/sec, est. 5.5s audio generated, 485 tokens, 65 chunks in 64.3s
+Progress: 7.5 tokens/sec, est. 5.7s audio generated, 500 tokens, 67 chunks in 66.4s
+Audio generation rate: 0.98 chunks/second
+Processing buffer with 28 tokens, total collected: 504
+Progress: 7.5 tokens/sec, est. 5.9s audio generated, 515 tokens, 69 chunks in 68.5s
+Token processing rate: 7.1 tokens/second
+Progress: 7.5 tokens/sec, est. 6.1s audio generated, 529 tokens, 72 chunks in 70.6s
+Progress: 7.5 tokens/sec, est. 6.1s audio generated, 543 tokens, 72 chunks in 72.6s
+Processing buffer with 28 tokens, total collected: 532
+Audio generation rate: 0.99 chunks/second
+Progress: 7.5 tokens/sec, est. 6.3s audio generated, 557 tokens, 74 chunks in 74.6s
+Progress: 7.4 tokens/sec, est. 6.5s audio generated, 571 tokens, 76 chunks in 76.7s
+Token processing rate: 7.1 tokens/second
+Processing buffer with 28 tokens, total collected: 560
+Audio generation rate: 0.98 chunks/second
+Progress: 7.4 tokens/sec, est. 6.6s audio generated, 585 tokens, 78 chunks in 78.7s
+Processing buffer with 28 tokens, total collected: 588
+Progress: 7.4 tokens/sec, est. 6.9s audio generated, 599 tokens, 81 chunks in 80.8s
+Audio generation rate: 0.98 chunks/second
+Progress: 7.4 tokens/sec, est. 7.1s audio generated, 613 tokens, 83 chunks in 82.8s
+Token processing rate: 7.1 tokens/second
+Processing buffer with 28 tokens, total collected: 616
+Progress: 7.4 tokens/sec, est. 7.2s audio generated, 627 tokens, 85 chunks in 84.9s
+Audio generation rate: 0.98 chunks/second
+Progress: 7.4 tokens/sec, est. 7.5s audio generated, 641 tokens, 88 chunks in 87.0s
+Progress: 7.3 tokens/sec, est. 7.5s audio generated, 655 tokens, 88 chunks in 89.1s
+Processing buffer with 28 tokens, total collected: 644
+Progress: 7.3 tokens/sec, est. 7.7s audio generated, 669 tokens, 90 chunks in 91.2s
+Token processing rate: 7.0 tokens/second
+Audio generation rate: 0.98 chunks/second
+Progress: 7.3 tokens/sec, est. 7.8s audio generated, 683 tokens, 92 chunks in 93.3s
+Processing buffer with 28 tokens, total collected: 672
+Progress: 7.3 tokens/sec, est. 8.0s audio generated, 697 tokens, 94 chunks in 95.4s
+Audio generation rate: 0.97 chunks/second
+Processing buffer with 28 tokens, total collected: 700
+Progress: 7.3 tokens/sec, est. 8.2s audio generated, 711 tokens, 97 chunks in 97.5s
+Token processing rate: 7.0 tokens/second
+Progress: 7.3 tokens/sec, est. 8.4s audio generated, 725 tokens, 99 chunks in 99.6s
+Progress: 7.3 tokens/sec, est. 8.4s audio generated, 739 tokens, 99 chunks in 101.7s
+Processing buffer with 28 tokens, total collected: 728
+Progress: 7.3 tokens/sec, est. 8.4s audio generated, 753 tokens, 99 chunks in 103.8s
+Progress: 7.2 tokens/sec, est. 8.4s audio generated, 765 tokens, 99 chunks in 105.9s
+Token processing rate: 6.9 tokens/second
+Audio generation rate: 0.93 chunks/second
+Processing buffer with 28 tokens, total collected: 756
+Progress: 7.2 tokens/sec, est. 8.6s audio generated, 777 tokens, 101 chunks in 107.9s
+Progress: 7.2 tokens/sec, est. 8.8s audio generated, 790 tokens, 103 chunks in 109.9s
+Token processing rate: 6.9 tokens/second
+Audio generation rate: 0.92 chunks/second
+Processing buffer with 28 tokens, total collected: 784
+Progress: 7.2 tokens/sec, est. 8.9s audio generated, 804 tokens, 105 chunks in 112.1s
+Progress: 7.2 tokens/sec, est. 9.2s audio generated, 817 tokens, 108 chunks in 114.1s
+Progress: 7.1 tokens/sec, est. 9.2s audio generated, 830 tokens, 108 chunks in 116.1s
+Processing buffer with 28 tokens, total collected: 812
+Audio generation rate: 0.93 chunks/second
+Token processing rate: 7.0 tokens/second
+Progress: 7.1 tokens/sec, est. 9.4s audio generated, 843 tokens, 110 chunks in 118.2s
+Progress: 7.1 tokens/sec, est. 9.5s audio generated, 856 tokens, 112 chunks in 120.2s
+Token processing rate: 6.8 tokens/second
+Processing buffer with 28 tokens, total collected: 840
+Audio generation rate: 0.92 chunks/second
+Progress: 7.1 tokens/sec, est. 9.8s audio generated, 869 tokens, 115 chunks in 122.3s
+Processing buffer with 28 tokens, total collected: 868
+Progress: 7.1 tokens/sec, est. 9.9s audio generated, 882 tokens, 117 chunks in 124.4s
+Progress: 7.1 tokens/sec, est. 9.9s audio generated, 895 tokens, 117 chunks in 126.4s
+Token processing rate: 6.8 tokens/second
+Audio generation rate: 0.92 chunks/second
+Progress: 7.1 tokens/sec, est. 10.1s audio generated, 908 tokens, 119 chunks in 128.5s
+Processing buffer with 28 tokens, total collected: 896
+Progress: 7.1 tokens/sec, est. 10.3s audio generated, 921 tokens, 121 chunks in 130.6s
+Token processing rate: 6.8 tokens/second
+Audio generation rate: 0.92 chunks/second
+Progress: 7.0 tokens/sec, est. 10.5s audio generated, 934 tokens, 124 chunks in 132.7s
+Processing buffer with 28 tokens, total collected: 924
+Progress: 7.0 tokens/sec, est. 10.7s audio generated, 947 tokens, 126 chunks in 134.8s
+Progress: 7.0 tokens/sec, est. 10.7s audio generated, 960 tokens, 126 chunks in 136.9s
+Token processing rate: 6.8 tokens/second
+Audio generation rate: 0.92 chunks/second
+Progress: 7.0 tokens/sec, est. 10.9s audio generated, 973 tokens, 128 chunks in 139.0s
+Processing buffer with 28 tokens, total collected: 952
+Progress: 7.0 tokens/sec, est. 11.1s audio generated, 986 tokens, 131 chunks in 141.2s
+Token processing rate: 6.7 tokens/second
+Audio generation rate: 0.92 chunks/second
+Processing buffer with 28 tokens, total collected: 980
+Progress: 7.0 tokens/sec, est. 11.3s audio generated, 999 tokens, 133 chunks in 143.3s
+Progress: 7.0 tokens/sec, est. 11.5s audio generated, 1012 tokens, 135 chunks in 145.5s
+Token processing rate: 6.7 tokens/second
+Audio generation rate: 0.91 chunks/second
+Processing buffer with 28 tokens, total collected: 1008
+Progress: 6.9 tokens/sec, est. 11.6s audio generated, 1024 tokens, 137 chunks in 147.5s
+Progress: 6.9 tokens/sec, est. 11.6s audio generated, 1037 tokens, 137 chunks in 149.6s
+Progress: 6.9 tokens/sec, est. 11.9s audio generated, 1049 tokens, 140 chunks in 151.8s
+Token processing rate: 6.7 tokens/second
+Processing buffer with 28 tokens, total collected: 1036
+Audio generation rate: 0.91 chunks/second
+Progress: 6.9 tokens/sec, est. 12.1s audio generated, 1061 tokens, 142 chunks in 153.8s
+Progress: 6.9 tokens/sec, est. 12.2s audio generated, 1073 tokens, 144 chunks in 155.8s
+Progress: 6.9 tokens/sec, est. 12.2s audio generated, 1086 tokens, 144 chunks in 158.0s
+Token processing rate: 6.7 tokens/second
+Processing buffer with 28 tokens, total collected: 1064
+Audio generation rate: 0.91 chunks/second
+Progress: 6.9 tokens/sec, est. 12.5s audio generated, 1099 tokens, 147 chunks in 160.1s
+Processing buffer with 28 tokens, total collected: 1092
+Progress: 6.9 tokens/sec, est. 12.7s audio generated, 1111 tokens, 149 chunks in 162.1s
+Token processing rate: 6.6 tokens/second
+Audio generation rate: 0.91 chunks/second
+Progress: 6.8 tokens/sec, est. 12.8s audio generated, 1123 tokens, 151 chunks in 164.2s
+Progress: 6.8 tokens/sec, est. 12.8s audio generated, 1135 tokens, 151 chunks in 166.2s
+Processing buffer with 28 tokens, total collected: 1120
+Progress: 6.8 tokens/sec, est. 13.0s audio generated, 1147 tokens, 153 chunks in 168.2s
+Token processing rate: 6.6 tokens/second
+Audio generation rate: 0.90 chunks/second
+Progress: 6.8 tokens/sec, est. 13.3s audio generated, 1159 tokens, 156 chunks in 170.2s
+Processing buffer with 28 tokens, total collected: 1148
+Progress: 6.8 tokens/sec, est. 13.4s audio generated, 1171 tokens, 158 chunks in 172.3s
+Progress: 6.8 tokens/sec, est. 13.4s audio generated, 1183 tokens, 158 chunks in 174.4s
+Token processing rate: 6.6 tokens/second
+Audio generation rate: 0.90 chunks/second
+Progress: 6.8 tokens/sec, est. 13.6s audio generated, 1195 tokens, 160 chunks in 176.5s
+Processing buffer with 28 tokens, total collected: 1176
+Progress: 6.8 tokens/sec, est. 13.9s audio generated, 1207 tokens, 163 chunks in 178.6s
+Token processing rate: 6.6 tokens/second
+Audio generation rate: 0.90 chunks/second
+Processing buffer with 28 tokens, total collected: 1204
+Progress: 6.7 tokens/sec, est. 14.0s audio generated, 1219 tokens, 165 chunks in 180.6s
+Progress: 6.7 tokens/sec, est. 14.0s audio generated, 1231 tokens, 165 chunks in 182.7s
+Progress: 6.7 tokens/sec, est. 14.2s audio generated, 1243 tokens, 167 chunks in 184.8s
+Token processing rate: 6.5 tokens/second
+Audio generation rate: 0.90 chunks/second
+Processing buffer with 28 tokens, total collected: 1232
+Progress: 6.7 tokens/sec, est. 14.4s audio generated, 1255 tokens, 169 chunks in 186.9s
+Progress: 6.7 tokens/sec, est. 14.6s audio generated, 1267 tokens, 172 chunks in 189.0s
+Progress: 6.7 tokens/sec, est. 14.6s audio generated, 1279 tokens, 172 chunks in 191.1s
+Token processing rate: 6.5 tokens/second
+Processing buffer with 28 tokens, total collected: 1260
+Audio generation rate: 0.90 chunks/second
+Progress: 6.7 tokens/sec, est. 14.8s audio generated, 1291 tokens, 174 chunks in 193.3s
+Progress: 6.7 tokens/sec, est. 15.0s audio generated, 1303 tokens, 176 chunks in 195.4s
+Token processing rate: 6.5 tokens/second
+Processing buffer with 28 tokens, total collected: 1288
+Audio generation rate: 0.89 chunks/second
+Progress: 6.7 tokens/sec, est. 15.2s audio generated, 1314 tokens, 179 chunks in 197.6s
+Progress: 6.6 tokens/sec, est. 15.2s audio generated, 1326 tokens, 179 chunks in 199.7s
+Processing buffer with 28 tokens, total collected: 1316
+Progress: 6.6 tokens/sec, est. 15.4s audio generated, 1338 tokens, 181 chunks in 201.9s
+Token processing rate: 6.5 tokens/second
+Audio generation rate: 0.89 chunks/second
+Progress: 6.6 tokens/sec, est. 15.6s audio generated, 1350 tokens, 183 chunks in 204.0s
+Processing buffer with 28 tokens, total collected: 1344
+Progress: 6.6 tokens/sec, est. 15.7s audio generated, 1361 tokens, 185 chunks in 206.0s
+Progress: 6.6 tokens/sec, est. 15.7s audio generated, 1373 tokens, 185 chunks in 208.2s
+Token processing rate: 6.4 tokens/second
+Audio generation rate: 0.89 chunks/second
+Progress: 6.6 tokens/sec, est. 16.0s audio generated, 1385 tokens, 188 chunks in 210.3s
+Processing buffer with 28 tokens, total collected: 1372
+Progress: 6.6 tokens/sec, est. 16.2s audio generated, 1397 tokens, 190 chunks in 212.5s
+Token processing rate: 6.4 tokens/second
+Progress: 6.6 tokens/sec, est. 16.2s audio generated, 1408 tokens, 191 chunks in 214.5s
+Audio generation rate: 0.89 chunks/second
+Progress: 6.6 tokens/sec, est. 16.3s audio generated, 1419 tokens, 192 chunks in 216.5s
+Processing buffer with 28 tokens, total collected: 1400
+Progress: 6.5 tokens/sec, est. 16.6s audio generated, 1430 tokens, 195 chunks in 218.6s
+Token processing rate: 6.4 tokens/second
+Audio generation rate: 0.88 chunks/second
+Processing buffer with 28 tokens, total collected: 1428
+Progress: 6.5 tokens/sec, est. 16.7s audio generated, 1441 tokens, 197 chunks in 220.6s
+Progress: 6.5 tokens/sec, est. 16.7s audio generated, 1452 tokens, 197 chunks in 222.6s
+Progress: 6.5 tokens/sec, est. 16.9s audio generated, 1463 tokens, 199 chunks in 224.6s
+Token processing rate: 6.4 tokens/second
+Audio generation rate: 0.88 chunks/second
+Processing buffer with 28 tokens, total collected: 1456
+Progress: 6.5 tokens/sec, est. 17.1s audio generated, 1474 tokens, 201 chunks in 226.7s
+Progress: 6.5 tokens/sec, est. 17.1s audio generated, 1485 tokens, 201 chunks in 228.7s
+Progress: 6.5 tokens/sec, est. 17.3s audio generated, 1496 tokens, 204 chunks in 230.7s
+Token processing rate: 6.3 tokens/second
+Processing buffer with 28 tokens, total collected: 1484
+Audio generation rate: 0.88 chunks/second
+Progress: 6.5 tokens/sec, est. 17.5s audio generated, 1507 tokens, 206 chunks in 232.8s
+Progress: 6.5 tokens/sec, est. 17.5s audio generated, 1518 tokens, 206 chunks in 234.9s
+Progress: 6.5 tokens/sec, est. 17.7s audio generated, 1529 tokens, 208 chunks in 236.9s
+Token processing rate: 6.3 tokens/second
+Processing buffer with 28 tokens, total collected: 1512
+Audio generation rate: 0.87 chunks/second
+Progress: 6.4 tokens/sec, est. 17.9s audio generated, 1540 tokens, 211 chunks in 238.9s
+Progress: 6.4 tokens/sec, est. 17.9s audio generated, 1551 tokens, 211 chunks in 241.0s
+Processing buffer with 28 tokens, total collected: 1540
+Progress: 6.4 tokens/sec, est. 18.1s audio generated, 1562 tokens, 213 chunks in 243.1s
+Token processing rate: 6.3 tokens/second
+Audio generation rate: 0.87 chunks/second
+Progress: 6.4 tokens/sec, est. 18.3s audio generated, 1572 tokens, 215 chunks in 245.2s
+Progress: 6.4 tokens/sec, est. 18.3s audio generated, 1583 tokens, 215 chunks in 247.3s
+Audio generation rate: 0.87 chunks/second
+Processing buffer with 28 tokens, total collected: 1568
+Progress: 6.4 tokens/sec, est. 18.4s audio generated, 1590 tokens, 217 chunks in 249.5s
+Progress: 6.3 tokens/sec, est. 18.4s audio generated, 1593 tokens, 217 chunks in 251.6s
+Progress: 6.3 tokens/sec, est. 18.4s audio generated, 1596 tokens, 217 chunks in 253.6s
+Progress: 6.2 tokens/sec, est. 18.4s audio generated, 1600 tokens, 217 chunks in 256.2s
+Token processing rate: 6.1 tokens/second
+Audio generation rate: 0.85 chunks/second
+Progress: 6.2 tokens/sec, est. 18.7s audio generated, 1603 tokens, 220 chunks in 258.2s
+Progress: 6.2 tokens/sec, est. 18.7s audio generated, 1607 tokens, 220 chunks in 260.9s
+Progress: 6.1 tokens/sec, est. 18.7s audio generated, 1611 tokens, 220 chunks in 263.5s
+Progress: 6.1 tokens/sec, est. 18.7s audio generated, 1614 tokens, 220 chunks in 265.5s
+Token processing rate: 5.9 tokens/second
+Processing buffer with 28 tokens, total collected: 1596
+Audio generation rate: 0.82 chunks/second
+Progress: 6.0 tokens/sec, est. 18.9s audio generated, 1617 tokens, 222 chunks in 267.6s
+Progress: 6.0 tokens/sec, est. 18.9s audio generated, 1621 tokens, 222 chunks in 270.2s
+Progress: 6.0 tokens/sec, est. 18.9s audio generated, 1625 tokens, 222 chunks in 272.7s
+Progress: 5.9 tokens/sec, est. 18.9s audio generated, 1629 tokens, 222 chunks in 275.1s
+Token processing rate: 5.8 tokens/second
+Audio generation rate: 0.80 chunks/second
+Progress: 5.9 tokens/sec, est. 19.0s audio generated, 1635 tokens, 224 chunks in 277.2s
+Progress: 5.9 tokens/sec, est. 19.0s audio generated, 1642 tokens, 224 chunks in 279.5s
+Token processing rate: 5.7 tokens/second
+Processing buffer with 28 tokens, total collected: 1624
+Audio generation rate: 0.80 chunks/second
+Progress: 5.9 tokens/sec, est. 19.3s audio generated, 1649 tokens, 227 chunks in 281.8s
+Progress: 5.8 tokens/sec, est. 19.3s audio generated, 1655 tokens, 227 chunks in 283.9s
+Progress: 5.8 tokens/sec, est. 19.3s audio generated, 1662 tokens, 227 chunks in 286.1s
+Token processing rate: 5.7 tokens/second
+Audio generation rate: 0.79 chunks/second
+Processing buffer with 28 tokens, total collected: 1652
+Progress: 5.8 tokens/sec, est. 19.5s audio generated, 1669 tokens, 229 chunks in 288.4s
+Progress: 5.8 tokens/sec, est. 19.5s audio generated, 1675 tokens, 229 chunks in 290.4s
+Token processing rate: 5.6 tokens/second
+Audio generation rate: 0.78 chunks/second
+Progress: 5.7 tokens/sec, est. 19.6s audio generated, 1681 tokens, 231 chunks in 292.6s
+Progress: 5.7 tokens/sec, est. 19.6s audio generated, 1687 tokens, 231 chunks in 294.7s
+Progress: 5.7 tokens/sec, est. 19.6s audio generated, 1693 tokens, 231 chunks in 296.7s
+Token processing rate: 5.6 tokens/second
+Audio generation rate: 0.78 chunks/second
+Processing buffer with 28 tokens, total collected: 1680
+Progress: 5.7 tokens/sec, est. 19.8s audio generated, 1699 tokens, 233 chunks in 298.8s
+Progress: 5.7 tokens/sec, est. 19.8s audio generated, 1705 tokens, 233 chunks in 300.8s
+Progress: 5.6 tokens/sec, est. 19.8s audio generated, 1711 tokens, 233 chunks in 302.9s
+Token processing rate: 5.5 tokens/second
+Audio generation rate: 0.77 chunks/second
+Progress: 5.6 tokens/sec, est. 20.1s audio generated, 1717 tokens, 236 chunks in 305.0s
+Progress: 5.6 tokens/sec, est. 20.1s audio generated, 1724 tokens, 236 chunks in 307.3s
+Token processing rate: 5.5 tokens/second
+Processing buffer with 28 tokens, total collected: 1708
+Audio generation rate: 0.76 chunks/second
+Progress: 5.6 tokens/sec, est. 20.2s audio generated, 1730 tokens, 238 chunks in 309.4s
+Progress: 5.6 tokens/sec, est. 20.2s audio generated, 1737 tokens, 238 chunks in 311.7s
+Progress: 5.6 tokens/sec, est. 20.2s audio generated, 1743 tokens, 238 chunks in 313.7s
+Token processing rate: 5.5 tokens/second
+Audio generation rate: 0.76 chunks/second
+Progress: 5.5 tokens/sec, est. 20.4s audio generated, 1749 tokens, 240 chunks in 315.8s
+Progress: 5.5 tokens/sec, est. 20.4s audio generated, 1755 tokens, 240 chunks in 317.9s
+Token processing rate: 5.4 tokens/second
+Processing buffer with 28 tokens, total collected: 1736
+Audio generation rate: 0.75 chunks/second
+Progress: 5.5 tokens/sec, est. 20.7s audio generated, 1762 tokens, 243 chunks in 320.0s
+Progress: 5.5 tokens/sec, est. 20.7s audio generated, 1773 tokens, 243 chunks in 322.2s
+Audio generation rate: 0.75 chunks/second
+Processing buffer with 28 tokens, total collected: 1764
+Progress: 5.5 tokens/sec, est. 20.8s audio generated, 1784 tokens, 245 chunks in 324.4s
+Progress: 5.5 tokens/sec, est. 20.8s audio generated, 1790 tokens, 245 chunks in 326.5s
+Token processing rate: 5.4 tokens/second
+Audio generation rate: 0.75 chunks/second
+Progress: 5.5 tokens/sec, est. 21.0s audio generated, 1793 tokens, 247 chunks in 328.6s
+Progress: 5.4 tokens/sec, est. 21.0s audio generated, 1796 tokens, 247 chunks in 330.6s
+Progress: 5.4 tokens/sec, est. 21.0s audio generated, 1799 tokens, 247 chunks in 332.6s
+Progress: 5.4 tokens/sec, est. 21.0s audio generated, 1803 tokens, 247 chunks in 335.2s
+Progress: 5.4 tokens/sec, est. 21.0s audio generated, 1806 tokens, 247 chunks in 337.3s
+Token processing rate: 5.2 tokens/second
+Audio generation rate: 0.73 chunks/second
+Processing buffer with 28 tokens, total collected: 1792
+Progress: 5.3 tokens/sec, est. 21.2s audio generated, 1809 tokens, 249 chunks in 339.5s
+Progress: 5.3 tokens/sec, est. 21.2s audio generated, 1812 tokens, 249 chunks in 341.6s
+Progress: 5.3 tokens/sec, est. 21.2s audio generated, 1815 tokens, 249 chunks in 343.7s
+Progress: 5.3 tokens/sec, est. 21.2s audio generated, 1819 tokens, 249 chunks in 346.0s
+Token processing rate: 5.2 tokens/second
+Audio generation rate: 0.72 chunks/second
+Progress: 5.2 tokens/sec, est. 21.4s audio generated, 1825 tokens, 252 chunks in 348.2s
+Progress: 5.2 tokens/sec, est. 21.4s audio generated, 1831 tokens, 252 chunks in 350.2s
+Progress: 5.2 tokens/sec, est. 21.4s audio generated, 1837 tokens, 252 chunks in 352.3s
+Token processing rate: 5.1 tokens/second
+Processing buffer with 28 tokens, total collected: 1820
+Audio generation rate: 0.71 chunks/second
+Progress: 5.2 tokens/sec, est. 21.6s audio generated, 1843 tokens, 254 chunks in 354.4s
+Progress: 5.2 tokens/sec, est. 21.6s audio generated, 1849 tokens, 254 chunks in 356.5s
+Progress: 5.2 tokens/sec, est. 21.6s audio generated, 1855 tokens, 254 chunks in 358.5s
+Token processing rate: 5.1 tokens/second
+Audio generation rate: 0.71 chunks/second
+Progress: 5.2 tokens/sec, est. 21.8s audio generated, 1861 tokens, 256 chunks in 360.7s
+Progress: 5.1 tokens/sec, est. 21.8s audio generated, 1867 tokens, 256 chunks in 362.8s
+Token processing rate: 5.0 tokens/second
+Processing buffer with 28 tokens, total collected: 1848
+Audio generation rate: 0.70 chunks/second
+Progress: 5.1 tokens/sec, est. 22.0s audio generated, 1873 tokens, 259 chunks in 364.9s
+Progress: 5.1 tokens/sec, est. 22.0s audio generated, 1879 tokens, 259 chunks in 367.1s
+Progress: 5.1 tokens/sec, est. 22.0s audio generated, 1885 tokens, 259 chunks in 369.1s
+Token processing rate: 5.0 tokens/second
+Audio generation rate: 0.70 chunks/second
+Processing buffer with 28 tokens, total collected: 1876
+Progress: 5.1 tokens/sec, est. 22.2s audio generated, 1891 tokens, 261 chunks in 371.2s
+Progress: 5.1 tokens/sec, est. 22.2s audio generated, 1897 tokens, 261 chunks in 373.3s
+Progress: 5.1 tokens/sec, est. 22.2s audio generated, 1903 tokens, 261 chunks in 375.5s
+Token processing rate: 5.0 tokens/second
+Audio generation rate: 0.69 chunks/second
+Progress: 5.1 tokens/sec, est. 22.4s audio generated, 1909 tokens, 263 chunks in 377.5s
+Progress: 5.0 tokens/sec, est. 22.4s audio generated, 1915 tokens, 263 chunks in 379.6s
+Token processing rate: 5.0 tokens/second
+Audio generation rate: 0.69 chunks/second
+Processing buffer with 28 tokens, total collected: 1904
+Progress: 5.0 tokens/sec, est. 22.5s audio generated, 1921 tokens, 265 chunks in 381.8s
+Progress: 5.0 tokens/sec, est. 22.5s audio generated, 1927 tokens, 265 chunks in 383.8s
+Progress: 5.0 tokens/sec, est. 22.5s audio generated, 1933 tokens, 265 chunks in 386.0s
+Token processing rate: 4.9 tokens/second
+Audio generation rate: 0.68 chunks/second
+Progress: 5.0 tokens/sec, est. 22.8s audio generated, 1939 tokens, 268 chunks in 388.1s
+Progress: 5.0 tokens/sec, est. 22.8s audio generated, 1945 tokens, 268 chunks in 390.3s
+Processing buffer with 28 tokens, total collected: 1932
+Audio generation rate: 0.68 chunks/second
+Progress: 5.0 tokens/sec, est. 23.0s audio generated, 1955 tokens, 270 chunks in 392.5s
+Progress: 5.0 tokens/sec, est. 23.0s audio generated, 1964 tokens, 270 chunks in 394.5s
+Token processing rate: 4.9 tokens/second
+Audio generation rate: 0.68 chunks/second
+Progress: 5.0 tokens/sec, est. 23.1s audio generated, 1971 tokens, 272 chunks in 396.7s
+Progress: 4.9 tokens/sec, est. 23.1s audio generated, 1975 tokens, 272 chunks in 399.4s
+Progress: 4.9 tokens/sec, est. 23.1s audio generated, 1978 tokens, 272 chunks in 401.5s
+Progress: 4.9 tokens/sec, est. 23.1s audio generated, 1981 tokens, 272 chunks in 403.7s
+Progress: 4.9 tokens/sec, est. 23.1s audio generated, 1984 tokens, 272 chunks in 405.8s
+Token processing rate: 4.8 tokens/second
+Processing buffer with 28 tokens, total collected: 1960
+Audio generation rate: 0.67 chunks/second
+Progress: 4.9 tokens/sec, est. 23.4s audio generated, 1988 tokens, 275 chunks in 408.5s
+Progress: 4.8 tokens/sec, est. 23.4s audio generated, 1991 tokens, 275 chunks in 410.6s
+Progress: 4.8 tokens/sec, est. 23.4s audio generated, 1994 tokens, 275 chunks in 412.7s
+Progress: 4.8 tokens/sec, est. 23.4s audio generated, 1997 tokens, 275 chunks in 415.0s
+Token processing rate: 4.7 tokens/second
+Audio generation rate: 0.66 chunks/second
+Processing buffer with 28 tokens, total collected: 1988
+Progress: 4.8 tokens/sec, est. 23.5s audio generated, 2002 tokens, 277 chunks in 417.0s
+Progress: 4.8 tokens/sec, est. 23.5s audio generated, 2008 tokens, 277 chunks in 419.2s
+Progress: 4.8 tokens/sec, est. 23.5s audio generated, 2014 tokens, 277 chunks in 421.3s
+Token processing rate: 4.7 tokens/second
+Audio generation rate: 0.66 chunks/second
+Progress: 4.8 tokens/sec, est. 23.7s audio generated, 2020 tokens, 279 chunks in 423.5s
+Progress: 4.8 tokens/sec, est. 23.7s audio generated, 2026 tokens, 279 chunks in 425.7s
+Progress: 4.7 tokens/sec, est. 23.7s audio generated, 2032 tokens, 279 chunks in 427.9s
+Token processing rate: 4.7 tokens/second
+Audio generation rate: 0.65 chunks/second
+Processing buffer with 28 tokens, total collected: 2016
+Progress: 4.7 tokens/sec, est. 23.9s audio generated, 2038 tokens, 281 chunks in 430.1s
+Progress: 4.7 tokens/sec, est. 23.9s audio generated, 2044 tokens, 281 chunks in 432.3s
+Token processing rate: 4.7 tokens/second
+Audio generation rate: 0.65 chunks/second
+Progress: 4.7 tokens/sec, est. 24.1s audio generated, 2050 tokens, 284 chunks in 434.4s
+Progress: 4.7 tokens/sec, est. 24.1s audio generated, 2056 tokens, 284 chunks in 436.6s
+Progress: 4.7 tokens/sec, est. 24.1s audio generated, 2062 tokens, 284 chunks in 438.8s
+Token processing rate: 4.6 tokens/second
+Processing buffer with 28 tokens, total collected: 2044
+Audio generation rate: 0.65 chunks/second
+Progress: 4.7 tokens/sec, est. 24.3s audio generated, 2068 tokens, 286 chunks in 441.1s
+Progress: 4.7 tokens/sec, est. 24.3s audio generated, 2074 tokens, 286 chunks in 443.1s
+Progress: 4.7 tokens/sec, est. 24.3s audio generated, 2080 tokens, 286 chunks in 445.4s
+Token processing rate: 4.6 tokens/second
+Audio generation rate: 0.64 chunks/second
+Progress: 4.7 tokens/sec, est. 24.5s audio generated, 2086 tokens, 288 chunks in 447.6s
+Progress: 4.7 tokens/sec, est. 24.5s audio generated, 2092 tokens, 288 chunks in 449.9s
+Token processing rate: 4.6 tokens/second
+Processing buffer with 28 tokens, total collected: 2072
+Audio generation rate: 0.64 chunks/second
+Progress: 4.6 tokens/sec, est. 24.7s audio generated, 2098 tokens, 291 chunks in 452.0s
+Progress: 4.6 tokens/sec, est. 24.7s audio generated, 2104 tokens, 291 chunks in 454.2s
+Progress: 4.6 tokens/sec, est. 24.7s audio generated, 2110 tokens, 291 chunks in 456.4s
+Token processing rate: 4.6 tokens/second
+Audio generation rate: 0.64 chunks/second
+Processing buffer with 28 tokens, total collected: 2100
+Progress: 4.6 tokens/sec, est. 24.9s audio generated, 2116 tokens, 293 chunks in 458.6s
+Progress: 4.6 tokens/sec, est. 24.9s audio generated, 2123 tokens, 293 chunks in 460.7s
+Audio generation rate: 0.63 chunks/second
+Progress: 4.6 tokens/sec, est. 25.1s audio generated, 2133 tokens, 295 chunks in 462.9s
+Progress: 4.6 tokens/sec, est. 25.1s audio generated, 2143 tokens, 295 chunks in 465.1s
+Token processing rate: 4.5 tokens/second
+Audio generation rate: 0.63 chunks/second
+Processing buffer with 28 tokens, total collected: 2128
+Progress: 4.6 tokens/sec, est. 25.2s audio generated, 2148 tokens, 297 chunks in 467.2s
+Progress: 4.6 tokens/sec, est. 25.2s audio generated, 2151 tokens, 297 chunks in 469.5s
+Progress: 4.6 tokens/sec, est. 25.2s audio generated, 2154 tokens, 297 chunks in 471.8s
+Progress: 4.5 tokens/sec, est. 25.2s audio generated, 2157 tokens, 297 chunks in 474.2s
+Progress: 4.5 tokens/sec, est. 25.2s audio generated, 2160 tokens, 297 chunks in 476.4s
+Token processing rate: 4.5 tokens/second
+Audio generation rate: 0.62 chunks/second
+Progress: 4.5 tokens/sec, est. 25.5s audio generated, 2163 tokens, 300 chunks in 478.9s
+Progress: 4.5 tokens/sec, est. 25.5s audio generated, 2166 tokens, 300 chunks in 481.1s
+Progress: 4.5 tokens/sec, est. 25.5s audio generated, 2169 tokens, 300 chunks in 483.3s
+Progress: 4.5 tokens/sec, est. 25.5s audio generated, 2172 tokens, 300 chunks in 485.5s
+Progress: 4.5 tokens/sec, est. 25.5s audio generated, 2175 tokens, 300 chunks in 487.7s
+Token processing rate: 4.4 tokens/second
+Processing buffer with 28 tokens, total collected: 2156
+Audio generation rate: 0.61 chunks/second
+Progress: 4.5 tokens/sec, est. 25.7s audio generated, 2181 tokens, 302 chunks in 490.1s
+Progress: 4.4 tokens/sec, est. 25.7s audio generated, 2187 tokens, 302 chunks in 492.4s
+Token processing rate: 4.4 tokens/second
+Progress: 4.4 tokens/sec, est. 25.8s audio generated, 2192 tokens, 303 chunks in 494.4s
+Audio generation rate: 0.61 chunks/second
+Progress: 4.4 tokens/sec, est. 25.8s audio generated, 2198 tokens, 304 chunks in 496.7s
+Progress: 4.4 tokens/sec, est. 25.8s audio generated, 2204 tokens, 304 chunks in 499.0s
+Token processing rate: 4.4 tokens/second
+Processing buffer with 28 tokens, total collected: 2184
+Audio generation rate: 0.61 chunks/second
+Progress: 4.4 tokens/sec, est. 26.1s audio generated, 2210 tokens, 307 chunks in 501.3s
+Progress: 4.4 tokens/sec, est. 26.1s audio generated, 2216 tokens, 307 chunks in 503.7s
+Progress: 4.4 tokens/sec, est. 26.1s audio generated, 2222 tokens, 307 chunks in 505.9s
+Token processing rate: 4.3 tokens/second
+Audio generation rate: 0.61 chunks/second
+Processing buffer with 28 tokens, total collected: 2212
+Progress: 4.4 tokens/sec, est. 26.3s audio generated, 2228 tokens, 309 chunks in 508.2s
+Progress: 4.4 tokens/sec, est. 26.3s audio generated, 2234 tokens, 309 chunks in 510.5s
+Progress: 4.4 tokens/sec, est. 26.3s audio generated, 2240 tokens, 309 chunks in 512.8s
+Token processing rate: 4.3 tokens/second
+Audio generation rate: 0.60 chunks/second
+Progress: 4.4 tokens/sec, est. 26.4s audio generated, 2246 tokens, 311 chunks in 515.1s
+Progress: 4.4 tokens/sec, est. 26.4s audio generated, 2252 tokens, 311 chunks in 517.5s
+Token processing rate: 4.3 tokens/second
+Audio generation rate: 0.60 chunks/second
+Processing buffer with 28 tokens, total collected: 2240
+Progress: 4.3 tokens/sec, est. 26.6s audio generated, 2258 tokens, 313 chunks in 519.8s
+Progress: 4.3 tokens/sec, est. 26.6s audio generated, 2264 tokens, 313 chunks in 522.1s
+Progress: 4.3 tokens/sec, est. 26.6s audio generated, 2270 tokens, 313 chunks in 524.4s
+Token processing rate: 4.3 tokens/second
+Audio generation rate: 0.60 chunks/second
+Progress: 4.3 tokens/sec, est. 26.9s audio generated, 2276 tokens, 316 chunks in 526.7s
+Progress: 4.3 tokens/sec, est. 26.9s audio generated, 2282 tokens, 316 chunks in 529.1s
+Progress: 4.3 tokens/sec, est. 26.9s audio generated, 2288 tokens, 316 chunks in 531.4s
+Token processing rate: 4.2 tokens/second
+Processing buffer with 28 tokens, total collected: 2268
+Audio generation rate: 0.60 chunks/second
+Progress: 4.3 tokens/sec, est. 27.0s audio generated, 2293 tokens, 318 chunks in 533.4s
+Progress: 4.3 tokens/sec, est. 27.0s audio generated, 2301 tokens, 318 chunks in 535.4s
+Audio generation rate: 0.59 chunks/second
+Progress: 4.3 tokens/sec, est. 27.2s audio generated, 2310 tokens, 320 chunks in 537.5s
+Progress: 4.3 tokens/sec, est. 27.2s audio generated, 2318 tokens, 320 chunks in 539.9s
+Token processing rate: 4.2 tokens/second
+Processing buffer with 28 tokens, total collected: 2296
+Audio generation rate: 0.59 chunks/second
+Progress: 4.3 tokens/sec, est. 27.5s audio generated, 2322 tokens, 323 chunks in 542.5s
+Progress: 4.3 tokens/sec, est. 27.5s audio generated, 2325 tokens, 323 chunks in 544.8s
+Progress: 4.3 tokens/sec, est. 27.5s audio generated, 2328 tokens, 323 chunks in 547.1s
+Progress: 4.2 tokens/sec, est. 27.5s audio generated, 2331 tokens, 323 chunks in 549.4s
+Progress: 4.2 tokens/sec, est. 27.5s audio generated, 2334 tokens, 323 chunks in 551.7s
+Token processing rate: 4.2 tokens/second
+Audio generation rate: 0.58 chunks/second
+Processing buffer with 28 tokens, total collected: 2324
+Progress: 4.2 tokens/sec, est. 27.6s audio generated, 2337 tokens, 325 chunks in 553.9s
+Progress: 4.2 tokens/sec, est. 27.6s audio generated, 2340 tokens, 325 chunks in 556.2s
+Progress: 4.2 tokens/sec, est. 27.6s audio generated, 2343 tokens, 325 chunks in 558.6s
+Progress: 4.2 tokens/sec, est. 27.6s audio generated, 2346 tokens, 325 chunks in 561.0s
+Progress: 4.2 tokens/sec, est. 27.6s audio generated, 2349 tokens, 325 chunks in 563.3s
+Progress: 4.2 tokens/sec, est. 27.6s audio generated, 2352 tokens, 325 chunks in 565.5s
+Token processing rate: 4.1 tokens/second
+Audio generation rate: 0.58 chunks/second
+Progress: 4.1 tokens/sec, est. 27.8s audio generated, 2355 tokens, 327 chunks in 567.9s
+Progress: 4.1 tokens/sec, est. 27.8s audio generated, 2358 tokens, 327 chunks in 570.1s
+Progress: 4.1 tokens/sec, est. 27.8s audio generated, 2361 tokens, 327 chunks in 572.4s
+Progress: 4.1 tokens/sec, est. 27.8s audio generated, 2364 tokens, 327 chunks in 574.8s
+Progress: 4.1 tokens/sec, est. 27.8s audio generated, 2367 tokens, 327 chunks in 577.2s
+Token processing rate: 4.0 tokens/second
+Audio generation rate: 0.57 chunks/second
+Processing buffer with 28 tokens, total collected: 2352
+Progress: 4.1 tokens/sec, est. 28.0s audio generated, 2370 tokens, 329 chunks in 579.5s
+Progress: 4.1 tokens/sec, est. 28.0s audio generated, 2373 tokens, 329 chunks in 581.9s
+Progress: 4.1 tokens/sec, est. 28.0s audio generated, 2376 tokens, 329 chunks in 584.4s
+Progress: 4.1 tokens/sec, est. 28.0s audio generated, 2379 tokens, 329 chunks in 586.9s
+Progress: 4.0 tokens/sec, est. 28.0s audio generated, 2382 tokens, 329 chunks in 589.4s
+Token processing rate: 4.0 tokens/second
+Audio generation rate: 0.56 chunks/second
+Progress: 4.0 tokens/sec, est. 28.2s audio generated, 2385 tokens, 332 chunks in 592.0s
+Progress: 4.0 tokens/sec, est. 28.2s audio generated, 2388 tokens, 332 chunks in 594.3s
+Progress: 4.0 tokens/sec, est. 28.2s audio generated, 2391 tokens, 332 chunks in 596.7s
+Progress: 4.0 tokens/sec, est. 28.2s audio generated, 2394 tokens, 332 chunks in 598.9s
+Progress: 4.0 tokens/sec, est. 28.2s audio generated, 2398 tokens, 332 chunks in 601.2s
+Token processing rate: 3.9 tokens/second
+Processing buffer with 28 tokens, total collected: 2380
+Audio generation rate: 0.55 chunks/second
+Progress: 4.0 tokens/sec, est. 28.4s audio generated, 2404 tokens, 334 chunks in 603.6s
+Progress: 4.0 tokens/sec, est. 28.4s audio generated, 2409 tokens, 334 chunks in 605.7s
+Progress: 4.0 tokens/sec, est. 28.4s audio generated, 2414 tokens, 334 chunks in 607.7s
+Token processing rate: 3.9 tokens/second
+Audio generation rate: 0.55 chunks/second
+Progress: 4.0 tokens/sec, est. 28.6s audio generated, 2419 tokens, 336 chunks in 609.7s
+Progress: 4.0 tokens/sec, est. 28.6s audio generated, 2424 tokens, 336 chunks in 611.7s
+Progress: 4.0 tokens/sec, est. 28.6s audio generated, 2430 tokens, 336 chunks in 614.1s
+Token processing rate: 3.9 tokens/second
+Processing buffer with 28 tokens, total collected: 2408
+Audio generation rate: 0.55 chunks/second
+Progress: 4.0 tokens/sec, est. 28.8s audio generated, 2436 tokens, 339 chunks in 616.5s
+Progress: 3.9 tokens/sec, est. 28.8s audio generated, 2441 tokens, 339 chunks in 618.5s
+Progress: 3.9 tokens/sec, est. 28.8s audio generated, 2447 tokens, 339 chunks in 620.9s
+Token processing rate: 3.9 tokens/second
+Audio generation rate: 0.55 chunks/second
+Processing buffer with 28 tokens, total collected: 2436
+Progress: 3.9 tokens/sec, est. 29.0s audio generated, 2452 tokens, 341 chunks in 623.0s
+Progress: 3.9 tokens/sec, est. 29.0s audio generated, 2458 tokens, 341 chunks in 625.4s
+Progress: 3.9 tokens/sec, est. 29.0s audio generated, 2463 tokens, 341 chunks in 627.4s
+Token processing rate: 3.9 tokens/second
+Audio generation rate: 0.54 chunks/second
+Progress: 3.9 tokens/sec, est. 29.2s audio generated, 2468 tokens, 343 chunks in 629.5s
+Progress: 3.9 tokens/sec, est. 29.2s audio generated, 2473 tokens, 343 chunks in 631.5s
+Progress: 3.9 tokens/sec, est. 29.2s audio generated, 2478 tokens, 343 chunks in 633.6s
+Token processing rate: 3.9 tokens/second
+Audio generation rate: 0.54 chunks/second
+Processing buffer with 28 tokens, total collected: 2464
+Progress: 3.9 tokens/sec, est. 29.3s audio generated, 2483 tokens, 345 chunks in 635.6s
+Progress: 3.9 tokens/sec, est. 29.3s audio generated, 2488 tokens, 345 chunks in 637.7s
+Progress: 3.9 tokens/sec, est. 29.3s audio generated, 2493 tokens, 345 chunks in 639.8s
+Token processing rate: 3.8 tokens/second
+Audio generation rate: 0.54 chunks/second
+Progress: 3.9 tokens/sec, est. 29.6s audio generated, 2498 tokens, 348 chunks in 641.8s
+Progress: 3.9 tokens/sec, est. 29.6s audio generated, 2503 tokens, 348 chunks in 643.9s
+Progress: 3.9 tokens/sec, est. 29.6s audio generated, 2509 tokens, 348 chunks in 646.3s
+Token processing rate: 3.8 tokens/second
+Processing buffer with 28 tokens, total collected: 2492
+Audio generation rate: 0.54 chunks/second
+Progress: 3.9 tokens/sec, est. 29.8s audio generated, 2514 tokens, 350 chunks in 648.4s
+Progress: 3.9 tokens/sec, est. 29.8s audio generated, 2520 tokens, 350 chunks in 650.8s
+Progress: 3.9 tokens/sec, est. 29.8s audio generated, 2525 tokens, 350 chunks in 652.8s
+Token processing rate: 3.8 tokens/second
+Audio generation rate: 0.54 chunks/second
+Progress: 3.9 tokens/sec, est. 29.9s audio generated, 2530 tokens, 352 chunks in 654.9s
+Progress: 3.9 tokens/sec, est. 29.9s audio generated, 2538 tokens, 352 chunks in 657.0s
+Processing buffer with 28 tokens, total collected: 2520
+Audio generation rate: 0.54 chunks/second
+INFO:     127.0.0.1:56598 - "GET /health HTTP/1.1" 200 OK
+Progress: 3.9 tokens/sec, est. 30.2s audio generated, 2547 tokens, 355 chunks in 659.1s
+Progress: 3.9 tokens/sec, est. 30.2s audio generated, 2553 tokens, 355 chunks in 661.3s
+Progress: 3.9 tokens/sec, est. 30.2s audio generated, 2556 tokens, 355 chunks in 663.4s
+Token processing rate: 3.8 tokens/second
+Audio generation rate: 0.53 chunks/second
+Processing buffer with 28 tokens, total collected: 2548
+Progress: 3.8 tokens/sec, est. 30.3s audio generated, 2561 tokens, 357 chunks in 665.8s
+Progress: 3.8 tokens/sec, est. 30.3s audio generated, 2566 tokens, 357 chunks in 668.0s
+Progress: 3.8 tokens/sec, est. 30.3s audio generated, 2571 tokens, 357 chunks in 670.2s
+Progress: 3.8 tokens/sec, est. 30.3s audio generated, 2576 tokens, 357 chunks in 672.4s
+Token processing rate: 3.8 tokens/second
+Audio generation rate: 0.53 chunks/second
+Progress: 3.8 tokens/sec, est. 30.5s audio generated, 2581 tokens, 359 chunks in 674.7s
+Progress: 3.8 tokens/sec, est. 30.5s audio generated, 2586 tokens, 359 chunks in 677.0s
+Progress: 3.8 tokens/sec, est. 30.5s audio generated, 2591 tokens, 359 chunks in 679.3s
+Token processing rate: 3.8 tokens/second
+Audio generation rate: 0.53 chunks/second
+Processing buffer with 28 tokens, total collected: 2576
+Progress: 3.8 tokens/sec, est. 30.7s audio generated, 2596 tokens, 361 chunks in 681.5s
+Progress: 3.8 tokens/sec, est. 30.7s audio generated, 2601 tokens, 361 chunks in 683.6s
+Progress: 3.8 tokens/sec, est. 30.7s audio generated, 2606 tokens, 361 chunks in 685.8s
+Token processing rate: 3.8 tokens/second
+Audio generation rate: 0.53 chunks/second
+Progress: 3.8 tokens/sec, est. 30.9s audio generated, 2611 tokens, 364 chunks in 688.0s
+Progress: 3.8 tokens/sec, est. 30.9s audio generated, 2616 tokens, 364 chunks in 690.2s
+Progress: 3.8 tokens/sec, est. 30.9s audio generated, 2621 tokens, 364 chunks in 692.5s
+Token processing rate: 3.7 tokens/second
+Processing buffer with 28 tokens, total collected: 2604
+Audio generation rate: 0.53 chunks/second
+Progress: 3.8 tokens/sec, est. 31.1s audio generated, 2626 tokens, 366 chunks in 694.7s
+Progress: 3.8 tokens/sec, est. 31.1s audio generated, 2631 tokens, 366 chunks in 696.8s
+Progress: 3.8 tokens/sec, est. 31.1s audio generated, 2636 tokens, 366 chunks in 698.9s
+Token processing rate: 3.7 tokens/second
+Audio generation rate: 0.52 chunks/second
+Progress: 3.8 tokens/sec, est. 31.3s audio generated, 2641 tokens, 368 chunks in 701.0s
+Progress: 3.8 tokens/sec, est. 31.3s audio generated, 2650 tokens, 368 chunks in 703.2s
+Processing buffer with 28 tokens, total collected: 2632
+Audio generation rate: 0.52 chunks/second
+Progress: 3.8 tokens/sec, est. 31.5s audio generated, 2659 tokens, 371 chunks in 705.3s
+Progress: 3.8 tokens/sec, est. 31.5s audio generated, 2665 tokens, 371 chunks in 707.5s
+Progress: 3.8 tokens/sec, est. 31.5s audio generated, 2668 tokens, 371 chunks in 710.0s
+Progress: 3.7 tokens/sec, est. 31.5s audio generated, 2671 tokens, 371 chunks in 712.4s
+Token processing rate: 3.7 tokens/second
+Audio generation rate: 0.52 chunks/second
+Processing buffer with 28 tokens, total collected: 2660
+Progress: 3.7 tokens/sec, est. 31.7s audio generated, 2674 tokens, 373 chunks in 714.4s
+INFO:     127.0.0.1:54451 - "GET /health HTTP/1.1" 200 OK
+Progress: 3.7 tokens/sec, est. 31.7s audio generated, 2682 tokens, 373 chunks in 716.6s
+Audio generation rate: 0.52 chunks/second
+Progress: 3.7 tokens/sec, est. 31.9s audio generated, 2691 tokens, 375 chunks in 718.7s
+Progress: 3.7 tokens/sec, est. 31.9s audio generated, 2700 tokens, 375 chunks in 720.9s
+Token processing rate: 3.7 tokens/second
+Audio generation rate: 0.52 chunks/second
+Processing buffer with 28 tokens, total collected: 2688
+Progress: 3.7 tokens/sec, est. 32.0s audio generated, 2709 tokens, 377 chunks in 723.0s
+Progress: 3.7 tokens/sec, est. 32.0s audio generated, 2717 tokens, 377 chunks in 725.1s
+Audio generation rate: 0.52 chunks/second
+Progress: 3.7 tokens/sec, est. 32.3s audio generated, 2725 tokens, 380 chunks in 727.2s
+Progress: 3.7 tokens/sec, est. 32.3s audio generated, 2734 tokens, 380 chunks in 729.4s
+Token processing rate: 3.7 tokens/second
+Processing buffer with 28 tokens, total collected: 2716
+Audio generation rate: 0.52 chunks/second
+Progress: 3.7 tokens/sec, est. 32.5s audio generated, 2743 tokens, 382 chunks in 731.5s
+Progress: 3.8 tokens/sec, est. 32.5s audio generated, 2752 tokens, 382 chunks in 733.7s
+Audio generation rate: 0.52 chunks/second
+Progress: 3.8 tokens/sec, est. 32.6s audio generated, 2761 tokens, 384 chunks in 735.9s
+Token processing rate: 3.7 tokens/second
+Processing buffer with 28 tokens, total collected: 2744
+Audio generation rate: 0.52 chunks/second
+Progress: 3.8 tokens/sec, est. 32.9s audio generated, 2770 tokens, 387 chunks in 738.1s
+Progress: 3.8 tokens/sec, est. 32.9s audio generated, 2779 tokens, 387 chunks in 740.3s
+Audio generation rate: 0.52 chunks/second
+Processing buffer with 28 tokens, total collected: 2772
+Progress: 3.8 tokens/sec, est. 33.1s audio generated, 2788 tokens, 389 chunks in 742.5s
+Progress: 3.8 tokens/sec, est. 33.1s audio generated, 2797 tokens, 389 chunks in 744.7s
+Token processing rate: 3.7 tokens/second
+Audio generation rate: 0.52 chunks/second
+Progress: 3.8 tokens/sec, est. 33.2s audio generated, 2806 tokens, 391 chunks in 746.9s
+Progress: 3.8 tokens/sec, est. 33.2s audio generated, 2815 tokens, 391 chunks in 749.1s
+Audio generation rate: 0.52 chunks/second
+Processing buffer with 28 tokens, total collected: 2800
+Progress: 3.8 tokens/sec, est. 33.4s audio generated, 2824 tokens, 393 chunks in 751.3s
+Token processing rate: 3.7 tokens/second
+Audio generation rate: 0.52 chunks/second
+Progress: 3.8 tokens/sec, est. 33.7s audio generated, 2832 tokens, 396 chunks in 753.3s
+Progress: 3.8 tokens/sec, est. 33.7s audio generated, 2841 tokens, 396 chunks in 755.5s
+Processing buffer with 28 tokens, total collected: 2828
+Audio generation rate: 0.52 chunks/second
+Progress: 3.8 tokens/sec, est. 33.8s audio generated, 2850 tokens, 398 chunks in 757.7s
+Progress: 3.8 tokens/sec, est. 33.8s audio generated, 2859 tokens, 398 chunks in 760.0s
+Token processing rate: 3.7 tokens/second
+Audio generation rate: 0.52 chunks/second
+Progress: 3.8 tokens/sec, est. 34.0s audio generated, 2868 tokens, 400 chunks in 762.2s
+Progress: 3.8 tokens/sec, est. 34.0s audio generated, 2877 tokens, 400 chunks in 764.4s
+Processing buffer with 28 tokens, total collected: 2856
+Audio generation rate: 0.52 chunks/second
+Progress: 3.8 tokens/sec, est. 34.3s audio generated, 2886 tokens, 403 chunks in 766.7s
+Progress: 3.8 tokens/sec, est. 34.3s audio generated, 2894 tokens, 403 chunks in 768.7s
+Token processing rate: 3.7 tokens/second
+Audio generation rate: 0.52 chunks/second
+Processing buffer with 28 tokens, total collected: 2884
+Progress: 3.8 tokens/sec, est. 34.4s audio generated, 2902 tokens, 405 chunks in 770.9s
+Progress: 3.8 tokens/sec, est. 34.4s audio generated, 2910 tokens, 405 chunks in 773.2s
+Audio generation rate: 0.52 chunks/second
+Progress: 3.8 tokens/sec, est. 34.6s audio generated, 2918 tokens, 407 chunks in 775.3s
+Progress: 3.8 tokens/sec, est. 34.6s audio generated, 2927 tokens, 407 chunks in 777.6s
+Token processing rate: 3.7 tokens/second
+Audio generation rate: 0.52 chunks/second
+Processing buffer with 28 tokens, total collected: 2912
+Progress: 3.8 tokens/sec, est. 34.8s audio generated, 2935 tokens, 409 chunks in 779.6s
+Progress: 3.8 tokens/sec, est. 34.8s audio generated, 2940 tokens, 409 chunks in 781.8s
+Token processing rate: 3.7 tokens/second
+Audio generation rate: 0.52 chunks/second
+Progress: 3.8 tokens/sec, est. 34.9s audio generated, 2948 tokens, 411 chunks in 784.1s
+Progress: 3.8 tokens/sec, est. 34.9s audio generated, 2958 tokens, 411 chunks in 786.4s
+Token generation complete: 2966 tokens in 788.15s (3.8 tokens/sec)
+Generated 411 audio segments
+Generated 35.07 seconds of audio in 788.15 seconds
+Realtime factor: 0.04x
+Warning: Generation is slower than realtime
+Total speech generation completed in 788.15 seconds
+Starting speech generation for 'I completed the read-only repository learning pass...'
+Using voice: tara, GPU acceleration: Yes
+Generating speech for: <|audio|>tara: I completed the read-only repository learning pass, sir. No project files were changed. Project root: F:\quantule_mapper Files inventoried: 1438 Files read: 36 Project brief:<|eot_id|>
+Progress: 9.4 tokens/sec, est. 0.0s audio generated, 19 tokens, 0 chunks in 2.0s
+Processing buffer with 28 tokens, total collected: 28
+Audio generation rate: 0.20 chunks/second
+Progress: 8.9 tokens/sec, est. 0.1s audio generated, 36 tokens, 1 chunks in 4.1s
+Token processing rate: 4.4 tokens/second
+Progress: 8.7 tokens/sec, est. 0.3s audio generated, 53 tokens, 3 chunks in 6.1s
+Audio generation rate: 0.46 chunks/second
+Processing buffer with 28 tokens, total collected: 56
+Progress: 8.6 tokens/sec, est. 0.4s audio generated, 70 tokens, 5 chunks in 8.1s
+Progress: 8.5 tokens/sec, est. 0.7s audio generated, 87 tokens, 8 chunks in 10.2s
+Token processing rate: 6.2 tokens/second
+Processing buffer with 28 tokens, total collected: 84
+Audio generation rate: 0.71 chunks/second
+Progress: 8.5 tokens/sec, est. 0.9s audio generated, 104 tokens, 10 chunks in 12.3s
+Progress: 8.4 tokens/sec, est. 1.0s audio generated, 121 tokens, 12 chunks in 14.4s
+Processing buffer with 28 tokens, total collected: 112
+Audio generation rate: 0.79 chunks/second
+Progress: 8.4 tokens/sec, est. 1.2s audio generated, 138 tokens, 14 chunks in 16.4s
+Token processing rate: 6.8 tokens/second
+Processing buffer with 28 tokens, total collected: 140
+Progress: 8.3 tokens/sec, est. 1.4s audio generated, 155 tokens, 17 chunks in 18.6s
+Audio generation rate: 0.88 chunks/second
+Progress: 8.3 tokens/sec, est. 1.6s audio generated, 171 tokens, 19 chunks in 20.6s
+Processing buffer with 28 tokens, total collected: 168
+Progress: 8.3 tokens/sec, est. 1.8s audio generated, 187 tokens, 21 chunks in 22.6s
+Token processing rate: 7.1 tokens/second
+Audio generation rate: 0.89 chunks/second
+Progress: 8.2 tokens/sec, est. 2.0s audio generated, 203 tokens, 24 chunks in 24.7s
+Processing buffer with 28 tokens, total collected: 196
+Progress: 8.2 tokens/sec, est. 2.2s audio generated, 218 tokens, 26 chunks in 26.7s
+Audio generation rate: 0.93 chunks/second
+Progress: 8.0 tokens/sec, est. 2.4s audio generated, 231 tokens, 28 chunks in 28.7s
+Token processing rate: 7.0 tokens/second
+Processing buffer with 28 tokens, total collected: 224
+Progress: 7.9 tokens/sec, est. 2.6s audio generated, 244 tokens, 30 chunks in 30.8s
+Audio generation rate: 0.91 chunks/second
+Processing buffer with 28 tokens, total collected: 252
+Progress: 7.8 tokens/sec, est. 2.8s audio generated, 256 tokens, 33 chunks in 32.8s
+Progress: 7.8 tokens/sec, est. 2.8s audio generated, 272 tokens, 33 chunks in 34.9s
+Progress: 7.8 tokens/sec, est. 3.0s audio generated, 288 tokens, 35 chunks in 37.0s
+Token processing rate: 7.0 tokens/second
+Audio generation rate: 0.94 chunks/second
+Processing buffer with 28 tokens, total collected: 280
+Progress: 7.8 tokens/sec, est. 3.1s audio generated, 304 tokens, 37 chunks in 39.1s
+Progress: 7.8 tokens/sec, est. 3.4s audio generated, 319 tokens, 40 chunks in 41.1s
+Processing buffer with 28 tokens, total collected: 308
+Audio generation rate: 0.96 chunks/second

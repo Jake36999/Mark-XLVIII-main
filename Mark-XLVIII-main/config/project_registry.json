@@ -15,7 +15,7 @@
         "coding": "codex",
         "continuity": "openclaw"
       },
-      "safe_operations": ["list", "status", "scout", "code_map", "handoff", "delegate_openclaw", "logs", "health"],
+      "safe_operations": ["list", "status", "scout", "code_map", "learn_project", "handoff", "delegate_openclaw", "logs", "health"],
       "confirmation_operations": ["launch", "stop", "stage_run", "worker", "long_hunt", "gpu_worker"],
       "blocked_operations": ["delete_results", "purge_archive", "reset_git"],
       "safe_commands": [
@@ -42,7 +42,7 @@
         "coding": "codex",
         "continuity": "openclaw"
       },
-      "safe_operations": ["list", "status", "scout", "code_map", "handoff", "delegate_openclaw", "lightweight_check"],
+      "safe_operations": ["list", "status", "scout", "code_map", "learn_project", "handoff", "delegate_openclaw", "lightweight_check"],
       "confirmation_operations": ["docker_stack", "heavy_training", "dataset_generation", "model_refinement"],
       "blocked_operations": ["delete_dataset", "purge_output", "reset_git"],
       "safe_commands": [
@@ -68,7 +68,7 @@
         "coding": "codex",
         "continuity": "openclaw"
       },
-      "safe_operations": ["list", "status", "scout", "code_map", "handoff", "delegate_openclaw", "health"],
+      "safe_operations": ["list", "status", "scout", "code_map", "learn_project", "handoff", "delegate_openclaw", "health"],
       "confirmation_operations": ["start_mark", "start_aletheia", "stop_service", "install_dependencies"],
       "blocked_operations": ["reset_git", "delete_embedded_repo"],
       "safe_commands": [
@@ -91,7 +91,7 @@
         "coding": "codex",
         "continuity": "openclaw"
       },
-      "safe_operations": ["list", "status", "scout", "code_map", "handoff", "delegate_openclaw", "verify_rf_backend"],
+      "safe_operations": ["list", "status", "scout", "code_map", "learn_project", "handoff", "delegate_openclaw", "verify_rf_backend"],
       "confirmation_operations": ["deploy_rf_backend", "stop_rf_backend", "mode_change", "service_restart"],
       "blocked_operations": ["bypass_invariant", "raw_csi_exfiltration", "reset_git"],
       "safe_commands": [

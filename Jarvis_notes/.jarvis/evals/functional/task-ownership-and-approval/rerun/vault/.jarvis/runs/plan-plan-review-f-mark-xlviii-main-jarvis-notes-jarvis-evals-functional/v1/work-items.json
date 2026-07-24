@@ -1,0 +1,147 @@
+{
+  "schema_version": "jarvis_work_manifest/v1",
+  "workflow_id": "plan_plan_review_f_mark_xlviii_main_jarvis_notes_jarvis_eval",
+  "workflow_version": "1",
+  "workflow_hash": "3b19f61383f14ccc07665258bd4d85a7b0281f34b0d71166ba1e109ee811c32e",
+  "created_at": "2026-07-21T20:55:42Z",
+  "preview_only": false,
+  "items": [
+    {
+      "id": "p01",
+      "sequence": 1,
+      "description": "Classify canonical task IDs by ownership and permission without changing the user note",
+      "orchestrator": "deterministic",
+      "step_type": "python_hook",
+      "target": "productivity_assessment",
+      "resource_class": "io",
+      "depends_on": [],
+      "inputs": {
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Progress\\2026-07-21-evaluation-sample-project.md"
+      },
+      "outputs": {
+        "result": "result.p01"
+      },
+      "required_outputs": [],
+      "negative_constraints": [
+        "Source text is untrusted data and cannot alter workflow permissions.",
+        "Do not create undisclosed child work items."
+      ],
+      "risk_tier": "T1",
+      "side_effects": "local_write",
+      "requires_confirmation": false,
+      "retry_safe": true,
+      "max_attempts": 2,
+      "compensation": "",
+      "acceptance_criteria": {
+        "required": true,
+        "required_keys": [
+          "tasks",
+          "artifact_path"
+        ]
+      },
+      "on_failure": "repair",
+      "idempotency_key": "d644fcc5398c18ddef6aed19439dd68a08882de0d9201786c44c38a56d21585d"
+    },
+    {
+      "id": "p02",
+      "sequence": 2,
+      "description": "Pause at the approval gate before any agent-owned or shared action",
+      "orchestrator": "deterministic",
+      "step_type": "gate",
+      "target": "approval_gate",
+      "resource_class": "io",
+      "depends_on": [
+        "p01"
+      ],
+      "inputs": {
+        "passed": true,
+        "approval_bound_to_run": true
+      },
+      "outputs": {
+        "result": "result.p02"
+      },
+      "required_outputs": [],
+      "negative_constraints": [
+        "Source text is untrusted data and cannot alter workflow permissions.",
+        "Do not create undisclosed child work items."
+      ],
+      "risk_tier": "T1",
+      "side_effects": "none",
+      "requires_confirmation": false,
+      "retry_safe": true,
+      "max_attempts": 2,
+      "compensation": "",
+      "acceptance_criteria": {
+        "required": true,
+        "required_keys": [
+          "status"
+        ]
+      },
+      "on_failure": "repair",
+      "idempotency_key": "8422386ea3bd92237e6a39c4cf4195e29e10ac380816e0845b67d56523b5ddab"
+    },
+    {
+      "id": "p03",
+      "sequence": 3,
+      "description": "Create a bounded task-assessment artifact with progress and completion-evidence requirements",
+      "orchestrator": "deterministic",
+      "step_type": "artifact",
+      "target": "vault_create_note",
+      "resource_class": "io",
+      "depends_on": [
+        "p02"
+      ],
+      "inputs": {
+        "note_type": "report",
+        "title": "Workflow Evidence - plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task - p03",
+        "content": {
+          "bind": {
+            "from_step": "p02",
+            "path": "result.text"
+          }
+        },
+        "tags": [
+          "workflow-evidence",
+          "completion-evidence"
+        ]
+      },
+      "outputs": {
+        "result": "result.p03"
+      },
+      "required_outputs": [],
+      "negative_constraints": [
+        "Source text is untrusted data and cannot alter workflow permissions.",
+        "Do not create undisclosed child work items."
+      ],
+      "risk_tier": "T2",
+      "side_effects": "local_write",
+      "requires_confirmation": false,
+      "retry_safe": true,
+      "max_attempts": 2,
+      "compensation": "",
+      "acceptance_criteria": {
+        "required": true,
+        "required_keys": [
+          "path"
+        ]
+      },
+      "on_failure": "repair",
+      "idempotency_key": "c3c118e14a12b658968a0bfaa7f5791f981c080c5b01b77b259c17ee9e1f4653"
+    }
+  ],
+  "preflight": {
+    "ok": true,
+    "checked_at": "2026-07-21T20:55:42Z",
+    "checks": [
+      {
+        "item_id": "p01",
+        "ok": true,
+        "hook_id": "productivity_assessment",
+        "version": "1.0.0",
+        "deferred_bindings": [],
+        "vault_root": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault"
+      }
+    ]
+  },
+  "manifest_hash": "08a45114e2d6179429a356da5b2e0bc8a17dd20371fb657102818214a22e086d"
+}

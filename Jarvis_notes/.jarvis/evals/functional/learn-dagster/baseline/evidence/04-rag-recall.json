@@ -1,0 +1,11 @@
+{
+  "ok": true,
+  "backend": "local_sqlite",
+  "query": "Dagster assets resources orchestration",
+  "filters": {
+    "project_id": "",
+    "note_types": [],
+    "tags": []
+  },
+  "results": []
+}

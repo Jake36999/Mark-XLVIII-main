@@ -35,6 +35,7 @@ except ImportError:
 
 from google import genai
 from google.genai import types as gtypes
+from core.runtime_config import load_runtime_config, save_runtime_config
 
 def _base_dir() -> Path:
     if getattr(sys, "frozen", False):
@@ -43,30 +44,21 @@ def _base_dir() -> Path:
 
 
 _BASE        = _base_dir()
-_CONFIG_PATH = _BASE / "config" / "api_keys.json"
-
-
 def _load_config() -> dict:
-    try:
-        return json.loads(_CONFIG_PATH.read_text(encoding="utf-8"))
-    except Exception:
-        return {}
+    return load_runtime_config()
 
 
 def _save_config_key(key: str, value) -> None:
     try:
         cfg = _load_config()
         cfg[key] = value
-        _CONFIG_PATH.write_text(json.dumps(cfg, indent=4), encoding="utf-8")
+        save_runtime_config(cfg)
     except Exception as e:
         print(f"[Vision] ⚠️  Could not save config key '{key}': {e}")
 
 
 def _get_api_key() -> str:
-    key = _load_config().get("gemini_api_key", "")
-    if not key:
-        raise RuntimeError("gemini_api_key not found in config.")
-    return key
+    raise RuntimeError("Gemini Live is optional and has no linked session credential.")
 
 
 def _get_os() -> str:
@@ -89,7 +81,7 @@ _SYSTEM_PROMPT = (
     "For technical questions (circuits, code, hardware) give specific, expert answers. "
     "Be concise — 2-4 sentences — unless the question demands more detail. "
     "Speak directly to the user ('I can see...', 'You have...'). "
-    "Address the user as 'sir' depending on the language they used."
+    "Answer in English and address the user as 'sir' when natural."
 )
 
 

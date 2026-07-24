@@ -1,3 +1,5 @@
+import json
+import tempfile
 import unittest
 import re
 from pathlib import Path
@@ -79,6 +81,15 @@ class ProjectOperatorRegistryTests(unittest.TestCase):
         self.assertEqual("allow", decision["action"])
         self.assertFalse(decision["requires_confirmation"])
 
+    def test_learn_project_is_registered_as_read_only_safe(self):
+        from actions import project_operator
+
+        registry = project_operator.load_registry()
+        decision = project_operator.classify_operation(registry, "mark_platform", "learn_project")
+
+        self.assertEqual("allow", decision["action"])
+        self.assertFalse(decision["requires_confirmation"])
+
 
 class ProjectOperatorBridgeTests(unittest.TestCase):
     def test_build_jsonrpc_request_uses_tools_call_shape(self):
@@ -154,6 +165,29 @@ class ProjectOperatorBridgeTests(unittest.TestCase):
         self.assertLess(len(result_text), 6000)
         self.assertIn("files_omitted", result_text)
 
+    def test_explicit_directory_learning_does_not_require_project_registration(self):
+        from actions import project_operator
+
+        with tempfile.TemporaryDirectory() as tmp, patch(
+            "actions.project_learning.learn_repository",
+            return_value={
+                "ok": True,
+                "status": "complete",
+                "brief_path": "brief.md",
+                "memory_path": "memory.md",
+                "snapshot_path": "snapshot.json",
+            },
+        ) as learn:
+            payload = json.loads(
+                project_operator.project_operator(
+                    {"operation": "learn_project", "path": tmp, "intent": "read this directory"}
+                )
+            )
+
+        self.assertTrue(payload["ok"])
+        self.assertTrue(payload["policy"]["reason"].startswith("Explicit directory learning"))
+        self.assertEqual(Path(learn.call_args.args[0]), Path(tmp).resolve())
+
 
 class FakeCompleted:
     def __init__(self, returncode=0, stdout="spawned", stderr=""):
@@ -176,6 +210,8 @@ class OpenClawDelegationTests(unittest.TestCase):
 
         self.assertIn("spawn", command)
         self.assertIn("subprocess", command)
+        subprocess_index = command.index("subprocess")
+        self.assertEqual(command[subprocess_index + 1:subprocess_index + 3], ["openclaw", "agent"])
         self.assertIn("--no-keepalive", command)
         self.assertIn("--no-workspace", command)
 
@@ -205,6 +241,10 @@ class OpenClawDelegationTests(unittest.TestCase):
         self.assertEqual(result["agents"], 1)
         self.assertEqual(len(calls), 1)
         self.assertIn("--no-keepalive", calls[0][0])
+        self.assertEqual(
+            calls[0][0][calls[0][0].index("--openclaw-agent") + 1],
+            "jarvis-worker",
+        )
         self.assertEqual(result["handoff_note"]["path"], "handoff.md")
 
     def test_delegate_openclaw_blocks_multiple_agents_without_explicit_parallel_intent(self):

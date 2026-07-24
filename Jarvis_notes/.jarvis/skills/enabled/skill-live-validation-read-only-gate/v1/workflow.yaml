@@ -1,0 +1,25 @@
+schema_version: jarvis_dual_orchestrator/v1
+workflow_id: skill_live_validation_read_only_gate
+version: '1'
+name: Live Validation Read Only Gate
+max_steps: 1
+steps:
+- step_id: confirm_scope
+  orchestrator: deterministic
+  step_type: gate
+  target: approval_gate
+  description: Confirm the already approved read-only validation scope.
+  depends_on: []
+  inputs:
+    passed: true
+  risk_tier: T1
+  side_effects: none
+  retry_policy:
+    safe: true
+    max_attempts: 1
+  acceptance_criteria:
+    required: true
+    required_keys:
+    - status
+  on_failure: halt
+description: 'Approved declarative skill: Live Validation Read Only Gate'

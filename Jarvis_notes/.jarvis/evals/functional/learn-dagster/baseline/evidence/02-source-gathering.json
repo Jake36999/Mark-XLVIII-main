@@ -1,0 +1,104 @@
+{
+  "ok": true,
+  "mode": "research",
+  "query": "site:docs.dagster.io Dagster concepts assets jobs resources sensors schedules partitions ML data pipelines",
+  "effective_query": "site:docs.dagster.io Dagster concepts assets jobs resources sensors schedules partitions ML data pipelines",
+  "date_from": "",
+  "date_to": "",
+  "retrieved_at": "2026-07-21T15:59:46Z",
+  "require_citations": true,
+  "results": [
+    {
+      "title": "Concepts - Dagster Docs",
+      "snippet": "A ResourceDefinition is a way to make external resources (like database or API connections) available to Dagster entities (like assets , schedules , or sensors ) during job execution, and to clean up after execution resolves.",
+      "url": "https://docs.dagster.io/getting-started/concepts",
+      "source": "docs.dagster.io",
+      "published_at": "",
+      "retrieved_at": "2026-07-21T15:59:47Z",
+      "backend": "ddg_html"
+    },
+    {
+      "title": "Partitioning assets - Dagster Docs",
+      "snippet": "In Dagster , partitioning is a powerful technique for managing large datasets, improving pipeline performance, and enabling incremental processing. This guide will help you understand how to implement data partitioning in your Dagster projects. There are several ways to partition your data in Dagster : Time-based partitioning, for processing data in specific time intervals Static partitioning ...",
+      "url": "https://docs.dagster.io/guides/build/partitions-and-backfills/partitioning-assets",
+      "source": "docs.dagster.io",
+      "published_at": "",
+      "retrieved_at": "2026-07-21T15:59:47Z",
+      "backend": "ddg_html"
+    },
+    {
+      "title": "Jobs - Dagster Docs",
+      "snippet": "When a job begins, it kicks off a run. A run is a single execution of a job in Dagster . Runs can be launched and viewed in the Dagster UI. Benefits Using jobs provides the following benefits: Automation: With schedules and sensors , jobs can be used to automate the execution of your Dagster pipelines . Refer to the Automation guide for more info.",
+      "url": "https://docs.dagster.io/guides/build/jobs",
+      "source": "docs.dagster.io",
+      "published_at": "",
+      "retrieved_at": "2026-07-21T15:59:47Z",
+      "backend": "ddg_html"
+    },
+    {
+      "title": "Constructing schedules from partitioned assets and jobs - Dagster",
+      "snippet": "In this guide, we'll walk you through how to construct schedules from partitioned assets and jobs . By the end, you'll be able to: Construct a schedule for a time-partitioned job Customize a partitioned job's starting time Customize the most recent partition in a set Construct a schedule for a statically-partitioned job Working with time-based ...",
+      "url": "https://docs.dagster.io/guides/automate/schedules/constructing-schedules-for-partitioned-assets-and-jobs",
+      "source": "docs.dagster.io",
+      "published_at": "",
+      "retrieved_at": "2026-07-21T15:59:47Z",
+      "backend": "ddg_html"
+    },
+    {
+      "title": "Asset jobs - Dagster Docs",
+      "snippet": "An asset job is a type of Dagster job that targets a selection of assets and can be launched manually from the UI, or programmatically by schedules or sensors .",
+      "url": "https://docs.dagster.io/guides/build/jobs/asset-jobs",
+      "source": "docs.dagster.io",
+      "published_at": "",
+      "retrieved_at": "2026-07-21T15:59:47Z",
+      "backend": "ddg_html"
+    },
+    {
+      "title": "Schedules - Dagster Docs",
+      "snippet": "Schedules Schedules enable automated execution of jobs at specified intervals. These intervals can range from common frequencies like hourly, daily, or weekly, to more complex patterns defined using cron expressions. Basic schedule A basic schedule is defined by a JobDefinition and a cron_schedule using the ScheduleDefinition class. A job can be thought of as a selection of assets or ...",
+      "url": "https://docs.dagster.io/guides/automate/schedules",
+      "source": "docs.dagster.io",
+      "published_at": "",
+      "retrieved_at": "2026-07-21T15:59:47Z",
+      "backend": "ddg_html"
+    },
+    {
+      "title": "Schedules and sensors - Dagster Docs",
+      "snippet": "Schedules and sensors Dagster offers several ways to run data pipelines without manual intervention, including traditional scheduling and event-based triggers. Automating your Dagster pipelines can boost efficiency and ensure that data is produced consistently and reliably.",
+      "url": "https://docs.dagster.io/api/dagster/schedules-sensors",
+      "source": "docs.dagster.io",
+      "published_at": "",
+      "retrieved_at": "2026-07-21T15:59:47Z",
+      "backend": "ddg_html"
+    },
+    {
+      "title": "Asset sensors - Dagster Docs",
+      "snippet": "Asset sensors Asset sensors in Dagster allow you to monitor asset materializations and trigger downstream computations or notifications (e.g. launch a job imperatively or send a Slack message) based on those events. This guide covers the most common use cases for asset sensors , such as defining cross- job and cross-code location dependencies.",
+      "url": "https://docs.dagster.io/guides/automate/asset-sensors",
+      "source": "docs.dagster.io",
+      "published_at": "",
+      "retrieved_at": "2026-07-21T15:59:47Z",
+      "backend": "ddg_html"
+    },
+    {
+      "title": "Overview | Dagster Docs",
+      "snippet": "Dagster is a data orchestrator built for data engineers, with integrated lineage, observability, a declarative programming model, and best-in-class testability.",
+      "url": "https://docs.dagster.io/",
+      "source": "docs.dagster.io",
+      "published_at": "",
+      "retrieved_at": "2026-07-21T15:59:47Z",
+      "backend": "ddg_html"
+    },
+    {
+      "title": "Sensors - Dagster Docs",
+      "snippet": "Sensors enable you to take action in response to events that occur either internally within Dagster or in external systems by checking for events at regular intervals and either performing an action or providing an explanation for why the action was skipped.",
+      "url": "https://docs.dagster.io/guides/automate/sensors",
+      "source": "docs.dagster.io",
+      "published_at": "",
+      "retrieved_at": "2026-07-21T15:59:47Z",
+      "backend": "ddg_html"
+    }
+  ],
+  "text": "Search results: site:docs.dagster.io Dagster concepts assets jobs resources sensors schedules partitions ML data pipelines\n\n1. Concepts - Dagster Docs [docs.dagster.io]\n   A ResourceDefinition is a way to make external resources (like database or API connections) available to Dagster entities (like assets , schedules , or sensors ) during job execution, and to clean up after execution resolves.\n   Source: https://docs.dagster.io/getting-started/concepts\n\n2. Partitioning assets - Dagster Docs [docs.dagster.io]\n   In Dagster , partitioning is a powerful technique for managing large datasets, improving pipeline performance, and enabling incremental processing. This guide will help you understand how to implement data partitioning in your Dagster proje\n   Source: https://docs.dagster.io/guides/build/partitions-and-backfills/partitioning-assets\n\n3. Jobs - Dagster Docs [docs.dagster.io]\n   When a job begins, it kicks off a run. A run is a single execution of a job in Dagster . Runs can be launched and viewed in the Dagster UI. Benefits Using jobs provides the following benefits: Automation: With schedules and sensors , jobs c\n   Source: https://docs.dagster.io/guides/build/jobs\n\n4. Constructing schedules from partitioned assets and jobs - Dagster [docs.dagster.io]\n   In this guide, we'll walk you through how to construct schedules from partitioned assets and jobs . By the end, you'll be able to: Construct a schedule for a time-partitioned job Customize a partitioned job's starting time Customize the mos\n   Source: https://docs.dagster.io/guides/automate/schedules/constructing-schedules-for-partitioned-assets-and-jobs\n\n5. Asset jobs - Dagster Docs [docs.dagster.io]\n   An asset job is a type of Dagster job that targets a selection of assets and can be launched manually from the UI, or programmatically by schedules or sensors .\n   Source: https://docs.dagster.io/guides/build/jobs/asset-jobs\n\n6. Schedules - Dagster Docs [docs.dagster.io]\n   Schedules Schedules enable automated execution of jobs at specified intervals. These intervals can range from common frequencies like hourly, daily, or weekly, to more complex patterns defined using cron expressions. Basic schedule A basic \n   Source: https://docs.dagster.io/guides/automate/schedules\n\n7. Schedules and sensors - Dagster Docs [docs.dagster.io]\n   Schedules and sensors Dagster offers several ways to run data pipelines without manual intervention, including traditional scheduling and event-based triggers. Automating your Dagster pipelines can boost efficiency and ensure that data is p\n   Source: https://docs.dagster.io/api/dagster/schedules-sensors\n\n8. Asset sensors - Dagster Docs [docs.dagster.io]\n   Asset sensors Asset sensors in Dagster allow you to monitor asset materializations and trigger downstream computations or notifications (e.g. launch a job imperatively or send a Slack message) based on those events. This guide covers the mo\n   Source: https://docs.dagster.io/guides/automate/asset-sensors\n\n9. Overview | Dagster Docs [docs.dagster.io]\n   Dagster is a data orchestrator built for data engineers, with integrated lineage, observability, a declarative programming model, and best-in-class testability.\n   Source: https://docs.dagster.io/\n\n10. Sensors - Dagster Docs [docs.dagster.io]\n   Sensors enable you to take action in response to events that occur either internally within Dagster or in external systems by checking for events at regular intervals and either performing an action or providing an explanation for why the a\n   Source: https://docs.dagster.io/guides/automate/sensors",
+  "message": ""
+}

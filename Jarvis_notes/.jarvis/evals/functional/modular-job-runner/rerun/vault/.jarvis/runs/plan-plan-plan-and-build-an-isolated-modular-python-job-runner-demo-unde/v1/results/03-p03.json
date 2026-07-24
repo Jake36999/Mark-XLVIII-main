@@ -1,0 +1,18 @@
+{
+  "schema_version": "jarvis_work_result/v1",
+  "run_id": "plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde-v1",
+  "item_id": "p03",
+  "verdict": "ACCEPT",
+  "defects": [],
+  "result": {
+    "ok": true,
+    "output_root": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\artifacts\\job_runner_demo",
+    "missing": [],
+    "returncode": 0,
+    "stdout": "..                                                                       [100%]\n2 passed in 0.05s\n",
+    "stderr": "",
+    "summary": "Fresh validation passed."
+  },
+  "model_provenance": null,
+  "completed_at": "2026-07-21T16:32:04Z"
+}

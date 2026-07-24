@@ -68,6 +68,7 @@ def build_agent_prompt(
     team_size: int = 1,
     isolated_workspace: bool = False,
     repo_path: str | None = None,
+    one_shot: bool = False,
 ) -> str:
     """Build agent prompt: identity + mission + workspace + memory + task + coordination."""
     lines = [
@@ -131,6 +132,20 @@ def build_agent_prompt(
             "## Context\n",
             context_block,
         ])
+
+    if one_shot:
+        lines.extend([
+            "",
+            "## One-Shot Completion Contract\n",
+            "- Execute only the task above and then return one terminal summary.",
+            "- Do not poll team tasks or wait for additional instructions.",
+            "- Do not commit or modify files unless the task explicitly grants a write scope.",
+            "- Include direct evidence, blockers, one safe next step, and a confidence tag.",
+            "",
+            METACOGNITION_BLOCK,
+            "",
+        ])
+        return "\n".join(lines)
 
     lines.extend([
         "",

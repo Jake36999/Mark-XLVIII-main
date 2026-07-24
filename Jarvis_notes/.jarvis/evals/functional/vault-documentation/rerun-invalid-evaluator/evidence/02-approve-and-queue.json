@@ -1,0 +1,70 @@
+{
+  "ok": true,
+  "path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\vault-documentation\\rerun\\vault\\Plans\\2026-07-21-plan-review-the-markdown-vault-and-create-three-linked-obsidian-artifacts-an-eva.md",
+  "title": "Plan - Review the Markdown vault and create three linked Obsidian artifacts: an Evaluation MOC, a",
+  "status": "queued",
+  "approval_state": "approved",
+  "execution_state": "queued",
+  "run_id": "plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-art-v1",
+  "bundle_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\vault-documentation\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-art\\v1",
+  "execution_summary_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\vault-documentation\\rerun\\vault\\Summaries\\2026-07-21-execution-run-plan-review-the-markdown-vault-and-create-three-linked-obsidian-ar.md",
+  "packets": [
+    {
+      "id": "p01",
+      "task": "Inventory the configured Markdown vault and retain citations to inspected source notes",
+      "worker": "vault_inventory",
+      "step_type": "python_hook",
+      "depends_on": []
+    },
+    {
+      "id": "p02",
+      "task": "Create the linked Evaluation MOC, Workflow Architecture Report, and Knowledge Gaps and Next Actions Report",
+      "worker": "create_vault_documentation_set",
+      "step_type": "python_hook",
+      "depends_on": [
+        "p01"
+      ]
+    },
+    {
+      "id": "p03",
+      "task": "Validate generated frontmatter, typed relationships, and every Obsidian link",
+      "worker": "validate_vault_artifacts",
+      "step_type": "python_hook",
+      "depends_on": [
+        "p02"
+      ]
+    },
+    {
+      "id": "p04",
+      "task": "Record documentation artifacts and validation evidence in the vault",
+      "worker": "vault_create_note",
+      "step_type": "artifact",
+      "depends_on": [
+        "p03"
+      ]
+    }
+  ],
+  "agent_count": 1,
+  "reindex": {
+    "ok": true,
+    "backend": "local_sqlite",
+    "index_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\vault-documentation\\rerun\\vault\\.jarvis\\memory.sqlite",
+    "indexed_notes": 3,
+    "excluded_notes": 0,
+    "superseded_notes": 0,
+    "deduplicated_notes": 0
+  },
+  "message": "Plan approved and queued. Execution starts after the current JARVIS speech turn completes.",
+  "canvas": {
+    "ok": true,
+    "operation": "sync_plan",
+    "path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\vault-documentation\\rerun\\vault\\Canvases\\JARVIS\\plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-artifact.canvas",
+    "plan_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\vault-documentation\\rerun\\vault\\Plans\\2026-07-21-plan-review-the-markdown-vault-and-create-three-linked-obsidian-artifacts-an-eva.md",
+    "node_count": 16,
+    "edge_count": 15,
+    "active_task_count": 14,
+    "completed_task_count": 0,
+    "rolling_limit": 24,
+    "canonical_source": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\vault-documentation\\rerun\\vault\\Plans\\2026-07-21-plan-review-the-markdown-vault-and-create-three-linked-obsidian-artifacts-an-eva.md"
+  }
+}

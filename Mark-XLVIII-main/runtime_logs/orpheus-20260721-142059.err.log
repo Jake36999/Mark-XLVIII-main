@@ -1,0 +1,6 @@
+F:\network_management\Wi-Fi Sensing & CSI Data Extraction\Model_training\.venv-gtx1080\Lib\site-packages\torch\cuda\__init__.py:174: UserWarning: CUDA initialization: Unexpected error from cudaGetDeviceCount(). Did you run some cuda functions before calling NumCudaDevices() that might have already set an error? Error 1: invalid argument (Triggered internally at C:\actions-runner\_work\pytorch\pytorch\pytorch\c10\cuda\CUDAFunctions.cpp:109.)
+  return torch._C._cuda_getDeviceCount() > 0
+INFO:     Started server process [24500]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:5006 (Press CTRL+C to quit)

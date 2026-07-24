@@ -13,13 +13,16 @@ from pathlib import Path
 
 import psutil
 
+from core.runtime_config import RUNTIME_CONFIG_PATH, load_runtime_config, save_runtime_config
+from core.session_credentials import get_session_broker
+
 if platform.system() == "Windows":
     _WIN_HIDE: dict = {"creationflags": subprocess.CREATE_NO_WINDOW}
 else:
     _WIN_HIDE: dict = {}
 
 from PyQt6.QtCore import (
-    QEasingCurve, QMimeData, QObject, QPointF, QRectF, QSize, Qt,
+    QEasingCurve, QMimeData, QObject, QPointF, QRectF, QSettings, QSize, Qt,
     QTimer, QUrl, pyqtSignal,
 )
 from PyQt6.QtGui import (
@@ -33,6 +36,10 @@ from PyQt6.QtWidgets import (
     QStackedWidget, QTextEdit, QVBoxLayout, QWidget, QProgressBar,
 )
 
+from jarvis_ui_components.command_palette import CommandPalette
+from jarvis_ui_components.operations_panel import OperationsDialog, STATE_COLORS
+from jarvis_ui_components.process_trace import ProcessTraceWidget
+
 def _base_dir() -> Path:
     if getattr(sys, "frozen", False):
         return Path(sys.executable).parent
@@ -40,7 +47,7 @@ def _base_dir() -> Path:
 
 BASE_DIR   = _base_dir()
 CONFIG_DIR = BASE_DIR / "config"
-API_FILE   = CONFIG_DIR / "api_keys.json"
+API_FILE   = RUNTIME_CONFIG_PATH
 
 _PROVIDER_DEFAULTS = {
     "assistant_mode": "router",
@@ -61,34 +68,20 @@ _PROVIDER_DEFAULTS = {
 
 
 def _load_api_config() -> dict:
-    try:
-        return json.loads(API_FILE.read_text(encoding="utf-8-sig"))
-    except Exception:
-        return {}
+    return load_runtime_config()
 
 
 def _merge_setup_config(existing: dict, gemini_key: str, os_name: str, openai_key: str = "") -> dict:
     cfg = dict(existing or {})
-    legacy_openai_key = cfg.pop("openAI_API_KEY", "")
-
-    gemini_key = (gemini_key or "").strip()
-    openai_key = (openai_key or "").strip()
-
-    if gemini_key:
-        cfg["gemini_api_key"] = gemini_key
-    if openai_key:
-        cfg["openai_api_key"] = openai_key
-    elif legacy_openai_key and not cfg.get("openai_api_key"):
-        cfg["openai_api_key"] = legacy_openai_key
+    for key in list(cfg):
+        normalized = key.lower().replace("-", "_")
+        if "api_key" in normalized or "apikey" in normalized or "secret" in normalized:
+            cfg.pop(key, None)
 
     cfg["os_system"] = os_name
 
     for key, value in _PROVIDER_DEFAULTS.items():
         cfg.setdefault(key, value)
-
-    if openai_key:
-        cfg["planner_provider"] = "openai"
-        cfg["planner_model"] = cfg.get("openai_model") or "gpt-5.4"
 
     return cfg
 
@@ -108,12 +101,11 @@ def _is_local_provider(value: str | None) -> bool:
 
 def _is_config_ready(cfg: dict) -> bool:
     has_os = bool((cfg or {}).get("os_system"))
-    has_model_key = bool((cfg or {}).get("gemini_api_key") or (cfg or {}).get("openai_api_key"))
     local_router = str((cfg or {}).get("assistant_mode") or "router").strip().lower() == "router"
     has_local_model = _is_local_provider((cfg or {}).get("planner_provider")) or _is_local_provider(
         (cfg or {}).get("worker_provider")
     )
-    return has_os and (has_model_key or (local_router and has_local_model))
+    return has_os and local_router and has_local_model
 
 _DEFAULT_W, _DEFAULT_H = 980, 700
 _MIN_W,     _MIN_H     = 820, 580
@@ -1016,9 +1008,8 @@ class SetupOverlay(QWidget):
             _OS.lower(), "linux"
         )
         self._sel_os = detected
-        existing_cfg = _load_api_config()
-        self._existing_gemini = bool(existing_cfg.get("gemini_api_key"))
-        self._existing_openai = bool(existing_cfg.get("openai_api_key") or existing_cfg.get("openAI_API_KEY"))
+        self._key_input = QLineEdit()
+        self._openai_key_input = QLineEdit()
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(30, 22, 30, 22)
@@ -1041,42 +1032,14 @@ class SetupOverlay(QWidget):
         sep.setStyleSheet(f"color: {C.BORDER};"); layout.addWidget(sep)
         layout.addSpacing(4)
 
-        layout.addWidget(_lbl("GEMINI API KEY (OPTIONAL)", 8, color=C.TEXT_DIM,
-                               align=Qt.AlignmentFlag.AlignLeft))
-        self._key_input = QLineEdit()
-        self._key_input.setEchoMode(QLineEdit.EchoMode.Password)
-        self._key_input.setPlaceholderText(
-            "Configured - leave blank to keep" if self._existing_gemini else "Optional for Gemini Live"
+        cloud_note = _lbl(
+            "Cloud keys are linked after startup and remain session-only.",
+            8,
+            color=C.TEXT_MED,
+            align=Qt.AlignmentFlag.AlignLeft,
         )
-        self._key_input.setFont(QFont("Courier New", 10))
-        self._key_input.setFixedHeight(32)
-        self._key_input.setStyleSheet(f"""
-            QLineEdit {{
-                background: #000d12; color: {C.TEXT};
-                border: 1px solid {C.BORDER}; border-radius: 3px; padding: 4px 8px;
-            }}
-            QLineEdit:focus {{ border: 1px solid {C.PRI}; }}
-        """)
-        layout.addWidget(self._key_input)
-        layout.addSpacing(8)
-
-        layout.addWidget(_lbl("OPENAI API KEY (OPTIONAL)", 8, color=C.TEXT_DIM,
-                               align=Qt.AlignmentFlag.AlignLeft))
-        self._openai_key_input = QLineEdit()
-        self._openai_key_input.setEchoMode(QLineEdit.EchoMode.Password)
-        self._openai_key_input.setPlaceholderText(
-            "Configured - leave blank to keep" if self._existing_openai else "Optional paid planner"
-        )
-        self._openai_key_input.setFont(QFont("Courier New", 10))
-        self._openai_key_input.setFixedHeight(32)
-        self._openai_key_input.setStyleSheet(f"""
-            QLineEdit {{
-                background: #000d12; color: {C.TEXT};
-                border: 1px solid {C.BORDER}; border-radius: 3px; padding: 4px 8px;
-            }}
-            QLineEdit:focus {{ border: 1px solid {C.PRI}; }}
-        """)
-        layout.addWidget(self._openai_key_input)
+        cloud_note.setWordWrap(True)
+        layout.addWidget(cloud_note)
         layout.addSpacing(12)
 
         sep2 = QFrame(); sep2.setFrameShape(QFrame.Shape.HLine)
@@ -1382,6 +1345,9 @@ class MainWindow(QMainWindow):
     _camera_sig     = pyqtSignal(bytes)   # show camera frame preview (small overlay)
     _cam_stream_sig = pyqtSignal(bool)   # True=start live stream, False=stop
     _cam_frame_sig  = pyqtSignal(bytes)  # live camera frame → HUD area
+    _credential_sig = pyqtSignal(object)
+    _planning_sig = pyqtSignal(bool, bool)
+    _operations_sig = pyqtSignal(object)
 
     def __init__(self, face_path: str):
         super().__init__()
@@ -1401,8 +1367,15 @@ class MainWindow(QMainWindow):
         self.on_interrupt      = None   # callable: () -> None — stop JARVIS mid-speech
         self.on_mute_changed   = None   # callable: (muted: bool) -> None
         self._muted            = False
+        self._planning_mode    = False
+        self._planning_prompt_submitted = False
         self._current_file: str | None = None
         self._remote_overlay: RemoteKeyOverlay | None = None
+        self._credential_sig.connect(self._apply_credential_status)
+        self._planning_sig.connect(self._apply_planning_mode)
+        self._operations_sig.connect(self._apply_operational_state)
+        self._operations_refresh_active = False
+        self._settings = QSettings("FatiMakes Industries", "MARK XLVIII")
 
         central = QWidget()
         central.setStyleSheet(f"background: {C.BG};")
@@ -1507,6 +1480,19 @@ class MainWindow(QMainWindow):
         self._cam_frame_sig.connect(self._on_cam_frame)
         self._cam_stop = threading.Event()
 
+        cfg = _load_api_config()
+        self._command_palette = CommandPalette(self)
+        self._command_palette.set_actions(self._command_actions())
+        self._command_palette.action_triggered.connect(self._handle_palette_action)
+        self._operations_dialog = OperationsDialog(self)
+        self._operations_dialog.refresh_requested.connect(self._refresh_operations)
+        self._operations_dialog.action_requested.connect(self._handle_operation_action)
+        self._operations_tmr = QTimer(self)
+        self._operations_tmr.timeout.connect(self._refresh_operations)
+        self._operations_tmr.start(10000)
+        if cfg.get("operations_ui_enabled", True):
+            self._refresh_operations()
+
         # Camera preview overlay (child of central widget, positioned in resizeEvent)
         self._cam_preview = _CameraPreview(self.centralWidget())
 
@@ -1521,6 +1507,10 @@ class MainWindow(QMainWindow):
         sc_full.activated.connect(self._toggle_fullscreen)
         sc_intr = QShortcut(QKeySequence("Escape"), self)
         sc_intr.activated.connect(self._do_interrupt)
+        sc_palette = QShortcut(QKeySequence("Ctrl+K"), self)
+        sc_palette.activated.connect(self._command_palette.open_palette)
+        sc_operations = QShortcut(QKeySequence("Ctrl+Shift+O"), self)
+        sc_operations.activated.connect(self._show_operations)
 
     def _show_camera_frame(self, img_bytes: bytes):
         """Slot — display camera preview overlay (main thread)."""
@@ -1563,11 +1553,10 @@ class MainWindow(QMainWindow):
     def _cam_loop(self) -> None:
         try:
             import cv2
-            # Reuse camera index detected by screen_processor (cached in api_keys.json)
+            # Reuse the non-secret camera index cached in runtime configuration.
             cam_idx = 0
             try:
-                import json as _j
-                cfg = _j.loads((CONFIG_DIR / "api_keys.json").read_text())
+                cfg = load_runtime_config()
                 cam_idx = int(cfg.get("camera_index", 0))
             except Exception:
                 pass
@@ -2046,23 +2035,119 @@ class MainWindow(QMainWindow):
         lay.addWidget(info_panel)
         lay.addSpacing(4)
 
+        key_hdr = QLabel("OPENAI API KEY")
+        key_hdr.setFont(QFont("Courier New", 7, QFont.Weight.Bold))
+        key_hdr.setStyleSheet(f"color: {C.PRI}; background: transparent; border: none;")
+        lay.addWidget(key_hdr)
+
+        self._openai_session_key = QLineEdit()
+        self._openai_session_key.setEchoMode(QLineEdit.EchoMode.Password)
+        self._openai_session_key.setPlaceholderText("session key")
+        self._openai_session_key.setFixedHeight(26)
+        self._openai_session_key.setFont(QFont("Courier New", 8))
+        self._openai_session_key.setStyleSheet(
+            f"background: #000d12; color: {C.TEXT}; border: 1px solid {C.BORDER}; "
+            "border-radius: 3px; padding: 3px 5px;"
+        )
+        self._openai_session_key.returnPressed.connect(self._link_openai_key)
+        lay.addWidget(self._openai_session_key)
+
+        key_buttons = QHBoxLayout()
+        key_buttons.setSpacing(3)
+        self._link_key_btn = QPushButton("LINK")
+        self._unlink_key_btn = QPushButton("UNLINK")
+        for button in (self._link_key_btn, self._unlink_key_btn):
+            button.setFixedHeight(24)
+            button.setFont(QFont("Courier New", 7, QFont.Weight.Bold))
+            button.setCursor(Qt.CursorShape.PointingHandCursor)
+            button.setStyleSheet(
+                f"QPushButton {{ background: {C.PANEL2}; color: {C.PRI}; border: 1px solid {C.BORDER_A}; "
+                "border-radius: 3px; } QPushButton:hover { border-color: #00d9ff; }"
+            )
+            key_buttons.addWidget(button)
+        self._link_key_btn.clicked.connect(self._link_openai_key)
+        self._unlink_key_btn.clicked.connect(self._unlink_openai_key)
+        lay.addLayout(key_buttons)
+
+        self._openai_key_status = QLabel("UNLINKED")
+        self._openai_key_status.setFont(QFont("Courier New", 7, QFont.Weight.Bold))
+        self._openai_key_status.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self._openai_key_status.setStyleSheet(f"color: {C.TEXT_DIM}; background: transparent; border: none;")
+        lay.addWidget(self._openai_key_status)
+        lay.addSpacing(4)
+
         lay.addStretch()
 
-        for txt, col in [
-            ("AI CORE\nACTIVE",     C.GREEN),
-            ("SEC\nCLEARED",        C.PRI),
-            ("PROTOCOL\nXLVIII",    C.TEXT_DIM),
+        self._verified_health_labels: dict[str, QLabel] = {}
+        for subsystem, txt in [
+            ("models", "MODELS\nUNKNOWN"),
+            ("vault", "VAULT\nUNKNOWN"),
+            ("speech", "SPEECH\nUNKNOWN"),
         ]:
             lbl = QLabel(txt)
             lbl.setFont(QFont("Courier New", 7, QFont.Weight.Bold))
             lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
             lbl.setStyleSheet(
-                f"color: {col}; background: {C.PANEL2};"
+                f"color: {C.TEXT_DIM}; background: {C.PANEL2};"
                 f"border: 1px solid {C.BORDER_A}; border-radius: 3px; padding: 4px;"
             )
             lay.addWidget(lbl)
+            self._verified_health_labels[subsystem] = lbl
 
         return w
+
+    def _link_openai_key(self) -> None:
+        key = self._openai_session_key.text().strip()
+        self._openai_session_key.clear()
+        if not key:
+            self._apply_credential_status({"state": "invalid", "reason": "empty_key"})
+            return
+        self._link_key_btn.setEnabled(False)
+        self._openai_key_status.setText("CHECKING")
+        self._openai_key_status.setStyleSheet(f"color: {C.ACC2}; background: transparent; border: none;")
+        cfg = _load_api_config()
+
+        def _link() -> None:
+            secret = key
+            try:
+                result = get_session_broker().link_openai(
+                    secret,
+                    base_url=str(cfg.get("openai_url") or "https://api.openai.com/v1"),
+                    model=str(cfg.get("planner_model") or cfg.get("openai_model") or "gpt-5.5"),
+                )
+            except Exception as exc:
+                result = {"ok": False, "state": "degraded", "reason": f"broker_error: {exc}"}
+            finally:
+                secret = ""
+            self._credential_sig.emit(result)
+
+        threading.Thread(target=_link, name="openai-key-link", daemon=True).start()
+
+    def _unlink_openai_key(self) -> None:
+        def _unlink() -> None:
+            try:
+                result = get_session_broker().unlink("openai")
+            except Exception as exc:
+                result = {"ok": False, "state": "degraded", "reason": f"broker_error: {exc}"}
+            self._credential_sig.emit(result)
+
+        threading.Thread(target=_unlink, name="openai-key-unlink", daemon=True).start()
+
+    def _apply_credential_status(self, result: object) -> None:
+        data = result if isinstance(result, dict) else {}
+        state = str(data.get("state") or "degraded").lower()
+        labels = {
+            "linked": ("LINKED", C.GREEN),
+            "degraded": ("DEGRADED", C.ACC2),
+            "invalid": ("INVALID", C.MUTED_C),
+            "unlinked": ("UNLINKED", C.TEXT_DIM),
+        }
+        label, color = labels.get(state, (state.upper(), C.TEXT_DIM))
+        self._openai_key_status.setText(label)
+        self._openai_key_status.setToolTip(str(data.get("reason") or ""))
+        self._openai_key_status.setStyleSheet(f"color: {color}; background: transparent; border: none;")
+        self._link_key_btn.setEnabled(True)
+
     def _build_right_panel(self) -> QWidget:
         w = QWidget()
         w.setFixedWidth(_RIGHT_W)
@@ -2094,7 +2179,7 @@ class MainWindow(QMainWindow):
         self._file_hint.setFont(QFont("Courier New", 7))
         self._file_hint.setStyleSheet(f"color: {C.TEXT_MED}; background: transparent;")
         self._file_hint.setWordWrap(True)
-        lay.addWidget(self._file_hint)
+        self._file_hint.hide()
 
         sep2 = QFrame(); sep2.setFrameShape(QFrame.Shape.HLine)
         sep2.setStyleSheet(f"color: {C.BORDER}; margin: 2px 0;")
@@ -2102,6 +2187,40 @@ class MainWindow(QMainWindow):
 
         lay.addWidget(_sec("COMMAND INPUT"))
         lay.addLayout(self._build_input_row())
+
+        self._plan_btn = QPushButton("CREATE PLAN")
+        self._plan_btn.setFixedHeight(28)
+        self._plan_btn.setFont(QFont("Courier New", 8, QFont.Weight.Bold))
+        self._plan_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self._plan_btn.setStyleSheet(f"""
+            QPushButton {{
+                background: #00120f; color: {C.ACC2};
+                border: 1px solid {C.ACC2}; border-radius: 3px;
+            }}
+            QPushButton:hover {{
+                background: #00221d; color: {C.WHITE};
+                border: 1px solid {C.PRI};
+            }}
+        """)
+        self._plan_btn.clicked.connect(self._create_plan_from_input)
+        lay.addWidget(self._plan_btn)
+
+        start_plan_btn = QPushButton("START PLAN")
+        start_plan_btn.setFixedHeight(28)
+        start_plan_btn.setFont(QFont("Courier New", 8, QFont.Weight.Bold))
+        start_plan_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        start_plan_btn.setStyleSheet(f"""
+            QPushButton {{
+                background: #001407; color: {C.GREEN};
+                border: 1px solid {C.GREEN}; border-radius: 3px;
+            }}
+            QPushButton:hover {{
+                background: #00210d; color: {C.WHITE};
+                border: 1px solid {C.PRI};
+            }}
+        """)
+        start_plan_btn.clicked.connect(self._start_plan_from_input)
+        lay.addWidget(start_plan_btn)
 
         self._interrupt_btn = QPushButton("✋  INTERRUPT  [ESC]")
         self._interrupt_btn.setFixedHeight(34)
@@ -2297,7 +2416,25 @@ class MainWindow(QMainWindow):
                 height: 0; border: none;
             }}
         """)
-        lay.addWidget(self._content_display)
+        self._router_content_split = QSplitter(Qt.Orientation.Vertical)
+        self._router_content_split.setChildrenCollapsible(False)
+        self._router_content_split.setStyleSheet(
+            f"QSplitter::handle {{ background: {C.BORDER}; height: 4px; }}"
+            f"QSplitter::handle:hover {{ background: {C.PRI_DIM}; }}"
+        )
+        self._process_trace = ProcessTraceWidget()
+        self._process_trace.setMinimumHeight(88)
+        self._process_trace.activity.connect(self._show_trace_activity)
+        self._router_content_split.addWidget(self._process_trace)
+        self._router_content_split.addWidget(self._content_display)
+        self._router_content_split.setStretchFactor(0, 1)
+        self._router_content_split.setStretchFactor(1, 2)
+        saved = self._settings.value("router_trace_splitter") if hasattr(self, "_settings") else None
+        if saved:
+            self._router_content_split.restoreState(saved)
+        else:
+            self._router_content_split.setSizes([120, 220])
+        lay.addWidget(self._router_content_split)
 
         return w
 
@@ -2314,7 +2451,21 @@ class MainWindow(QMainWindow):
         self._content_panel.show()
         if first_show:
             total = self._center_split.height()
-            self._center_split.setSizes([max(total - 220, 120), 220])
+            self._center_split.setSizes([max(total - 340, 120), 340])
+
+    def _show_trace_activity(self, event: object = None) -> None:
+        data = event if isinstance(event, dict) else {}
+        if str(data.get("category") or "").casefold() not in {
+            "router", "tool", "capability", "workflow", "approval"
+        }:
+            return
+        if not self._content_panel.isVisible():
+            self._content_title_lbl.setText("ROUTER MODE")
+            self._content_ts_lbl.setText(time.strftime("%H:%M:%S"))
+            self._content_display.setPlaceholderText("JARVIS response will appear here when the turn completes.")
+            self._content_panel.show()
+            total = self._center_split.height()
+            self._center_split.setSizes([max(total - 300, 120), 300])
 
     def _build_footer(self) -> QWidget:
         w = QWidget()
@@ -2420,20 +2571,167 @@ class MainWindow(QMainWindow):
                 QPushButton:hover {{ background: #001f10; }}
             """)
 
+    def _create_plan_from_input(self):
+        if self._planning_mode:
+            self._input.clear()
+            self._apply_planning_mode(False, False)
+            msg = "cancel planning"
+            self._log.append_log(f"You: {msg}")
+            if self.on_text_command:
+                threading.Thread(target=self.on_text_command, args=(msg,), daemon=True).start()
+            return
+
+        self._apply_planning_mode(True, False)
+        txt = self._input.text().strip()
+        if not txt:
+            self._input.setPlaceholderText("Describe the plan, then press Enter...")
+            self._input.setFocus()
+            return
+        self._input.clear()
+        self._planning_prompt_submitted = True
+        msg = f"create plan: {txt}"
+        self._log.append_log(f"You: {msg}")
+        if self.on_text_command:
+            threading.Thread(target=self.on_text_command, args=(msg,), daemon=True).start()
+
+    def _start_plan_from_input(self):
+        txt = self._input.text().strip()
+        self._input.clear()
+        target = txt or "latest"
+        self._apply_planning_mode(False, False)
+        msg = f"start plan: {target}"
+        self._log.append_log(f"You: {msg}")
+        if self.on_text_command:
+            threading.Thread(target=self.on_text_command, args=(msg,), daemon=True).start()
+
     def _send(self):
         txt = self._input.text().strip()
         if not txt: return
         self._input.clear()
+        if self._planning_mode:
+            if self._planning_prompt_submitted:
+                txt = f"revise the latest plan: {txt}"
+            else:
+                txt = f"create plan: {txt}"
+                self._planning_prompt_submitted = True
         self._log.append_log(f"You: {txt}")
         if self.on_text_command:
             threading.Thread(target=self.on_text_command, args=(txt,), daemon=True).start()
+
+    def _command_actions(self) -> list[dict]:
+        return [
+            {"id": "assistant.capabilities", "title": "Show capabilities", "subtitle": "Inspect verified tools, skills, and workflows", "group": "JARVIS", "keywords": ["tools", "skills", "manifest"], "payload": {"prompt": "what tools, skills, and workflows are currently available?"}},
+            {"id": "plan.create", "title": "Create plan", "subtitle": "Start a read-only planning and research pass", "group": "Workflows", "keywords": ["research", "plan", "obsidian"], "payload": {"prompt": "create plan: "}},
+            {"id": "vault.search", "title": "Search vault memory", "subtitle": "Query local RAG with citations", "group": "Vault", "keywords": ["rag", "notes", "memory"], "payload": {"prompt": "search your vault memory for "}},
+            {"id": "vault.changes", "title": "Review vault changes", "subtitle": "Ask about recent external Obsidian edits", "group": "Vault", "keywords": ["changed", "watcher", "edits"], "payload": {"prompt": "what changed recently in the vault?"}},
+            {"id": "canvas.status", "title": "Canvas status", "subtitle": "Validate and inspect managed Canvas views", "group": "Canvas", "keywords": ["layout", "relationships", "validate"], "payload": {"prompt": "show the current Canvas service status and available operations"}},
+            {"id": "models.status", "title": "Model lifecycle status", "subtitle": "Show loaded models, leases, and cleanup policy", "group": "Runtime", "keywords": ["lm studio", "gpu", "loaded"], "payload": {"prompt": "show model lifecycle status"}},
+            {"id": "operations.open", "title": "Open operations", "subtitle": "Inspect health and workflow execution state", "group": "Runtime", "keywords": ["health", "workflow", "services"]},
+        ]
+
+    def _handle_palette_action(self, action_id: str, payload: object) -> None:
+        if action_id == "operations.open":
+            self._show_operations()
+            return
+        data = payload if isinstance(payload, dict) else {}
+        prompt = str(data.get("prompt") or "").strip()
+        if prompt.endswith(":") or prompt.endswith("for"):
+            self._input.setText(prompt + " ")
+            self._input.setFocus()
+            return
+        if prompt:
+            self._submit_operational_prompt(prompt)
+
+    def _submit_operational_prompt(self, prompt: str) -> None:
+        self._log.append_log(f"You: {prompt}")
+        if self.on_text_command:
+            threading.Thread(target=self.on_text_command, args=(prompt,), daemon=True).start()
+
+    def _show_operations(self) -> None:
+        self._operations_dialog.show()
+        self._operations_dialog.raise_()
+        self._operations_dialog.activateWindow()
+        self._refresh_operations()
+
+    def _refresh_operations(self) -> None:
+        if self._operations_refresh_active:
+            return
+        self._operations_refresh_active = True
+
+        def collect() -> None:
+            try:
+                from core.operations_state import collect_operational_state
+
+                result = collect_operational_state()
+            except Exception as exc:
+                result = {"ok": False, "health": [], "operations": [], "error": str(exc)}
+            self._operations_sig.emit(result)
+
+        threading.Thread(target=collect, name="jarvis-operations-health", daemon=True).start()
+
+    def _apply_operational_state(self, payload: object) -> None:
+        self._operations_refresh_active = False
+        data = payload if isinstance(payload, dict) else {}
+        self._operations_dialog.set_state(data)
+        by_id = {str(item.get("id")): item for item in data.get("health", []) if isinstance(item, dict)}
+        for subsystem, label in self._verified_health_labels.items():
+            health = by_id.get(subsystem, {"state": "unknown", "detail": "No verified telemetry."})
+            state = str(health.get("state") or "unknown")
+            color = STATE_COLORS.get(state, STATE_COLORS["unknown"])
+            label.setText(f"{subsystem.upper()}\n{state.upper()}")
+            label.setToolTip(str(health.get("detail") or ""))
+            label.setStyleSheet(
+                f"color: {color}; background: {C.PANEL2}; border: 1px solid {color}; "
+                "border-radius: 3px; padding: 4px;"
+            )
+
+    def _handle_operation_action(self, action: str, run_id: str) -> None:
+        prompts = {
+            "pause": f"pause workflow {run_id}",
+            "resume": f"resume workflow {run_id}",
+            "review": f"show workflow status and review evidence for {run_id}",
+            "cancel": f"cancel workflow {run_id}",
+            "recover": f"recover workflow {run_id}",
+        }
+        prompt = prompts.get(action)
+        if prompt:
+            self._submit_operational_prompt(prompt)
+
+    def _apply_planning_mode(self, active: bool, prompt_submitted: bool = False) -> None:
+        self._planning_mode = bool(active)
+        self._planning_prompt_submitted = bool(active and prompt_submitted)
+        if not hasattr(self, "_plan_btn"):
+            return
+        if self._planning_mode:
+            self._plan_btn.setText("CANCEL PLANNING")
+            self._plan_btn.setToolTip("Leave planning mode; existing vault plans are preserved.")
+            self._plan_btn.setStyleSheet(f"""
+                QPushButton {{
+                    background: #140008; color: {C.MUTED_C};
+                    border: 1px solid {C.MUTED_C}; border-radius: 3px;
+                }}
+                QPushButton:hover {{
+                    background: #200010; color: {C.WHITE}; border: 1px solid #ff6688;
+                }}
+            """)
+            return
+        self._plan_btn.setText("CREATE PLAN")
+        self._plan_btn.setToolTip("Enter planning mode and create a reviewable vault plan.")
+        self._plan_btn.setStyleSheet(f"""
+            QPushButton {{
+                background: #00120f; color: {C.ACC2};
+                border: 1px solid {C.ACC2}; border-radius: 3px;
+            }}
+            QPushButton:hover {{
+                background: #00221d; color: {C.WHITE}; border: 1px solid {C.PRI};
+            }}
+        """)
 
     def _apply_state(self, state: str):
         self.hud.state    = state
         self.hud.speaking = (state == "SPEAKING")
 
     def _check_config(self) -> bool:
-        if not API_FILE.exists(): return False
         try:
             d = _load_api_config()
             return _is_config_ready(d)
@@ -2456,16 +2754,20 @@ class MainWindow(QMainWindow):
     def _on_setup_done(self, key: str, os_name: str, openai_key: str = ""):
         os.makedirs(CONFIG_DIR, exist_ok=True)
         cfg = _merge_setup_config(_load_api_config(), key, os_name, openai_key)
-        API_FILE.write_text(
-            json.dumps(cfg, indent=4),
-            encoding="utf-8",
-        )
+        save_runtime_config(cfg)
         self._ready = True
         if self._overlay:
             self._overlay.hide()
             self._overlay = None
         self._apply_state("LISTENING")
         self._log.append_log(f"SYS: Initialised. OS={os_name.upper()}. JARVIS online.")
+
+    def closeEvent(self, event) -> None:
+        self._cam_stop.set()
+        if hasattr(self, "_router_content_split"):
+            self._settings.setValue("router_trace_splitter", self._router_content_split.saveState())
+        get_session_broker().close()
+        super().closeEvent(event)
 
 class _RootShim:
     def __init__(self, app: QApplication):
@@ -2534,6 +2836,9 @@ class JarvisUI:
 
     def set_state(self, state: str):
         self._win._state_sig.emit(state)
+
+    def set_planning_mode(self, active: bool, prompt_submitted: bool = False) -> None:
+        self._win._planning_sig.emit(bool(active), bool(prompt_submitted))
 
     def write_log(self, text: str):
         self._win._log_sig.emit(text)

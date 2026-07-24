@@ -1,0 +1,4 @@
+F:\Mark-XLVIII-main\Mark-XLVIII-main\main.py:21: DeprecationWarning: 'audioop' is deprecated and slated for removal in Python 3.13
+  import audioop
+qt.qpa.window: SetProcessDpiAwarenessContext() failed: Access is denied.
+Qt's default DPI awareness context is DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2. If you know what you are doing, you can overwrite this default using qt.conf (https://doc.qt.io/qt-6/highdpi.html#configuring-windows).

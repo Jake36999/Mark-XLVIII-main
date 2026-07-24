@@ -1,0 +1,92 @@
+{
+  "schema_version": "jarvis_work_result/v1",
+  "run_id": "plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-art-v1",
+  "item_id": "p01",
+  "verdict": "ACCEPT",
+  "defects": [],
+  "result": {
+    "ok": true,
+    "count": 3,
+    "notes": [
+      {
+        "id": "plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-artifact",
+        "title": "Plan - Review the Markdown vault and create three linked Obsidian artifacts: an Evaluation MOC, a",
+        "type": "plan",
+        "path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\vault-documentation\\rerun\\vault\\Plans\\2026-07-21-plan-review-the-markdown-vault-and-create-three-linked-obsidian-artifacts-an-eva.md",
+        "headings": [
+          "Plan - Review the Markdown vault and create three linked Obsidian artifacts: an Evaluation MOC, a",
+          "Summary",
+          "Research Notes",
+          "Local Vault Context",
+          "Web Research Context",
+          "Desired Outcome",
+          "Definition Of Done",
+          "Scope",
+          "In scope",
+          "Out of scope",
+          "Task Ownership Assessment",
+          "Milestones",
+          "Workflow Plan",
+          "Subagent Delegation",
+          "Risks And Blockers",
+          "Decision Points",
+          "Approval Gates",
+          "Next Actions",
+          "Sources",
+          "Change Log",
+          "Executable Work Items"
+        ],
+        "citation": "[[Plans/2026-07-21-plan-review-the-markdown-vault-and-create-three-linked-obsidian-artifacts-an-eva|2026-07-21-plan-review-the-markdown-vault-and-create-three-linked-obsidian-artifacts-an-eva]]"
+      },
+      {
+        "id": "README",
+        "title": "JARVIS Obsidian Workflow Templates",
+        "type": "system-guide",
+        "path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\vault-documentation\\rerun\\vault\\Source Vault\\README.md",
+        "headings": [
+          "JARVIS Obsidian Workflow Templates",
+          "Core architectural rule",
+          "Included workflow packs",
+          "1. Deep Research and Planning",
+          "2. Learning and Skills",
+          "3. Productivity and Task Management",
+          "Installation",
+          "Suggested vault structure",
+          "Workflow lifecycles",
+          "Research",
+          "Learning",
+          "Productivity",
+          "RAG policy in brief",
+          "Agent permission policy in brief",
+          "Naming conventions",
+          "Template variables",
+          "Operating expectations for JARVIS"
+        ],
+        "citation": "[[Source Vault/README|README]]"
+      },
+      {
+        "id": "jarvis-20260721T163338Z-77d54b35",
+        "title": "Execution Run - Plan - Review the Markdown vault and create three linked Obsidian artifacts: an Evaluation MOC, a - v1",
+        "type": "execution_summary",
+        "path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\vault-documentation\\rerun\\vault\\Summaries\\2026-07-21-execution-run-plan-review-the-markdown-vault-and-create-three-linked-obsidian-ar.md",
+        "headings": [
+          "Execution Run - Plan - Review the Markdown vault and create three linked Obsidian artifacts: an Evaluation MOC, a",
+          "System Prompt Injection",
+          "Sequenced Work Packets",
+          "Packet Checklist",
+          "Agent Delegation",
+          "Research Collection Protocol",
+          "Subagent Report Protocol",
+          "Synthesis Protocol",
+          "Stop Conditions",
+          "Sources",
+          "Change Log"
+        ],
+        "citation": "[[Summaries/2026-07-21-execution-run-plan-review-the-markdown-vault-and-create-three-linked-obsidian-ar|2026-07-21-execution-run-plan-review-the-markdown-vault-and-create-three-linked-obsidian-ar]]"
+      }
+    ],
+    "summary": "Inspected 3 vault note(s)."
+  },
+  "model_provenance": null,
+  "completed_at": "2026-07-21T16:33:38Z"
+}

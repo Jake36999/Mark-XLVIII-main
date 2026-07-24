@@ -1,0 +1,145 @@
+........................................................................ [ 24%]
+........................................................................ [ 49%]
+........................................................................ [ 73%]
+........................................................................ [ 98%]
+.F..                                                                     [100%]
+================================== FAILURES ===================================
+_ WorkflowArtifactTests.test_documentation_set_has_resolvable_links_and_relationships _
+
+self = <tests.test_workflow_artifacts.WorkflowArtifactTests testMethod=test_documentation_set_has_resolvable_links_and_relationships>
+
+    def test_documentation_set_has_resolvable_links_and_relationships(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            create_note(
+                note_type="report",
+                title="Source Architecture Note",
+                content="## Architecture\n\nJARVIS uses a deterministic workflow runtime.",
+                cfg=self.cfg(root),
+                sync=False,
+                reindex=False,
+            )
+    
+>           result = wa.create_vault_documentation_set({}, root)
+
+tests\test_workflow_artifacts.py:46: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+actions\workflow_artifacts.py:400: in create_vault_documentation_set
+    reindex = reindex_local(cfg)
+actions\jarvis_memory.py:1446: in reindex_local
+    embedding_health = _store_record_embeddings(conn, embedding_records, cfg)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+conn = <sqlite3.Connection object at 0x000002B1EADC3A60>
+records = [{'body': '# Source Architecture Note\n\n## Summary\n\n## Architecture\n\nJARVIS uses a deterministic workflow runtime...nce': 0.5, 'content_hash': '73b92a557d13b190cb2e061d6ae86830c5e874db350cfcfa9576daded7150263', 'contradicts': [], ...}]
+cfg = {'jarvis_notes_root': 'C:\\Users\\jakem\\AppData\\Local\\Temp\\tmpb59cqipm', 'notes_root': 'C:\\Users\\jakem\\AppData\\Local\\Temp\\tmpb59cqipm', 'remember_enabled': False, 'remember_project_id': 'jarvis_notes', ...}
+
+    def _store_record_embeddings(
+        conn: sqlite3.Connection,
+        records: list[dict[str, Any]],
+        cfg: dict[str, Any],
+    ) -> dict[str, Any]:
+        if not records:
+            stored = conn.execute(
+                "SELECT COUNT(*) FROM note_embeddings WHERE model=?",
+                (cfg["rag_embedding_model"],),
+            ).fetchone()[0]
+            return {
+                "ok": bool(stored),
+                "status": "up_to_date" if stored else "not_indexed",
+                "provider": cfg.get("rag_embedding_provider"),
+                "model": cfg.get("rag_embedding_model"),
+                "indexed_notes": int(stored),
+            }
+    
+        health: dict[str, Any] = {"ok": False, "status": "not_attempted"}
+        indexed = 0
+        failed: list[dict[str, str]] = []
+        batch_size = int(cfg.get("rag_embedding_batch_size") or 8)
+    
+        def store_batch(batch: list[dict[str, Any]], vectors: list[list[float]]) -> None:
+            nonlocal indexed
+            for record, vector in zip(batch, vectors):
+                conn.execute(
+                    """
+                    INSERT OR REPLACE INTO note_embeddings(note_id, model, dimensions, vector_json, content_hash, updated_at)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        record["id"], cfg["rag_embedding_model"], len(vector),
+                        json.dumps(vector, separators=(",", ":")), record["content_hash"], _now(),
+                    ),
+                )
+                indexed += 1
+            conn.commit()
+    
+        def embed_batch(batch: list[dict[str, Any]]) -> None:
+            nonlocal health
+            if not batch:
+                return
+            vectors, current_health = _embed_texts([_embedding_text(record) for record in batch], cfg)
+            health = current_health
+            if vectors:
+                store_batch(batch, vectors)
+                return
+            error = str(current_health.get("error") or "")
+            retryable_size_error = "400" in error or "bad request" in error.lower()
+            if retryable_size_error and len(batch) > 1:
+                midpoint = max(1, len(batch) // 2)
+                embed_batch(batch[:midpoint])
+                embed_batch(batch[midpoint:])
+                return
+            if retryable_size_error and len(batch) == 1:
+                record = batch[0]
+                full_text = _embedding_text(record)
+                for max_chars in (3000, 1500):
+                    vectors, current_health = _embed_texts([full_text[:max_chars]], cfg)
+                    health = current_health
+                    if vectors:
+                        store_batch(batch, vectors)
+                        return
+            failed.extend(
+                {
+                    "id": str(record.get("id") or ""),
+                    "title": str(record.get("title") or ""),
+                    "error": error[:300],
+                }
+                for record in batch
+            )
+    
+        for offset in range(0, len(records), batch_size):
+            embed_batch(records[offset : offset + batch_size])
+            if failed and health.get("status") in {
+                "waiting_for_active_generation_lexical_only",
+                "waiting_for_model_budget_lexical_only",
+                "model_not_loaded_lexical_only",
+            }:
+                break
+        health = dict(health)
+        health["indexed_this_run"] = indexed
+        health["requested_notes"] = len(records)
+        health["failed_notes"] = failed
+        if indexed and failed:
+            health["ok"] = True
+            health["status"] = "partial"
+        elif indexed == len(records):
+            health["ok"] = True
+            health["status"] = "available"
+        health["indexed_notes"] = int(
+            conn.execute(
+                "SELECT COUNT(*) FROM note_embeddings WHERE model=?",
+>               (cfg["rag_embedding_model"],),
+            ).fetchone()[0]
+        )
+E       KeyError: 'rag_embedding_model'
+
+actions\jarvis_memory.py:1364: KeyError
+============================== warnings summary ===============================
+tests/test_red_team_eval.py::RoundOneDiscoveryAndContractsTests::test_every_enabled_non_speech_tool_has_an_explicit_policy
+  F:\Mark-XLVIII-main\Mark-XLVIII-main\main.py:21: DeprecationWarning: 'audioop' is deprecated and slated for removal in Python 3.13
+    import audioop
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_workflow_artifacts.py::WorkflowArtifactTests::test_documentation_set_has_resolvable_links_and_relationships
+1 failed, 291 passed, 1 warning in 164.18s (0:02:44)

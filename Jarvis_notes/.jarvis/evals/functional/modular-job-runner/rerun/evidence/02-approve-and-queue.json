@@ -1,0 +1,106 @@
+{
+  "ok": true,
+  "path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\Plans\\2026-07-21-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-under-f-mark-xlvi.md",
+  "title": "Plan - Plan and build an isolated modular Python job-runner demo under F:\\Mark-XLVIII-main\\Jarvis",
+  "status": "queued",
+  "approval_state": "approved",
+  "execution_state": "queued",
+  "run_id": "plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde-v1",
+  "bundle_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\.jarvis\\runs\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde\\v1",
+  "execution_summary_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\Summaries\\2026-07-21-execution-run-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-und.md",
+  "packets": [
+    {
+      "id": "p01",
+      "task": "Validate the approved output root and job-runner acceptance criteria",
+      "worker": "approval_gate",
+      "step_type": "gate",
+      "depends_on": []
+    },
+    {
+      "id": "p02",
+      "task": "Build the modular Python job runner through the registered project scaffold hook",
+      "worker": "build_python_job_runner",
+      "step_type": "python_hook",
+      "depends_on": [
+        "p01"
+      ]
+    },
+    {
+      "id": "p03",
+      "task": "Run fresh-process success, retry, terminal-failure, and telemetry validation",
+      "worker": "validate_python_project",
+      "step_type": "python_hook",
+      "depends_on": [
+        "p02"
+      ]
+    },
+    {
+      "id": "p04",
+      "task": "Record project artifacts, test evidence, and reproduction instructions in the vault",
+      "worker": "vault_create_note",
+      "step_type": "artifact",
+      "depends_on": [
+        "p03"
+      ]
+    },
+    {
+      "id": "p05",
+      "task": "Research and context",
+      "worker": "local_worker",
+      "step_type": "model_reasoning",
+      "depends_on": [
+        "p04"
+      ]
+    },
+    {
+      "id": "p06",
+      "task": "Plan review",
+      "worker": "local_worker",
+      "step_type": "model_reasoning",
+      "depends_on": [
+        "p05"
+      ]
+    },
+    {
+      "id": "p07",
+      "task": "Approved execution",
+      "worker": "local_worker",
+      "step_type": "model_reasoning",
+      "depends_on": [
+        "p06"
+      ]
+    },
+    {
+      "id": "p08",
+      "task": "Validation",
+      "worker": "local_worker",
+      "step_type": "model_reasoning",
+      "depends_on": [
+        "p07"
+      ]
+    }
+  ],
+  "agent_count": 1,
+  "reindex": {
+    "ok": true,
+    "backend": "local_sqlite",
+    "index_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\.jarvis\\memory.sqlite",
+    "indexed_notes": 2,
+    "excluded_notes": 0,
+    "superseded_notes": 0,
+    "deduplicated_notes": 0
+  },
+  "message": "Plan approved and queued. Execution starts after the current JARVIS speech turn completes.",
+  "canvas": {
+    "ok": true,
+    "operation": "sync_plan",
+    "path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\Canvases\\JARVIS\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-under-f-m.canvas",
+    "plan_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\Plans\\2026-07-21-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-under-f-mark-xlvi.md",
+    "node_count": 16,
+    "edge_count": 15,
+    "active_task_count": 14,
+    "completed_task_count": 0,
+    "rolling_limit": 24,
+    "canonical_source": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\Plans\\2026-07-21-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-under-f-mark-xlvi.md"
+  }
+}

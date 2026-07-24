@@ -1,0 +1,51 @@
+{
+  "schema_version": "jarvis_skill_registry/v1",
+  "skills": {
+    "skill-live-validation-read-only-gate": {
+      "deprecated_at": "2026-07-21T21:34:46Z",
+      "enabled_at": "2026-07-21T21:34:46Z",
+      "manifest_hash": "9b043aceb8dcb23e37b1dee6ed8b867f27ea8bb3418044af2086d5866ffe89ab",
+      "note_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Skills\\live-validation-read-only-gate.md",
+      "playbook_hash": "b09dd4f6b1b438387cdb7d739b15a1c1313548e337aa2a6ca20a44fb466bf655",
+      "playbook_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\skills\\enabled\\skill-live-validation-read-only-gate\\v1\\workflow.yaml",
+      "skill_id": "skill-live-validation-read-only-gate",
+      "state": "deprecated",
+      "steps": [
+        {
+          "acceptance_criteria": {
+            "required": true,
+            "required_keys": [
+              "status"
+            ]
+          },
+          "compensation": "",
+          "depends_on": [],
+          "description": "Confirm the already approved read-only validation scope.",
+          "id": "confirm_scope",
+          "idempotency_key": "606b0e35cb2080d3d6e97bfccc359c7333d273876b245c77d248a9c3ae50081a",
+          "inputs": {
+            "passed": true
+          },
+          "max_attempts": 1,
+          "negative_constraints": [],
+          "on_failure": "halt",
+          "orchestrator": "deterministic",
+          "outputs": {},
+          "required_outputs": [],
+          "requires_confirmation": false,
+          "resource_class": "io",
+          "retry_safe": true,
+          "risk_tier": "T1",
+          "sequence": 1,
+          "side_effects": "none",
+          "step_type": "gate",
+          "target": "approval_gate"
+        }
+      ],
+      "title": "Live Validation Read Only Gate",
+      "version": 1,
+      "workflow_hash": "1c67e7dfdff4514cc9ad2a0771f4091c3776f2d3580b18f7409a25e9157e210a"
+    }
+  },
+  "updated_at": "2026-07-21T21:34:46Z"
+}

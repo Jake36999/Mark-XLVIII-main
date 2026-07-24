@@ -1,0 +1,272 @@
+{
+  "ok": true,
+  "query": "Assess reliable mixed-vendor dual-GPU local-model orchestration with LM Studio and llama.cpp. Cover memory allocation, concurrency, model loading, telemetry, failure recovery, and practical recommendations. Use current primary sources, preserve uncertainty, consolidate duplicate findings, and keep high-contrast findings separate.",
+  "workflow_id": "learn_topic_memory",
+  "workflow": {
+    "name": "learn_topic_memory",
+    "workflow_id": "learn_topic_memory",
+    "kind": "workflow",
+    "title": "Learn Topic Memory",
+    "summary": "Research a topic, create a cited report, store key points as a learned-topic memory note, and reindex local RAG.",
+    "categories": [
+      "workflow",
+      "learning",
+      "research",
+      "memory",
+      "rag"
+    ],
+    "keywords": [
+      "learn",
+      "learn about",
+      "learn topic",
+      "teach yourself",
+      "study topic",
+      "knowledge",
+      "rag memory",
+      "deep research",
+      "cited sources"
+    ],
+    "details": "Use when the user asks JARVIS to learn about a topic. The workflow must gather cited sources first, then call jarvis_memory.learn_topic so the readable report and compact RAG memory are both created from the same provenance.",
+    "triggers": [
+      "learn about",
+      "could you learn about",
+      "teach yourself about",
+      "study the topic of",
+      "build your knowledge on"
+    ],
+    "steps": [
+      {
+        "id": "plan_learning",
+        "tool": "capability_registry",
+        "operation": "plan",
+        "requires": [
+          "topic"
+        ],
+        "produces": [
+          "workflow_plan"
+        ],
+        "summary": "plan",
+        "progress_text": "plan"
+      },
+      {
+        "id": "research_topic",
+        "tool": "web_search",
+        "operation": "research",
+        "requires": [
+          "topic",
+          "require_citations"
+        ],
+        "produces": [
+          "structured_sources"
+        ],
+        "summary": "research",
+        "progress_text": "research"
+      },
+      {
+        "id": "persist_learning",
+        "tool": "jarvis_memory",
+        "operation": "learn_topic",
+        "requires": [
+          "topic",
+          "structured_sources"
+        ],
+        "produces": [
+          "deep_research_report",
+          "learned_topic_memory"
+        ],
+        "summary": "learn topic",
+        "progress_text": "learn topic"
+      },
+      {
+        "id": "index_learning",
+        "tool": "jarvis_memory",
+        "operation": "reindex_local",
+        "produces": [
+          "local_rag_index"
+        ],
+        "summary": "reindex local",
+        "requires": [],
+        "progress_text": "reindex local"
+      }
+    ],
+    "invokes": [
+      "capability_registry",
+      "web_search",
+      "jarvis_memory"
+    ],
+    "produces": [
+      "workflow_plan",
+      "structured_sources",
+      "deep_research_report",
+      "learned_topic_memory",
+      "local_rag_index"
+    ],
+    "artifacts": [
+      "Jarvis_notes/Deep Research/*.md",
+      "Jarvis_notes/Memories/learned_topics/*.md",
+      "Jarvis_notes/.jarvis/memory.sqlite"
+    ],
+    "examples": [
+      "learn about WiFi sensing datasets",
+      "teach yourself about local RAG indexing",
+      "study the topic of CSI analysis open-source tools"
+    ],
+    "safety": "Read-only web research plus local Markdown vault writes. It should fail clearly when cited sources are not available.",
+    "risk_level": "low",
+    "requires_confirmation": false,
+    "confirmation_rules": "Read-only web research plus local Markdown vault writes. It should fail clearly when cited sources are not available.",
+    "success_statuses": [
+      "sources_validated",
+      "report_created",
+      "memory_note_created",
+      "indexed_local"
+    ],
+    "block_statuses": [
+      "no_cited_sources",
+      "not_enough_sources",
+      "quality_validation_failed"
+    ],
+    "progress": [
+      "Planning learning route",
+      "Researching cited sources",
+      "Writing report and memory note",
+      "Indexing vault"
+    ],
+    "available": false
+  },
+  "candidates": [
+    {
+      "name": "learn_topic_memory",
+      "title": "Learn Topic Memory",
+      "summary": "Research a topic, create a cited report, store key points as a learned-topic memory note, and reindex local RAG.",
+      "categories": [
+        "workflow",
+        "learning",
+        "research",
+        "memory",
+        "rag"
+      ],
+      "available": false,
+      "kind": "workflow",
+      "score": 27
+    },
+    {
+      "name": "current_news_report",
+      "title": "Current News Report",
+      "summary": "Search current news with exact date context, validate cited sources, and save a populated Obsidian report.",
+      "categories": [
+        "workflow",
+        "news",
+        "web",
+        "memory"
+      ],
+      "available": false,
+      "kind": "workflow",
+      "score": 26
+    },
+    {
+      "name": "deep_research_report",
+      "title": "Deep Research Report",
+      "summary": "Research a topic, synthesize findings, and store a long-form Markdown report in the vault.",
+      "categories": [
+        "workflow",
+        "research",
+        "web",
+        "memory"
+      ],
+      "available": false,
+      "kind": "workflow",
+      "score": 21
+    }
+  ],
+  "match_reason": "Matched workflow 'learn_topic_memory' from request terms and workflow triggers.",
+  "invokes": [
+    "capability_registry",
+    "web_search",
+    "jarvis_memory"
+  ],
+  "requires_confirmation": false,
+  "risk_level": "low",
+  "expected_artifacts": [
+    "Jarvis_notes/Deep Research/*.md",
+    "Jarvis_notes/Memories/learned_topics/*.md",
+    "Jarvis_notes/.jarvis/memory.sqlite"
+  ],
+  "steps": [
+    {
+      "id": "plan_learning",
+      "tool": "capability_registry",
+      "operation": "plan",
+      "requires": [
+        "topic"
+      ],
+      "produces": [
+        "workflow_plan"
+      ],
+      "summary": "plan",
+      "progress_text": "plan"
+    },
+    {
+      "id": "research_topic",
+      "tool": "web_search",
+      "operation": "research",
+      "requires": [
+        "topic",
+        "require_citations"
+      ],
+      "produces": [
+        "structured_sources"
+      ],
+      "summary": "research",
+      "progress_text": "research"
+    },
+    {
+      "id": "persist_learning",
+      "tool": "jarvis_memory",
+      "operation": "learn_topic",
+      "requires": [
+        "topic",
+        "structured_sources"
+      ],
+      "produces": [
+        "deep_research_report",
+        "learned_topic_memory"
+      ],
+      "summary": "learn topic",
+      "progress_text": "learn topic"
+    },
+    {
+      "id": "index_learning",
+      "tool": "jarvis_memory",
+      "operation": "reindex_local",
+      "produces": [
+        "local_rag_index"
+      ],
+      "summary": "reindex local",
+      "requires": [],
+      "progress_text": "reindex local"
+    }
+  ],
+  "progress": [
+    "Planning learning route",
+    "Researching cited sources",
+    "Writing report and memory note",
+    "Indexing vault"
+  ],
+  "success_statuses": [
+    "sources_validated",
+    "report_created",
+    "memory_note_created",
+    "indexed_local"
+  ],
+  "block_statuses": [
+    "no_cited_sources",
+    "not_enough_sources",
+    "quality_validation_failed"
+  ],
+  "identity": {
+    "assistant_name": "JARVIS",
+    "platform_name": "MARK XLVIII",
+    "summary": "JARVIS is the assistant. MARK XLVIII is the local platform and shell."
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "ok": true,
+  "checks": {
+    "first_ok": true,
+    "three_files": true,
+    "multiple_chunks": true,
+    "first_run_fresh": true,
+    "second_ok": true,
+    "all_chunks_resumed": true,
+    "same_checkpoint": true,
+    "report_has_content": true
+  },
+  "fixture_root": "F:\\Mark-XLVIII-main\\Mark-XLVIII-main\\runtime_validation\\document-map-reduce",
+  "first": {
+    "seconds": 138.422,
+    "files_considered": 3,
+    "segments": 3,
+    "chunks": 3,
+    "resumed_chunks": 0,
+    "checkpoint_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\file_jobs\\c9e160228b198c4d94b777e1ef513b2afa363bb116352424fef37295cedc292e.json",
+    "diagnostics": []
+  },
+  "second": {
+    "seconds": 30.469,
+    "chunks": 3,
+    "resumed_chunks": 3,
+    "checkpoint_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\file_jobs\\c9e160228b198c4d94b777e1ef513b2afa363bb116352424fef37295cedc292e.json"
+  },
+  "report_preview": "**Final Report: Live Validation 1784673205435879000**\n\n---\n\n**Executive Summary**  \nThis report summarizes the architecture, operations, and identified risks of the live validation system based on available documentation. The system is structured around four core components: Markdown (readable authority), JSON (executable manifest), SQLite (runtime state storage), and RAG (derived retrieval layer). Execution is governed by approval hashes that bind operations to approved plans, with immutability enforced when scope or permissions change. Operational workflows leverage bounded leases and deterministic checkpoints for resource access and state consistency, with serialized execution per resource class. Key risks include lack of clarity on approval hash mechanics, resource class definitions, and integration of RAG, as well as insufficient detail on edit reconciliation and model lifecycle management. All findings are derived exclusively from the provided source texts and are presented without inference or external claims.\n\n---\n\n**Findings**  \n\n**Architecture**  \n- The system is composed of four core components:  \n  - Markdown serves as the authoritative, human-readable documentation sou"
+}

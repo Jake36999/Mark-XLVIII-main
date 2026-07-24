@@ -1,0 +1,177 @@
+{
+	"nodes":[
+		{"id":"jarvis-165609c6e41474be","type":"file","file":"Plans/2026-07-22-plan-wifi-sensing-pipeline-resource-research.md","x":0,"y":0,"width":460,"height":280},
+		{"id":"jarvis-befd00ac888b522b","type":"text","text":"# Plan - WiFi Sensing Pipeline Resource Research\n**Status:** pending_review\n**Approval:** pending_review\n**Execution:** not_started\n**Visible tasks:** 14 of 14\n\n> This Canvas is a rolling view. The linked Markdown plan is authoritative.","x":560,"y":0,"width":420,"height":230,"color":"4"},
+		{
+			"id":"jarvis-0ccc729de17efd1d",
+			"type":"text",
+			"text":"## [ ] Approval gates are visible.\n\n`plan-plan-wifi-sensing-pipeline-resource-research-42`\n\nSource line 42",
+			"x":1080,
+			"y":0,
+			"width":350,
+			"height":170,
+			"color":"3",
+			"jarvis":{"kind":"task","task_id":"plan-plan-wifi-sensing-pipeline-resource-research-42","source_path":"F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-22-plan-wifi-sensing-pipeline-resource-research.md","source_line":42,"source_done":false,"source_permission":"propose","source_run_id":"","source_hash":"3db7d1c8271e1968b421107a5a3799b9eb95a43809b14ae9019d2eae58dbec58"}
+		},
+		{
+			"id":"jarvis-51d92b6f6cbe4782",
+			"type":"text",
+			"text":"## [ ] Blockers and design decision points are explicit.\n\n`plan-plan-wifi-sensing-pipeline-resource-research-41`\n\nSource line 41",
+			"x":1470,
+			"y":0,
+			"width":350,
+			"height":170,
+			"color":"3",
+			"jarvis":{"kind":"task","task_id":"plan-plan-wifi-sensing-pipeline-resource-research-41","source_path":"F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-22-plan-wifi-sensing-pipeline-resource-research.md","source_line":41,"source_done":false,"source_permission":"propose","source_run_id":"","source_hash":"a8573b37f17db9ab1513b94a5969bda3c5e2bbb887a62db40d13b9286a09adea"}
+		},
+		{
+			"id":"jarvis-1bc00ac4a5179c2e",
+			"type":"text",
+			"text":"## [ ] Completion summary requirements are defined.\n\n`plan-plan-wifi-sensing-pipeline-resource-research-43`\n\nSource line 43",
+			"x":1860,
+			"y":0,
+			"width":350,
+			"height":170,
+			"color":"3",
+			"jarvis":{"kind":"task","task_id":"plan-plan-wifi-sensing-pipeline-resource-research-43","source_path":"F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-22-plan-wifi-sensing-pipeline-resource-research.md","source_line":43,"source_done":false,"source_permission":"propose","source_run_id":"","source_hash":"cbe70f4bb52360dd35f74bdf79c8821c9d64fd85cc3a27066987ea68c5b8e7f8"}
+		},
+		{
+			"id":"jarvis-5f79dd2b351273b3",
+			"type":"text",
+			"text":"## [ ] Destructive actions explicitly confirmed.\n\n`plan-plan-wifi-sensing-pipeline-resource-research-114`\n\nSource line 114",
+			"x":1080,
+			"y":210,
+			"width":350,
+			"height":170,
+			"color":"3",
+			"jarvis":{"kind":"task","task_id":"plan-plan-wifi-sensing-pipeline-resource-research-114","source_path":"F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-22-plan-wifi-sensing-pipeline-resource-research.md","source_line":114,"source_done":false,"source_permission":"propose","source_run_id":"","source_hash":"4903cb7a0bc008e68a6c8e757ea67f179875ac29be9ec7a76a1f8315de1f9b87"}
+		},
+		{
+			"id":"jarvis-720e9a89e6fc1a64",
+			"type":"text",
+			"text":"## [ ] Execution milestones are ordered.\n\n`plan-plan-wifi-sensing-pipeline-resource-research-40`\n\nSource line 40",
+			"x":1470,
+			"y":210,
+			"width":350,
+			"height":170,
+			"color":"3",
+			"jarvis":{"kind":"task","task_id":"plan-plan-wifi-sensing-pipeline-resource-research-40","source_path":"F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-22-plan-wifi-sensing-pipeline-resource-research.md","source_line":40,"source_done":false,"source_permission":"propose","source_run_id":"","source_hash":"7f4c137231ce0641757e8fc62b129a51dcc09af5dc0b6a5309f3a47df7d693e2"}
+		},
+		{
+			"id":"jarvis-b126268cbbf11558",
+			"type":"text",
+			"text":"## [ ] High-cost model use approved when needed.\n\n`plan-plan-wifi-sensing-pipeline-resource-research-115`\n\nSource line 115",
+			"x":1860,
+			"y":210,
+			"width":350,
+			"height":170,
+			"color":"3",
+			"jarvis":{"kind":"task","task_id":"plan-plan-wifi-sensing-pipeline-resource-research-115","source_path":"F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-22-plan-wifi-sensing-pipeline-resource-research.md","source_line":115,"source_done":false,"source_permission":"propose","source_run_id":"","source_hash":"cb1fbd40ab4f4925cf2414e5b8d39f955bf96b9a3b840c3e307d726d4a4848af"}
+		},
+		{
+			"id":"jarvis-5f3b40be5de45eb1",
+			"type":"text",
+			"text":"## [ ] JARVIS creates a summary or blocker note after execution starts.\n\n`plan-plan-wifi-sensing-pipeline-resource-research-123`\n\nSource line 123",
+			"x":1080,
+			"y":420,
+			"width":350,
+			"height":170,
+			"color":"3",
+			"jarvis":{"kind":"task","task_id":"plan-plan-wifi-sensing-pipeline-resource-research-123","source_path":"F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-22-plan-wifi-sensing-pipeline-resource-research.md","source_line":123,"source_done":false,"source_permission":"propose","source_run_id":"","source_hash":"a232ce6cd8ad42a309ed3525be63864bcded4308b38d83145f9e44092f636992"}
+		},
+		{
+			"id":"jarvis-1930cf891dfd4558",
+			"type":"text",
+			"text":"## [ ] JARVIS updates the plan if the goal changes.\n\n`plan-plan-wifi-sensing-pipeline-resource-research-122`\n\nSource line 122",
+			"x":1470,
+			"y":420,
+			"width":350,
+			"height":170,
+			"color":"3",
+			"jarvis":{"kind":"task","task_id":"plan-plan-wifi-sensing-pipeline-resource-research-122","source_path":"F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-22-plan-wifi-sensing-pipeline-resource-research.md","source_line":122,"source_done":false,"source_permission":"propose","source_run_id":"","source_hash":"2968a645bf76ac79ae078b2d974bce4cec26574ef36da21a3782a30d9401c292"}
+		},
+		{
+			"id":"jarvis-df8d604d4ac59a80",
+			"type":"text",
+			"text":"## [ ] Plan approved by user.\n\n`plan-plan-wifi-sensing-pipeline-resource-research-113`\n\nSource line 113",
+			"x":1860,
+			"y":420,
+			"width":350,
+			"height":170,
+			"color":"3",
+			"jarvis":{"kind":"task","task_id":"plan-plan-wifi-sensing-pipeline-resource-research-113","source_path":"F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-22-plan-wifi-sensing-pipeline-resource-research.md","source_line":113,"source_done":false,"source_permission":"propose","source_run_id":"","source_hash":"af466f708b8c947dad485e4d7ff17ad6d77749b1e0d0969b1d3b677d55eee78a"}
+		},
+		{
+			"id":"jarvis-58d12f995e51c8e5",
+			"type":"text",
+			"text":"## [ ] Plan reviewed in Obsidian.\n\n`plan-plan-wifi-sensing-pipeline-resource-research-38`\n\nSource line 38",
+			"x":1080,
+			"y":630,
+			"width":350,
+			"height":170,
+			"color":"3",
+			"jarvis":{"kind":"task","task_id":"plan-plan-wifi-sensing-pipeline-resource-research-38","source_path":"F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-22-plan-wifi-sensing-pipeline-resource-research.md","source_line":38,"source_done":false,"source_permission":"propose","source_run_id":"","source_hash":"adae1169b554eb59572186679fb8518d493edd52d059cb194deeb335e7a0dda0"}
+		},
+		{
+			"id":"jarvis-3c09f3c20586b5e0",
+			"type":"text",
+			"text":"## [ ] Scope and out-of-scope items are clear.\n\n`plan-plan-wifi-sensing-pipeline-resource-research-39`\n\nSource line 39",
+			"x":1470,
+			"y":630,
+			"width":350,
+			"height":170,
+			"color":"3",
+			"jarvis":{"kind":"task","task_id":"plan-plan-wifi-sensing-pipeline-resource-research-39","source_path":"F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-22-plan-wifi-sensing-pipeline-resource-research.md","source_line":39,"source_done":false,"source_permission":"propose","source_run_id":"","source_hash":"3438169b8e51a2a2b8c274d8841930ff0abea85f9703b80fdc572f7044aa5d9c"}
+		},
+		{
+			"id":"jarvis-4a46ea9943950414",
+			"type":"text",
+			"text":"## [ ] Subagent delegation approved when needed.\n\n`plan-plan-wifi-sensing-pipeline-resource-research-116`\n\nSource line 116",
+			"x":1860,
+			"y":630,
+			"width":350,
+			"height":170,
+			"color":"3",
+			"jarvis":{"kind":"task","task_id":"plan-plan-wifi-sensing-pipeline-resource-research-116","source_path":"F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-22-plan-wifi-sensing-pipeline-resource-research.md","source_line":116,"source_done":false,"source_permission":"propose","source_run_id":"","source_hash":"a9ca1fff6403f3766620c83047f90bd3a33782a930ba5b61ee73297d07c127a9"}
+		},
+		{
+			"id":"jarvis-d1af683ca3e675eb",
+			"type":"text",
+			"text":"## [ ] User requests edits or approves execution.\n\n`plan-plan-wifi-sensing-pipeline-resource-research-121`\n\nSource line 121",
+			"x":1080,
+			"y":840,
+			"width":350,
+			"height":170,
+			"color":"3",
+			"jarvis":{"kind":"task","task_id":"plan-plan-wifi-sensing-pipeline-resource-research-121","source_path":"F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-22-plan-wifi-sensing-pipeline-resource-research.md","source_line":121,"source_done":false,"source_permission":"propose","source_run_id":"","source_hash":"8babd3bfeeed7cb5348043a77739c48b64ecde547230dd521e0a24f0cce3f6e4"}
+		},
+		{
+			"id":"jarvis-a69a7c9349d62282",
+			"type":"text",
+			"text":"## [ ] User reviews this plan in Obsidian.\n\n`plan-plan-wifi-sensing-pipeline-resource-research-120`\n\nSource line 120",
+			"x":1470,
+			"y":840,
+			"width":350,
+			"height":170,
+			"color":"3",
+			"jarvis":{"kind":"task","task_id":"plan-plan-wifi-sensing-pipeline-resource-research-120","source_path":"F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-22-plan-wifi-sensing-pipeline-resource-research.md","source_line":120,"source_done":false,"source_permission":"propose","source_run_id":"","source_hash":"848c22a9e1b0205223f112a58ede4c90683cf0f780158f0993ac2321b9054be7"}
+		}
+	],
+	"edges":[
+		{"id":"jarvis-858db9a71543f630","fromNode":"jarvis-165609c6e41474be","fromSide":"right","toNode":"jarvis-befd00ac888b522b","toSide":"left","label":"current state"},
+		{"id":"jarvis-3f6d84a17a666c4d","fromNode":"jarvis-befd00ac888b522b","fromSide":"right","toNode":"jarvis-0ccc729de17efd1d","toSide":"left","label":"next"},
+		{"id":"jarvis-08b32b2a382a86ae","fromNode":"jarvis-befd00ac888b522b","fromSide":"right","toNode":"jarvis-51d92b6f6cbe4782","toSide":"left","label":"next"},
+		{"id":"jarvis-6bb3436dfa090a30","fromNode":"jarvis-befd00ac888b522b","fromSide":"right","toNode":"jarvis-1bc00ac4a5179c2e","toSide":"left","label":"next"},
+		{"id":"jarvis-85787ae26e64ce6f","fromNode":"jarvis-befd00ac888b522b","fromSide":"right","toNode":"jarvis-5f79dd2b351273b3","toSide":"left","label":"next"},
+		{"id":"jarvis-34a30159c0b48f10","fromNode":"jarvis-befd00ac888b522b","fromSide":"right","toNode":"jarvis-720e9a89e6fc1a64","toSide":"left","label":"next"},
+		{"id":"jarvis-545509792278ba3a","fromNode":"jarvis-befd00ac888b522b","fromSide":"right","toNode":"jarvis-b126268cbbf11558","toSide":"left","label":"next"},
+		{"id":"jarvis-cf55dbdf383e5a65","fromNode":"jarvis-befd00ac888b522b","fromSide":"right","toNode":"jarvis-5f3b40be5de45eb1","toSide":"left","label":"next"},
+		{"id":"jarvis-a8bdd1f90380a7aa","fromNode":"jarvis-befd00ac888b522b","fromSide":"right","toNode":"jarvis-1930cf891dfd4558","toSide":"left","label":"next"},
+		{"id":"jarvis-71f15b2ccc81662f","fromNode":"jarvis-befd00ac888b522b","fromSide":"right","toNode":"jarvis-df8d604d4ac59a80","toSide":"left","label":"next"},
+		{"id":"jarvis-18a1762e8d32f354","fromNode":"jarvis-befd00ac888b522b","fromSide":"right","toNode":"jarvis-58d12f995e51c8e5","toSide":"left","label":"next"},
+		{"id":"jarvis-8fe9e539bf47f084","fromNode":"jarvis-befd00ac888b522b","fromSide":"right","toNode":"jarvis-3c09f3c20586b5e0","toSide":"left","label":"next"},
+		{"id":"jarvis-6a36de187c0e1658","fromNode":"jarvis-befd00ac888b522b","fromSide":"right","toNode":"jarvis-4a46ea9943950414","toSide":"left","label":"next"},
+		{"id":"jarvis-fd020ce03bd15d4a","fromNode":"jarvis-befd00ac888b522b","fromSide":"right","toNode":"jarvis-d1af683ca3e675eb","toSide":"left","label":"next"},
+		{"id":"jarvis-a1d2d404ad4b625d","fromNode":"jarvis-befd00ac888b522b","fromSide":"right","toNode":"jarvis-a69a7c9349d62282","toSide":"left","label":"next"}
+	]
+}

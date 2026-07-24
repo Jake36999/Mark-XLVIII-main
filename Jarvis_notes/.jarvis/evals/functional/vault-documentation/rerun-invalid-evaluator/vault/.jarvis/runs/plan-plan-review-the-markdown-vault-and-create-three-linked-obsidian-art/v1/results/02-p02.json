@@ -1,0 +1,31 @@
+{
+  "schema_version": "jarvis_work_result/v1",
+  "run_id": "plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-art-v1",
+  "item_id": "p02",
+  "verdict": "ACCEPT",
+  "defects": [],
+  "result": {
+    "ok": true,
+    "artifacts": [
+      "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\vault-documentation\\rerun\\vault\\Reports\\2026-07-21-evaluation-moc.md",
+      "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\vault-documentation\\rerun\\vault\\Reports\\2026-07-21-workflow-architecture-report.md",
+      "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\vault-documentation\\rerun\\vault\\Reports\\2026-07-21-knowledge-gaps-and-next-actions-report.md"
+    ],
+    "moc_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\vault-documentation\\rerun\\vault\\Reports\\2026-07-21-evaluation-moc.md",
+    "architecture_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\vault-documentation\\rerun\\vault\\Reports\\2026-07-21-workflow-architecture-report.md",
+    "gaps_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\vault-documentation\\rerun\\vault\\Reports\\2026-07-21-knowledge-gaps-and-next-actions-report.md",
+    "source_count": 3,
+    "reindex": {
+      "ok": true,
+      "backend": "local_sqlite",
+      "index_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\vault-documentation\\rerun\\vault\\.jarvis\\memory.sqlite",
+      "indexed_notes": 3,
+      "excluded_notes": 3,
+      "superseded_notes": 0,
+      "deduplicated_notes": 0
+    },
+    "summary": "Created a linked evaluation MOC, architecture report, and knowledge-gap report."
+  },
+  "model_provenance": null,
+  "completed_at": "2026-07-21T16:33:38Z"
+}

@@ -36,14 +36,10 @@ def _base_dir() -> Path:
 
 
 _BASE         = _base_dir()
-_CONFIG_PATH  = _BASE / "config" / "api_keys.json"
 _MEMORY_PATH  = _BASE / "memory" / "long_term.json"
 
 def _load_config() -> dict:
-    try:
-        return json.loads(_CONFIG_PATH.read_text(encoding="utf-8"))
-    except Exception:
-        return {}
+    return load_runtime_config()
 
 def _platform_os() -> str:
     return {"Windows": "windows", "Darwin": "mac", "Linux": "linux"}.get(
@@ -55,7 +51,7 @@ def _get_os() -> str:
 
 
 def _get_api_key() -> str:
-    return _load_config().get("gemini_api_key", "")
+    raise RuntimeError("Gemini cloud credentials are session-only and unavailable to this legacy action.")
 
 _SAFE_SCREENSHOT_ROOTS = (
     Path.home(),
@@ -313,7 +309,7 @@ def _focus_window(title: str) -> str:
 def _screen_find(description: str) -> tuple[int, int] | None:
     api_key = _get_api_key()
     if not api_key:
-        print("[ComputerControl] ⚠️ No API key for screen_find")
+        print("[ComputerControl] WARNING: No API key for screen_find")
         return None
 
     try:
@@ -352,7 +348,7 @@ def _screen_find(description: str) -> tuple[int, int] | None:
             return int(match.group(1)), int(match.group(2))
 
     except Exception as e:
-        print(f"[ComputerControl] ⚠️ screen_find failed: {e}")
+        print(f"[ComputerControl] WARNING: screen_find failed: {e}")
 
     return None
 
@@ -413,7 +409,7 @@ def computer_control(
     if player:
         player.write_log(f"[Computer] {action}")
 
-    print(f"[ComputerControl] ▶ {action}  {params}")
+    print(f"[ComputerControl] {action}  {params}")
 
     try:
 
@@ -495,7 +491,7 @@ def computer_control(
         if action == "random_data":
             dt     = params.get("type", "name")
             result = _random_data(dt)
-            print(f"[ComputerControl] 🎲 random {dt} → {result}")
+            print(f"[ComputerControl] random {dt}: {result}")
             return result
 
         if action == "user_data":
@@ -504,11 +500,12 @@ def computer_control(
             value   = profile.get(field, "")
             if not value:
                 value = _random_data(field)
-                print(f"[ComputerControl] ⚠️ No '{field}' in memory, using random: {value}")
+                print(f"[ComputerControl] WARNING: No '{field}' in memory, using random: {value}")
             return value
 
         return f"Unknown action: '{action}'"
 
     except Exception as e:
-        print(f"[ComputerControl] ❌ {action}: {e}")
+        print(f"[ComputerControl] ERROR: {action}: {e}")
         return f"computer_control '{action}' failed: {e}"
+from core.runtime_config import load_runtime_config

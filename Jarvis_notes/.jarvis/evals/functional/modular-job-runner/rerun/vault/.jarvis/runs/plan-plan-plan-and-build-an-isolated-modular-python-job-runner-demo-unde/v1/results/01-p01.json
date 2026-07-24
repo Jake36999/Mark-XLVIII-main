@@ -1,0 +1,14 @@
+{
+  "schema_version": "jarvis_work_result/v1",
+  "run_id": "plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde-v1",
+  "item_id": "p01",
+  "verdict": "ACCEPT",
+  "defects": [],
+  "result": {
+    "ok": true,
+    "status": "passed",
+    "summary": "Validate the approved output root and job-runner acceptance criteria"
+  },
+  "model_provenance": null,
+  "completed_at": "2026-07-21T16:32:02Z"
+}

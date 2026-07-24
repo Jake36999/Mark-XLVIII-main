@@ -1,0 +1,282 @@
+{
+  "ok": true,
+  "run": {
+    "run_id": "plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-art-v1",
+    "plan_id": "plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-artifact",
+    "plan_version": 1,
+    "status": "BLOCKED",
+    "bundle_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\vault-documentation\\baseline\\vault\\.jarvis\\runs\\plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-art\\v1",
+    "manifest_hash": "f1a4908469e70d902c48c17e290259e20eeb314244974947412d881cc01a1c11",
+    "approval_projection_hash": "64ddf6eac35a95d1648f26f81dd911a97a73120e5790232f6d3c6b554c27fabd",
+    "workflow_hash": "1e0811123e287f50925c3826c7daceed03cec25186615741b0caff9fb23a06c7",
+    "cancel_requested": 0,
+    "created_at": "2026-07-21T16:00:20Z",
+    "updated_at": "2026-07-21T16:00:22Z"
+  },
+  "items": [
+    {
+      "item_id": "p01",
+      "state": "REJECT_REPLAN",
+      "attempt": 3,
+      "repair_count": 3,
+      "result_path": null,
+      "error": "LM Studio local model route failed. Tried: qwen/qwen3-4b-2507: 'load_timeout_seconds'"
+    },
+    {
+      "item_id": "p02",
+      "state": "PENDING",
+      "attempt": 0,
+      "repair_count": 0,
+      "result_path": null,
+      "error": null
+    },
+    {
+      "item_id": "p03",
+      "state": "PENDING",
+      "attempt": 0,
+      "repair_count": 0,
+      "result_path": null,
+      "error": null
+    },
+    {
+      "item_id": "p04",
+      "state": "PENDING",
+      "attempt": 0,
+      "repair_count": 0,
+      "result_path": null,
+      "error": null
+    },
+    {
+      "item_id": "p05",
+      "state": "PENDING",
+      "attempt": 0,
+      "repair_count": 0,
+      "result_path": null,
+      "error": null
+    },
+    {
+      "item_id": "p06",
+      "state": "PENDING",
+      "attempt": 0,
+      "repair_count": 0,
+      "result_path": null,
+      "error": null
+    },
+    {
+      "item_id": "p07",
+      "state": "PENDING",
+      "attempt": 0,
+      "repair_count": 0,
+      "result_path": null,
+      "error": null
+    },
+    {
+      "item_id": "p08",
+      "state": "PENDING",
+      "attempt": 0,
+      "repair_count": 0,
+      "result_path": null,
+      "error": null
+    },
+    {
+      "item_id": "p09",
+      "state": "PENDING",
+      "attempt": 0,
+      "repair_count": 0,
+      "result_path": null,
+      "error": null
+    },
+    {
+      "item_id": "p10",
+      "state": "PENDING",
+      "attempt": 0,
+      "repair_count": 0,
+      "result_path": null,
+      "error": null
+    },
+    {
+      "item_id": "p11",
+      "state": "PENDING",
+      "attempt": 0,
+      "repair_count": 0,
+      "result_path": null,
+      "error": null
+    },
+    {
+      "item_id": "p12",
+      "state": "PENDING",
+      "attempt": 0,
+      "repair_count": 0,
+      "result_path": null,
+      "error": null
+    }
+  ],
+  "events": [
+    {
+      "item_id": null,
+      "event_type": "run_registered",
+      "details_json": "{\"item_count\": 12}",
+      "created_at": "2026-07-21T16:00:20Z",
+      "details": {
+        "item_count": 12
+      }
+    },
+    {
+      "item_id": null,
+      "event_type": "run_approved",
+      "details_json": "{}",
+      "created_at": "2026-07-21T16:00:22Z",
+      "details": {}
+    },
+    {
+      "item_id": "p01",
+      "event_type": "item_started",
+      "details_json": "{\"worker_id\": \"jarvis-local-worker\"}",
+      "created_at": "2026-07-21T16:00:22Z",
+      "details": {
+        "worker_id": "jarvis-local-worker"
+      }
+    },
+    {
+      "item_id": "p01",
+      "event_type": "item_failed",
+      "details_json": "{\"error\": \"LM Studio local model route failed. Tried: qwen/qwen3-4b-2507: 'load_timeout_seconds'\", \"state\": \"REPAIR\"}",
+      "created_at": "2026-07-21T16:00:22Z",
+      "details": {
+        "error": "LM Studio local model route failed. Tried: qwen/qwen3-4b-2507: 'load_timeout_seconds'",
+        "state": "REPAIR"
+      }
+    },
+    {
+      "item_id": null,
+      "event_type": "repair_retry",
+      "details_json": "{\"status\": \"REPAIRING\"}",
+      "created_at": "2026-07-21T16:00:22Z",
+      "details": {
+        "status": "REPAIRING"
+      }
+    },
+    {
+      "item_id": "p01",
+      "event_type": "item_started",
+      "details_json": "{\"worker_id\": \"jarvis-local-worker\"}",
+      "created_at": "2026-07-21T16:00:22Z",
+      "details": {
+        "worker_id": "jarvis-local-worker"
+      }
+    },
+    {
+      "item_id": "p01",
+      "event_type": "item_failed",
+      "details_json": "{\"error\": \"LM Studio local model route failed. Tried: qwen/qwen3-4b-2507: 'load_timeout_seconds'\", \"state\": \"REPAIR\"}",
+      "created_at": "2026-07-21T16:00:22Z",
+      "details": {
+        "error": "LM Studio local model route failed. Tried: qwen/qwen3-4b-2507: 'load_timeout_seconds'",
+        "state": "REPAIR"
+      }
+    },
+    {
+      "item_id": null,
+      "event_type": "repair_retry",
+      "details_json": "{\"status\": \"REPAIRING\"}",
+      "created_at": "2026-07-21T16:00:22Z",
+      "details": {
+        "status": "REPAIRING"
+      }
+    },
+    {
+      "item_id": "p01",
+      "event_type": "item_started",
+      "details_json": "{\"worker_id\": \"jarvis-local-worker\"}",
+      "created_at": "2026-07-21T16:00:22Z",
+      "details": {
+        "worker_id": "jarvis-local-worker"
+      }
+    },
+    {
+      "item_id": "p01",
+      "event_type": "item_failed",
+      "details_json": "{\"error\": \"LM Studio local model route failed. Tried: qwen/qwen3-4b-2507: 'load_timeout_seconds'\", \"state\": \"REJECT_REPLAN\"}",
+      "created_at": "2026-07-21T16:00:22Z",
+      "details": {
+        "error": "LM Studio local model route failed. Tried: qwen/qwen3-4b-2507: 'load_timeout_seconds'",
+        "state": "REJECT_REPLAN"
+      }
+    },
+    {
+      "item_id": null,
+      "event_type": "run_finished",
+      "details_json": "{\"status\": \"BLOCKED\"}",
+      "created_at": "2026-07-21T16:00:22Z",
+      "details": {
+        "status": "BLOCKED"
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "item_id": "p01",
+      "phase": "before_dispatch",
+      "idempotency_key": "8ef2bafdef3ee4ec0dc8693fb80aef61e088bfe6778b64c7c7d6bfe8b4351806",
+      "details_json": "{\"side_effects\": \"none\"}",
+      "created_at": "2026-07-21T16:00:22Z",
+      "details": {
+        "side_effects": "none"
+      }
+    },
+    {
+      "item_id": "p01",
+      "phase": "dispatch_interrupted",
+      "idempotency_key": "8ef2bafdef3ee4ec0dc8693fb80aef61e088bfe6778b64c7c7d6bfe8b4351806",
+      "details_json": "{\"error\": \"LM Studio local model route failed. Tried: qwen/qwen3-4b-2507: 'load_timeout_seconds'\", \"state\": \"REPAIR\"}",
+      "created_at": "2026-07-21T16:00:22Z",
+      "details": {
+        "error": "LM Studio local model route failed. Tried: qwen/qwen3-4b-2507: 'load_timeout_seconds'",
+        "state": "REPAIR"
+      }
+    },
+    {
+      "item_id": "p01",
+      "phase": "before_dispatch",
+      "idempotency_key": "8ef2bafdef3ee4ec0dc8693fb80aef61e088bfe6778b64c7c7d6bfe8b4351806",
+      "details_json": "{\"side_effects\": \"none\"}",
+      "created_at": "2026-07-21T16:00:22Z",
+      "details": {
+        "side_effects": "none"
+      }
+    },
+    {
+      "item_id": "p01",
+      "phase": "dispatch_interrupted",
+      "idempotency_key": "8ef2bafdef3ee4ec0dc8693fb80aef61e088bfe6778b64c7c7d6bfe8b4351806",
+      "details_json": "{\"error\": \"LM Studio local model route failed. Tried: qwen/qwen3-4b-2507: 'load_timeout_seconds'\", \"state\": \"REPAIR\"}",
+      "created_at": "2026-07-21T16:00:22Z",
+      "details": {
+        "error": "LM Studio local model route failed. Tried: qwen/qwen3-4b-2507: 'load_timeout_seconds'",
+        "state": "REPAIR"
+      }
+    },
+    {
+      "item_id": "p01",
+      "phase": "before_dispatch",
+      "idempotency_key": "8ef2bafdef3ee4ec0dc8693fb80aef61e088bfe6778b64c7c7d6bfe8b4351806",
+      "details_json": "{\"side_effects\": \"none\"}",
+      "created_at": "2026-07-21T16:00:22Z",
+      "details": {
+        "side_effects": "none"
+      }
+    },
+    {
+      "item_id": "p01",
+      "phase": "dispatch_interrupted",
+      "idempotency_key": "8ef2bafdef3ee4ec0dc8693fb80aef61e088bfe6778b64c7c7d6bfe8b4351806",
+      "details_json": "{\"error\": \"LM Studio local model route failed. Tried: qwen/qwen3-4b-2507: 'load_timeout_seconds'\", \"state\": \"REJECT_REPLAN\"}",
+      "created_at": "2026-07-21T16:00:22Z",
+      "details": {
+        "error": "LM Studio local model route failed. Tried: qwen/qwen3-4b-2507: 'load_timeout_seconds'",
+        "state": "REJECT_REPLAN"
+      }
+    }
+  ],
+  "blocker_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\vault-documentation\\baseline\\vault\\Blockers\\2026-07-21-blocked-plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-art.md"
+}

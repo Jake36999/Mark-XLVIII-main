@@ -1,0 +1,34 @@
+INFO:     Started server process [13660]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:5006 (Press CTRL+C to quit)
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Exception in thread Thread-6 (run_async):
+Traceback (most recent call last):
+  File "C:\Users\jakem\AppData\Local\Programs\Python\Python311\Lib\threading.py", line 1038, in _bootstrap_inner
+    self.run()
+  File "C:\Users\jakem\AppData\Local\Programs\Python\Python311\Lib\threading.py", line 975, in run
+    self._target(*self._args, **self._kwargs)
+  File "F:\Mark-XLVIII-main\Mark-XLVIII-main\tools\Orpheus-FastAPI-LMStudio\tts_engine\inference.py", line 402, in run_async
+    asyncio.run(async_producer())
+  File "C:\Users\jakem\AppData\Local\Programs\Python\Python311\Lib\asyncio\runners.py", line 190, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\jakem\AppData\Local\Programs\Python\Python311\Lib\asyncio\runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jakem\AppData\Local\Programs\Python\Python311\Lib\asyncio\base_events.py", line 653, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "F:\Mark-XLVIII-main\Mark-XLVIII-main\tools\Orpheus-FastAPI-LMStudio\tts_engine\inference.py", line 385, in async_producer
+    async for audio_chunk in tokens_decoder(async_token_gen()):
+  File "F:\Mark-XLVIII-main\Mark-XLVIII-main\tools\Orpheus-FastAPI-LMStudio\tts_engine\inference.py", line 316, in tokens_decoder
+    async for token_text in token_gen:
+  File "F:\Mark-XLVIII-main\Mark-XLVIII-main\tools\Orpheus-FastAPI-LMStudio\tts_engine\inference.py", line 369, in async_token_gen
+    for token in syn_token_gen:
+  File "F:\Mark-XLVIII-main\Mark-XLVIII-main\tools\Orpheus-FastAPI-LMStudio\tts_engine\inference.py", line 140, in generate_tokens_from_api
+    print(f"Generating speech for: {formatted_prompt}")
+  File "C:\Users\jakem\AppData\Local\Programs\Python\Python311\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f60a' in position 139: character maps to <undefined>

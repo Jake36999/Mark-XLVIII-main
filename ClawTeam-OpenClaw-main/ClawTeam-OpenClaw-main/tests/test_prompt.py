@@ -105,6 +105,18 @@ class TestBuildAgentPrompt:
         assert "clawteam inbox receive my-team --agent dev" in prompt
         assert "clawteam lifecycle idle my-team" in prompt
 
+    def test_one_shot_prompt_omits_coordination_loop(self):
+        prompt = build_agent_prompt(
+            agent_name="dev", agent_id="id", agent_type="continuity",
+            team_name="my-team", leader_name="boss", task="inspect the empty folder",
+            one_shot=True,
+        )
+        assert "One-Shot Completion Contract" in prompt
+        assert "inspect the empty folder" in prompt
+        assert "clawteam task list" not in prompt
+        assert "Worker Loop Protocol" not in prompt
+        assert "Do not commit or modify files" in prompt
+
     # --- Intent-based prompt (Auftragstaktik) ---
 
     def test_mission_section_with_intent(self):

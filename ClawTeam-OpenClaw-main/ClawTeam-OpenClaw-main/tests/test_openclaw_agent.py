@@ -302,9 +302,9 @@ def test_tmux_backend_sets_openclaw_workspace_env(monkeypatch):
     # ~16k tmux command-length limit), so we extract that path and check the
     # file contents instead of the inline shell string.
     import re
-    m = re.search(r"\. (/[^\s;]+\.env\.sh)", full_shell_cmd)
+    m = re.search(r"\.\s+(?:'([^']+\.env\.sh)'|(/[^\s;]+\.env\.sh))", full_shell_cmd)
     assert m, f"No env file source in {full_shell_cmd!r}"
-    env_file_path = m.group(1)
+    env_file_path = m.group(1) or m.group(2)
     env_content = open(env_file_path).read()
     assert "OPENCLAW_WORKSPACE=" in env_content, (
         f"Expected OPENCLAW_WORKSPACE in env file, got: {env_content!r}"
@@ -315,19 +315,41 @@ def test_tmux_backend_sets_openclaw_workspace_env(monkeypatch):
 # SubprocessBackend tests
 # ---------------------------------------------------------------------------
 
-def test_subprocess_backend_raises_with_openclaw_agent(monkeypatch):
-    """subprocess_backend.spawn() with openclaw_agent should raise NotImplementedError."""
-    import pytest
-
+def test_subprocess_backend_targets_named_openclaw_agent(monkeypatch, tmp_path):
+    """The Windows-friendly subprocess backend may select an isolated OpenClaw agent."""
     from clawteam.spawn.subprocess_backend import SubprocessBackend
 
+    captured = {}
+
+    def fake_popen(command, **kwargs):
+        captured["command"] = command
+        process = MagicMock()
+        process.pid = 4321
+        return process
+
+    monkeypatch.setattr(
+        "clawteam.spawn.command_validation.shutil.which",
+        lambda name, path=None: str(tmp_path / f"{name}.cmd"),
+    )
+    monkeypatch.setattr("clawteam.spawn.subprocess_backend.subprocess.Popen", fake_popen)
+    monkeypatch.setattr("clawteam.spawn.registry.register_agent", lambda **_: None)
+
     backend = SubprocessBackend()
-    with pytest.raises(NotImplementedError, match="subprocess backend"):
-        backend.spawn(
-            command=["codex"],
-            agent_name="worker",
-            agent_id="agent-3",
-            agent_type="general-purpose",
-            team_name="test-team",
-            openclaw_agent="researcher",
-        )
+    result = backend.spawn(
+        command=["openclaw", "agent"],
+        agent_name="worker",
+        agent_id="agent-3",
+        agent_type="general-purpose",
+        team_name="test-team",
+        prompt="inspect the project",
+        openclaw_agent="jarvis-worker",
+    )
+
+    command = captured["command"]
+    assert result == "Agent 'worker' spawned as subprocess (pid=4321)"
+    assert command.count("--agent") == 2  # wrapper identity plus OpenClaw target
+    assert any(
+        command[index:index + 2] == ["--agent", "jarvis-worker"]
+        for index in range(len(command) - 1)
+    )
+    assert "--local" in command

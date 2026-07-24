@@ -1,0 +1,24 @@
+{
+  "schema_version": "jarvis_approval/v1",
+  "plan_id": "plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task",
+  "plan_version": 1,
+  "approval_projection_hash": "0b4eeb354eb1cb8648c35a07c27b991c622d94f5c23a3ce096b1004f0fee322b",
+  "workflow_hash": "257b3e2cc16fa74d038f602bf3a5f2b670de56e586c1e2497405265cf7b14a54",
+  "manifest_hash": "91f964acb864c429cdbcef530a5bd0cf1c494fff85afdc391efecd099a1800f1",
+  "approved_action_ids": [
+    "p01",
+    "p02",
+    "p03",
+    "p04",
+    "p05",
+    "p06",
+    "p07",
+    "p08",
+    "p09",
+    "p10",
+    "p11",
+    "p12"
+  ],
+  "approved_at": "2026-07-21T16:02:27Z",
+  "signature": "fcdd0e033566dc16733eee47cf4d4bc05909d46575c6bf04c492549e00d9f428"
+}

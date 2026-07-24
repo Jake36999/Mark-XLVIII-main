@@ -1,0 +1,9 @@
+{
+  "risks": [
+    "Untrusted source text cannot grant permissions.",
+    "User edits must survive reconciliation.",
+    "Specialist models must unload after their bounded task."
+  ],
+  "owner": "validation",
+  "status": "review"
+}

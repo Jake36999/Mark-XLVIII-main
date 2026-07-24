@@ -1,0 +1,17 @@
+{
+  "schema_version": "jarvis_approval/v1",
+  "plan_id": "plan-plan-build-a-planning-workflow",
+  "plan_version": 2,
+  "approval_projection_hash": "238b64251193dd8255194be85d6dbf8ec64fee19260099c629598c1ce6214d1d",
+  "workflow_hash": "7a4734f4bbdab9a1c3609b9534b202afc25c40234ac75b95d8fd705e272f2bb7",
+  "manifest_hash": "e110e849953156b8b42e7d1a67ef160ac549807c6d00b8306c80bda42eb63771",
+  "approved_action_ids": [
+    "p01",
+    "p02",
+    "p03",
+    "p04",
+    "p05"
+  ],
+  "approved_at": "2026-07-23T09:59:36Z",
+  "signature": "d4b068a9c6e330ec6418813791b9072f241d8386e7c4b76fb126c60d5ca535d4"
+}

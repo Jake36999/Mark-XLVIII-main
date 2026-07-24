@@ -1,0 +1,11 @@
+{
+  "schema_version": "jarvis_run_bundle/v1",
+  "run_id": "plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-v1",
+  "plan_id": "plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task",
+  "plan_version": 1,
+  "plan_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\baseline\\vault\\Plans\\2026-07-21-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-ownersh.md",
+  "approval_projection_hash": "0b4eeb354eb1cb8648c35a07c27b991c622d94f5c23a3ce096b1004f0fee322b",
+  "workflow_hash": "257b3e2cc16fa74d038f602bf3a5f2b670de56e586c1e2497405265cf7b14a54",
+  "manifest_hash": "91f964acb864c429cdbcef530a5bd0cf1c494fff85afdc391efecd099a1800f1",
+  "created_at": "2026-07-21T16:02:24Z"
+}

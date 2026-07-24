@@ -1,0 +1,285 @@
+{
+  "nodes": [
+    {
+      "id": "jarvis-11ce6931ea16bab5",
+      "type": "file",
+      "file": "Plans/2026-07-21-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-under-f-mark-xlvi.md",
+      "x": 0,
+      "y": 0,
+      "width": 460,
+      "height": 280
+    },
+    {
+      "id": "jarvis-f9a0efe6f8460bca",
+      "type": "text",
+      "text": "# Plan - Plan and build an isolated modular Python job-runner demo under F:\\Mark-XLVIII-main\\Jarvis\n**Status:** queued\n**Approval:** approved\n**Execution:** queued\n**Visible tasks:** 14 of 14\n\n> This Canvas is a rolling view. The linked Markdown plan is authoritative.",
+      "x": 560,
+      "y": 0,
+      "width": 420,
+      "height": 230,
+      "color": "4"
+    },
+    {
+      "id": "jarvis-825b1c87378879e4",
+      "type": "text",
+      "text": "## [ ] Approval gates are visible.\n\n`plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-under-f-m-34`\n\nSource line 34",
+      "x": 1080,
+      "y": 0,
+      "width": 350,
+      "height": 170,
+      "color": "3"
+    },
+    {
+      "id": "jarvis-a489d9e16cd9237c",
+      "type": "text",
+      "text": "## [ ] Blockers and design decision points are explicit.\n\n`plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-under-f-m-33`\n\nSource line 33",
+      "x": 1470,
+      "y": 0,
+      "width": 350,
+      "height": 170,
+      "color": "3"
+    },
+    {
+      "id": "jarvis-2affe475669cab3a",
+      "type": "text",
+      "text": "## [ ] Completion summary requirements are defined.\n\n`plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-under-f-m-35`\n\nSource line 35",
+      "x": 1860,
+      "y": 0,
+      "width": 350,
+      "height": 170,
+      "color": "3"
+    },
+    {
+      "id": "jarvis-f0f3c09545975ea3",
+      "type": "text",
+      "text": "## [ ] Destructive actions explicitly confirmed.\n\n`plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-under-f-m-105`\n\nSource line 105",
+      "x": 1080,
+      "y": 210,
+      "width": 350,
+      "height": 170,
+      "color": "3"
+    },
+    {
+      "id": "jarvis-6ff3c3824628d0ce",
+      "type": "text",
+      "text": "## [ ] Execution milestones are ordered.\n\n`plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-under-f-m-32`\n\nSource line 32",
+      "x": 1470,
+      "y": 210,
+      "width": 350,
+      "height": 170,
+      "color": "3"
+    },
+    {
+      "id": "jarvis-921c4a96e4b4d6db",
+      "type": "text",
+      "text": "## [ ] High-cost model use approved when needed.\n\n`plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-under-f-m-106`\n\nSource line 106",
+      "x": 1860,
+      "y": 210,
+      "width": 350,
+      "height": 170,
+      "color": "3"
+    },
+    {
+      "id": "jarvis-4af33179bc29981e",
+      "type": "text",
+      "text": "## [ ] JARVIS creates a summary or blocker note after execution starts.\n\n`plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-under-f-m-114`\n\nSource line 114",
+      "x": 1080,
+      "y": 420,
+      "width": 350,
+      "height": 170,
+      "color": "3"
+    },
+    {
+      "id": "jarvis-db7bf8f7cb91dd93",
+      "type": "text",
+      "text": "## [ ] JARVIS updates the plan if the goal changes.\n\n`plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-under-f-m-113`\n\nSource line 113",
+      "x": 1470,
+      "y": 420,
+      "width": 350,
+      "height": 170,
+      "color": "3"
+    },
+    {
+      "id": "jarvis-083e305589a859ce",
+      "type": "text",
+      "text": "## [ ] Plan approved by user.\n\n`plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-under-f-m-104`\n\nSource line 104",
+      "x": 1860,
+      "y": 420,
+      "width": 350,
+      "height": 170,
+      "color": "3"
+    },
+    {
+      "id": "jarvis-62c81bc18c0147a7",
+      "type": "text",
+      "text": "## [ ] Plan reviewed in Obsidian.\n\n`plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-under-f-m-30`\n\nSource line 30",
+      "x": 1080,
+      "y": 630,
+      "width": 350,
+      "height": 170,
+      "color": "3"
+    },
+    {
+      "id": "jarvis-d87e6a53b2045a46",
+      "type": "text",
+      "text": "## [ ] Scope and out-of-scope items are clear.\n\n`plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-under-f-m-31`\n\nSource line 31",
+      "x": 1470,
+      "y": 630,
+      "width": 350,
+      "height": 170,
+      "color": "3"
+    },
+    {
+      "id": "jarvis-675e048956c4e81d",
+      "type": "text",
+      "text": "## [ ] Subagent delegation approved when needed.\n\n`plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-under-f-m-107`\n\nSource line 107",
+      "x": 1860,
+      "y": 630,
+      "width": 350,
+      "height": 170,
+      "color": "3"
+    },
+    {
+      "id": "jarvis-b2e20251148bee4b",
+      "type": "text",
+      "text": "## [ ] User requests edits or approves execution.\n\n`plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-under-f-m-112`\n\nSource line 112",
+      "x": 1080,
+      "y": 840,
+      "width": 350,
+      "height": 170,
+      "color": "3"
+    },
+    {
+      "id": "jarvis-5119adb165052027",
+      "type": "text",
+      "text": "## [ ] User reviews this plan in Obsidian.\n\n`plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-under-f-m-111`\n\nSource line 111",
+      "x": 1470,
+      "y": 840,
+      "width": 350,
+      "height": 170,
+      "color": "3"
+    }
+  ],
+  "edges": [
+    {
+      "id": "jarvis-d1a2845879edc481",
+      "fromNode": "jarvis-11ce6931ea16bab5",
+      "fromSide": "right",
+      "toNode": "jarvis-f9a0efe6f8460bca",
+      "toSide": "left",
+      "label": "current state"
+    },
+    {
+      "id": "jarvis-502b9c2e1e25cc77",
+      "fromNode": "jarvis-f9a0efe6f8460bca",
+      "fromSide": "right",
+      "toNode": "jarvis-825b1c87378879e4",
+      "toSide": "left",
+      "label": "next"
+    },
+    {
+      "id": "jarvis-59d35e538f714e9c",
+      "fromNode": "jarvis-f9a0efe6f8460bca",
+      "fromSide": "right",
+      "toNode": "jarvis-a489d9e16cd9237c",
+      "toSide": "left",
+      "label": "next"
+    },
+    {
+      "id": "jarvis-7cf1491ac5557372",
+      "fromNode": "jarvis-f9a0efe6f8460bca",
+      "fromSide": "right",
+      "toNode": "jarvis-2affe475669cab3a",
+      "toSide": "left",
+      "label": "next"
+    },
+    {
+      "id": "jarvis-47814d415f4190d0",
+      "fromNode": "jarvis-f9a0efe6f8460bca",
+      "fromSide": "right",
+      "toNode": "jarvis-f0f3c09545975ea3",
+      "toSide": "left",
+      "label": "next"
+    },
+    {
+      "id": "jarvis-224862ff272b7bc8",
+      "fromNode": "jarvis-f9a0efe6f8460bca",
+      "fromSide": "right",
+      "toNode": "jarvis-6ff3c3824628d0ce",
+      "toSide": "left",
+      "label": "next"
+    },
+    {
+      "id": "jarvis-a40eab0fd6042eb6",
+      "fromNode": "jarvis-f9a0efe6f8460bca",
+      "fromSide": "right",
+      "toNode": "jarvis-921c4a96e4b4d6db",
+      "toSide": "left",
+      "label": "next"
+    },
+    {
+      "id": "jarvis-c918d182d838fb96",
+      "fromNode": "jarvis-f9a0efe6f8460bca",
+      "fromSide": "right",
+      "toNode": "jarvis-4af33179bc29981e",
+      "toSide": "left",
+      "label": "next"
+    },
+    {
+      "id": "jarvis-6d81d60ca26c21f4",
+      "fromNode": "jarvis-f9a0efe6f8460bca",
+      "fromSide": "right",
+      "toNode": "jarvis-db7bf8f7cb91dd93",
+      "toSide": "left",
+      "label": "next"
+    },
+    {
+      "id": "jarvis-96f5cbdd3ea3ec35",
+      "fromNode": "jarvis-f9a0efe6f8460bca",
+      "fromSide": "right",
+      "toNode": "jarvis-083e305589a859ce",
+      "toSide": "left",
+      "label": "next"
+    },
+    {
+      "id": "jarvis-45cccede63984313",
+      "fromNode": "jarvis-f9a0efe6f8460bca",
+      "fromSide": "right",
+      "toNode": "jarvis-62c81bc18c0147a7",
+      "toSide": "left",
+      "label": "next"
+    },
+    {
+      "id": "jarvis-8acd01acf958a071",
+      "fromNode": "jarvis-f9a0efe6f8460bca",
+      "fromSide": "right",
+      "toNode": "jarvis-d87e6a53b2045a46",
+      "toSide": "left",
+      "label": "next"
+    },
+    {
+      "id": "jarvis-f4aada121cdf5488",
+      "fromNode": "jarvis-f9a0efe6f8460bca",
+      "fromSide": "right",
+      "toNode": "jarvis-675e048956c4e81d",
+      "toSide": "left",
+      "label": "next"
+    },
+    {
+      "id": "jarvis-416721f0b1c55089",
+      "fromNode": "jarvis-f9a0efe6f8460bca",
+      "fromSide": "right",
+      "toNode": "jarvis-b2e20251148bee4b",
+      "toSide": "left",
+      "label": "next"
+    },
+    {
+      "id": "jarvis-95bf103ab141018f",
+      "fromNode": "jarvis-f9a0efe6f8460bca",
+      "fromSide": "right",
+      "toNode": "jarvis-5119adb165052027",
+      "toSide": "left",
+      "label": "next"
+    }
+  ]
+}

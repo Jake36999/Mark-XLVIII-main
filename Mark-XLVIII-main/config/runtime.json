@@ -1,0 +1,225 @@
+{
+  "os_system": "Windows",
+  "assistant_mode": "router",
+  "voice_provider": "disabled",
+  "voice_enabled": true,
+  "tts_engine": "orpheus",
+  "tts_url": "http://127.0.0.1:5006/v1",
+  "tts_model": "orpheus",
+  "tts_voice": "tara",
+  "tts_response_format": "wav",
+  "tts_rate": 0,
+  "tts_volume": 100,
+  "tts_chunking_enabled": true,
+  "tts_chunk_chars": 120,
+  "tts_chunk_workers": 1,
+  "tts_max_pending_utterances": 1,
+  "tts_request_timeout_seconds": 240,
+  "tts_auto_start_bridge": true,
+  "tts_lmstudio_model": "orpeus_text_to_speech",
+  "tts_model_load_timeout_seconds": 180,
+  "tts_bridge_startup_seconds": 30,
+  "tts_orpheus_first_turn_wait_seconds": 12,
+  "tts_warm_retry_seconds": 60,
+  "tts_primary_failure_backoff_seconds": 60,
+  "tts_release_idle_task_models": true,
+  "tts_fallback_voice": "",
+  "tts_fallback_rate": 0,
+  "stt_engine": "vosk",
+  "stt_language": "en-us",
+  "stt_device_name": "Microphone (Jabra Evolve2 40)",
+  "stt_quiet_rms_threshold": 300,
+  "stt_speech_rms_threshold": 300,
+  "stt_turn_silence_seconds": 2.5,
+  "stt_idle_restart_seconds": 18,
+  "stt_after_tts_cooldown_seconds": 3,
+  "stt_filler_cooldown_seconds": 900,
+  "stt_filler_user_idle_seconds": 900,
+  "planner_provider": "openai",
+  "planner_model": "gpt-5.4",
+  "model_routes": {
+    "quick": [
+      "qwen/qwen3-4b-2507",
+      "mistralai/mistral-7b-instruct-v0.3",
+      "google/gemma-4-e4b",
+      "qwen/qwen3-vl-4b"
+    ],
+    "main": [
+      "qwen/qwen3.5-9b",
+      "mistralai/mistral-7b-instruct-v0.3",
+      "deepseek-r1-0528-qwen3-8b",
+      "google/gemma-4-e4b"
+    ],
+    "reasoning": [
+      "deepseek-r1-0528-qwen3-8b",
+      "qwen/qwen3.5-9b",
+      "mistralai/mistral-7b-instruct-v0.3"
+    ],
+    "code": [
+      "deepseek-r1-0528-qwen3-8b",
+      "qwen/qwen3.5-9b",
+      "mistralai/mistral-7b-instruct-v0.3"
+    ],
+    "vision": [
+      "qwen/qwen3-vl-4b"
+    ],
+    "research": [
+      "qwen2.5-14b-deepresearch-i1",
+      "marco-deepresearch-8b",
+      "deepseek-r1-0528-qwen3-8b"
+    ],
+    "worker": [
+      "qwen/qwen3-4b-2507",
+      "google/gemma-4-e4b",
+      "mistralai/mistral-7b-instruct-v0.3",
+      "qwen/qwen3-vl-4b"
+    ]
+  },
+  "openai_url": "https://api.openai.com/v1",
+  "worker_provider": "lmstudio",
+  "worker_model": "qwen/qwen3-4b-2507",
+  "research_provider": "lmstudio",
+  "research_model": "qwen2.5-14b-deepresearch-i1",
+  "repository_synthesis_model": "qwen/qwen3-4b-2507",
+  "repository_synthesis_timeout_seconds": 300,
+  "repository_synthesis_max_tokens": 700,
+  "lmstudio_url": "http://localhost:1234/v1",
+  "lmstudio_native_url": "http://localhost:1234/api/v1",
+  "baseline_models": [
+    "qwen/qwen3-4b-2507",
+    "orpeus_text_to_speech"
+  ],
+  "task_model_ttl_seconds": 300,
+  "idle_cleanup_seconds": 300,
+  "max_task_models_loaded": 1,
+  "model_generation_wait_seconds": 900,
+  "model_generation_lease_seconds": 2400,
+  "model_first_token_timeout_seconds": 180,
+  "model_inter_token_timeout_seconds": 180,
+  "research_generation_max_seconds": 1800,
+  "model_health_enabled": true,
+  "model_health_probe_enabled": true,
+  "model_health_probe_timeout_seconds": 45,
+  "model_health_probe_max_tokens": 64,
+  "model_health_probe_reasoning_max_tokens": 512,
+  "model_health_probe_wait_seconds": 5,
+  "model_health_sample_ttl_seconds": 3600,
+  "model_health_failure_threshold": 2,
+  "model_health_cooldown_seconds": [
+    300,
+    900,
+    3600
+  ],
+  "model_health_slow_first_token_seconds": 90,
+  "research_worker_batch_size": 4,
+  "research_worker_max_batches": 3,
+  "openclaw_worker_agent": "jarvis-worker",
+  "lmstudio_use_system_role": true,
+  "lmstudio_explicit_load_enabled": true,
+  "lmstudio_load_timeout_seconds": 180,
+  "lmstudio_runtime_strategy": "mixed_vendor_vulkan",
+  "lmstudio_host_profile": {
+    "runtime": "llama.cpp Vulkan via LM Studio",
+    "system_ram_gb": 31.93,
+    "gpus": [
+      {
+        "name": "NVIDIA GeForce GTX 1080",
+        "vram_gb": 8.08,
+        "preferred_role": "primary"
+      },
+      {
+        "name": "AMD Radeon RX 5500 XT",
+        "vram_gb": 7.98,
+        "preferred_role": "secondary"
+      }
+    ],
+    "mixed_vendor": true
+  },
+  "lmstudio_model_load_profiles": {
+    "default": {
+      "context_length": 8192,
+      "eval_batch_size": 256,
+      "flash_attention": true,
+      "offload_kv_cache_to_gpu": true
+    },
+    "qwen/qwen3-4b-2507": {
+      "context_length": 4096,
+      "eval_batch_size": 256,
+      "flash_attention": true,
+      "offload_kv_cache_to_gpu": true
+    },
+    "orpeus_text_to_speech": {
+      "context_length": 4096,
+      "eval_batch_size": 256,
+      "flash_attention": true,
+      "offload_kv_cache_to_gpu": true
+    },
+    "qwen/qwen3.5-9b": {
+      "context_length": 24576,
+      "eval_batch_size": 256,
+      "flash_attention": true,
+      "offload_kv_cache_to_gpu": true
+    },
+    "qwen2.5-14b-deepresearch-i1": {
+      "context_length": 8192,
+      "eval_batch_size": 256,
+      "flash_attention": true,
+      "offload_kv_cache_to_gpu": false
+    },
+    "marco-deepresearch-8b": {
+      "context_length": 8192,
+      "eval_batch_size": 256,
+      "flash_attention": true,
+      "offload_kv_cache_to_gpu": true
+    },
+    "text-embedding-nomic-embed-text-v1.5@q4_k_m": {
+      "context_length": 2048
+    },
+    "deepseek-r1-0528-qwen3-8b": {
+      "context_length": 8192,
+      "eval_batch_size": 256,
+      "flash_attention": true,
+      "offload_kv_cache_to_gpu": true
+    }
+  },
+  "jarvis_notes_root": "F:\\Mark-XLVIII-main\\Jarvis_notes",
+  "jarvis_canvas_folder": "Canvases/JARVIS",
+  "jarvis_canvas_max_plan_nodes": 24,
+  "jarvis_canvas_max_task_nodes": 36,
+  "jarvis_canvas_history_limit": 5,
+  "rag_embedding_provider": "lmstudio",
+  "rag_embedding_url": "http://localhost:1234/v1",
+  "rag_embedding_model": "text-embedding-nomic-embed-text-v1.5@q4_k_m",
+  "rag_embedding_timeout_seconds": 45,
+  "rag_embedding_auto_load": true,
+  "rag_embedding_batch_size": 8,
+  "rag_semantic_weight": 0.45,
+  "memory_tiers_enabled": true,
+  "memory_short_term_age_days": 21,
+  "memory_review_default_days": 30,
+  "memory_long_term_root": "Long Term",
+  "memory_archive_root": "Archive",
+  "memory_archive_weight": 0.25,
+  "memory_consolidation_enabled": true,
+  "memory_consolidation_max_candidates": 40,
+  "memory_consolidation_similarity_threshold": 0.82,
+  "rag_watch_enabled": true,
+  "rag_watch_debounce_seconds": 2.0,
+  "vault_turn_awareness_enabled": true,
+  "vault_turn_change_limit": 8,
+  "vault_turn_change_max_chars": 1800,
+  "safe_canvas_commits_enabled": true,
+  "process_trace_enabled": true,
+  "operations_ui_enabled": true,
+  "mcp_transport": "stdio",
+  "mcp_http_host": "127.0.0.1",
+  "mcp_http_port": 8766,
+  "aletheia_bridge_host": "127.0.0.1",
+  "aletheia_bridge_port": 8765,
+  "aletheia_autostart": false,
+  "aletheia_startup_timeout_seconds": 30,
+  "remember_enabled": false,
+  "remember_api_url": "http://127.0.0.1:8010",
+  "remember_project_id": "jarvis_notes",
+  "remember_project_name": "Jarvis Notes"
+}

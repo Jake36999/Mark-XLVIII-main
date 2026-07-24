@@ -1,0 +1,796 @@
+{
+  "schema_version": "jarvis_functional_eval_run/v1",
+  "run_id": "functional-coding-rerun-20260721-173159",
+  "scenario": "coding",
+  "round": "rerun",
+  "started_at": "2026-07-21T16:31:59Z",
+  "completed_at": "2026-07-21T16:32:05Z",
+  "provider": [
+    "deterministic"
+  ],
+  "model": [],
+  "route": [
+    "plan_workflow/create_plan",
+    "plan_workflow/start_plan",
+    "plan_workflow/dispatch"
+  ],
+  "tools": [
+    "dual_orchestrator",
+    "jarvis_memory",
+    "plan_workflow"
+  ],
+  "duration_seconds": 4.697,
+  "artifacts": [
+    "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\.jarvis\\runs\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde\\v1",
+    "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\.jarvis\\runs\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde\\v1\\work-items.json",
+    "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\.jarvis\\runs\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde\\v1\\workflow.yaml",
+    "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\Blockers\\2026-07-21-blocked-plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde.md",
+    "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\Plans\\2026-07-21-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-under-f-mark-xlvi.md",
+    "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\Summaries\\2026-07-21-execution-run-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-und.md"
+  ],
+  "fallback_reason": [],
+  "steps": [
+    {
+      "step_id": "create-plan",
+      "route": "plan_workflow/create_plan",
+      "tools": [
+        "plan_workflow",
+        "jarvis_memory"
+      ],
+      "started_at": "2026-07-21T16:31:59Z",
+      "completed_at": "2026-07-21T16:31:59Z",
+      "duration_seconds": 0.108,
+      "ok": true,
+      "provider": "deterministic",
+      "model": "",
+      "role": "",
+      "fallback_reason": "",
+      "artifacts": [
+        "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\.jarvis\\runs\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde\\v1\\work-items.json",
+        "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\.jarvis\\runs\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde\\v1\\workflow.yaml",
+        "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\Plans\\2026-07-21-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-under-f-mark-xlvi.md"
+      ],
+      "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\evidence\\01-create-plan.json",
+      "error": ""
+    },
+    {
+      "step_id": "approve-and-queue",
+      "route": "plan_workflow/start_plan",
+      "tools": [
+        "plan_workflow",
+        "dual_orchestrator"
+      ],
+      "started_at": "2026-07-21T16:31:59Z",
+      "completed_at": "2026-07-21T16:32:02Z",
+      "duration_seconds": 2.621,
+      "ok": true,
+      "provider": "deterministic",
+      "model": "",
+      "role": "",
+      "fallback_reason": "",
+      "artifacts": [
+        "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\.jarvis\\runs\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde\\v1",
+        "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\Plans\\2026-07-21-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-under-f-mark-xlvi.md",
+        "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\Summaries\\2026-07-21-execution-run-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-und.md"
+      ],
+      "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\evidence\\02-approve-and-queue.json",
+      "error": ""
+    },
+    {
+      "step_id": "execute-run",
+      "route": "plan_workflow/dispatch",
+      "tools": [
+        "plan_workflow",
+        "dual_orchestrator"
+      ],
+      "started_at": "2026-07-21T16:32:02Z",
+      "completed_at": "2026-07-21T16:32:04Z",
+      "duration_seconds": 1.968,
+      "ok": true,
+      "provider": "deterministic",
+      "model": "",
+      "role": "",
+      "fallback_reason": "",
+      "artifacts": [
+        "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\Blockers\\2026-07-21-blocked-plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde.md"
+      ],
+      "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\evidence\\03-execute-run.json",
+      "error": ""
+    }
+  ],
+  "validators": [
+    {
+      "id": "approved-run-executed",
+      "passed": false,
+      "critical": true,
+      "score": 1.0,
+      "evidence": {
+        "run_id": "plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde-v1",
+        "status": "BLOCKED"
+      }
+    },
+    {
+      "id": "project-created",
+      "passed": true,
+      "critical": true,
+      "score": 4.0,
+      "evidence": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\artifacts\\job_runner_demo"
+    },
+    {
+      "id": "modular-files",
+      "passed": true,
+      "critical": true,
+      "score": 4.0,
+      "evidence": [
+        "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\artifacts\\job_runner_demo\\README.md",
+        "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\artifacts\\job_runner_demo\\job_runner.py",
+        "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\artifacts\\job_runner_demo\\tasks.py",
+        "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\artifacts\\job_runner_demo\\telemetry.py"
+      ]
+    },
+    {
+      "id": "tests-created",
+      "passed": true,
+      "critical": false,
+      "score": 4.0,
+      "evidence": [
+        "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\artifacts\\job_runner_demo\\tests\\test_job_runner.py"
+      ]
+    },
+    {
+      "id": "telemetry-contract",
+      "passed": true,
+      "critical": false,
+      "score": 4.0,
+      "evidence": "required telemetry fields"
+    },
+    {
+      "id": "fresh-process",
+      "passed": true,
+      "critical": true,
+      "score": 4.0,
+      "evidence": {
+        "attempted": true,
+        "returncode": 0,
+        "stdout": "..                                                                       [100%]\n2 passed in 0.05s\n",
+        "stderr": ""
+      }
+    }
+  ],
+  "average_score": 3.5,
+  "critical_failures": [
+    "approved-run-executed"
+  ],
+  "passed": false,
+  "outputs": {
+    "plan": {
+      "ok": true,
+      "local_written": true,
+      "path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\Plans\\2026-07-21-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-under-f-mark-xlvi.md",
+      "metadata": {
+        "id": "plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-under-f-m",
+        "title": "Plan - Plan and build an isolated modular Python job-runner demo under F:\\Mark-XLVIII-main\\Jarvis",
+        "type": "plan",
+        "status": "pending_review",
+        "created": "2026-07-21T16:31:59Z",
+        "updated": "2026-07-21T16:31:59Z",
+        "project_id": "functional_eval_coding",
+        "source": "jarvis",
+        "tags": [
+          "plan",
+          "workflow",
+          "pending-approval"
+        ],
+        "sync_state": "local_only",
+        "index_state": "indexed_local",
+        "remember_note_id": "",
+        "rag_index": true,
+        "sensitivity": "internal",
+        "confidence": 0.5,
+        "valid_from": "2026-07-21T16:31:59Z",
+        "review_after": "",
+        "source_version": 1,
+        "content_hash": "fd47da0af814ca00877d05a69728b2dd7ba37aadf6e674691bf4cfbc918a21f8",
+        "supersedes": [],
+        "contradicts": [],
+        "depends_on": [],
+        "depended_on_by": [],
+        "extends": [],
+        "extended_by": [],
+        "implements": [],
+        "implemented_by": [],
+        "consumes": [],
+        "consumed_by": [],
+        "related": [],
+        "deleted": false,
+        "deleted_at": "",
+        "agent_permission": "propose",
+        "approval_state": "pending_review",
+        "decision_gates": [],
+        "execution_state": "not_started",
+        "local_context_count": 0,
+        "original_prompt": "Plan and build an isolated modular Python job-runner demo under F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\artifacts\\job_runner_demo. Use a replaceable task module and replaceable telemetry adapter. Emit structured events with run ID, task ID, timestamps, status, duration, errors, retries, and health. Include setup instructions, tests, intentional failure telemetry, documentation, and prove a fresh process can reproduce the result.",
+        "plan_version": 1,
+        "research_state": "complete",
+        "schema_version": "jarvis_plan/v1",
+        "web_source_count": 0,
+        "workflow_id": "long_form_plan_execution"
+      },
+      "sync": null,
+      "reindex": {
+        "ok": true,
+        "backend": "local_sqlite",
+        "index_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\.jarvis\\memory.sqlite",
+        "indexed_notes": 1,
+        "excluded_notes": 0,
+        "superseded_notes": 0,
+        "deduplicated_notes": 0
+      },
+      "run_id": "plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde-v1",
+      "run_bundle": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\.jarvis\\runs\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde\\v1",
+      "workflow_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\.jarvis\\runs\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde\\v1\\workflow.yaml",
+      "manifest_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\.jarvis\\runs\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde\\v1\\work-items.json",
+      "work_item_count": 12,
+      "plan_status": "pending_review",
+      "local_context_count": 0,
+      "web_source_count": 0,
+      "canvas": {
+        "ok": true,
+        "operation": "sync_plan",
+        "path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\Canvases\\JARVIS\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-under-f-m.canvas",
+        "plan_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\Plans\\2026-07-21-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-under-f-mark-xlvi.md",
+        "node_count": 16,
+        "edge_count": 15,
+        "active_task_count": 14,
+        "completed_task_count": 0,
+        "rolling_limit": 24,
+        "canonical_source": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\Plans\\2026-07-21-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-under-f-mark-xlvi.md"
+      },
+      "message": "Plan, workflow YAML, and immutable work manifest created. Awaiting user review or approval."
+    },
+    "start": {
+      "ok": true,
+      "path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\Plans\\2026-07-21-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-under-f-mark-xlvi.md",
+      "title": "Plan - Plan and build an isolated modular Python job-runner demo under F:\\Mark-XLVIII-main\\Jarvis",
+      "status": "queued",
+      "approval_state": "approved",
+      "execution_state": "queued",
+      "run_id": "plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde-v1",
+      "bundle_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\.jarvis\\runs\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde\\v1",
+      "execution_summary_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\Summaries\\2026-07-21-execution-run-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-und.md",
+      "packets": [
+        {
+          "id": "p01",
+          "task": "Validate the approved output root and job-runner acceptance criteria",
+          "worker": "approval_gate",
+          "step_type": "gate",
+          "depends_on": []
+        },
+        {
+          "id": "p02",
+          "task": "Build the modular Python job runner through the registered project scaffold hook",
+          "worker": "build_python_job_runner",
+          "step_type": "python_hook",
+          "depends_on": [
+            "p01"
+          ]
+        },
+        {
+          "id": "p03",
+          "task": "Run fresh-process success, retry, terminal-failure, and telemetry validation",
+          "worker": "validate_python_project",
+          "step_type": "python_hook",
+          "depends_on": [
+            "p02"
+          ]
+        },
+        {
+          "id": "p04",
+          "task": "Record project artifacts, test evidence, and reproduction instructions in the vault",
+          "worker": "vault_create_note",
+          "step_type": "artifact",
+          "depends_on": [
+            "p03"
+          ]
+        },
+        {
+          "id": "p05",
+          "task": "Research and context",
+          "worker": "local_worker",
+          "step_type": "model_reasoning",
+          "depends_on": [
+            "p04"
+          ]
+        },
+        {
+          "id": "p06",
+          "task": "Plan review",
+          "worker": "local_worker",
+          "step_type": "model_reasoning",
+          "depends_on": [
+            "p05"
+          ]
+        },
+        {
+          "id": "p07",
+          "task": "Approved execution",
+          "worker": "local_worker",
+          "step_type": "model_reasoning",
+          "depends_on": [
+            "p06"
+          ]
+        },
+        {
+          "id": "p08",
+          "task": "Validation",
+          "worker": "local_worker",
+          "step_type": "model_reasoning",
+          "depends_on": [
+            "p07"
+          ]
+        }
+      ],
+      "agent_count": 1,
+      "reindex": {
+        "ok": true,
+        "backend": "local_sqlite",
+        "index_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\.jarvis\\memory.sqlite",
+        "indexed_notes": 2,
+        "excluded_notes": 0,
+        "superseded_notes": 0,
+        "deduplicated_notes": 0
+      },
+      "message": "Plan approved and queued. Execution starts after the current JARVIS speech turn completes.",
+      "canvas": {
+        "ok": true,
+        "operation": "sync_plan",
+        "path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\Canvases\\JARVIS\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-under-f-m.canvas",
+        "plan_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\Plans\\2026-07-21-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-under-f-mark-xlvi.md",
+        "node_count": 16,
+        "edge_count": 15,
+        "active_task_count": 14,
+        "completed_task_count": 0,
+        "rolling_limit": 24,
+        "canonical_source": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\Plans\\2026-07-21-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-under-f-mark-xlvi.md"
+      }
+    },
+    "execution": {
+      "ok": true,
+      "run": {
+        "run_id": "plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde-v1",
+        "plan_id": "plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-under-f-m",
+        "plan_version": 1,
+        "status": "BLOCKED",
+        "bundle_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\.jarvis\\runs\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde\\v1",
+        "manifest_hash": "3a6075029f7b25e87c549475686cb9851ad7381873fa07219b26b1c6a2066988",
+        "approval_projection_hash": "9dbc0039e0c7ef3c6ef8fc9c3566d331f835c1b4f5a4a1fd43d8dc059e4c1eae",
+        "workflow_hash": "1e01b40deb0b67a8faee7e63128b5d6383400c0377bb562573ed765bee61a740",
+        "cancel_requested": 0,
+        "created_at": "2026-07-21T16:31:59Z",
+        "updated_at": "2026-07-21T16:32:04Z"
+      },
+      "items": [
+        {
+          "item_id": "p01",
+          "state": "ACCEPTED",
+          "attempt": 1,
+          "repair_count": 0,
+          "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\.jarvis\\runs\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde\\v1\\results\\01-p01.json",
+          "error": null
+        },
+        {
+          "item_id": "p02",
+          "state": "ACCEPTED",
+          "attempt": 1,
+          "repair_count": 0,
+          "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\.jarvis\\runs\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde\\v1\\results\\02-p02.json",
+          "error": null
+        },
+        {
+          "item_id": "p03",
+          "state": "ACCEPTED",
+          "attempt": 1,
+          "repair_count": 0,
+          "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\.jarvis\\runs\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde\\v1\\results\\03-p03.json",
+          "error": null
+        },
+        {
+          "item_id": "p04",
+          "state": "REJECT_REPLAN",
+          "attempt": 3,
+          "repair_count": 3,
+          "result_path": null,
+          "error": "'remember_project_id'"
+        },
+        {
+          "item_id": "p05",
+          "state": "PENDING",
+          "attempt": 0,
+          "repair_count": 0,
+          "result_path": null,
+          "error": null
+        },
+        {
+          "item_id": "p06",
+          "state": "PENDING",
+          "attempt": 0,
+          "repair_count": 0,
+          "result_path": null,
+          "error": null
+        },
+        {
+          "item_id": "p07",
+          "state": "PENDING",
+          "attempt": 0,
+          "repair_count": 0,
+          "result_path": null,
+          "error": null
+        },
+        {
+          "item_id": "p08",
+          "state": "PENDING",
+          "attempt": 0,
+          "repair_count": 0,
+          "result_path": null,
+          "error": null
+        },
+        {
+          "item_id": "p09",
+          "state": "PENDING",
+          "attempt": 0,
+          "repair_count": 0,
+          "result_path": null,
+          "error": null
+        },
+        {
+          "item_id": "p10",
+          "state": "PENDING",
+          "attempt": 0,
+          "repair_count": 0,
+          "result_path": null,
+          "error": null
+        },
+        {
+          "item_id": "p11",
+          "state": "PENDING",
+          "attempt": 0,
+          "repair_count": 0,
+          "result_path": null,
+          "error": null
+        },
+        {
+          "item_id": "p12",
+          "state": "PENDING",
+          "attempt": 0,
+          "repair_count": 0,
+          "result_path": null,
+          "error": null
+        }
+      ],
+      "events": [
+        {
+          "item_id": null,
+          "event_type": "run_registered",
+          "details_json": "{\"item_count\": 12}",
+          "created_at": "2026-07-21T16:31:59Z",
+          "details": {
+            "item_count": 12
+          }
+        },
+        {
+          "item_id": null,
+          "event_type": "run_approved",
+          "details_json": "{}",
+          "created_at": "2026-07-21T16:32:02Z",
+          "details": {}
+        },
+        {
+          "item_id": "p01",
+          "event_type": "item_started",
+          "details_json": "{\"worker_id\": \"jarvis-local-worker\"}",
+          "created_at": "2026-07-21T16:32:02Z",
+          "details": {
+            "worker_id": "jarvis-local-worker"
+          }
+        },
+        {
+          "item_id": "p01",
+          "event_type": "item_reviewed",
+          "details_json": "{\"defects\": [], \"verdict\": \"ACCEPT\"}",
+          "created_at": "2026-07-21T16:32:02Z",
+          "details": {
+            "defects": [],
+            "verdict": "ACCEPT"
+          }
+        },
+        {
+          "item_id": "p02",
+          "event_type": "item_started",
+          "details_json": "{\"worker_id\": \"jarvis-local-worker\"}",
+          "created_at": "2026-07-21T16:32:02Z",
+          "details": {
+            "worker_id": "jarvis-local-worker"
+          }
+        },
+        {
+          "item_id": "p02",
+          "event_type": "item_reviewed",
+          "details_json": "{\"defects\": [], \"verdict\": \"ACCEPT\"}",
+          "created_at": "2026-07-21T16:32:03Z",
+          "details": {
+            "defects": [],
+            "verdict": "ACCEPT"
+          }
+        },
+        {
+          "item_id": "p03",
+          "event_type": "item_started",
+          "details_json": "{\"worker_id\": \"jarvis-local-worker\"}",
+          "created_at": "2026-07-21T16:32:03Z",
+          "details": {
+            "worker_id": "jarvis-local-worker"
+          }
+        },
+        {
+          "item_id": "p03",
+          "event_type": "item_reviewed",
+          "details_json": "{\"defects\": [], \"verdict\": \"ACCEPT\"}",
+          "created_at": "2026-07-21T16:32:04Z",
+          "details": {
+            "defects": [],
+            "verdict": "ACCEPT"
+          }
+        },
+        {
+          "item_id": "p04",
+          "event_type": "item_started",
+          "details_json": "{\"worker_id\": \"jarvis-local-worker\"}",
+          "created_at": "2026-07-21T16:32:04Z",
+          "details": {
+            "worker_id": "jarvis-local-worker"
+          }
+        },
+        {
+          "item_id": "p04",
+          "event_type": "item_failed",
+          "details_json": "{\"error\": \"'remember_project_id'\", \"state\": \"REPAIR\"}",
+          "created_at": "2026-07-21T16:32:04Z",
+          "details": {
+            "error": "'remember_project_id'",
+            "state": "REPAIR"
+          }
+        },
+        {
+          "item_id": null,
+          "event_type": "repair_retry",
+          "details_json": "{\"status\": \"REPAIRING\"}",
+          "created_at": "2026-07-21T16:32:04Z",
+          "details": {
+            "status": "REPAIRING"
+          }
+        },
+        {
+          "item_id": "p04",
+          "event_type": "item_started",
+          "details_json": "{\"worker_id\": \"jarvis-local-worker\"}",
+          "created_at": "2026-07-21T16:32:04Z",
+          "details": {
+            "worker_id": "jarvis-local-worker"
+          }
+        },
+        {
+          "item_id": "p04",
+          "event_type": "item_failed",
+          "details_json": "{\"error\": \"'remember_project_id'\", \"state\": \"REPAIR\"}",
+          "created_at": "2026-07-21T16:32:04Z",
+          "details": {
+            "error": "'remember_project_id'",
+            "state": "REPAIR"
+          }
+        },
+        {
+          "item_id": null,
+          "event_type": "repair_retry",
+          "details_json": "{\"status\": \"REPAIRING\"}",
+          "created_at": "2026-07-21T16:32:04Z",
+          "details": {
+            "status": "REPAIRING"
+          }
+        },
+        {
+          "item_id": "p04",
+          "event_type": "item_started",
+          "details_json": "{\"worker_id\": \"jarvis-local-worker\"}",
+          "created_at": "2026-07-21T16:32:04Z",
+          "details": {
+            "worker_id": "jarvis-local-worker"
+          }
+        },
+        {
+          "item_id": "p04",
+          "event_type": "item_failed",
+          "details_json": "{\"error\": \"'remember_project_id'\", \"state\": \"REJECT_REPLAN\"}",
+          "created_at": "2026-07-21T16:32:04Z",
+          "details": {
+            "error": "'remember_project_id'",
+            "state": "REJECT_REPLAN"
+          }
+        },
+        {
+          "item_id": null,
+          "event_type": "run_finished",
+          "details_json": "{\"status\": \"BLOCKED\"}",
+          "created_at": "2026-07-21T16:32:04Z",
+          "details": {
+            "status": "BLOCKED"
+          }
+        }
+      ],
+      "checkpoints": [
+        {
+          "item_id": "p01",
+          "phase": "before_dispatch",
+          "idempotency_key": "c8849339c289ada6270b438ca5c7e40fc0e9dafcd7e7c0d716bea3757bae0705",
+          "details_json": "{\"side_effects\": \"none\"}",
+          "created_at": "2026-07-21T16:32:02Z",
+          "details": {
+            "side_effects": "none"
+          }
+        },
+        {
+          "item_id": "p01",
+          "phase": "result_written",
+          "idempotency_key": "c8849339c289ada6270b438ca5c7e40fc0e9dafcd7e7c0d716bea3757bae0705",
+          "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\evals\\\\functional\\\\modular-job-runner\\\\rerun\\\\vault\\\\.jarvis\\\\runs\\\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde\\\\v1\\\\results\\\\01-p01.json\", \"verdict\": \"ACCEPT\"}",
+          "created_at": "2026-07-21T16:32:02Z",
+          "details": {
+            "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\.jarvis\\runs\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde\\v1\\results\\01-p01.json",
+            "verdict": "ACCEPT"
+          }
+        },
+        {
+          "item_id": "p01",
+          "phase": "committed",
+          "idempotency_key": "c8849339c289ada6270b438ca5c7e40fc0e9dafcd7e7c0d716bea3757bae0705",
+          "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\evals\\\\functional\\\\modular-job-runner\\\\rerun\\\\vault\\\\.jarvis\\\\runs\\\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde\\\\v1\\\\results\\\\01-p01.json\"}",
+          "created_at": "2026-07-21T16:32:02Z",
+          "details": {
+            "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\.jarvis\\runs\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde\\v1\\results\\01-p01.json"
+          }
+        },
+        {
+          "item_id": "p02",
+          "phase": "before_dispatch",
+          "idempotency_key": "0cc644475136144af1a777df73b2e6b3ec4d777431884d02d56585e86d3ed43b",
+          "details_json": "{\"side_effects\": \"local_write\"}",
+          "created_at": "2026-07-21T16:32:02Z",
+          "details": {
+            "side_effects": "local_write"
+          }
+        },
+        {
+          "item_id": "p02",
+          "phase": "result_written",
+          "idempotency_key": "0cc644475136144af1a777df73b2e6b3ec4d777431884d02d56585e86d3ed43b",
+          "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\evals\\\\functional\\\\modular-job-runner\\\\rerun\\\\vault\\\\.jarvis\\\\runs\\\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde\\\\v1\\\\results\\\\02-p02.json\", \"verdict\": \"ACCEPT\"}",
+          "created_at": "2026-07-21T16:32:03Z",
+          "details": {
+            "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\.jarvis\\runs\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde\\v1\\results\\02-p02.json",
+            "verdict": "ACCEPT"
+          }
+        },
+        {
+          "item_id": "p02",
+          "phase": "committed",
+          "idempotency_key": "0cc644475136144af1a777df73b2e6b3ec4d777431884d02d56585e86d3ed43b",
+          "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\evals\\\\functional\\\\modular-job-runner\\\\rerun\\\\vault\\\\.jarvis\\\\runs\\\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde\\\\v1\\\\results\\\\02-p02.json\"}",
+          "created_at": "2026-07-21T16:32:03Z",
+          "details": {
+            "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\.jarvis\\runs\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde\\v1\\results\\02-p02.json"
+          }
+        },
+        {
+          "item_id": "p03",
+          "phase": "before_dispatch",
+          "idempotency_key": "538721caa2e93ab42ad362477904d8e16ccace0337451613e07db9e0d98a93b9",
+          "details_json": "{\"side_effects\": \"local_read\"}",
+          "created_at": "2026-07-21T16:32:03Z",
+          "details": {
+            "side_effects": "local_read"
+          }
+        },
+        {
+          "item_id": "p03",
+          "phase": "result_written",
+          "idempotency_key": "538721caa2e93ab42ad362477904d8e16ccace0337451613e07db9e0d98a93b9",
+          "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\evals\\\\functional\\\\modular-job-runner\\\\rerun\\\\vault\\\\.jarvis\\\\runs\\\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde\\\\v1\\\\results\\\\03-p03.json\", \"verdict\": \"ACCEPT\"}",
+          "created_at": "2026-07-21T16:32:04Z",
+          "details": {
+            "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\.jarvis\\runs\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde\\v1\\results\\03-p03.json",
+            "verdict": "ACCEPT"
+          }
+        },
+        {
+          "item_id": "p03",
+          "phase": "committed",
+          "idempotency_key": "538721caa2e93ab42ad362477904d8e16ccace0337451613e07db9e0d98a93b9",
+          "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\evals\\\\functional\\\\modular-job-runner\\\\rerun\\\\vault\\\\.jarvis\\\\runs\\\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde\\\\v1\\\\results\\\\03-p03.json\"}",
+          "created_at": "2026-07-21T16:32:04Z",
+          "details": {
+            "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\.jarvis\\runs\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde\\v1\\results\\03-p03.json"
+          }
+        },
+        {
+          "item_id": "p04",
+          "phase": "before_dispatch",
+          "idempotency_key": "91925a514d8a467f93e1fc0499d85e64a63aab4f8ec87ae74c8582cc2ce43111",
+          "details_json": "{\"side_effects\": \"local_write\"}",
+          "created_at": "2026-07-21T16:32:04Z",
+          "details": {
+            "side_effects": "local_write"
+          }
+        },
+        {
+          "item_id": "p04",
+          "phase": "dispatch_interrupted",
+          "idempotency_key": "91925a514d8a467f93e1fc0499d85e64a63aab4f8ec87ae74c8582cc2ce43111",
+          "details_json": "{\"error\": \"'remember_project_id'\", \"state\": \"REPAIR\"}",
+          "created_at": "2026-07-21T16:32:04Z",
+          "details": {
+            "error": "'remember_project_id'",
+            "state": "REPAIR"
+          }
+        },
+        {
+          "item_id": "p04",
+          "phase": "before_dispatch",
+          "idempotency_key": "91925a514d8a467f93e1fc0499d85e64a63aab4f8ec87ae74c8582cc2ce43111",
+          "details_json": "{\"side_effects\": \"local_write\"}",
+          "created_at": "2026-07-21T16:32:04Z",
+          "details": {
+            "side_effects": "local_write"
+          }
+        },
+        {
+          "item_id": "p04",
+          "phase": "dispatch_interrupted",
+          "idempotency_key": "91925a514d8a467f93e1fc0499d85e64a63aab4f8ec87ae74c8582cc2ce43111",
+          "details_json": "{\"error\": \"'remember_project_id'\", \"state\": \"REPAIR\"}",
+          "created_at": "2026-07-21T16:32:04Z",
+          "details": {
+            "error": "'remember_project_id'",
+            "state": "REPAIR"
+          }
+        },
+        {
+          "item_id": "p04",
+          "phase": "before_dispatch",
+          "idempotency_key": "91925a514d8a467f93e1fc0499d85e64a63aab4f8ec87ae74c8582cc2ce43111",
+          "details_json": "{\"side_effects\": \"local_write\"}",
+          "created_at": "2026-07-21T16:32:04Z",
+          "details": {
+            "side_effects": "local_write"
+          }
+        },
+        {
+          "item_id": "p04",
+          "phase": "dispatch_interrupted",
+          "idempotency_key": "91925a514d8a467f93e1fc0499d85e64a63aab4f8ec87ae74c8582cc2ce43111",
+          "details_json": "{\"error\": \"'remember_project_id'\", \"state\": \"REJECT_REPLAN\"}",
+          "created_at": "2026-07-21T16:32:04Z",
+          "details": {
+            "error": "'remember_project_id'",
+            "state": "REJECT_REPLAN"
+          }
+        }
+      ],
+      "blocker_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\Blockers\\2026-07-21-blocked-plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde.md"
+    },
+    "fresh_process": {
+      "attempted": true,
+      "returncode": 0,
+      "stdout": "..                                                                       [100%]\n2 passed in 0.05s\n",
+      "stderr": ""
+    }
+  }
+}

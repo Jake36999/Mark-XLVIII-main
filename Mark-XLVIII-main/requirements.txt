@@ -10,6 +10,9 @@ pillow
 requests
 beautifulsoup4
 duckduckgo-search
+jsonschema
+PyYAML
+watchdog
 playwright
 pyautogui
 pyperclip
@@ -21,6 +24,12 @@ psutil
 send2trash
 youtube-transcript-api
 python-pptx
+python-docx
+pdfplumber
+pytesseract
+pandas
+openpyxl
+pydub
 fastapi
 uvicorn[standard]
 cryptography

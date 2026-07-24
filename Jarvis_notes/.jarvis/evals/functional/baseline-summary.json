@@ -1,0 +1,14 @@
+{
+  "round": "baseline",
+  "completed_at": "2026-07-21T16:02:27Z",
+  "runs": [
+    {
+      "scenario": "productivity",
+      "passed": false,
+      "critical_failures": [
+        "ownership-classified"
+      ],
+      "run": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\baseline\\run.json"
+    }
+  ]
+}

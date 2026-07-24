@@ -3452,6 +3452,7 @@ def spawn_agent(
             memory_scope=f"custom:team-{_team}",
             isolated_workspace=bool(workspace and cwd),
             repo_path=repo,
+            one_shot=not keepalive,
         )
 
     # Session resume: inject the native client resume flag.

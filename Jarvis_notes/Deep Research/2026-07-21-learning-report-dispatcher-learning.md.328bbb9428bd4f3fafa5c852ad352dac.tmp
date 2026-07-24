@@ -1,0 +1,55 @@
+---
+id: "jarvis-20260721T122749Z-bd8aec4b"
+title: "Learning Report - Dispatcher Learning"
+type: "deep_research_report"
+status: "draft"
+created: "2026-07-21T12:27:49Z"
+updated: "2026-07-21T12:27:49Z"
+project_id: "jarvis_notes"
+source: "daemon"
+tags: ["learning", "learned-topic", "rag", "dispatcher-learning", "research-report"]
+sync_state: "local_only"
+index_state: "index_pending"
+remember_note_id: ""
+learning_state: "report_created"
+quality_state: "validated"
+retrieved_at: "2026-07-21T09:00:00Z"
+search_mode: "research"
+source_count: 2
+sync_error: ""
+topic: "Dispatcher Learning"
+workflow_id: "learn_topic_memory"
+---
+
+# Learning Report - Dispatcher Learning
+
+## Executive Summary
+
+JARVIS learned about **Dispatcher Learning** from 2 cited sources. Retrieved at 2026-07-21T09:00:00Z.
+
+## Research Question
+
+What should JARVIS retain about Dispatcher Learning for future grounded responses?
+
+## Key Findings
+
+1. A: Alpha topic source. [1]
+2. B: Beta topic source. [2]
+
+## Evidence
+
+- [1] Alpha topic source.
+- [2] Beta topic source.
+
+## Open Questions
+
+- Review the cited sources in Obsidian before treating fine-grained claims as settled.
+- Add follow-up notes when the topic becomes project-specific or implementation-specific.
+
+## Sources
+
+1. A, retrieved: 2026-07-21T09:00:00Z
+   https://example.com/a
+
+2. B, retrieved: 2026-07-21T09:00:00Z
+   https://example.com/b

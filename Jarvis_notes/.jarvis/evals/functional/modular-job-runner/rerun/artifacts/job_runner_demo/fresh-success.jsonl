@@ -1,0 +1,4 @@
+{"duration_ms": 0.0, "error": "", "health": "healthy", "retry": 0, "run_id": "9757b815d0744e0790699e9ddeb7324f", "status": "run_started", "task_id": "demo-task", "timestamp": "2026-07-21T16:32:03.471002Z"}
+{"duration_ms": 0.0, "error": "", "health": "healthy", "retry": 0, "run_id": "9757b815d0744e0790699e9ddeb7324f", "status": "task_started", "task_id": "demo-task", "timestamp": "2026-07-21T16:32:03.471996Z"}
+{"duration_ms": 0.24189999930968042, "error": "", "health": "healthy", "retry": 0, "run_id": "9757b815d0744e0790699e9ddeb7324f", "status": "task_succeeded", "task_id": "demo-task", "timestamp": "2026-07-21T16:32:03.471996Z"}
+{"duration_ms": 0.9188999993057223, "error": "", "health": "healthy", "retry": 0, "run_id": "9757b815d0744e0790699e9ddeb7324f", "status": "run_completed", "task_id": "demo-task", "timestamp": "2026-07-21T16:32:03.471996Z"}

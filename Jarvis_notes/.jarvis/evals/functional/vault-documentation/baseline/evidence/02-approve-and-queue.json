@@ -1,0 +1,106 @@
+{
+  "ok": true,
+  "path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\vault-documentation\\baseline\\vault\\Plans\\2026-07-21-plan-review-the-markdown-vault-and-create-three-linked-obsidian-artifacts-an-eva.md",
+  "title": "Plan - Review the Markdown vault and create three linked Obsidian artifacts: an Evaluation MOC, a",
+  "status": "queued",
+  "approval_state": "approved",
+  "execution_state": "queued",
+  "run_id": "plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-art-v1",
+  "bundle_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\vault-documentation\\baseline\\vault\\.jarvis\\runs\\plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-art\\v1",
+  "execution_summary_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\vault-documentation\\baseline\\vault\\Summaries\\2026-07-21-execution-run-plan-review-the-markdown-vault-and-create-three-linked-obsidian-ar.md",
+  "packets": [
+    {
+      "id": "p01",
+      "task": "Confirm objective, constraints, and success criteria with the user",
+      "worker": "local_worker",
+      "step_type": "model_reasoning",
+      "depends_on": []
+    },
+    {
+      "id": "p02",
+      "task": "Collect read-only local context from the vault, relevant files, project registry, and capability manifest",
+      "worker": "local_worker",
+      "step_type": "model_reasoning",
+      "depends_on": [
+        "p01"
+      ]
+    },
+    {
+      "id": "p03",
+      "task": "Collect cited web research when the task depends on current or external information",
+      "worker": "web_search",
+      "step_type": "tool",
+      "depends_on": [
+        "p02"
+      ]
+    },
+    {
+      "id": "p04",
+      "task": "Reject uncited or generic summaries; require source URLs for current-information claims",
+      "worker": "web_search",
+      "step_type": "tool",
+      "depends_on": [
+        "p03"
+      ]
+    },
+    {
+      "id": "p05",
+      "task": "Draft the plan as an Obsidian Markdown artifact and wait for review",
+      "worker": "local_worker",
+      "step_type": "model_reasoning",
+      "depends_on": [
+        "p04"
+      ]
+    },
+    {
+      "id": "p06",
+      "task": "Revise the plan until scope, risks, and decision points are clear",
+      "worker": "local_worker",
+      "step_type": "model_reasoning",
+      "depends_on": [
+        "p05"
+      ]
+    },
+    {
+      "id": "p07",
+      "task": "Prepare a project handoff and delegate lightweight coding continuity to OpenClaw only after approval",
+      "worker": "local_worker",
+      "step_type": "model_reasoning",
+      "depends_on": [
+        "p06"
+      ]
+    },
+    {
+      "id": "p08",
+      "task": "After approval, execute one milestone at a time using existing guarded tools and subagent delegation only when useful",
+      "worker": "local_worker",
+      "step_type": "model_reasoning",
+      "depends_on": [
+        "p07"
+      ]
+    }
+  ],
+  "agent_count": 1,
+  "reindex": {
+    "ok": true,
+    "backend": "local_sqlite",
+    "index_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\vault-documentation\\baseline\\vault\\.jarvis\\memory.sqlite",
+    "indexed_notes": 0,
+    "excluded_notes": 0,
+    "superseded_notes": 0,
+    "deduplicated_notes": 0
+  },
+  "message": "Plan approved and queued. Execution starts after the current JARVIS speech turn completes.",
+  "canvas": {
+    "ok": true,
+    "operation": "sync_plan",
+    "path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\vault-documentation\\baseline\\vault\\Canvases\\JARVIS\\plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-artifact.canvas",
+    "plan_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\vault-documentation\\baseline\\vault\\Plans\\2026-07-21-plan-review-the-markdown-vault-and-create-three-linked-obsidian-artifacts-an-eva.md",
+    "node_count": 16,
+    "edge_count": 15,
+    "active_task_count": 14,
+    "completed_task_count": 0,
+    "rolling_limit": 24,
+    "canonical_source": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\vault-documentation\\baseline\\vault\\Plans\\2026-07-21-plan-review-the-markdown-vault-and-create-three-linked-obsidian-artifacts-an-eva.md"
+  }
+}

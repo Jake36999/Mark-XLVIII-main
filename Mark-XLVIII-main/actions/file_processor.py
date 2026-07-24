@@ -25,10 +25,22 @@ import tempfile
 from pathlib import Path
 from datetime import datetime
 
+from core.model_router import get_model_wrapper
+
+
+ANALYSIS_SYSTEM_PROMPT = (
+    "You are JARVIS's file analysis worker. Answer in English. "
+    "Be concise for small files and structured for large documents. "
+    "Do not claim to have inspected content that was not provided."
+)
+
+
+def _analysis_client():
+    return get_model_wrapper(role="worker", system=ANALYSIS_SYSTEM_PROMPT)
+
+
 def _get_api_key() -> str:
-    config_path = Path(__file__).resolve().parent.parent / "config" / "api_keys.json"
-    with open(config_path, "r", encoding="utf-8") as f:
-        return json.load(f)["gemini_api_key"]
+    raise RuntimeError("Gemini cloud credentials are session-only; use the model router for file analysis.")
 
 
 def _gemini_client():
@@ -90,21 +102,17 @@ def _process_image(path: Path, action: str, params: dict, speak=None) -> str:
 
     if action in ("describe", "ocr", "analyze", "read", "extract_text"):
         try:
-            model  = _gemini_client()
-            img    = Image.open(path)
-            prompt = {
-                "describe": "Describe this image in detail.",
-                "ocr":      "Extract all text visible in this image. Return only the text, formatted clearly.",
-                "analyze":  "Analyze this image thoroughly: objects, colors, composition, any text, context.",
-                "read":     "Read all text in this image, preserving structure and formatting.",
-                "extract_text": "Extract all text from this image.",
-            }.get(action, "Describe this image.")
+            import pytesseract
 
-            if params.get("instruction"):
-                prompt = params["instruction"]
-
-            response = model.generate_content([prompt, img])
-            result   = response.text.strip()
+            img = Image.open(path)
+            extracted = str(pytesseract.image_to_string(img, lang="eng") or "").strip()
+            if action in {"ocr", "read", "extract_text"}:
+                result = extracted or "No OCR text was detected."
+            else:
+                result = (
+                    f"Image: {img.width}x{img.height}, mode {img.mode}.\n\n"
+                    + (f"OCR text:\n{extracted}" if extracted else "No OCR text was detected. Local visual description requires a healthy vision route.")
+                )
 
             if len(result) > 500 and params.get("save", True):
                 out = _output_path(path, "result", ".txt")
@@ -112,7 +120,7 @@ def _process_image(path: Path, action: str, params: dict, speak=None) -> str:
                 return f"{result[:300]}...\n\nFull result saved to: {out}"
             return result
         except Exception as e:
-            return f"AI image analysis failed: {e}"
+            return f"Local image/OCR analysis failed: {e}"
 
     if action == "resize":
         width  = int(params.get("width",  0))
@@ -210,7 +218,7 @@ def _process_pdf(path: Path, action: str, params: dict, speak=None) -> str:
             "reformat":       f"Reformat this text cleanly with proper structure:\n\n{text}",
         }
         try:
-            model    = _gemini_client()
+            model    = _analysis_client()
             response = model.generate_content(prompt_map.get(action, f"Analyze:\n\n{text}"))
             result   = response.text.strip()
             if len(result) > 600 and params.get("save", True):
@@ -300,7 +308,7 @@ def _process_text_doc(path: Path, file_type: str, action: str,
         instruction = action
 
     try:
-        model    = _gemini_client()
+        model    = _analysis_client()
         response = model.generate_content(prompt_map[action])
         result   = response.text.strip()
         if len(result) > 600 and params.get("save", True):
@@ -347,7 +355,7 @@ def _process_data(path: Path, file_type: str, action: str,
                    f"Rows: {len(df)}\nPreview:\n{preview}\n\n"
                    f"Give insights, patterns, and notable findings.")
         try:
-            model    = _gemini_client()
+            model    = _analysis_client()
             response = model.generate_content(prompt)
             return response.text.strip()
         except Exception as e:
@@ -401,7 +409,7 @@ def _process_data(path: Path, file_type: str, action: str,
 
     preview = df.head(30).to_string()
     try:
-        model    = _gemini_client()
+        model    = _analysis_client()
         response = model.generate_content(
             f"Task: {action}\nDataset ({len(df)} rows, cols: {list(df.columns)}):\n{preview}"
         )
@@ -432,7 +440,7 @@ def _process_json(path: Path, action: str, params: dict, speak=None) -> str:
         if params.get("instruction"):
             prompt = f"{params['instruction']}\n\nJSON data:\n{preview}"
         try:
-            model    = _gemini_client()
+            model    = _analysis_client()
             response = model.generate_content(prompt)
             return response.text.strip()
         except Exception as e:
@@ -496,7 +504,7 @@ def _process_code(path: Path, action: str, params: dict, speak=None) -> str:
         prompt = prompt_map[action]
 
     try:
-        model    = _gemini_client()
+        model    = _analysis_client()
         response = model.generate_content(prompt)
         result   = response.text.strip()
 
@@ -530,25 +538,40 @@ def _process_audio(path: Path, action: str, params: dict, speak=None) -> str:
 
     if action == "transcribe":
         try:
-            model   = _gemini_client()
-            content = path.read_bytes()
-            mime    = {
-                "mp3": "audio/mp3", "wav": "audio/wav",
-                "ogg": "audio/ogg", "m4a": "audio/mp4",
-                "aac": "audio/aac", "flac": "audio/flac",
-            }.get(path.suffix.lstrip(".").lower(), "audio/mpeg")
-            response = model.generate_content([
-                "Transcribe all speech in this audio file accurately.",
-                {"mime_type": mime, "data": content}
-            ])
-            result = response.text.strip()
+            from core.stt import VoskSTT
+
+            process = subprocess.Popen(
+                ["ffmpeg", "-v", "error", "-i", str(path), "-f", "s16le", "-ac", "1", "-ar", "16000", "pipe:1"],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+            recognizer = VoskSTT(language="en-us")
+            segments = []
+            assert process.stdout is not None
+            while True:
+                chunk = process.stdout.read(8000)
+                if not chunk:
+                    break
+                text, final = recognizer.process_chunk(chunk)
+                if final and text.strip():
+                    segments.append(text.strip())
+            trailing = recognizer.final_result().strip()
+            if trailing:
+                segments.append(trailing)
+            process.wait(timeout=30)
+            if process.returncode != 0:
+                error = (process.stderr.read() if process.stderr else b"").decode("utf-8", errors="replace")
+                raise RuntimeError(error or "ffmpeg audio conversion failed")
+            result = " ".join(segments).strip()
+            if not result:
+                return "No English speech was detected in the audio."
             if params.get("save", True):
                 out = _output_path(path, "transcript", ".txt")
                 out.write_text(result, encoding="utf-8")
                 return f"Transcription saved: {out.name}\n\nPreview: {result[:300]}"
             return result
         except Exception as e:
-            return f"Transcription failed: {e}"
+            return f"Local Vosk transcription failed: {e}"
 
     if action == "convert":
         fmt = params.get("format", "mp3").lstrip(".")
@@ -735,7 +758,20 @@ def _process_archive(path: Path, action: str, params: dict, speak=None) -> str:
         dest = Path(params.get("destination", str(path.parent / path.stem)))
         dest.mkdir(parents=True, exist_ok=True)
         try:
-            shutil.unpack_archive(path, dest)
+            if path.suffix.lower() == ".zip":
+                import zipfile
+
+                root = dest.resolve()
+                with zipfile.ZipFile(path) as archive:
+                    for entry in archive.infolist():
+                        target = (root / entry.filename).resolve()
+                        try:
+                            target.relative_to(root)
+                        except ValueError:
+                            return f"Extract blocked: unsafe archive path {entry.filename}"
+                    archive.extractall(root)
+            else:
+                shutil.unpack_archive(path, dest)
             return f"Extracted to: {dest}"
         except Exception as e:
             return f"Extract failed: {e}"
@@ -767,7 +803,7 @@ def _process_pptx(path: Path, action: str, params: dict, speak=None) -> str:
             out.write_text(text, encoding="utf-8")
             return f"Text extracted. Saved: {out.name}"
         try:
-            model    = _gemini_client()
+            model    = _analysis_client()
             prompt   = f"{'Summarize' if action == 'summarize' else 'Analyze'} this presentation:\n{text[:30000]}"
             response = model.generate_content(prompt)
             return response.text.strip()
@@ -784,11 +820,22 @@ def file_processor(parameters: dict, player=None, speak=None) -> str:
     path = Path(file_path_str)
     if not path.exists():
         return f"File not found: {file_path_str}"
+    action = (parameters.get("action") or "").lower().strip()
+    large_threshold = max(100000, int(parameters.get("large_file_threshold_bytes") or 250000))
+    auto_large = path.is_file() and path.stat().st_size >= large_threshold and action in {"", "summarize", "summarise", "analyze", "analyse"}
+    if path.is_dir() or auto_large or action in {"analyze_large", "analyse_large", "analyze_folder", "analyse_folder"} or bool(parameters.get("chunked")):
+        from actions.document_workflow import analyze_path
+
+        result = analyze_path(
+            path,
+            instruction=str(parameters.get("instruction") or "Summarize and analyze this source."),
+            params=parameters,
+        )
+        return json.dumps(result, ensure_ascii=False, indent=2)
     if not path.is_file():
         return f"Path is not a file: {file_path_str}"
 
     file_type   = _detect_type(path)
-    action      = (parameters.get("action") or "").lower().strip()
     instruction = parameters.get("instruction", "")
     params      = {**parameters, "instruction": instruction}
 
@@ -800,7 +847,7 @@ def file_processor(parameters: dict, player=None, speak=None) -> str:
     if file_type == "unknown":
         try:
             content = path.read_text(encoding="utf-8", errors="ignore")[:10000]
-            model   = _gemini_client()
+            model   = _analysis_client()
             prompt  = f"File: {path.name}\nContent preview:\n{content}\n\nTask: {action or instruction or 'Describe what this file contains and what can be done with it.'}"
             response = model.generate_content(prompt)
             return response.text.strip()

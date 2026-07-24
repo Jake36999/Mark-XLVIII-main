@@ -1,0 +1,425 @@
+{
+  "nodes": [
+    {
+      "id": "jarvis-425aceb1f32affb4",
+      "type": "file",
+      "file": "Plans/2026-07-21-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-ownersh.md",
+      "x": 0,
+      "y": 0,
+      "width": 460,
+      "height": 280
+    },
+    {
+      "id": "jarvis-ab812fca08d41fdd",
+      "type": "text",
+      "text": "# Plan - Review F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approv\n**Status:** approved\n**Approval:** approved\n**Execution:** ready\n**Visible tasks:** 14 of 14\n\n> This Canvas is a rolling view. The linked Markdown plan is authoritative.",
+      "x": 560,
+      "y": 0,
+      "width": 420,
+      "height": 230,
+      "color": "4"
+    },
+    {
+      "id": "jarvis-a76a1a13f9d3e8d3",
+      "type": "text",
+      "text": "## [ ] Approval gates are visible.\n\n`plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-34`\n\nSource line 34",
+      "x": 1080,
+      "y": 0,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-34",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Plans\\2026-07-21-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-ownersh.md",
+        "source_line": 34,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "3db7d1c8271e1968b421107a5a3799b9eb95a43809b14ae9019d2eae58dbec58"
+      }
+    },
+    {
+      "id": "jarvis-cac8f9044df0725e",
+      "type": "text",
+      "text": "## [ ] Blockers and design decision points are explicit.\n\n`plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-33`\n\nSource line 33",
+      "x": 1470,
+      "y": 0,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-33",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Plans\\2026-07-21-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-ownersh.md",
+        "source_line": 33,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "a8573b37f17db9ab1513b94a5969bda3c5e2bbb887a62db40d13b9286a09adea"
+      }
+    },
+    {
+      "id": "jarvis-eb5f3ed987781d49",
+      "type": "text",
+      "text": "## [ ] Completion summary requirements are defined.\n\n`plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-35`\n\nSource line 35",
+      "x": 1860,
+      "y": 0,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-35",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Plans\\2026-07-21-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-ownersh.md",
+        "source_line": 35,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "cbe70f4bb52360dd35f74bdf79c8821c9d64fd85cc3a27066987ea68c5b8e7f8"
+      }
+    },
+    {
+      "id": "jarvis-fef10554e56cba0d",
+      "type": "text",
+      "text": "## [ ] Destructive actions explicitly confirmed.\n\n`plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-112`\n\nSource line 112",
+      "x": 1080,
+      "y": 210,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-112",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Plans\\2026-07-21-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-ownersh.md",
+        "source_line": 112,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "4903cb7a0bc008e68a6c8e757ea67f179875ac29be9ec7a76a1f8315de1f9b87"
+      }
+    },
+    {
+      "id": "jarvis-445029ce90c1ff32",
+      "type": "text",
+      "text": "## [ ] Execution milestones are ordered.\n\n`plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-32`\n\nSource line 32",
+      "x": 1470,
+      "y": 210,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-32",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Plans\\2026-07-21-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-ownersh.md",
+        "source_line": 32,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "7f4c137231ce0641757e8fc62b129a51dcc09af5dc0b6a5309f3a47df7d693e2"
+      }
+    },
+    {
+      "id": "jarvis-824940fadcbb9104",
+      "type": "text",
+      "text": "## [ ] High-cost model use approved when needed.\n\n`plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-113`\n\nSource line 113",
+      "x": 1860,
+      "y": 210,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-113",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Plans\\2026-07-21-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-ownersh.md",
+        "source_line": 113,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "cb1fbd40ab4f4925cf2414e5b8d39f955bf96b9a3b840c3e307d726d4a4848af"
+      }
+    },
+    {
+      "id": "jarvis-52fafe029c9c238d",
+      "type": "text",
+      "text": "## [ ] JARVIS creates a summary or blocker note after execution starts.\n\n`plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-121`\n\nSource line 121",
+      "x": 1080,
+      "y": 420,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-121",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Plans\\2026-07-21-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-ownersh.md",
+        "source_line": 121,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "a232ce6cd8ad42a309ed3525be63864bcded4308b38d83145f9e44092f636992"
+      }
+    },
+    {
+      "id": "jarvis-1306aae96280461e",
+      "type": "text",
+      "text": "## [ ] JARVIS updates the plan if the goal changes.\n\n`plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-120`\n\nSource line 120",
+      "x": 1470,
+      "y": 420,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-120",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Plans\\2026-07-21-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-ownersh.md",
+        "source_line": 120,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "2968a645bf76ac79ae078b2d974bce4cec26574ef36da21a3782a30d9401c292"
+      }
+    },
+    {
+      "id": "jarvis-4788e8be64c8659a",
+      "type": "text",
+      "text": "## [ ] Plan approved by user.\n\n`plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-111`\n\nSource line 111",
+      "x": 1860,
+      "y": 420,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-111",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Plans\\2026-07-21-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-ownersh.md",
+        "source_line": 111,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "af466f708b8c947dad485e4d7ff17ad6d77749b1e0d0969b1d3b677d55eee78a"
+      }
+    },
+    {
+      "id": "jarvis-469c6ccbe4879287",
+      "type": "text",
+      "text": "## [ ] Plan reviewed in Obsidian.\n\n`plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-30`\n\nSource line 30",
+      "x": 1080,
+      "y": 630,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-30",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Plans\\2026-07-21-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-ownersh.md",
+        "source_line": 30,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "adae1169b554eb59572186679fb8518d493edd52d059cb194deeb335e7a0dda0"
+      }
+    },
+    {
+      "id": "jarvis-34b9d1c0ef070f94",
+      "type": "text",
+      "text": "## [ ] Scope and out-of-scope items are clear.\n\n`plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-31`\n\nSource line 31",
+      "x": 1470,
+      "y": 630,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-31",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Plans\\2026-07-21-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-ownersh.md",
+        "source_line": 31,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "3438169b8e51a2a2b8c274d8841930ff0abea85f9703b80fdc572f7044aa5d9c"
+      }
+    },
+    {
+      "id": "jarvis-476217e97bae0007",
+      "type": "text",
+      "text": "## [ ] Subagent delegation approved when needed.\n\n`plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-114`\n\nSource line 114",
+      "x": 1860,
+      "y": 630,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-114",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Plans\\2026-07-21-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-ownersh.md",
+        "source_line": 114,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "a9ca1fff6403f3766620c83047f90bd3a33782a930ba5b61ee73297d07c127a9"
+      }
+    },
+    {
+      "id": "jarvis-fb9508b60bbb4053",
+      "type": "text",
+      "text": "## [ ] User requests edits or approves execution.\n\n`plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-119`\n\nSource line 119",
+      "x": 1080,
+      "y": 840,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-119",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Plans\\2026-07-21-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-ownersh.md",
+        "source_line": 119,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "8babd3bfeeed7cb5348043a77739c48b64ecde547230dd521e0a24f0cce3f6e4"
+      }
+    },
+    {
+      "id": "jarvis-da2125fe7051acc5",
+      "type": "text",
+      "text": "## [ ] User reviews this plan in Obsidian.\n\n`plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-118`\n\nSource line 118",
+      "x": 1470,
+      "y": 840,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-118",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Plans\\2026-07-21-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-ownersh.md",
+        "source_line": 118,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "848c22a9e1b0205223f112a58ede4c90683cf0f780158f0993ac2321b9054be7"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "jarvis-e55419d5151ca0c0",
+      "fromNode": "jarvis-425aceb1f32affb4",
+      "fromSide": "right",
+      "toNode": "jarvis-ab812fca08d41fdd",
+      "toSide": "left",
+      "label": "current state"
+    },
+    {
+      "id": "jarvis-0657d6b29ab45b72",
+      "fromNode": "jarvis-ab812fca08d41fdd",
+      "fromSide": "right",
+      "toNode": "jarvis-a76a1a13f9d3e8d3",
+      "toSide": "left",
+      "label": "next"
+    },
+    {
+      "id": "jarvis-b437c6a7da8bc65a",
+      "fromNode": "jarvis-ab812fca08d41fdd",
+      "fromSide": "right",
+      "toNode": "jarvis-cac8f9044df0725e",
+      "toSide": "left",
+      "label": "next"
+    },
+    {
+      "id": "jarvis-349e96350eb363f8",
+      "fromNode": "jarvis-ab812fca08d41fdd",
+      "fromSide": "right",
+      "toNode": "jarvis-eb5f3ed987781d49",
+      "toSide": "left",
+      "label": "next"
+    },
+    {
+      "id": "jarvis-7663986847dbfa35",
+      "fromNode": "jarvis-ab812fca08d41fdd",
+      "fromSide": "right",
+      "toNode": "jarvis-fef10554e56cba0d",
+      "toSide": "left",
+      "label": "next"
+    },
+    {
+      "id": "jarvis-3f925a843de615f0",
+      "fromNode": "jarvis-ab812fca08d41fdd",
+      "fromSide": "right",
+      "toNode": "jarvis-445029ce90c1ff32",
+      "toSide": "left",
+      "label": "next"
+    },
+    {
+      "id": "jarvis-a05a0c1bdffef741",
+      "fromNode": "jarvis-ab812fca08d41fdd",
+      "fromSide": "right",
+      "toNode": "jarvis-824940fadcbb9104",
+      "toSide": "left",
+      "label": "next"
+    },
+    {
+      "id": "jarvis-c0d4c7e09dc8b09f",
+      "fromNode": "jarvis-ab812fca08d41fdd",
+      "fromSide": "right",
+      "toNode": "jarvis-52fafe029c9c238d",
+      "toSide": "left",
+      "label": "next"
+    },
+    {
+      "id": "jarvis-7f01d48b2a274872",
+      "fromNode": "jarvis-ab812fca08d41fdd",
+      "fromSide": "right",
+      "toNode": "jarvis-1306aae96280461e",
+      "toSide": "left",
+      "label": "next"
+    },
+    {
+      "id": "jarvis-825fbc44a98c7879",
+      "fromNode": "jarvis-ab812fca08d41fdd",
+      "fromSide": "right",
+      "toNode": "jarvis-4788e8be64c8659a",
+      "toSide": "left",
+      "label": "next"
+    },
+    {
+      "id": "jarvis-ccd2e1584bdd7389",
+      "fromNode": "jarvis-ab812fca08d41fdd",
+      "fromSide": "right",
+      "toNode": "jarvis-469c6ccbe4879287",
+      "toSide": "left",
+      "label": "next"
+    },
+    {
+      "id": "jarvis-a4bc829206de6f79",
+      "fromNode": "jarvis-ab812fca08d41fdd",
+      "fromSide": "right",
+      "toNode": "jarvis-34b9d1c0ef070f94",
+      "toSide": "left",
+      "label": "next"
+    },
+    {
+      "id": "jarvis-110de8c04619f985",
+      "fromNode": "jarvis-ab812fca08d41fdd",
+      "fromSide": "right",
+      "toNode": "jarvis-476217e97bae0007",
+      "toSide": "left",
+      "label": "next"
+    },
+    {
+      "id": "jarvis-ba2758c498cb145f",
+      "fromNode": "jarvis-ab812fca08d41fdd",
+      "fromSide": "right",
+      "toNode": "jarvis-fb9508b60bbb4053",
+      "toSide": "left",
+      "label": "next"
+    },
+    {
+      "id": "jarvis-54b1efee5526bac2",
+      "fromNode": "jarvis-ab812fca08d41fdd",
+      "fromSide": "right",
+      "toNode": "jarvis-da2125fe7051acc5",
+      "toSide": "left",
+      "label": "next"
+    }
+  ]
+}

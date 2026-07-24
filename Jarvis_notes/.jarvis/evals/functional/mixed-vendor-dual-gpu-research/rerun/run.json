@@ -1,0 +1,690 @@
+{
+  "schema_version": "jarvis_functional_eval_run/v1",
+  "run_id": "functional-research-rerun-20260721-174329",
+  "scenario": "research",
+  "round": "rerun",
+  "started_at": "2026-07-21T16:43:29Z",
+  "completed_at": "2026-07-21T16:55:37Z",
+  "provider": [
+    "deterministic"
+  ],
+  "model": [],
+  "route": [
+    "capability_registry/workflows/plan",
+    "web_search/research",
+    "jarvis_memory/create_report_from_search"
+  ],
+  "tools": [
+    "capability_registry",
+    "jarvis_memory",
+    "web_search"
+  ],
+  "duration_seconds": 728.254,
+  "artifacts": [
+    "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\mixed-vendor-dual-gpu-research\\rerun\\vault\\Reports\\2026-07-21-mixed-vendor-dual-gpu-local-model-orchestration.md"
+  ],
+  "fallback_reason": [],
+  "steps": [
+    {
+      "step_id": "workflow-plan",
+      "route": "capability_registry/workflows/plan",
+      "tools": [
+        "capability_registry"
+      ],
+      "started_at": "2026-07-21T16:43:29Z",
+      "completed_at": "2026-07-21T16:43:29Z",
+      "duration_seconds": 0.005,
+      "ok": true,
+      "provider": "deterministic",
+      "model": "",
+      "role": "",
+      "fallback_reason": "",
+      "artifacts": [],
+      "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\mixed-vendor-dual-gpu-research\\rerun\\evidence\\01-workflow-plan.json",
+      "error": ""
+    },
+    {
+      "step_id": "source-gathering",
+      "route": "web_search/research",
+      "tools": [
+        "web_search"
+      ],
+      "started_at": "2026-07-21T16:43:29Z",
+      "completed_at": "2026-07-21T16:43:30Z",
+      "duration_seconds": 1.129,
+      "ok": true,
+      "provider": "deterministic",
+      "model": "",
+      "role": "",
+      "fallback_reason": "",
+      "artifacts": [],
+      "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\mixed-vendor-dual-gpu-research\\rerun\\evidence\\02-source-gathering.json",
+      "error": ""
+    },
+    {
+      "step_id": "report-persistence",
+      "route": "jarvis_memory/create_report_from_search",
+      "tools": [
+        "jarvis_memory"
+      ],
+      "started_at": "2026-07-21T16:43:30Z",
+      "completed_at": "2026-07-21T16:55:37Z",
+      "duration_seconds": 727.12,
+      "ok": true,
+      "provider": "deterministic",
+      "model": "",
+      "role": "",
+      "fallback_reason": "",
+      "artifacts": [
+        "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\mixed-vendor-dual-gpu-research\\rerun\\vault\\Reports\\2026-07-21-mixed-vendor-dual-gpu-local-model-orchestration.md"
+      ],
+      "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\mixed-vendor-dual-gpu-research\\rerun\\evidence\\03-report-persistence.json",
+      "error": ""
+    }
+  ],
+  "validators": [
+    {
+      "id": "report-created",
+      "passed": true,
+      "critical": true,
+      "score": 4.0,
+      "evidence": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\mixed-vendor-dual-gpu-research\\rerun\\vault\\Reports\\2026-07-21-mixed-vendor-dual-gpu-local-model-orchestration.md"
+    },
+    {
+      "id": "cited-sources",
+      "passed": true,
+      "critical": true,
+      "score": 4.0,
+      "evidence": [
+        "https://blogs.nvidia.com/blog/ai-decoded-lm-studio/",
+        "https://carteakey.dev/blog/local-inference/local-llm-optimization/",
+        "https://dasroot.net/posts/2026/01/local-llm-deployment-ollama-llama.cpp/",
+        "https://insiderllm.com/guides/multi-gpu-local-ai/",
+        "https://lmstudio.ai/blog/lmstudio-v0.3.14",
+        "https://markaicode.com/architecture/lm-studio-local-ai-architecture/",
+        "https://markaicode.com/lm-studio-multi-gpu-split-large-models/",
+        "https://medium.com/@yash9439/run-any-llm-on-distributed-multiple-gpus-locally-using-llama-cpp-2ff478a0dc3c",
+        "https://www.digitalocean.com/community/tutorials/splitting-llms-across-multiple-gpus",
+        "https://www.promptquorum.com/local-llms/multi-gpu-local-llms"
+      ]
+    },
+    {
+      "id": "scope-coverage",
+      "passed": false,
+      "critical": false,
+      "score": 1.5,
+      "evidence": {
+        "memory": true,
+        "concurr": false,
+        "load": true,
+        "telemetr": false,
+        "recover": false
+      }
+    },
+    {
+      "id": "primary-source-quality",
+      "passed": false,
+      "critical": false,
+      "score": 2.0,
+      "evidence": {
+        "primary_domains": [
+          "lmstudio.ai"
+        ],
+        "all_domains": [
+          "blogs.nvidia.com",
+          "carteakey.dev",
+          "dasroot.net",
+          "digitalocean.com",
+          "insiderllm.com",
+          "lmstudio.ai",
+          "markaicode.com",
+          "medium.com",
+          "promptquorum.com"
+        ],
+        "ratio": 0.1111111111111111
+      }
+    },
+    {
+      "id": "uncertainty-and-inference",
+      "passed": false,
+      "critical": false,
+      "score": 1.0,
+      "evidence": [
+        "inference"
+      ]
+    },
+    {
+      "id": "host-specific-recommendations",
+      "passed": false,
+      "critical": false,
+      "score": 1.0,
+      "evidence": {
+        "signals": [],
+        "actions": "- Review the cited articles in Obsidian.\n- Promote useful claims into project notes only after source review."
+      }
+    },
+    {
+      "id": "consolidation-and-contrast",
+      "passed": false,
+      "critical": false,
+      "score": 1.0,
+      "evidence": {
+        "finding_bullets": 10,
+        "synthesis_signals": []
+      }
+    }
+  ],
+  "average_score": 2.07,
+  "critical_failures": [],
+  "passed": false,
+  "outputs": {
+    "plan": {
+      "ok": true,
+      "query": "Assess reliable mixed-vendor dual-GPU local-model orchestration with LM Studio and llama.cpp. Cover memory allocation, concurrency, model loading, telemetry, failure recovery, and practical recommendations. Use current primary sources, preserve uncertainty, consolidate duplicate findings, and keep high-contrast findings separate.",
+      "workflow_id": "learn_topic_memory",
+      "workflow": {
+        "name": "learn_topic_memory",
+        "workflow_id": "learn_topic_memory",
+        "kind": "workflow",
+        "title": "Learn Topic Memory",
+        "summary": "Research a topic, create a cited report, store key points as a learned-topic memory note, and reindex local RAG.",
+        "categories": [
+          "workflow",
+          "learning",
+          "research",
+          "memory",
+          "rag"
+        ],
+        "keywords": [
+          "learn",
+          "learn about",
+          "learn topic",
+          "teach yourself",
+          "study topic",
+          "knowledge",
+          "rag memory",
+          "deep research",
+          "cited sources"
+        ],
+        "details": "Use when the user asks JARVIS to learn about a topic. The workflow must gather cited sources first, then call jarvis_memory.learn_topic so the readable report and compact RAG memory are both created from the same provenance.",
+        "triggers": [
+          "learn about",
+          "could you learn about",
+          "teach yourself about",
+          "study the topic of",
+          "build your knowledge on"
+        ],
+        "steps": [
+          {
+            "id": "plan_learning",
+            "tool": "capability_registry",
+            "operation": "plan",
+            "requires": [
+              "topic"
+            ],
+            "produces": [
+              "workflow_plan"
+            ],
+            "summary": "plan",
+            "progress_text": "plan"
+          },
+          {
+            "id": "research_topic",
+            "tool": "web_search",
+            "operation": "research",
+            "requires": [
+              "topic",
+              "require_citations"
+            ],
+            "produces": [
+              "structured_sources"
+            ],
+            "summary": "research",
+            "progress_text": "research"
+          },
+          {
+            "id": "persist_learning",
+            "tool": "jarvis_memory",
+            "operation": "learn_topic",
+            "requires": [
+              "topic",
+              "structured_sources"
+            ],
+            "produces": [
+              "deep_research_report",
+              "learned_topic_memory"
+            ],
+            "summary": "learn topic",
+            "progress_text": "learn topic"
+          },
+          {
+            "id": "index_learning",
+            "tool": "jarvis_memory",
+            "operation": "reindex_local",
+            "produces": [
+              "local_rag_index"
+            ],
+            "summary": "reindex local",
+            "requires": [],
+            "progress_text": "reindex local"
+          }
+        ],
+        "invokes": [
+          "capability_registry",
+          "web_search",
+          "jarvis_memory"
+        ],
+        "produces": [
+          "workflow_plan",
+          "structured_sources",
+          "deep_research_report",
+          "learned_topic_memory",
+          "local_rag_index"
+        ],
+        "artifacts": [
+          "Jarvis_notes/Deep Research/*.md",
+          "Jarvis_notes/Memories/learned_topics/*.md",
+          "Jarvis_notes/.jarvis/memory.sqlite"
+        ],
+        "examples": [
+          "learn about WiFi sensing datasets",
+          "teach yourself about local RAG indexing",
+          "study the topic of CSI analysis open-source tools"
+        ],
+        "safety": "Read-only web research plus local Markdown vault writes. It should fail clearly when cited sources are not available.",
+        "risk_level": "low",
+        "requires_confirmation": false,
+        "confirmation_rules": "Read-only web research plus local Markdown vault writes. It should fail clearly when cited sources are not available.",
+        "success_statuses": [
+          "sources_validated",
+          "report_created",
+          "memory_note_created",
+          "indexed_local"
+        ],
+        "block_statuses": [
+          "no_cited_sources",
+          "not_enough_sources",
+          "quality_validation_failed"
+        ],
+        "progress": [
+          "Planning learning route",
+          "Researching cited sources",
+          "Writing report and memory note",
+          "Indexing vault"
+        ],
+        "available": false
+      },
+      "candidates": [
+        {
+          "name": "learn_topic_memory",
+          "title": "Learn Topic Memory",
+          "summary": "Research a topic, create a cited report, store key points as a learned-topic memory note, and reindex local RAG.",
+          "categories": [
+            "workflow",
+            "learning",
+            "research",
+            "memory",
+            "rag"
+          ],
+          "available": false,
+          "kind": "workflow",
+          "score": 27
+        },
+        {
+          "name": "current_news_report",
+          "title": "Current News Report",
+          "summary": "Search current news with exact date context, validate cited sources, and save a populated Obsidian report.",
+          "categories": [
+            "workflow",
+            "news",
+            "web",
+            "memory"
+          ],
+          "available": false,
+          "kind": "workflow",
+          "score": 26
+        },
+        {
+          "name": "deep_research_report",
+          "title": "Deep Research Report",
+          "summary": "Research a topic, synthesize findings, and store a long-form Markdown report in the vault.",
+          "categories": [
+            "workflow",
+            "research",
+            "web",
+            "memory"
+          ],
+          "available": false,
+          "kind": "workflow",
+          "score": 21
+        }
+      ],
+      "match_reason": "Matched workflow 'learn_topic_memory' from request terms and workflow triggers.",
+      "invokes": [
+        "capability_registry",
+        "web_search",
+        "jarvis_memory"
+      ],
+      "requires_confirmation": false,
+      "risk_level": "low",
+      "expected_artifacts": [
+        "Jarvis_notes/Deep Research/*.md",
+        "Jarvis_notes/Memories/learned_topics/*.md",
+        "Jarvis_notes/.jarvis/memory.sqlite"
+      ],
+      "steps": [
+        {
+          "id": "plan_learning",
+          "tool": "capability_registry",
+          "operation": "plan",
+          "requires": [
+            "topic"
+          ],
+          "produces": [
+            "workflow_plan"
+          ],
+          "summary": "plan",
+          "progress_text": "plan"
+        },
+        {
+          "id": "research_topic",
+          "tool": "web_search",
+          "operation": "research",
+          "requires": [
+            "topic",
+            "require_citations"
+          ],
+          "produces": [
+            "structured_sources"
+          ],
+          "summary": "research",
+          "progress_text": "research"
+        },
+        {
+          "id": "persist_learning",
+          "tool": "jarvis_memory",
+          "operation": "learn_topic",
+          "requires": [
+            "topic",
+            "structured_sources"
+          ],
+          "produces": [
+            "deep_research_report",
+            "learned_topic_memory"
+          ],
+          "summary": "learn topic",
+          "progress_text": "learn topic"
+        },
+        {
+          "id": "index_learning",
+          "tool": "jarvis_memory",
+          "operation": "reindex_local",
+          "produces": [
+            "local_rag_index"
+          ],
+          "summary": "reindex local",
+          "requires": [],
+          "progress_text": "reindex local"
+        }
+      ],
+      "progress": [
+        "Planning learning route",
+        "Researching cited sources",
+        "Writing report and memory note",
+        "Indexing vault"
+      ],
+      "success_statuses": [
+        "sources_validated",
+        "report_created",
+        "memory_note_created",
+        "indexed_local"
+      ],
+      "block_statuses": [
+        "no_cited_sources",
+        "not_enough_sources",
+        "quality_validation_failed"
+      ],
+      "identity": {
+        "assistant_name": "JARVIS",
+        "platform_name": "MARK XLVIII",
+        "summary": "JARVIS is the assistant. MARK XLVIII is the local platform and shell."
+      }
+    },
+    "search_result_count": 10,
+    "report": {
+      "ok": true,
+      "local_written": true,
+      "path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\mixed-vendor-dual-gpu-research\\rerun\\vault\\Reports\\2026-07-21-mixed-vendor-dual-gpu-local-model-orchestration.md",
+      "metadata": {
+        "id": "jarvis-20260721T165537Z-1b16c730",
+        "title": "Mixed-Vendor Dual-GPU Local Model Orchestration",
+        "type": "report",
+        "status": "draft",
+        "created": "2026-07-21T16:55:37Z",
+        "updated": "2026-07-21T16:55:37Z",
+        "project_id": "functional_eval_research",
+        "source": "daemon",
+        "tags": [
+          "web",
+          "research",
+          "report"
+        ],
+        "sync_state": "local_only",
+        "index_state": "indexed_local",
+        "remember_note_id": "",
+        "rag_index": true,
+        "sensitivity": "internal",
+        "confidence": 0.5,
+        "valid_from": "2026-07-21T16:55:37Z",
+        "review_after": "",
+        "source_version": 1,
+        "content_hash": "9850a14a95d4e82e66b7363a1d46d2ae49386740a205e0fdb06d468603a97054",
+        "supersedes": [],
+        "contradicts": [],
+        "depends_on": [],
+        "depended_on_by": [],
+        "extends": [],
+        "extended_by": [],
+        "implements": [],
+        "implemented_by": [],
+        "consumes": [],
+        "consumed_by": [],
+        "related": [],
+        "deleted": false,
+        "deleted_at": "",
+        "date_from": "",
+        "date_to": "",
+        "fallback_reason": "LM Studio local model route failed. Tried: qwen2.5-14b-deepresearch-i1: LM Studio chat request failed: {\"error\":\"Model unloaded.\"} | marco-deepresearch-8b: LM Studio chat request failed: {\"error\":\"Model unloaded.\"} | deepseek-r1-0528-qwen3-8b: LM Studio chat request failed: {\"error\":\"Model unloaded.\"} | qwen/qwen3-4b-2507: LM Studio chat request failed: <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Internal Server Error</pre>\n</body>\n</html>\n | mistralai/mistral-7b-instruct-v0.3: LM Studio chat request failed: {\"error\":\"Model unloaded.\"} | google/gemma-4-e4b: LM Studio chat request failed: {\n    \"error\": {\n        \"message\": \"Failed to load model \\\"google/gemma-4-e4b\\\". Error: Operation canceled.\",\n        \"type\": \"invalid_request_error\",\n        \"param\": \"model\",\n        \"co | qwen/qwen3-vl-4b: LM Studio chat request failed: {\"error\":\"Model unloaded.\"}",
+        "model_name": "",
+        "model_provider": "deterministic",
+        "model_role": "",
+        "original_query": "Assess reliable mixed-vendor dual-GPU local-model orchestration with LM Studio and llama.cpp. Cover memory allocation, concurrency, model loading, telemetry, failure recovery, and practical recommendations. Use current primary sources, preserve uncertainty, consolidate duplicate findings, and keep high-contrast findings separate.",
+        "quality_state": "degraded_unsynthesized",
+        "retrieved_at": "2026-07-21T16:43:29Z",
+        "search_mode": "research",
+        "source_count": 10,
+        "sync_error": "",
+        "synthesis_state": "deterministic_extract",
+        "workflow_id": "deep_research_report"
+      },
+      "sync": {
+        "ok": true,
+        "skipped": true,
+        "reason": "remember_me_disabled",
+        "path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\mixed-vendor-dual-gpu-research\\rerun\\vault\\Reports\\2026-07-21-mixed-vendor-dual-gpu-local-model-orchestration.md",
+        "metadata": {
+          "id": "jarvis-20260721T165537Z-1b16c730",
+          "title": "Mixed-Vendor Dual-GPU Local Model Orchestration",
+          "type": "report",
+          "status": "draft",
+          "created": "2026-07-21T16:55:37Z",
+          "updated": "2026-07-21T16:55:37Z",
+          "project_id": "functional_eval_research",
+          "source": "daemon",
+          "tags": [
+            "web",
+            "research",
+            "report"
+          ],
+          "sync_state": "local_only",
+          "index_state": "index_pending",
+          "remember_note_id": "",
+          "rag_index": true,
+          "sensitivity": "internal",
+          "confidence": 0.5,
+          "valid_from": "2026-07-21T16:55:37Z",
+          "review_after": "",
+          "source_version": 1,
+          "content_hash": "9850a14a95d4e82e66b7363a1d46d2ae49386740a205e0fdb06d468603a97054",
+          "supersedes": [],
+          "contradicts": [],
+          "depends_on": [],
+          "depended_on_by": [],
+          "extends": [],
+          "extended_by": [],
+          "implements": [],
+          "implemented_by": [],
+          "consumes": [],
+          "consumed_by": [],
+          "related": [],
+          "deleted": false,
+          "deleted_at": "",
+          "date_from": "",
+          "date_to": "",
+          "fallback_reason": "LM Studio local model route failed. Tried: qwen2.5-14b-deepresearch-i1: LM Studio chat request failed: {\"error\":\"Model unloaded.\"} | marco-deepresearch-8b: LM Studio chat request failed: {\"error\":\"Model unloaded.\"} | deepseek-r1-0528-qwen3-8b: LM Studio chat request failed: {\"error\":\"Model unloaded.\"} | qwen/qwen3-4b-2507: LM Studio chat request failed: <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Internal Server Error</pre>\n</body>\n</html>\n | mistralai/mistral-7b-instruct-v0.3: LM Studio chat request failed: {\"error\":\"Model unloaded.\"} | google/gemma-4-e4b: LM Studio chat request failed: {\n    \"error\": {\n        \"message\": \"Failed to load model \\\"google/gemma-4-e4b\\\". Error: Operation canceled.\",\n        \"type\": \"invalid_request_error\",\n        \"param\": \"model\",\n        \"co | qwen/qwen3-vl-4b: LM Studio chat request failed: {\"error\":\"Model unloaded.\"}",
+          "model_name": "",
+          "model_provider": "deterministic",
+          "model_role": "",
+          "original_query": "Assess reliable mixed-vendor dual-GPU local-model orchestration with LM Studio and llama.cpp. Cover memory allocation, concurrency, model loading, telemetry, failure recovery, and practical recommendations. Use current primary sources, preserve uncertainty, consolidate duplicate findings, and keep high-contrast findings separate.",
+          "quality_state": "degraded_unsynthesized",
+          "retrieved_at": "2026-07-21T16:43:29Z",
+          "search_mode": "research",
+          "source_count": 10,
+          "synthesis_state": "deterministic_extract",
+          "workflow_id": "deep_research_report",
+          "sync_error": ""
+        }
+      },
+      "reindex": {
+        "ok": true,
+        "backend": "local_sqlite",
+        "index_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\mixed-vendor-dual-gpu-research\\rerun\\vault\\.jarvis\\memory.sqlite",
+        "indexed_notes": 1,
+        "excluded_notes": 0,
+        "superseded_notes": 0,
+        "deduplicated_notes": 0
+      },
+      "quality": {
+        "ok": true,
+        "errors": [],
+        "source_urls": [
+          "https://markaicode.com/lm-studio-multi-gpu-split-large-models/",
+          "https://markaicode.com/architecture/lm-studio-local-ai-architecture/",
+          "https://insiderllm.com/guides/multi-gpu-local-ai/",
+          "https://lmstudio.ai/blog/lmstudio-v0.3.14",
+          "https://carteakey.dev/blog/local-inference/local-llm-optimization/",
+          "https://blogs.nvidia.com/blog/ai-decoded-lm-studio/",
+          "https://www.promptquorum.com/local-llms/multi-gpu-local-llms",
+          "https://medium.com/@yash9439/run-any-llm-on-distributed-multiple-gpus-locally-using-llama-cpp-2ff478a0dc3c",
+          "https://www.digitalocean.com/community/tutorials/splitting-llms-across-multiple-gpus",
+          "https://dasroot.net/posts/2026/01/local-llm-deployment-ollama-llama.cpp/"
+        ]
+      },
+      "source_count": 10,
+      "sources": [
+        {
+          "title": "Split Large Models Across GPUs: LM Studio Multi-GPU Setup 2026",
+          "snippet": "Configure LM Studio multi- GPU to split Llama 3.3 70B, Mixtral, and DeepSeek across 2-4 GPUs . Layer-splitting, VRAM balancing, and GPU offload settings explained.",
+          "url": "https://markaicode.com/lm-studio-multi-gpu-split-large-models/",
+          "source": "markaicode.com",
+          "published_at": "",
+          "retrieved_at": "2026-07-21T16:43:29Z",
+          "backend": "ddg_html"
+        },
+        {
+          "title": "LM Studio Production Architecture: Reliable Local LLM Inference",
+          "snippet": "Design a production-grade local AI inference architecture with LM Studio : multi-node scaling, observability, and failure mitigation for senior developers.",
+          "url": "https://markaicode.com/architecture/lm-studio-local-ai-architecture/",
+          "source": "markaicode.com",
+          "published_at": "",
+          "retrieved_at": "2026-07-21T16:43:29Z",
+          "backend": "ddg_html"
+        },
+        {
+          "title": "Best Dual-GPU Local AI Setup: RTX 3090, 5060 Ti (2026)",
+          "snippet": "Dual RTX 3090, 2x RTX 5060 Ti, 2x 2080 Ti modded, mixed setups: real configs for Qwen 3.6, MoE, 70B. Tensor vs pipeline parallelism, llama.cpp/vLLM.",
+          "url": "https://insiderllm.com/guides/multi-gpu-local-ai/",
+          "source": "insiderllm.com",
+          "published_at": "",
+          "retrieved_at": "2026-07-21T16:43:29Z",
+          "backend": "ddg_html"
+        },
+        {
+          "title": "LM Studio 0.3.14: Multi-GPU Controls ️",
+          "snippet": "Advanced controls for multi- GPU setups: enable/disable specific GPUs , choose allocation strategy, limit model weight to dedicated GPU memory , and more.",
+          "url": "https://lmstudio.ai/blog/lmstudio-v0.3.14",
+          "source": "lmstudio.ai",
+          "published_at": "",
+          "retrieved_at": "2026-07-21T16:43:29Z",
+          "backend": "ddg_html"
+        },
+        {
+          "title": "Local LLM Inference Optimization: The Complete Guide",
+          "snippet": "A practical guide to hardware, OS, and llama.cpp tuning, built from a year of experiments on a single consumer CUDA workstation.",
+          "url": "https://carteakey.dev/blog/local-inference/local-llm-optimization/",
+          "source": "carteakey.dev",
+          "published_at": "",
+          "retrieved_at": "2026-07-21T16:43:29Z",
+          "backend": "ddg_html"
+        },
+        {
+          "title": "Accelerate Larger LLMs Locally on RTX With LM Studio | NVIDIA Blog",
+          "snippet": "How to Accelerate Larger LLMs Locally on RTX With LM Studio GPU offloading makes massive models accessible on local RTX AI PCs and workstations.",
+          "url": "https://blogs.nvidia.com/blog/ai-decoded-lm-studio/",
+          "source": "blogs.nvidia.com",
+          "published_at": "",
+          "retrieved_at": "2026-07-21T16:43:29Z",
+          "backend": "ddg_html"
+        },
+        {
+          "title": "Multi-GPU Local LLMs 2026: Dual RTX 4090 for 70B at 100 tok/s",
+          "snippet": "Dual RTX 4090s (48 GB combined) run Llama 3.3 70B at ~100 tok/sec — only 5-10% slower than a theoretical single 48 GB GPU . This is the most cost-effective multi- GPU setup for 70B models in 2026.",
+          "url": "https://www.promptquorum.com/local-llms/multi-gpu-local-llms",
+          "source": "promptquorum.com",
+          "published_at": "",
+          "retrieved_at": "2026-07-21T16:43:29Z",
+          "backend": "ddg_html"
+        },
+        {
+          "title": "Run any LLM on Distributed Multiple GPUs Locally Using Llama_cpp",
+          "snippet": "In this tutorial, we will explore the efficient utilization of the Llama.cpp library to run fine-tuned LLMs on distributed multiple GPUs , unlocking ultra-fast performance.",
+          "url": "https://medium.com/@yash9439/run-any-llm-on-distributed-multiple-gpus-locally-using-llama-cpp-2ff478a0dc3c",
+          "source": "medium.com",
+          "published_at": "",
+          "retrieved_at": "2026-07-21T16:43:29Z",
+          "backend": "ddg_html"
+        },
+        {
+          "title": "Splitting LLMs Across Multiple GPUs: Techniques, Tools, and Best ...",
+          "snippet": "Learn how to split large language models (LLMs) across multiple GPUs using top techniques, tools, and best practices for efficient distributed training.",
+          "url": "https://www.digitalocean.com/community/tutorials/splitting-llms-across-multiple-gpus",
+          "source": "digitalocean.com",
+          "published_at": "",
+          "retrieved_at": "2026-07-21T16:43:29Z",
+          "backend": "ddg_html"
+        },
+        {
+          "title": "Local LLM Deployment with Ollama and llama.cpp: A Comprehensive Guide",
+          "snippet": "Learn how to deploy and optimize large language models locally using Ollama and llama.cpp. This guide covers installation, model customization with Modelfiles, and performance optimization through quantization for efficient GPU inference.",
+          "url": "https://dasroot.net/posts/2026/01/local-llm-deployment-ollama-llama.cpp/",
+          "source": "dasroot.net",
+          "published_at": "",
+          "retrieved_at": "2026-07-21T16:43:29Z",
+          "backend": "ddg_html"
+        }
+      ],
+      "synthesis_error": "LM Studio local model route failed. Tried: qwen2.5-14b-deepresearch-i1: LM Studio chat request failed: {\"error\":\"Model unloaded.\"} | marco-deepresearch-8b: LM Studio chat request failed: {\"error\":\"Model unloaded.\"} | deepseek-r1-0528-qwen3-8b: LM Studio chat request failed: {\"error\":\"Model unloaded.\"} | qwen/qwen3-4b-2507: LM Studio chat request failed: <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Internal Server Error</pre>\n</body>\n</html>\n | mistralai/mistral-7b-instruct-v0.3: LM Studio chat request failed: {\"error\":\"Model unloaded.\"} | google/gemma-4-e4b: LM Studio chat request failed: {\n    \"error\": {\n        \"message\": \"Failed to load model \\\"google/gemma-4-e4b\\\". Error: Operation canceled.\",\n        \"type\": \"invalid_request_error\",\n        \"param\": \"model\",\n        \"co | qwen/qwen3-vl-4b: LM Studio chat request failed: {\"error\":\"Model unloaded.\"}",
+      "model_provenance": {}
+    }
+  }
+}

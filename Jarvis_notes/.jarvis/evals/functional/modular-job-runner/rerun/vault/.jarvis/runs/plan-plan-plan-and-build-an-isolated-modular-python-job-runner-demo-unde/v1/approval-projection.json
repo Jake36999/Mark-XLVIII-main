@@ -1,0 +1,26 @@
+{
+  "frontmatter": {
+    "id": "plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-under-f-m",
+    "title": "Plan - Plan and build an isolated modular Python job-runner demo under F:\\Mark-XLVIII-main\\Jarvis",
+    "type": "plan",
+    "workflow_id": "long_form_plan_execution",
+    "plan_version": 1,
+    "original_prompt": "Plan and build an isolated modular Python job-runner demo under F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\artifacts\\job_runner_demo. Use a replaceable task module and replaceable telemetry adapter. Emit structured events with run ID, task ID, timestamps, status, duration, errors, retries, and health. Include setup instructions, tests, intentional failure telemetry, documentation, and prove a fresh process can reproduce the result.",
+    "agent_permission": "propose",
+    "decision_gates": []
+  },
+  "sections": {
+    "Summary": "> [!abstract] Plan summary\n> Draft long-form plan for: Plan and build an isolated modular Python job-runner demo under F:\\Mark-XLVIII-main\\Jarvis.\n\nThis plan is pending user review. It was generated from 0 local context result(s) and 0 cited web source(s).",
+    "Desired Outcome": "> [!success] Desired outcome\n> A reviewed, executable plan with clear scope, milestones, gates, and summary expectations.",
+    "Definition Of Done": "- [ ] Plan reviewed in Obsidian.\n- [ ] Scope and out-of-scope items are clear.\n- [ ] Execution milestones are ordered.\n- [ ] Blockers and design decision points are explicit.\n- [ ] Approval gates are visible.\n- [ ] Completion summary requirements are defined.",
+    "Scope": "",
+    "Task Ownership Assessment": "> [!note] Ownership assessment\n> No canonical Markdown task note was supplied for read-only classification.",
+    "Milestones": "| Milestone | Owner | Status | Evidence |\n| --- | --- | --- | --- |\n| Research and context | JARVIS/User | Not started | |\n| Plan review | JARVIS/User | Not started | |\n| Approved execution | JARVIS/User | Not started | |\n| Validation | JARVIS/User | Not started | |\n| Summary and handoff | JARVIS/User | Not started | |",
+    "Workflow Plan": "1. Validate the approved output root and job-runner acceptance criteria.\n2. Build the modular Python job runner through the registered project scaffold hook.\n3. Run fresh-process success, retry, terminal-failure, and telemetry validation.\n4. Record project artifacts, test evidence, and reproduction instructions in the vault.",
+    "Decision Points": "- Which parts of the plan are in scope for automated execution?\n- Which project or folder is authoritative for implementation work?\n- Which tasks require local-only models, high-tier models, or human review?\n- What should stop execution and return to the user?",
+    "Approval Gates": "> [!danger] Stop before\n> Delete, overwrite, move, broad refactors, browser submissions, purchases, account changes, heavy compute jobs, or multi-agent delegation.\n\n- [ ] Plan approved by user.\n- [ ] Destructive actions explicitly confirmed.\n- [ ] High-cost model use approved when needed.\n- [ ] Subagent delegation approved when needed.",
+    "Executable Work Items": "| ID | Sequence | Action | Target | Risk | Side effects | Depends on |\n| --- | ---: | --- | --- | --- | --- | --- |\n| p01 | 1 | Validate the approved output root and job-runner acceptance criteria | `approval_gate` | T1 | none | none |\n| p02 | 2 | Build the modular Python job runner through the registered project scaffold hook | `build_python_job_runner` | T1 | local_write | p01 |\n| p03 | 3 | Run fresh-process success, retry, terminal-failure, and telemetry validation | `validate_python_project` | T1 | local_read | p02 |\n| p04 | 4 | Record project artifacts, test evidence, and reproduction instructions in the vault | `vault_create_note` | T1 | local_write | p03 |\n| p05 | 5 | Research and context | `local_worker` | T1 | none | p04 |\n| p06 | 6 | Plan review | `local_worker` | T1 | none | p05 |\n| p07 | 7 | Approved execution | `local_worker` | T1 | none | p06 |\n| p08 | 8 | Validation | `local_worker` | T1 | none | p07 |\n| p09 | 9 | Summary and handoff | `local_worker` | T1 | none | p08 |\n| p10 | 10 | User reviews this plan in Obsidian | `local_worker` | T1 | none | p09 |\n| p11 | 11 | User requests edits or approves execution | `local_worker` | T1 | none | p10 |\n| p12 | 12 | JARVIS updates the plan if the goal changes | `local_worker` | T1 | none | p11 |\n\n> [!warning] Approval boundary\n> Only the IDs shown in this table may be dispatched. New child work requires a visible plan revision and renewed approval.",
+    "Next Actions": "- [ ] User reviews this plan in Obsidian.\n- [ ] User requests edits or approves execution.\n- [ ] JARVIS updates the plan if the goal changes.\n- [ ] JARVIS creates a summary or blocker note after execution starts.",
+    "Revision Request": ""
+  }
+}

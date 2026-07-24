@@ -58,12 +58,6 @@ class SubprocessBackend(SpawnBackend):
         is_leader: bool = False,
         keepalive: bool = False,
     ) -> str:
-        if openclaw_agent:
-            raise NotImplementedError(
-                f"openclaw_agent is not supported with subprocess backend "
-                f"(got {openclaw_agent!r}); use tmux backend instead."
-            )
-
         spawn_env = os.environ.copy()
         clawteam_bin = resolve_clawteam_executable()
         spawn_env.setdefault("LANG", "en_US.UTF-8")
@@ -131,6 +125,10 @@ class SubprocessBackend(SpawnBackend):
             final_command.extend(["--model", model])
         if model and is_openclaw_command(normalized_command) and "--model" not in final_command:
             final_command.extend(["--model", model])
+        if openclaw_agent and is_openclaw_command(normalized_command) and "--agent" not in final_command:
+            final_command.extend(["--agent", openclaw_agent])
+        if openclaw_agent and is_openclaw_command(normalized_command) and "--local" not in final_command:
+            final_command.append("--local")
         # Hermes Agent: insert 'chat' only when the user's original command is
         # bare `hermes` (don't clobber user-supplied global options or subcommands).
         # Check normalized_command, not final_command, since skip_permissions

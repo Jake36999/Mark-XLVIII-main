@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import json
 import os
+import tempfile
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -64,11 +66,29 @@ class SessionStore:
             state=state or {},
         )
         path = _sessions_root(self.team_name) / f"{agent_name}.json"
-        tmp = path.with_suffix(".tmp")
-        tmp.write_text(
-            session.model_dump_json(indent=2, by_alias=True), encoding="utf-8"
+        fd, tmp_name = tempfile.mkstemp(
+            prefix=f".{agent_name}.",
+            suffix=".tmp",
+            dir=str(path.parent),
         )
-        os.replace(str(tmp), str(path))
+        try:
+            with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as handle:
+                handle.write(session.model_dump_json(indent=2, by_alias=True))
+                handle.flush()
+                os.fsync(handle.fileno())
+            for attempt in range(8):
+                try:
+                    os.replace(tmp_name, str(path))
+                    break
+                except PermissionError:
+                    if attempt == 7:
+                        raise
+                    time.sleep(0.025 * (attempt + 1))
+        finally:
+            try:
+                os.unlink(tmp_name)
+            except FileNotFoundError:
+                pass
         return session
 
     def load(self, agent_name: str) -> SessionState | None:

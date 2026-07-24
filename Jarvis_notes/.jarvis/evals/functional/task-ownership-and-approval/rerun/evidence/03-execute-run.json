@@ -1,0 +1,312 @@
+{
+  "ok": true,
+  "run": {
+    "run_id": "plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-v1",
+    "plan_id": "plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task",
+    "plan_version": 1,
+    "status": "COMPLETED",
+    "bundle_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\v1",
+    "manifest_hash": "08a45114e2d6179429a356da5b2e0bc8a17dd20371fb657102818214a22e086d",
+    "approval_projection_hash": "490e30aeba5254993980129b60d9f5a8bb1441568a5fc9fc8d97d806723a2abf",
+    "workflow_hash": "3b19f61383f14ccc07665258bd4d85a7b0281f34b0d71166ba1e109ee811c32e",
+    "cancel_requested": 0,
+    "created_at": "2026-07-21T20:55:42Z",
+    "updated_at": "2026-07-21T20:55:44Z"
+  },
+  "items": [
+    {
+      "item_id": "p01",
+      "state": "ACCEPTED",
+      "attempt": 1,
+      "repair_count": 0,
+      "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\v1\\results\\01-p01.json",
+      "error": null
+    },
+    {
+      "item_id": "p02",
+      "state": "ACCEPTED",
+      "attempt": 1,
+      "repair_count": 0,
+      "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\v1\\results\\02-p02.json",
+      "error": null
+    },
+    {
+      "item_id": "p03",
+      "state": "ACCEPTED",
+      "attempt": 1,
+      "repair_count": 0,
+      "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\v1\\results\\03-p03.json",
+      "error": null
+    }
+  ],
+  "events": [
+    {
+      "item_id": null,
+      "event_type": "run_registered",
+      "details_json": "{\"item_count\": 3}",
+      "created_at": "2026-07-21T20:55:42Z",
+      "details": {
+        "item_count": 3
+      }
+    },
+    {
+      "item_id": null,
+      "event_type": "run_approved",
+      "details_json": "{}",
+      "created_at": "2026-07-21T20:55:42Z",
+      "details": {}
+    },
+    {
+      "item_id": "p01",
+      "event_type": "item_started",
+      "details_json": "{\"worker_id\": \"jarvis-local-worker:p01:f030fdc9\"}",
+      "created_at": "2026-07-21T20:55:43Z",
+      "details": {
+        "worker_id": "jarvis-local-worker:p01:f030fdc9"
+      }
+    },
+    {
+      "item_id": "p01",
+      "event_type": "item_reviewed",
+      "details_json": "{\"defects\": [], \"verdict\": \"ACCEPT\"}",
+      "created_at": "2026-07-21T20:55:43Z",
+      "details": {
+        "defects": [],
+        "verdict": "ACCEPT"
+      }
+    },
+    {
+      "item_id": "p02",
+      "event_type": "item_started",
+      "details_json": "{\"worker_id\": \"jarvis-local-worker:p02:ab2a74ef\"}",
+      "created_at": "2026-07-21T20:55:43Z",
+      "details": {
+        "worker_id": "jarvis-local-worker:p02:ab2a74ef"
+      }
+    },
+    {
+      "item_id": "p02",
+      "event_type": "item_reviewed",
+      "details_json": "{\"defects\": [], \"verdict\": \"ACCEPT\"}",
+      "created_at": "2026-07-21T20:55:43Z",
+      "details": {
+        "defects": [],
+        "verdict": "ACCEPT"
+      }
+    },
+    {
+      "item_id": "p03",
+      "event_type": "item_started",
+      "details_json": "{\"worker_id\": \"jarvis-local-worker:p03:75b63f69\"}",
+      "created_at": "2026-07-21T20:55:43Z",
+      "details": {
+        "worker_id": "jarvis-local-worker:p03:75b63f69"
+      }
+    },
+    {
+      "item_id": "p03",
+      "event_type": "item_reviewed",
+      "details_json": "{\"defects\": [], \"verdict\": \"ACCEPT\"}",
+      "created_at": "2026-07-21T20:55:44Z",
+      "details": {
+        "defects": [],
+        "verdict": "ACCEPT"
+      }
+    },
+    {
+      "item_id": null,
+      "event_type": "run_finished",
+      "details_json": "{\"status\": \"COMPLETED\"}",
+      "created_at": "2026-07-21T20:55:44Z",
+      "details": {
+        "status": "COMPLETED"
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "item_id": "p01",
+      "phase": "side_effect_prepared",
+      "idempotency_key": "d644fcc5398c18ddef6aed19439dd68a08882de0d9201786c44c38a56d21585d",
+      "details_json": "{\"side_effects\": \"local_write\"}",
+      "created_at": "2026-07-21T20:55:43Z",
+      "details": {
+        "side_effects": "local_write"
+      }
+    },
+    {
+      "item_id": "p01",
+      "phase": "before_dispatch",
+      "idempotency_key": "d644fcc5398c18ddef6aed19439dd68a08882de0d9201786c44c38a56d21585d",
+      "details_json": "{\"side_effects\": \"local_write\"}",
+      "created_at": "2026-07-21T20:55:43Z",
+      "details": {
+        "side_effects": "local_write"
+      }
+    },
+    {
+      "item_id": "p01",
+      "phase": "side_effect_started",
+      "idempotency_key": "d644fcc5398c18ddef6aed19439dd68a08882de0d9201786c44c38a56d21585d",
+      "details_json": "{\"resource_class\": \"io\"}",
+      "created_at": "2026-07-21T20:55:43Z",
+      "details": {
+        "resource_class": "io"
+      }
+    },
+    {
+      "item_id": "p01",
+      "phase": "result_written",
+      "idempotency_key": "d644fcc5398c18ddef6aed19439dd68a08882de0d9201786c44c38a56d21585d",
+      "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\evals\\\\functional\\\\task-ownership-and-approval\\\\rerun\\\\vault\\\\.jarvis\\\\runs\\\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\\\v1\\\\results\\\\01-p01.json\", \"verdict\": \"ACCEPT\"}",
+      "created_at": "2026-07-21T20:55:43Z",
+      "details": {
+        "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\v1\\results\\01-p01.json",
+        "verdict": "ACCEPT"
+      }
+    },
+    {
+      "item_id": "p01",
+      "phase": "side_effect_committed",
+      "idempotency_key": "d644fcc5398c18ddef6aed19439dd68a08882de0d9201786c44c38a56d21585d",
+      "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\evals\\\\functional\\\\task-ownership-and-approval\\\\rerun\\\\vault\\\\.jarvis\\\\runs\\\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\\\v1\\\\results\\\\01-p01.json\"}",
+      "created_at": "2026-07-21T20:55:43Z",
+      "details": {
+        "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\v1\\results\\01-p01.json"
+      }
+    },
+    {
+      "item_id": "p01",
+      "phase": "committed",
+      "idempotency_key": "d644fcc5398c18ddef6aed19439dd68a08882de0d9201786c44c38a56d21585d",
+      "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\evals\\\\functional\\\\task-ownership-and-approval\\\\rerun\\\\vault\\\\.jarvis\\\\runs\\\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\\\v1\\\\results\\\\01-p01.json\"}",
+      "created_at": "2026-07-21T20:55:43Z",
+      "details": {
+        "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\v1\\results\\01-p01.json"
+      }
+    },
+    {
+      "item_id": "p02",
+      "phase": "side_effect_prepared",
+      "idempotency_key": "8422386ea3bd92237e6a39c4cf4195e29e10ac380816e0845b67d56523b5ddab",
+      "details_json": "{\"side_effects\": \"none\"}",
+      "created_at": "2026-07-21T20:55:43Z",
+      "details": {
+        "side_effects": "none"
+      }
+    },
+    {
+      "item_id": "p02",
+      "phase": "before_dispatch",
+      "idempotency_key": "8422386ea3bd92237e6a39c4cf4195e29e10ac380816e0845b67d56523b5ddab",
+      "details_json": "{\"side_effects\": \"none\"}",
+      "created_at": "2026-07-21T20:55:43Z",
+      "details": {
+        "side_effects": "none"
+      }
+    },
+    {
+      "item_id": "p02",
+      "phase": "side_effect_started",
+      "idempotency_key": "8422386ea3bd92237e6a39c4cf4195e29e10ac380816e0845b67d56523b5ddab",
+      "details_json": "{\"resource_class\": \"io\"}",
+      "created_at": "2026-07-21T20:55:43Z",
+      "details": {
+        "resource_class": "io"
+      }
+    },
+    {
+      "item_id": "p02",
+      "phase": "result_written",
+      "idempotency_key": "8422386ea3bd92237e6a39c4cf4195e29e10ac380816e0845b67d56523b5ddab",
+      "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\evals\\\\functional\\\\task-ownership-and-approval\\\\rerun\\\\vault\\\\.jarvis\\\\runs\\\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\\\v1\\\\results\\\\02-p02.json\", \"verdict\": \"ACCEPT\"}",
+      "created_at": "2026-07-21T20:55:43Z",
+      "details": {
+        "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\v1\\results\\02-p02.json",
+        "verdict": "ACCEPT"
+      }
+    },
+    {
+      "item_id": "p02",
+      "phase": "side_effect_committed",
+      "idempotency_key": "8422386ea3bd92237e6a39c4cf4195e29e10ac380816e0845b67d56523b5ddab",
+      "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\evals\\\\functional\\\\task-ownership-and-approval\\\\rerun\\\\vault\\\\.jarvis\\\\runs\\\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\\\v1\\\\results\\\\02-p02.json\"}",
+      "created_at": "2026-07-21T20:55:43Z",
+      "details": {
+        "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\v1\\results\\02-p02.json"
+      }
+    },
+    {
+      "item_id": "p02",
+      "phase": "committed",
+      "idempotency_key": "8422386ea3bd92237e6a39c4cf4195e29e10ac380816e0845b67d56523b5ddab",
+      "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\evals\\\\functional\\\\task-ownership-and-approval\\\\rerun\\\\vault\\\\.jarvis\\\\runs\\\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\\\v1\\\\results\\\\02-p02.json\"}",
+      "created_at": "2026-07-21T20:55:43Z",
+      "details": {
+        "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\v1\\results\\02-p02.json"
+      }
+    },
+    {
+      "item_id": "p03",
+      "phase": "side_effect_prepared",
+      "idempotency_key": "c3c118e14a12b658968a0bfaa7f5791f981c080c5b01b77b259c17ee9e1f4653",
+      "details_json": "{\"side_effects\": \"local_write\"}",
+      "created_at": "2026-07-21T20:55:43Z",
+      "details": {
+        "side_effects": "local_write"
+      }
+    },
+    {
+      "item_id": "p03",
+      "phase": "before_dispatch",
+      "idempotency_key": "c3c118e14a12b658968a0bfaa7f5791f981c080c5b01b77b259c17ee9e1f4653",
+      "details_json": "{\"side_effects\": \"local_write\"}",
+      "created_at": "2026-07-21T20:55:43Z",
+      "details": {
+        "side_effects": "local_write"
+      }
+    },
+    {
+      "item_id": "p03",
+      "phase": "side_effect_started",
+      "idempotency_key": "c3c118e14a12b658968a0bfaa7f5791f981c080c5b01b77b259c17ee9e1f4653",
+      "details_json": "{\"resource_class\": \"io\"}",
+      "created_at": "2026-07-21T20:55:43Z",
+      "details": {
+        "resource_class": "io"
+      }
+    },
+    {
+      "item_id": "p03",
+      "phase": "result_written",
+      "idempotency_key": "c3c118e14a12b658968a0bfaa7f5791f981c080c5b01b77b259c17ee9e1f4653",
+      "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\evals\\\\functional\\\\task-ownership-and-approval\\\\rerun\\\\vault\\\\.jarvis\\\\runs\\\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\\\v1\\\\results\\\\03-p03.json\", \"verdict\": \"ACCEPT\"}",
+      "created_at": "2026-07-21T20:55:44Z",
+      "details": {
+        "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\v1\\results\\03-p03.json",
+        "verdict": "ACCEPT"
+      }
+    },
+    {
+      "item_id": "p03",
+      "phase": "side_effect_committed",
+      "idempotency_key": "c3c118e14a12b658968a0bfaa7f5791f981c080c5b01b77b259c17ee9e1f4653",
+      "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\evals\\\\functional\\\\task-ownership-and-approval\\\\rerun\\\\vault\\\\.jarvis\\\\runs\\\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\\\v1\\\\results\\\\03-p03.json\"}",
+      "created_at": "2026-07-21T20:55:44Z",
+      "details": {
+        "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\v1\\results\\03-p03.json"
+      }
+    },
+    {
+      "item_id": "p03",
+      "phase": "committed",
+      "idempotency_key": "c3c118e14a12b658968a0bfaa7f5791f981c080c5b01b77b259c17ee9e1f4653",
+      "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\evals\\\\functional\\\\task-ownership-and-approval\\\\rerun\\\\vault\\\\.jarvis\\\\runs\\\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\\\v1\\\\results\\\\03-p03.json\"}",
+      "created_at": "2026-07-21T20:55:44Z",
+      "details": {
+        "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\v1\\results\\03-p03.json"
+      }
+    }
+  ],
+  "summary_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Summaries\\2026-07-21-completed-plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-function.md"
+}

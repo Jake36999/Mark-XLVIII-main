@@ -40,6 +40,28 @@ def test_prepare_session_capture_generates_claude_session_id(monkeypatch, tmp_pa
     assert session.state["confidence"] == "exact"
 
 
+def test_session_store_retries_windows_replace_contention(monkeypatch, tmp_path):
+    monkeypatch.setenv("CLAWTEAM_DATA_DIR", str(tmp_path / ".clawteam"))
+    from clawteam.spawn import sessions as session_module
+
+    real_replace = session_module.os.replace
+    calls = 0
+
+    def flaky_replace(source, target):
+        nonlocal calls
+        calls += 1
+        if calls < 3:
+            raise PermissionError("simulated Windows sharing violation")
+        return real_replace(source, target)
+
+    monkeypatch.setattr(session_module.os, "replace", flaky_replace)
+    saved = SessionStore("demo").save("worker", session_id="session-1")
+
+    assert calls == 3
+    assert saved.session_id == "session-1"
+    assert SessionStore("demo").load("worker").session_id == "session-1"
+
+
 def test_prepare_session_capture_keeps_existing_claude_session_id():
     capture = prepare_session_capture(
         ["claude", "--session-id", "11111111-1111-4111-8111-111111111111"],

@@ -1,0 +1,24 @@
+{
+  "schema_version": "jarvis_approval/v1",
+  "plan_id": "plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-under-f-m",
+  "plan_version": 1,
+  "approval_projection_hash": "9dbc0039e0c7ef3c6ef8fc9c3566d331f835c1b4f5a4a1fd43d8dc059e4c1eae",
+  "workflow_hash": "1e01b40deb0b67a8faee7e63128b5d6383400c0377bb562573ed765bee61a740",
+  "manifest_hash": "3a6075029f7b25e87c549475686cb9851ad7381873fa07219b26b1c6a2066988",
+  "approved_action_ids": [
+    "p01",
+    "p02",
+    "p03",
+    "p04",
+    "p05",
+    "p06",
+    "p07",
+    "p08",
+    "p09",
+    "p10",
+    "p11",
+    "p12"
+  ],
+  "approved_at": "2026-07-21T16:32:02Z",
+  "signature": "823f52d4681811248d5c8eb3105778693e2bdd0b9a3eb556ed25be8bc1476a08"
+}

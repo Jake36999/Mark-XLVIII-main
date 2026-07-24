@@ -1,0 +1,40 @@
+{
+  "schema": "jarvis_functional_eval/v1",
+  "evaluation_id": "functional-2026-07-21",
+  "created_at": "2026-07-21T16:45:00Z",
+  "production_vault": "F:\\Mark-XLVIII-main\\Jarvis_notes",
+  "evaluation_root": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional",
+  "evaluation_vault": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\vault",
+  "fixture_project": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\fixtures\\job-runner-demo",
+  "reports_root": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Reports\\evals\\functional",
+  "speech_excluded": true,
+  "security_red_team": false,
+  "rounds": ["baseline", "rerun"],
+  "scenarios": [
+    "deep-research",
+    "planned-coding",
+    "planned-documentation",
+    "learn-dagster",
+    "productivity"
+  ],
+  "required_run_fields": [
+    "run_id",
+    "scenario",
+    "round",
+    "started_at",
+    "finished_at",
+    "duration_ms",
+    "status",
+    "provider",
+    "model",
+    "route",
+    "tools",
+    "artifacts",
+    "fallback_reason"
+  ],
+  "rag_policy": {
+    "raw_evaluation_artifacts": "excluded",
+    "compact_takeaways_only": true,
+    "backlinks_required": true
+  }
+}

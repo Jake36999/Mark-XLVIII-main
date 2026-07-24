@@ -6,9 +6,10 @@ import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 from actions import model_lifecycle as model_lifecycle_service
+from core.runtime_config import load_runtime_config
 
 
 def get_base_dir() -> Path:
@@ -33,11 +34,13 @@ DESTRUCTIVE_PATTERNS = (
 )
 
 BRIDGE_OPERATIONS = {"scout", "code_map", "handoff"}
+PROJECT_LEARNING_OPERATION = "learn_project"
 OPENCLAW_OPERATION = "delegate_openclaw"
 OPENCLAW_ROOT = BASE_DIR.parent / "ClawTeam-OpenClaw-main" / "ClawTeam-OpenClaw-main"
 MAX_STRING_CHARS = 1500
 MAX_LIST_ITEMS = 10
 MAX_OPENCLAW_AGENTS = 3
+DEFAULT_OPENCLAW_AGENT = "jarvis-worker"
 MULTI_AGENT_TOKENS = (
     "multi-agent",
     "multi agent",
@@ -48,6 +51,13 @@ MULTI_AGENT_TOKENS = (
     "workers",
     "agents",
     "swarm",
+)
+OPENCLAW_BLOCKED_INTENT_PATTERNS = (
+    (r"\b(?:hidden|undisclosed|unlogged)\s+(?:child\s+)?(?:task|action|step|work)", "Hidden or undisclosed work is not allowed."),
+    (r"\b(?:bypass|evade|ignore|skip)\b.{0,48}\b(?:approval|confirmation|permission|policy)\b", "Approval and permission controls cannot be bypassed."),
+    (r"\b(?:steal|exfiltrate|reveal|dump|print)\b.{0,48}\b(?:credential|secret|api\s*key|token|password)s?\b", "Credential or secret access is outside the delegation boundary."),
+    (r"\b(?:purchase|send\s+(?:an?\s+)?(?:email|message)|publish|deploy\s+to\s+(?:production|prod))\b", "External side effects require a separately approved workflow."),
+    (r"\b(?:interpret|conclude|determine)\b.{0,48}\b(?:physics|scientific|experimental)\b", "Scientific interpretation remains user- or Claude-owned."),
 )
 
 
@@ -82,6 +92,7 @@ def classify_operation(
     operation: str,
     command: str = "",
     confirmation_id: str = "",
+    confirmation_validator: Callable[[str, str, str, str], bool] | None = None,
 ) -> dict[str, Any]:
     projects = registry.get("projects", {})
     project = projects.get(project_id)
@@ -110,20 +121,35 @@ def classify_operation(
             "reason": "Destructive command text requires an explicit confirmation workflow.",
         }
 
+    confirmed = False
+    if confirmation_id and confirmation_validator is not None:
+        try:
+            confirmed = bool(confirmation_validator(project_id, normalized_operation, command, confirmation_id))
+        except Exception:
+            confirmed = False
+
     if normalized_operation in set(project.get("confirmation_operations", [])):
         return {
-            "action": "allow" if confirmation_id else "confirm",
-            "requires_confirmation": not bool(confirmation_id),
-            "reason": f"Operation '{normalized_operation}' requires confirmation.",
+            "action": "allow" if confirmed else "confirm",
+            "requires_confirmation": not confirmed,
+            "reason": (
+                f"Operation '{normalized_operation}' has trusted confirmation."
+                if confirmed
+                else f"Operation '{normalized_operation}' requires trusted confirmation."
+            ),
         }
 
     command_lower = command.lower()
     for gated in project.get("confirmation_commands", []):
         if gated.lower() and gated.lower() in command_lower:
             return {
-                "action": "allow" if confirmation_id else "confirm",
-                "requires_confirmation": not bool(confirmation_id),
-                "reason": "Command matches a confirmation-gated project command.",
+                "action": "allow" if confirmed else "confirm",
+                "requires_confirmation": not confirmed,
+                "reason": (
+                    "Command has trusted confirmation."
+                    if confirmed
+                    else "Command matches a confirmation-gated project command and requires trusted confirmation."
+                ),
             }
 
     if normalized_operation in set(project.get("safe_operations", [])):
@@ -162,22 +188,40 @@ def call_aletheia_tool(
     timeout = float(bridge.get("timeout_seconds", 20))
     request = build_jsonrpc_request(tool_name, args)
 
-    try:
+    def roundtrip() -> str:
         with socket.create_connection((host, port), timeout=timeout) as client:
             client.settimeout(timeout)
             line = json.dumps(request, separators=(",", ":")) + "\n"
             client.sendall(line.encode("utf-8"))
             reader = client.makefile("r", encoding="utf-8", newline="\n")
-            response_line = reader.readline()
+            return reader.readline()
+
+    try:
+        response_line = roundtrip()
     except OSError as exc:
-        return {
-            "ok": False,
-            "summary": (
-                "Aletheia bridge is not available. Start it with "
-                "scripts\\start-aletheia-operator.ps1, then retry."
-            ),
-            "error": {"code": "bridge_unavailable", "message": str(exc)},
-        }
+        from core.aletheia_supervisor import get_aletheia_supervisor
+
+        health = get_aletheia_supervisor().ensure_available({"host": host, "port": port})
+        if health.get("reachable"):
+            try:
+                response_line = roundtrip()
+            except OSError as retry_exc:
+                exc = retry_exc
+                response_line = ""
+        else:
+            response_line = ""
+        if response_line:
+            pass
+        else:
+            return {
+                "ok": False,
+                "summary": (
+                    "Aletheia bridge is not available. Start it with "
+                    "scripts\\start-aletheia-operator.ps1, then retry."
+                ),
+                "error": {"code": "bridge_unavailable", "message": str(exc)},
+                "health": health,
+            }
 
     if not response_line:
         return {
@@ -293,6 +337,27 @@ def _requested_openclaw_agents(parameters: dict[str, Any]) -> tuple[int, dict[st
     return count, {"action": "allow", "requires_confirmation": False, "reason": "OpenClaw agent count allowed."}
 
 
+def _classify_openclaw_intent(parameters: dict[str, Any]) -> dict[str, Any]:
+    intent = " ".join(
+        str(parameters.get(key) or "")
+        for key in ("intent", "task", "description", "command")
+    ).strip()
+    if _contains_destructive_command(intent):
+        return {
+            "action": "block",
+            "requires_confirmation": True,
+            "reason": "Destructive command text cannot be delegated through OpenClaw.",
+        }
+    for pattern, reason in OPENCLAW_BLOCKED_INTENT_PATTERNS:
+        if re.search(pattern, intent, flags=re.IGNORECASE | re.DOTALL):
+            return {"action": "block", "requires_confirmation": True, "reason": reason}
+    return {
+        "action": "allow",
+        "requires_confirmation": False,
+        "reason": "Intent is within the bounded coding-continuity delegation policy.",
+    }
+
+
 def _openclaw_task(project_id: str, project: dict[str, Any], parameters: dict[str, Any], agent_index: int, agents: int) -> str:
     intent = str(parameters.get("intent") or parameters.get("task") or parameters.get("description") or "").strip()
     if not intent:
@@ -324,6 +389,8 @@ def build_openclaw_spawn_command(
         "clawteam",
         "spawn",
         "subprocess",
+        "openclaw",
+        "agent",
         "--team",
         team,
         "--agent-name",
@@ -389,6 +456,10 @@ def delegate_openclaw(
     if agent_policy["action"] != "allow":
         return {"ok": False, "project_id": project_id, "operation": OPENCLAW_OPERATION, "policy": agent_policy}
 
+    intent_policy = _classify_openclaw_intent(parameters)
+    if intent_policy["action"] != "allow":
+        return {"ok": False, "project_id": project_id, "operation": OPENCLAW_OPERATION, "policy": intent_policy}
+
     if not OPENCLAW_ROOT.exists():
         return {
             "ok": False,
@@ -413,7 +484,12 @@ def delegate_openclaw(
 
     workspace = bool(parameters.get("workspace", _is_git_repo(str(project["root"]))))
     model = str(parameters.get("model") or "").strip()
-    openclaw_agent = str(parameters.get("openclaw_agent") or "").strip()
+    runtime_config = load_runtime_config()
+    openclaw_agent = str(
+        parameters.get("openclaw_agent")
+        or runtime_config.get("openclaw_worker_agent")
+        or DEFAULT_OPENCLAW_AGENT
+    ).strip()
     env = os.environ.copy()
     existing_pythonpath = env.get("PYTHONPATH", "")
     env["PYTHONPATH"] = str(OPENCLAW_ROOT) + (os.pathsep + existing_pythonpath if existing_pythonpath else "")
@@ -472,7 +548,7 @@ def delegate_openclaw(
         "workspace": workspace,
         "handoff_note": compact_for_mark(handoff_note),
         "spawned": compact_for_mark(spawned),
-        "policy": agent_policy,
+        "policy": {"agent_count": agent_policy, "intent": intent_policy},
     }
 
 
@@ -514,7 +590,66 @@ def project_operator(
     command = str(parameters.get("command", "")).strip()
     confirmation_id = str(parameters.get("confirmation_id", "")).strip()
 
-    if operation == "list" or not project_id:
+    if operation == "list":
+        return json.dumps({"ok": True, "projects": list_projects(registry)}, indent=2)
+
+    if operation == PROJECT_LEARNING_OPERATION:
+        project = registry.get("projects", {}).get(project_id) if project_id else None
+        explicit_path = str(parameters.get("path") or parameters.get("root") or "").strip()
+        if project is not None:
+            decision = classify_operation(registry, project_id, operation, command, confirmation_id)
+            if decision["action"] != "allow":
+                return json.dumps({"ok": False, "policy": decision}, indent=2)
+        elif explicit_path:
+            root = Path(explicit_path).expanduser().resolve()
+            if not root.is_dir():
+                return json.dumps({"ok": False, "error": f"Project directory was not found: {root}"}, indent=2)
+            project_id = project_id or _slug(root.name, "local-project")
+            project = {
+                "display_name": str(parameters.get("display_name") or root.name or project_id),
+                "root": str(root),
+                "summary": "Explicit read-only project learning target supplied by the user.",
+            }
+            decision = {
+                "action": "allow",
+                "requires_confirmation": False,
+                "reason": "Explicit directory learning is read-only; derivative notes are written only to Jarvis_notes.",
+            }
+        else:
+            return json.dumps(
+                {
+                    "ok": False,
+                    "error": "Provide a registered project_id or an explicit project directory path.",
+                    "projects": list_projects(registry),
+                },
+                indent=2,
+            )
+
+        bridge_context: dict[str, Any] = {}
+        if project_id in registry.get("projects", {}) and parameters.get("use_aletheia", True):
+            for bridge_operation in ("scout", "code_map"):
+                try:
+                    tool_name, tool_args = _build_bridge_call(project_id, bridge_operation, project)
+                    bridge_context[bridge_operation] = compact_for_mark(
+                        call_aletheia_tool(registry.get("bridge", {}), tool_name, tool_args)
+                    )
+                except Exception as exc:
+                    bridge_context[bridge_operation] = {"ok": False, "error": str(exc)}
+
+        from actions.project_learning import learn_repository
+
+        result = learn_repository(
+            str(project["root"]),
+            project_id=project_id,
+            display_name=str(project.get("display_name") or project_id),
+            intent=str(parameters.get("intent") or parameters.get("task") or ""),
+            bridge_context=bridge_context,
+            params=parameters,
+        )
+        result["policy"] = decision
+        return json.dumps(compact_for_mark(result), indent=2)
+
+    if not project_id:
         return json.dumps({"ok": True, "projects": list_projects(registry)}, indent=2)
 
     decision = classify_operation(registry, project_id, operation, command, confirmation_id)

@@ -1,0 +1,42 @@
+{
+  "schema_version": "jarvis_work_result/v1",
+  "run_id": "plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde-v1",
+  "item_id": "p02",
+  "verdict": "ACCEPT",
+  "defects": [],
+  "result": {
+    "ok": true,
+    "output_root": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\artifacts\\job_runner_demo",
+    "artifacts": [
+      "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\artifacts\\job_runner_demo\\README.md",
+      "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\artifacts\\job_runner_demo\\job_runner.py",
+      "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\artifacts\\job_runner_demo\\pyproject.toml",
+      "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\artifacts\\job_runner_demo\\tasks.py",
+      "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\artifacts\\job_runner_demo\\telemetry.py",
+      "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\artifacts\\job_runner_demo\\tests\\test_job_runner.py"
+    ],
+    "tests": {
+      "returncode": 0,
+      "stdout": "..                                                                       [100%]\n2 passed in 0.06s\n",
+      "stderr": ""
+    },
+    "fresh_process": {
+      "success_returncode": 0,
+      "retry_returncode": 0,
+      "success_events": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\artifacts\\job_runner_demo\\fresh-success.jsonl",
+      "retry_events": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\artifacts\\job_runner_demo\\fresh-retry.jsonl"
+    },
+    "model_provenance": {
+      "provider": "deterministic",
+      "model": "python_job_runner_template/v1",
+      "role": "artifact_builder"
+    },
+    "summary": "Created and verified a replaceable task/telemetry job-runner demo."
+  },
+  "model_provenance": {
+    "provider": "deterministic",
+    "model": "python_job_runner_template/v1",
+    "role": "artifact_builder"
+  },
+  "completed_at": "2026-07-21T16:32:03Z"
+}

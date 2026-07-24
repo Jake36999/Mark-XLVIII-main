@@ -1,0 +1,16 @@
+{
+  "schema_version": "jarvis_approval/v1",
+  "plan_id": "plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-artifact",
+  "plan_version": 1,
+  "approval_projection_hash": "d9dcc9af349142084a1d13ac9c9b12f83b13702c8e76d443559c4af27ebc36af",
+  "workflow_hash": "835ddf91b857a7f7bbf8d7fa1c607af1288de0254609c5acf6440d3ec7997a17",
+  "manifest_hash": "2513b4e51ee79e53d523ccc89492129414d19c830167e23ba3748a4bd06a9506",
+  "approved_action_ids": [
+    "p01",
+    "p02",
+    "p03",
+    "p04"
+  ],
+  "approved_at": "2026-07-21T16:34:17Z",
+  "signature": "a305fe092b18d9e4aa1300163e0242f02f0492d5dd35655a2245df3eab158cb2"
+}

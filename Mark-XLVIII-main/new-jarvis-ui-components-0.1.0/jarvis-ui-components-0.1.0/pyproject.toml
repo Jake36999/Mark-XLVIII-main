@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "jarvis-ui-components"
+version = "0.1.0"
+description = "Reusable PyQt6 knowledge and operations components for MARK XLVIII"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "JARVIS UI Components"}]
+dependencies = ["PyQt6>=6.6"]
+
+[tool.setuptools.packages.find]
+include = ["jarvis_ui_components*"]

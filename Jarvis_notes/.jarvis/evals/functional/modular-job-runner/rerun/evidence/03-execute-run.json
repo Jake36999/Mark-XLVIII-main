@@ -1,0 +1,432 @@
+{
+  "ok": true,
+  "run": {
+    "run_id": "plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde-v1",
+    "plan_id": "plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-under-f-m",
+    "plan_version": 1,
+    "status": "BLOCKED",
+    "bundle_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\.jarvis\\runs\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde\\v1",
+    "manifest_hash": "3a6075029f7b25e87c549475686cb9851ad7381873fa07219b26b1c6a2066988",
+    "approval_projection_hash": "9dbc0039e0c7ef3c6ef8fc9c3566d331f835c1b4f5a4a1fd43d8dc059e4c1eae",
+    "workflow_hash": "1e01b40deb0b67a8faee7e63128b5d6383400c0377bb562573ed765bee61a740",
+    "cancel_requested": 0,
+    "created_at": "2026-07-21T16:31:59Z",
+    "updated_at": "2026-07-21T16:32:04Z"
+  },
+  "items": [
+    {
+      "item_id": "p01",
+      "state": "ACCEPTED",
+      "attempt": 1,
+      "repair_count": 0,
+      "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\.jarvis\\runs\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde\\v1\\results\\01-p01.json",
+      "error": null
+    },
+    {
+      "item_id": "p02",
+      "state": "ACCEPTED",
+      "attempt": 1,
+      "repair_count": 0,
+      "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\.jarvis\\runs\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde\\v1\\results\\02-p02.json",
+      "error": null
+    },
+    {
+      "item_id": "p03",
+      "state": "ACCEPTED",
+      "attempt": 1,
+      "repair_count": 0,
+      "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\.jarvis\\runs\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde\\v1\\results\\03-p03.json",
+      "error": null
+    },
+    {
+      "item_id": "p04",
+      "state": "REJECT_REPLAN",
+      "attempt": 3,
+      "repair_count": 3,
+      "result_path": null,
+      "error": "'remember_project_id'"
+    },
+    {
+      "item_id": "p05",
+      "state": "PENDING",
+      "attempt": 0,
+      "repair_count": 0,
+      "result_path": null,
+      "error": null
+    },
+    {
+      "item_id": "p06",
+      "state": "PENDING",
+      "attempt": 0,
+      "repair_count": 0,
+      "result_path": null,
+      "error": null
+    },
+    {
+      "item_id": "p07",
+      "state": "PENDING",
+      "attempt": 0,
+      "repair_count": 0,
+      "result_path": null,
+      "error": null
+    },
+    {
+      "item_id": "p08",
+      "state": "PENDING",
+      "attempt": 0,
+      "repair_count": 0,
+      "result_path": null,
+      "error": null
+    },
+    {
+      "item_id": "p09",
+      "state": "PENDING",
+      "attempt": 0,
+      "repair_count": 0,
+      "result_path": null,
+      "error": null
+    },
+    {
+      "item_id": "p10",
+      "state": "PENDING",
+      "attempt": 0,
+      "repair_count": 0,
+      "result_path": null,
+      "error": null
+    },
+    {
+      "item_id": "p11",
+      "state": "PENDING",
+      "attempt": 0,
+      "repair_count": 0,
+      "result_path": null,
+      "error": null
+    },
+    {
+      "item_id": "p12",
+      "state": "PENDING",
+      "attempt": 0,
+      "repair_count": 0,
+      "result_path": null,
+      "error": null
+    }
+  ],
+  "events": [
+    {
+      "item_id": null,
+      "event_type": "run_registered",
+      "details_json": "{\"item_count\": 12}",
+      "created_at": "2026-07-21T16:31:59Z",
+      "details": {
+        "item_count": 12
+      }
+    },
+    {
+      "item_id": null,
+      "event_type": "run_approved",
+      "details_json": "{}",
+      "created_at": "2026-07-21T16:32:02Z",
+      "details": {}
+    },
+    {
+      "item_id": "p01",
+      "event_type": "item_started",
+      "details_json": "{\"worker_id\": \"jarvis-local-worker\"}",
+      "created_at": "2026-07-21T16:32:02Z",
+      "details": {
+        "worker_id": "jarvis-local-worker"
+      }
+    },
+    {
+      "item_id": "p01",
+      "event_type": "item_reviewed",
+      "details_json": "{\"defects\": [], \"verdict\": \"ACCEPT\"}",
+      "created_at": "2026-07-21T16:32:02Z",
+      "details": {
+        "defects": [],
+        "verdict": "ACCEPT"
+      }
+    },
+    {
+      "item_id": "p02",
+      "event_type": "item_started",
+      "details_json": "{\"worker_id\": \"jarvis-local-worker\"}",
+      "created_at": "2026-07-21T16:32:02Z",
+      "details": {
+        "worker_id": "jarvis-local-worker"
+      }
+    },
+    {
+      "item_id": "p02",
+      "event_type": "item_reviewed",
+      "details_json": "{\"defects\": [], \"verdict\": \"ACCEPT\"}",
+      "created_at": "2026-07-21T16:32:03Z",
+      "details": {
+        "defects": [],
+        "verdict": "ACCEPT"
+      }
+    },
+    {
+      "item_id": "p03",
+      "event_type": "item_started",
+      "details_json": "{\"worker_id\": \"jarvis-local-worker\"}",
+      "created_at": "2026-07-21T16:32:03Z",
+      "details": {
+        "worker_id": "jarvis-local-worker"
+      }
+    },
+    {
+      "item_id": "p03",
+      "event_type": "item_reviewed",
+      "details_json": "{\"defects\": [], \"verdict\": \"ACCEPT\"}",
+      "created_at": "2026-07-21T16:32:04Z",
+      "details": {
+        "defects": [],
+        "verdict": "ACCEPT"
+      }
+    },
+    {
+      "item_id": "p04",
+      "event_type": "item_started",
+      "details_json": "{\"worker_id\": \"jarvis-local-worker\"}",
+      "created_at": "2026-07-21T16:32:04Z",
+      "details": {
+        "worker_id": "jarvis-local-worker"
+      }
+    },
+    {
+      "item_id": "p04",
+      "event_type": "item_failed",
+      "details_json": "{\"error\": \"'remember_project_id'\", \"state\": \"REPAIR\"}",
+      "created_at": "2026-07-21T16:32:04Z",
+      "details": {
+        "error": "'remember_project_id'",
+        "state": "REPAIR"
+      }
+    },
+    {
+      "item_id": null,
+      "event_type": "repair_retry",
+      "details_json": "{\"status\": \"REPAIRING\"}",
+      "created_at": "2026-07-21T16:32:04Z",
+      "details": {
+        "status": "REPAIRING"
+      }
+    },
+    {
+      "item_id": "p04",
+      "event_type": "item_started",
+      "details_json": "{\"worker_id\": \"jarvis-local-worker\"}",
+      "created_at": "2026-07-21T16:32:04Z",
+      "details": {
+        "worker_id": "jarvis-local-worker"
+      }
+    },
+    {
+      "item_id": "p04",
+      "event_type": "item_failed",
+      "details_json": "{\"error\": \"'remember_project_id'\", \"state\": \"REPAIR\"}",
+      "created_at": "2026-07-21T16:32:04Z",
+      "details": {
+        "error": "'remember_project_id'",
+        "state": "REPAIR"
+      }
+    },
+    {
+      "item_id": null,
+      "event_type": "repair_retry",
+      "details_json": "{\"status\": \"REPAIRING\"}",
+      "created_at": "2026-07-21T16:32:04Z",
+      "details": {
+        "status": "REPAIRING"
+      }
+    },
+    {
+      "item_id": "p04",
+      "event_type": "item_started",
+      "details_json": "{\"worker_id\": \"jarvis-local-worker\"}",
+      "created_at": "2026-07-21T16:32:04Z",
+      "details": {
+        "worker_id": "jarvis-local-worker"
+      }
+    },
+    {
+      "item_id": "p04",
+      "event_type": "item_failed",
+      "details_json": "{\"error\": \"'remember_project_id'\", \"state\": \"REJECT_REPLAN\"}",
+      "created_at": "2026-07-21T16:32:04Z",
+      "details": {
+        "error": "'remember_project_id'",
+        "state": "REJECT_REPLAN"
+      }
+    },
+    {
+      "item_id": null,
+      "event_type": "run_finished",
+      "details_json": "{\"status\": \"BLOCKED\"}",
+      "created_at": "2026-07-21T16:32:04Z",
+      "details": {
+        "status": "BLOCKED"
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "item_id": "p01",
+      "phase": "before_dispatch",
+      "idempotency_key": "c8849339c289ada6270b438ca5c7e40fc0e9dafcd7e7c0d716bea3757bae0705",
+      "details_json": "{\"side_effects\": \"none\"}",
+      "created_at": "2026-07-21T16:32:02Z",
+      "details": {
+        "side_effects": "none"
+      }
+    },
+    {
+      "item_id": "p01",
+      "phase": "result_written",
+      "idempotency_key": "c8849339c289ada6270b438ca5c7e40fc0e9dafcd7e7c0d716bea3757bae0705",
+      "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\evals\\\\functional\\\\modular-job-runner\\\\rerun\\\\vault\\\\.jarvis\\\\runs\\\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde\\\\v1\\\\results\\\\01-p01.json\", \"verdict\": \"ACCEPT\"}",
+      "created_at": "2026-07-21T16:32:02Z",
+      "details": {
+        "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\.jarvis\\runs\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde\\v1\\results\\01-p01.json",
+        "verdict": "ACCEPT"
+      }
+    },
+    {
+      "item_id": "p01",
+      "phase": "committed",
+      "idempotency_key": "c8849339c289ada6270b438ca5c7e40fc0e9dafcd7e7c0d716bea3757bae0705",
+      "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\evals\\\\functional\\\\modular-job-runner\\\\rerun\\\\vault\\\\.jarvis\\\\runs\\\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde\\\\v1\\\\results\\\\01-p01.json\"}",
+      "created_at": "2026-07-21T16:32:02Z",
+      "details": {
+        "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\.jarvis\\runs\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde\\v1\\results\\01-p01.json"
+      }
+    },
+    {
+      "item_id": "p02",
+      "phase": "before_dispatch",
+      "idempotency_key": "0cc644475136144af1a777df73b2e6b3ec4d777431884d02d56585e86d3ed43b",
+      "details_json": "{\"side_effects\": \"local_write\"}",
+      "created_at": "2026-07-21T16:32:02Z",
+      "details": {
+        "side_effects": "local_write"
+      }
+    },
+    {
+      "item_id": "p02",
+      "phase": "result_written",
+      "idempotency_key": "0cc644475136144af1a777df73b2e6b3ec4d777431884d02d56585e86d3ed43b",
+      "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\evals\\\\functional\\\\modular-job-runner\\\\rerun\\\\vault\\\\.jarvis\\\\runs\\\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde\\\\v1\\\\results\\\\02-p02.json\", \"verdict\": \"ACCEPT\"}",
+      "created_at": "2026-07-21T16:32:03Z",
+      "details": {
+        "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\.jarvis\\runs\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde\\v1\\results\\02-p02.json",
+        "verdict": "ACCEPT"
+      }
+    },
+    {
+      "item_id": "p02",
+      "phase": "committed",
+      "idempotency_key": "0cc644475136144af1a777df73b2e6b3ec4d777431884d02d56585e86d3ed43b",
+      "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\evals\\\\functional\\\\modular-job-runner\\\\rerun\\\\vault\\\\.jarvis\\\\runs\\\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde\\\\v1\\\\results\\\\02-p02.json\"}",
+      "created_at": "2026-07-21T16:32:03Z",
+      "details": {
+        "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\.jarvis\\runs\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde\\v1\\results\\02-p02.json"
+      }
+    },
+    {
+      "item_id": "p03",
+      "phase": "before_dispatch",
+      "idempotency_key": "538721caa2e93ab42ad362477904d8e16ccace0337451613e07db9e0d98a93b9",
+      "details_json": "{\"side_effects\": \"local_read\"}",
+      "created_at": "2026-07-21T16:32:03Z",
+      "details": {
+        "side_effects": "local_read"
+      }
+    },
+    {
+      "item_id": "p03",
+      "phase": "result_written",
+      "idempotency_key": "538721caa2e93ab42ad362477904d8e16ccace0337451613e07db9e0d98a93b9",
+      "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\evals\\\\functional\\\\modular-job-runner\\\\rerun\\\\vault\\\\.jarvis\\\\runs\\\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde\\\\v1\\\\results\\\\03-p03.json\", \"verdict\": \"ACCEPT\"}",
+      "created_at": "2026-07-21T16:32:04Z",
+      "details": {
+        "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\.jarvis\\runs\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde\\v1\\results\\03-p03.json",
+        "verdict": "ACCEPT"
+      }
+    },
+    {
+      "item_id": "p03",
+      "phase": "committed",
+      "idempotency_key": "538721caa2e93ab42ad362477904d8e16ccace0337451613e07db9e0d98a93b9",
+      "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\evals\\\\functional\\\\modular-job-runner\\\\rerun\\\\vault\\\\.jarvis\\\\runs\\\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde\\\\v1\\\\results\\\\03-p03.json\"}",
+      "created_at": "2026-07-21T16:32:04Z",
+      "details": {
+        "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\.jarvis\\runs\\plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde\\v1\\results\\03-p03.json"
+      }
+    },
+    {
+      "item_id": "p04",
+      "phase": "before_dispatch",
+      "idempotency_key": "91925a514d8a467f93e1fc0499d85e64a63aab4f8ec87ae74c8582cc2ce43111",
+      "details_json": "{\"side_effects\": \"local_write\"}",
+      "created_at": "2026-07-21T16:32:04Z",
+      "details": {
+        "side_effects": "local_write"
+      }
+    },
+    {
+      "item_id": "p04",
+      "phase": "dispatch_interrupted",
+      "idempotency_key": "91925a514d8a467f93e1fc0499d85e64a63aab4f8ec87ae74c8582cc2ce43111",
+      "details_json": "{\"error\": \"'remember_project_id'\", \"state\": \"REPAIR\"}",
+      "created_at": "2026-07-21T16:32:04Z",
+      "details": {
+        "error": "'remember_project_id'",
+        "state": "REPAIR"
+      }
+    },
+    {
+      "item_id": "p04",
+      "phase": "before_dispatch",
+      "idempotency_key": "91925a514d8a467f93e1fc0499d85e64a63aab4f8ec87ae74c8582cc2ce43111",
+      "details_json": "{\"side_effects\": \"local_write\"}",
+      "created_at": "2026-07-21T16:32:04Z",
+      "details": {
+        "side_effects": "local_write"
+      }
+    },
+    {
+      "item_id": "p04",
+      "phase": "dispatch_interrupted",
+      "idempotency_key": "91925a514d8a467f93e1fc0499d85e64a63aab4f8ec87ae74c8582cc2ce43111",
+      "details_json": "{\"error\": \"'remember_project_id'\", \"state\": \"REPAIR\"}",
+      "created_at": "2026-07-21T16:32:04Z",
+      "details": {
+        "error": "'remember_project_id'",
+        "state": "REPAIR"
+      }
+    },
+    {
+      "item_id": "p04",
+      "phase": "before_dispatch",
+      "idempotency_key": "91925a514d8a467f93e1fc0499d85e64a63aab4f8ec87ae74c8582cc2ce43111",
+      "details_json": "{\"side_effects\": \"local_write\"}",
+      "created_at": "2026-07-21T16:32:04Z",
+      "details": {
+        "side_effects": "local_write"
+      }
+    },
+    {
+      "item_id": "p04",
+      "phase": "dispatch_interrupted",
+      "idempotency_key": "91925a514d8a467f93e1fc0499d85e64a63aab4f8ec87ae74c8582cc2ce43111",
+      "details_json": "{\"error\": \"'remember_project_id'\", \"state\": \"REJECT_REPLAN\"}",
+      "created_at": "2026-07-21T16:32:04Z",
+      "details": {
+        "error": "'remember_project_id'",
+        "state": "REJECT_REPLAN"
+      }
+    }
+  ],
+  "blocker_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\modular-job-runner\\rerun\\vault\\Blockers\\2026-07-21-blocked-plan-plan-plan-and-build-an-isolated-modular-python-job-runner-demo-unde.md"
+}

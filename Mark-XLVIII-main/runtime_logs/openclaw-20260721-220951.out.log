@@ -1,0 +1,18 @@
+2026-07-21T22:09:53.499+01:00 [gateway] loading configuration…
+2026-07-21T22:09:54.286+01:00 [gateway] resolving authentication…
+2026-07-21T22:09:54.316+01:00 [gateway] starting...
+2026-07-21T22:09:55.836+01:00 [gateway] auto-enabled plugins for this runtime without writing config:
+- lmstudio/qwen/qwen3-4b-2507 model configured, enabled automatically.
+2026-07-21T22:09:57.529+01:00 [gateway] starting HTTP server...
+2026-07-21T22:09:57.940+01:00 [health-monitor] started (interval: 300s, startup-grace: 60s, channel-connect-grace: 120s)
+2026-07-21T22:10:06.425+01:00 [gateway] agent model: lmstudio/qwen/qwen3-4b-2507 (thinking=medium, fast=off)
+2026-07-21T22:10:06.432+01:00 [gateway] http server listening (7 plugins: browser, canvas, device-pair, file-transfer, memory-core, phone-control, talk-voice; 12.1s)
+2026-07-21T22:10:06.439+01:00 [gateway] log file: C:\Users\jakem\AppData\Local\Temp\openclaw\openclaw-2026-07-21.log
+2026-07-21T22:10:07.377+01:00 [gateway] starting channels and sidecars...
+2026-07-21T22:10:07.961+01:00 [browser/server] Browser control listening on http://127.0.0.1:18791/ (auth=token)
+2026-07-21T22:10:08.059+01:00 [gateway] ready
+2026-07-21T22:10:08.074+01:00 [heartbeat] started
+2026-07-21T22:13:38.184+01:00 [reload] config change detected; evaluating reload (meta.lastTouchedAt, agents.defaults.model.primary, agents.defaults.models.lmstudio/qwen/qwen3.5-9b)
+2026-07-21T22:13:38.200+01:00 [reload] config hot reload applied (agents.defaults.model.primary, agents.defaults.models.lmstudio/qwen/qwen3.5-9b)
+2026-07-21T22:13:47.001+01:00 [reload] config change detected; evaluating reload (meta.lastTouchedAt, agents.defaults.experimental)
+2026-07-21T22:13:55.636+01:00 [reload] config change detected; evaluating reload (meta.lastTouchedAt)

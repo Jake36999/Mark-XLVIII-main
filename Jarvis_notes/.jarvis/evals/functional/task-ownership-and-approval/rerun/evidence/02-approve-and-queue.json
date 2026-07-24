@@ -1,0 +1,69 @@
+{
+  "ok": true,
+  "path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Plans\\2026-07-21-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-ownersh.md",
+  "title": "Plan - Review F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approv",
+  "status": "queued",
+  "approval_state": "approved",
+  "execution_state": "queued",
+  "run_id": "plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-v1",
+  "bundle_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\.jarvis\\runs\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional\\v1",
+  "execution_summary_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Summaries\\2026-07-21-execution-run-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functiona.md",
+  "packets": [
+    {
+      "id": "p01",
+      "task": "Classify canonical task IDs by ownership and permission without changing the user note",
+      "worker": "productivity_assessment",
+      "step_type": "python_hook",
+      "depends_on": []
+    },
+    {
+      "id": "p02",
+      "task": "Pause at the approval gate before any agent-owned or shared action",
+      "worker": "approval_gate",
+      "step_type": "gate",
+      "depends_on": [
+        "p01"
+      ]
+    },
+    {
+      "id": "p03",
+      "task": "Create a bounded task-assessment artifact with progress and completion-evidence requirements",
+      "worker": "vault_create_note",
+      "step_type": "artifact",
+      "depends_on": [
+        "p02"
+      ]
+    }
+  ],
+  "agent_count": 1,
+  "reindex": {
+    "ok": true,
+    "backend": "local_sqlite",
+    "index_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\.jarvis\\memory.sqlite",
+    "indexed_notes": 3,
+    "excluded_notes": 0,
+    "superseded_notes": 0,
+    "deduplicated_notes": 0,
+    "changed_notes": 1,
+    "unchanged_notes": 2,
+    "removed_notes": 0,
+    "embedding": {
+      "ok": false,
+      "status": "unsupported_provider"
+    }
+  },
+  "message": "Plan approved and queued. Execution starts after the current JARVIS speech turn completes.",
+  "canvas": {
+    "ok": true,
+    "operation": "sync_plan",
+    "path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Canvases\\JARVIS\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task.canvas",
+    "plan_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Plans\\2026-07-21-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-ownersh.md",
+    "node_count": 16,
+    "edge_count": 15,
+    "active_task_count": 14,
+    "completed_task_count": 0,
+    "rolling_limit": 24,
+    "canonical_source": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Plans\\2026-07-21-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task-ownersh.md",
+    "archived_snapshot": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\.jarvis\\canvas_history\\plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-task\\20260721-215542.canvas"
+  }
+}

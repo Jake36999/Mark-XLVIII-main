@@ -24,9 +24,7 @@ def _get_base_dir() -> Path:
     return Path(__file__).resolve().parent.parent
 
 def _get_api_key() -> str:
-    path = _get_base_dir() / "config" / "api_keys.json"
-    with open(path, "r", encoding="utf-8") as f:
-        return json.load(f)["gemini_api_key"]
+    raise RuntimeError("Gemini cloud credentials are session-only and unavailable to this legacy action.")
     
 def _get_desktop() -> Path:
     if _OS == "Linux":

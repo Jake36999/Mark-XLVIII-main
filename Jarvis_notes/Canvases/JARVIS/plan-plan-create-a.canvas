@@ -1,0 +1,37 @@
+{
+	"nodes":[
+		{"id":"jarvis-0a9db0d73f3a4423","type":"file","file":"Plans/2026-07-21-plan-create-a.md","x":0,"y":0,"width":460,"height":740},
+		{"id":"jarvis-7279c80f3ec6b2b0","type":"text","text":"# Plan - Create a\n**Status:** pending_review\n**Approval:** pending_review\n**Execution:** not_started\n**Visible tasks:** 14 of 14\n\n> This Canvas is a rolling view. The linked Markdown plan is authoritative.","x":560,"y":0,"width":420,"height":260,"color":"4"},
+		{"id":"jarvis-9358ecaf5e9e94bb","type":"text","text":"## [ ] Approval gates are visible.\n\n`plan-plan-create-a-51`\n\nSource line 51","x":1080,"y":0,"width":350,"height":170,"color":"3"},
+		{"id":"jarvis-d7edbdb86c98a8be","type":"text","text":"## [ ] Blockers and design decision points are explicit.\n\n`plan-plan-create-a-50`\n\nSource line 50","x":1470,"y":0,"width":350,"height":170,"color":"3"},
+		{"id":"jarvis-4140eeb93bfa6a15","type":"text","text":"## [ ] Completion summary requirements are defined.\n\n`plan-plan-create-a-52`\n\nSource line 52","x":1860,"y":0,"width":350,"height":170,"color":"3"},
+		{"id":"jarvis-498bbab344606897","type":"text","text":"## [ ] Destructive actions explicitly confirmed.\n\n`plan-plan-create-a-122`\n\nSource line 122","x":1080,"y":210,"width":350,"height":170,"color":"3"},
+		{"id":"jarvis-3a849f26fa4a3a59","type":"text","text":"## [ ] Execution milestones are ordered.\n\n`plan-plan-create-a-49`\n\nSource line 49","x":1470,"y":210,"width":350,"height":170,"color":"3"},
+		{"id":"jarvis-0f8caeaa7f81eb3c","type":"text","text":"## [ ] High-cost model use approved when needed.\n\n`plan-plan-create-a-123`\n\nSource line 123","x":1860,"y":210,"width":350,"height":170,"color":"3"},
+		{"id":"jarvis-7cddef3885398304","type":"text","text":"## [ ] JARVIS creates a summary or blocker note after execution starts.\n\n`plan-plan-create-a-131`\n\nSource line 131","x":1080,"y":420,"width":350,"height":170,"color":"3"},
+		{"id":"jarvis-94915d2d786383dc","type":"text","text":"## [ ] JARVIS updates the plan if the goal changes.\n\n`plan-plan-create-a-130`\n\nSource line 130","x":1470,"y":420,"width":350,"height":170,"color":"3"},
+		{"id":"jarvis-7402989ad7a868b2","type":"text","text":"## [ ] Plan approved by user.\n\n`plan-plan-create-a-121`\n\nSource line 121","x":1860,"y":420,"width":350,"height":170,"color":"3"},
+		{"id":"jarvis-77ddfcbf22547002","type":"text","text":"## [ ] Plan reviewed in Obsidian.\n\n`plan-plan-create-a-47`\n\nSource line 47","x":1080,"y":630,"width":350,"height":170,"color":"3"},
+		{"id":"jarvis-637736d9117fd4f1","type":"text","text":"## [ ] Scope and out-of-scope items are clear.\n\n`plan-plan-create-a-48`\n\nSource line 48","x":1470,"y":630,"width":350,"height":170,"color":"3"},
+		{"id":"jarvis-e8c57d676bfad37e","type":"text","text":"## [ ] Subagent delegation approved when needed.\n\n`plan-plan-create-a-124`\n\nSource line 124","x":1860,"y":630,"width":350,"height":170,"color":"3"},
+		{"id":"jarvis-d387f86c7639d588","type":"text","text":"## [ ] User requests edits or approves execution.\n\n`plan-plan-create-a-129`\n\nSource line 129","x":1080,"y":840,"width":350,"height":170,"color":"3"},
+		{"id":"jarvis-4927a6341cc51220","type":"text","text":"## [ ] User reviews this plan in Obsidian.\n\n`plan-plan-create-a-128`\n\nSource line 128","x":1470,"y":840,"width":350,"height":170,"color":"3"}
+	],
+	"edges":[
+		{"id":"jarvis-f0f57e11e3caf3a8","fromNode":"jarvis-0a9db0d73f3a4423","fromSide":"right","toNode":"jarvis-7279c80f3ec6b2b0","toSide":"left","label":"current state"},
+		{"id":"jarvis-d99314b2fc451fb0","fromNode":"jarvis-7279c80f3ec6b2b0","fromSide":"right","toNode":"jarvis-9358ecaf5e9e94bb","toSide":"left","label":"next"},
+		{"id":"jarvis-8530449a410d0571","fromNode":"jarvis-7279c80f3ec6b2b0","fromSide":"right","toNode":"jarvis-d7edbdb86c98a8be","toSide":"left","label":"next"},
+		{"id":"jarvis-9a4b2a6ed30a854a","fromNode":"jarvis-7279c80f3ec6b2b0","fromSide":"right","toNode":"jarvis-4140eeb93bfa6a15","toSide":"left","label":"next"},
+		{"id":"jarvis-20807f7a04c86429","fromNode":"jarvis-7279c80f3ec6b2b0","fromSide":"right","toNode":"jarvis-498bbab344606897","toSide":"left","label":"next"},
+		{"id":"jarvis-ea85f930a5523959","fromNode":"jarvis-7279c80f3ec6b2b0","fromSide":"right","toNode":"jarvis-3a849f26fa4a3a59","toSide":"left","label":"next"},
+		{"id":"jarvis-89658ad1df24b7ed","fromNode":"jarvis-7279c80f3ec6b2b0","fromSide":"right","toNode":"jarvis-0f8caeaa7f81eb3c","toSide":"left","label":"next"},
+		{"id":"jarvis-5b73a23c25c12341","fromNode":"jarvis-7279c80f3ec6b2b0","fromSide":"right","toNode":"jarvis-7cddef3885398304","toSide":"left","label":"next"},
+		{"id":"jarvis-0377f073433bb593","fromNode":"jarvis-7279c80f3ec6b2b0","fromSide":"right","toNode":"jarvis-94915d2d786383dc","toSide":"left","label":"next"},
+		{"id":"jarvis-3c622aa9a0cab3af","fromNode":"jarvis-7279c80f3ec6b2b0","fromSide":"right","toNode":"jarvis-7402989ad7a868b2","toSide":"left","label":"next"},
+		{"id":"jarvis-c6fdfcfa325b48d2","fromNode":"jarvis-7279c80f3ec6b2b0","fromSide":"right","toNode":"jarvis-77ddfcbf22547002","toSide":"left","label":"next"},
+		{"id":"jarvis-c119e57705da06f5","fromNode":"jarvis-7279c80f3ec6b2b0","fromSide":"right","toNode":"jarvis-637736d9117fd4f1","toSide":"left","label":"next"},
+		{"id":"jarvis-7d7bbdcad0ad9f8c","fromNode":"jarvis-7279c80f3ec6b2b0","fromSide":"right","toNode":"jarvis-e8c57d676bfad37e","toSide":"left","label":"next"},
+		{"id":"jarvis-270ba70e42a0df45","fromNode":"jarvis-7279c80f3ec6b2b0","fromSide":"right","toNode":"jarvis-d387f86c7639d588","toSide":"left","label":"next"},
+		{"id":"jarvis-44b52d2f72fdcc7d","fromNode":"jarvis-7279c80f3ec6b2b0","fromSide":"right","toNode":"jarvis-4927a6341cc51220","toSide":"left","label":"next"}
+	]
+}

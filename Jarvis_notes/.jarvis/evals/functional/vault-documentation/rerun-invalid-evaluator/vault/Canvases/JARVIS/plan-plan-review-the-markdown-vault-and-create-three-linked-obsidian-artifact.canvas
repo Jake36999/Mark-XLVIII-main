@@ -1,0 +1,285 @@
+{
+  "nodes": [
+    {
+      "id": "jarvis-eabc55669ae20720",
+      "type": "file",
+      "file": "Plans/2026-07-21-plan-review-the-markdown-vault-and-create-three-linked-obsidian-artifacts-an-eva.md",
+      "x": 0,
+      "y": 0,
+      "width": 460,
+      "height": 280
+    },
+    {
+      "id": "jarvis-4dfa8d32ae0ef185",
+      "type": "text",
+      "text": "# Plan - Review the Markdown vault and create three linked Obsidian artifacts: an Evaluation MOC, a\n**Status:** queued\n**Approval:** approved\n**Execution:** queued\n**Visible tasks:** 14 of 14\n\n> This Canvas is a rolling view. The linked Markdown plan is authoritative.",
+      "x": 560,
+      "y": 0,
+      "width": 420,
+      "height": 230,
+      "color": "4"
+    },
+    {
+      "id": "jarvis-5196f5f623668b7d",
+      "type": "text",
+      "text": "## [ ] Approval gates are visible.\n\n`plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-artifact-34`\n\nSource line 34",
+      "x": 1080,
+      "y": 0,
+      "width": 350,
+      "height": 170,
+      "color": "3"
+    },
+    {
+      "id": "jarvis-c4a249a0968a2b54",
+      "type": "text",
+      "text": "## [ ] Blockers and design decision points are explicit.\n\n`plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-artifact-33`\n\nSource line 33",
+      "x": 1470,
+      "y": 0,
+      "width": 350,
+      "height": 170,
+      "color": "3"
+    },
+    {
+      "id": "jarvis-60a11486fcf282a9",
+      "type": "text",
+      "text": "## [ ] Completion summary requirements are defined.\n\n`plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-artifact-35`\n\nSource line 35",
+      "x": 1860,
+      "y": 0,
+      "width": 350,
+      "height": 170,
+      "color": "3"
+    },
+    {
+      "id": "jarvis-224b4189b226481d",
+      "type": "text",
+      "text": "## [ ] Destructive actions explicitly confirmed.\n\n`plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-artifact-106`\n\nSource line 106",
+      "x": 1080,
+      "y": 210,
+      "width": 350,
+      "height": 170,
+      "color": "3"
+    },
+    {
+      "id": "jarvis-63ebbcaddedd83ac",
+      "type": "text",
+      "text": "## [ ] Execution milestones are ordered.\n\n`plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-artifact-32`\n\nSource line 32",
+      "x": 1470,
+      "y": 210,
+      "width": 350,
+      "height": 170,
+      "color": "3"
+    },
+    {
+      "id": "jarvis-5c792e3378321486",
+      "type": "text",
+      "text": "## [ ] High-cost model use approved when needed.\n\n`plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-artifact-107`\n\nSource line 107",
+      "x": 1860,
+      "y": 210,
+      "width": 350,
+      "height": 170,
+      "color": "3"
+    },
+    {
+      "id": "jarvis-06fe0da02e5aa69e",
+      "type": "text",
+      "text": "## [ ] JARVIS creates a summary or blocker note after execution starts.\n\n`plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-artifact-115`\n\nSource line 115",
+      "x": 1080,
+      "y": 420,
+      "width": 350,
+      "height": 170,
+      "color": "3"
+    },
+    {
+      "id": "jarvis-f8d5ac19b6d2a8a8",
+      "type": "text",
+      "text": "## [ ] JARVIS updates the plan if the goal changes.\n\n`plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-artifact-114`\n\nSource line 114",
+      "x": 1470,
+      "y": 420,
+      "width": 350,
+      "height": 170,
+      "color": "3"
+    },
+    {
+      "id": "jarvis-d8936b18d8a040b1",
+      "type": "text",
+      "text": "## [ ] Plan approved by user.\n\n`plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-artifact-105`\n\nSource line 105",
+      "x": 1860,
+      "y": 420,
+      "width": 350,
+      "height": 170,
+      "color": "3"
+    },
+    {
+      "id": "jarvis-53ac7fe9e23f614f",
+      "type": "text",
+      "text": "## [ ] Plan reviewed in Obsidian.\n\n`plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-artifact-30`\n\nSource line 30",
+      "x": 1080,
+      "y": 630,
+      "width": 350,
+      "height": 170,
+      "color": "3"
+    },
+    {
+      "id": "jarvis-c6aa44f2214e3d30",
+      "type": "text",
+      "text": "## [ ] Scope and out-of-scope items are clear.\n\n`plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-artifact-31`\n\nSource line 31",
+      "x": 1470,
+      "y": 630,
+      "width": 350,
+      "height": 170,
+      "color": "3"
+    },
+    {
+      "id": "jarvis-6cb99692a380fbf3",
+      "type": "text",
+      "text": "## [ ] Subagent delegation approved when needed.\n\n`plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-artifact-108`\n\nSource line 108",
+      "x": 1860,
+      "y": 630,
+      "width": 350,
+      "height": 170,
+      "color": "3"
+    },
+    {
+      "id": "jarvis-4e4fcaa7f79c02ef",
+      "type": "text",
+      "text": "## [ ] User requests edits or approves execution.\n\n`plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-artifact-113`\n\nSource line 113",
+      "x": 1080,
+      "y": 840,
+      "width": 350,
+      "height": 170,
+      "color": "3"
+    },
+    {
+      "id": "jarvis-6ef5d9e1dde6d533",
+      "type": "text",
+      "text": "## [ ] User reviews this plan in Obsidian.\n\n`plan-plan-review-the-markdown-vault-and-create-three-linked-obsidian-artifact-112`\n\nSource line 112",
+      "x": 1470,
+      "y": 840,
+      "width": 350,
+      "height": 170,
+      "color": "3"
+    }
+  ],
+  "edges": [
+    {
+      "id": "jarvis-40992f430b846405",
+      "fromNode": "jarvis-eabc55669ae20720",
+      "fromSide": "right",
+      "toNode": "jarvis-4dfa8d32ae0ef185",
+      "toSide": "left",
+      "label": "current state"
+    },
+    {
+      "id": "jarvis-c43b781f2e81c5d0",
+      "fromNode": "jarvis-4dfa8d32ae0ef185",
+      "fromSide": "right",
+      "toNode": "jarvis-5196f5f623668b7d",
+      "toSide": "left",
+      "label": "next"
+    },
+    {
+      "id": "jarvis-8f80b80184723477",
+      "fromNode": "jarvis-4dfa8d32ae0ef185",
+      "fromSide": "right",
+      "toNode": "jarvis-c4a249a0968a2b54",
+      "toSide": "left",
+      "label": "next"
+    },
+    {
+      "id": "jarvis-3af47b9fb2f9a718",
+      "fromNode": "jarvis-4dfa8d32ae0ef185",
+      "fromSide": "right",
+      "toNode": "jarvis-60a11486fcf282a9",
+      "toSide": "left",
+      "label": "next"
+    },
+    {
+      "id": "jarvis-e6beaafd6c1a862a",
+      "fromNode": "jarvis-4dfa8d32ae0ef185",
+      "fromSide": "right",
+      "toNode": "jarvis-224b4189b226481d",
+      "toSide": "left",
+      "label": "next"
+    },
+    {
+      "id": "jarvis-9eaa0df71033c9a6",
+      "fromNode": "jarvis-4dfa8d32ae0ef185",
+      "fromSide": "right",
+      "toNode": "jarvis-63ebbcaddedd83ac",
+      "toSide": "left",
+      "label": "next"
+    },
+    {
+      "id": "jarvis-119983a33a8f57f3",
+      "fromNode": "jarvis-4dfa8d32ae0ef185",
+      "fromSide": "right",
+      "toNode": "jarvis-5c792e3378321486",
+      "toSide": "left",
+      "label": "next"
+    },
+    {
+      "id": "jarvis-f7064606aabf0128",
+      "fromNode": "jarvis-4dfa8d32ae0ef185",
+      "fromSide": "right",
+      "toNode": "jarvis-06fe0da02e5aa69e",
+      "toSide": "left",
+      "label": "next"
+    },
+    {
+      "id": "jarvis-221201838506ea80",
+      "fromNode": "jarvis-4dfa8d32ae0ef185",
+      "fromSide": "right",
+      "toNode": "jarvis-f8d5ac19b6d2a8a8",
+      "toSide": "left",
+      "label": "next"
+    },
+    {
+      "id": "jarvis-fc495a714f10f834",
+      "fromNode": "jarvis-4dfa8d32ae0ef185",
+      "fromSide": "right",
+      "toNode": "jarvis-d8936b18d8a040b1",
+      "toSide": "left",
+      "label": "next"
+    },
+    {
+      "id": "jarvis-3343e77030a96d47",
+      "fromNode": "jarvis-4dfa8d32ae0ef185",
+      "fromSide": "right",
+      "toNode": "jarvis-53ac7fe9e23f614f",
+      "toSide": "left",
+      "label": "next"
+    },
+    {
+      "id": "jarvis-41e49d0f85b85153",
+      "fromNode": "jarvis-4dfa8d32ae0ef185",
+      "fromSide": "right",
+      "toNode": "jarvis-c6aa44f2214e3d30",
+      "toSide": "left",
+      "label": "next"
+    },
+    {
+      "id": "jarvis-6776973646f26fe5",
+      "fromNode": "jarvis-4dfa8d32ae0ef185",
+      "fromSide": "right",
+      "toNode": "jarvis-6cb99692a380fbf3",
+      "toSide": "left",
+      "label": "next"
+    },
+    {
+      "id": "jarvis-18aaad42e968893f",
+      "fromNode": "jarvis-4dfa8d32ae0ef185",
+      "fromSide": "right",
+      "toNode": "jarvis-4e4fcaa7f79c02ef",
+      "toSide": "left",
+      "label": "next"
+    },
+    {
+      "id": "jarvis-1fff35708e8ff304",
+      "fromNode": "jarvis-4dfa8d32ae0ef185",
+      "fromSide": "right",
+      "toNode": "jarvis-6ef5d9e1dde6d533",
+      "toSide": "left",
+      "label": "next"
+    }
+  ]
+}

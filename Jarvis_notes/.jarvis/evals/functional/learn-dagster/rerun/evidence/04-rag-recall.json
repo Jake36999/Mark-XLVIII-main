@@ -1,0 +1,47 @@
+{
+  "ok": true,
+  "backend": "local_sqlite",
+  "query": "Dagster assets resources orchestration",
+  "filters": {
+    "project_id": "",
+    "note_types": [],
+    "tags": []
+  },
+  "results": [
+    {
+      "source_id": "memory-learned-topics-dagster",
+      "title": "Learned Topic: Dagster",
+      "path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\learn-dagster\\rerun\\vault\\Memories\\learned_topics\\dagster.md",
+      "type": "memory",
+      "status": "draft",
+      "tags": [
+        "learning",
+        "learned-topic",
+        "rag",
+        "dagster"
+      ],
+      "content": "# Learned Topic: Dagster ## Summary JARVIS has learned the topic **Dagster** from 10 cited sources. Learning map: [[Learning/2026-07-21-dagster-topic-map|Dagster - Topic Map]]. Full review note: [[Deep Research/2026-07-21-learning-report-dagster|Learning Report - Dagster]]. ## Details ### Retained Key Points - 1. Concepts - Dagster Docs: A ResourceDefinition is a way to make external resources (like database or API connections) available to Dagster entities (like assets , schedules , or sensors ) during job execution, and to clean up after execution resolves. [1] - 2. Jobs - Dagster Docs: When",
+      "score": 0.9999953132087792,
+      "retrieval_method": "local_fts",
+      "citation": "[note:memory-learned-topics-dagster]",
+      "confidence": 0.7,
+      "valid_from": "2026-07-21T16:43:06Z",
+      "review_after": "",
+      "source_version": "1",
+      "content_hash": "9c22d97fe769c73ea71d26fc21583f616f6eb4c7c7f583b42d78b28b7da4b70b",
+      "supersedes": [],
+      "contradicts": [],
+      "sensitivity": "internal",
+      "trust_level": "untrusted_evidence",
+      "instruction_authority": "none",
+      "project_id": "functional_eval_learning",
+      "layer": "",
+      "files": [],
+      "relations": {
+        "related": [
+          "learning-dagster-map"
+        ]
+      }
+    }
+  ]
+}

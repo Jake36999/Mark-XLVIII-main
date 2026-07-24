@@ -1,0 +1,45 @@
+{
+  "schema_version": "jarvis_work_result/v1",
+  "run_id": "plan-plan-review-f-mark-xlviii-main-jarvis-notes-jarvis-evals-functional-v1",
+  "item_id": "p01",
+  "verdict": "ACCEPT",
+  "defects": [],
+  "result": {
+    "ok": true,
+    "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Progress\\2026-07-21-evaluation-sample-project.md",
+    "artifact_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\evals\\functional\\task-ownership-and-approval\\rerun\\vault\\Reports\\2026-07-21-task-ownership-assessment-evaluation-sample-project.md",
+    "tasks": [
+      {
+        "task_id": "task-user-router",
+        "text": "User connected the test router.",
+        "owner": "advice-only",
+        "permission": "propose",
+        "done": true
+      },
+      {
+        "task_id": "task-user-antenna",
+        "text": "User: choose the final antenna position.",
+        "owner": "user-owned",
+        "permission": "advice-only",
+        "done": false
+      },
+      {
+        "task_id": "task-shared-outline",
+        "text": "Shared: agree on the report outline.",
+        "owner": "shared",
+        "permission": "confirmation-required",
+        "done": false
+      },
+      {
+        "task_id": "task-agent-inventory",
+        "text": "Agent: draft a Markdown inventory from supplied facts.",
+        "owner": "agent-owned",
+        "permission": "confirmation-required",
+        "done": false
+      }
+    ],
+    "summary": "Classified 4 task(s) without mutating the canonical note."
+  },
+  "model_provenance": null,
+  "completed_at": "2026-07-21T20:55:43Z"
+}
