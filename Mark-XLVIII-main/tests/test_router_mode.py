@@ -710,6 +710,154 @@ class ToolSummaryGroundingTests(unittest.TestCase):
         self.assertNotIn("project_operator, project_operator", prompt)
 
 
+class ToolReceiptTests(unittest.TestCase):
+    """WS2 (2026-07-24 planning roadmap, D4): a deterministic, unfabricatable
+    record of what a tool call actually returned, used both for the process
+    trace and as evidence for the anti-fabrication check below."""
+
+    def test_json_result_extracts_ok_returncode_and_error(self):
+        import main
+
+        result = '{"ok": false, "returncode": 1, "error": "boom", "extra": "ignored-shape"}'
+        receipt = main._tool_receipt("code_helper", {"operation": "run"}, result)
+
+        self.assertEqual(receipt["tool"], "code_helper")
+        self.assertEqual(receipt["operation"], "run")
+        self.assertEqual(receipt["ok"], False)
+        self.assertEqual(receipt["returncode"], 1)
+        self.assertEqual(receipt["error"], "boom")
+
+    def test_non_json_result_falls_back_to_a_snippet(self):
+        import main
+
+        receipt = main._tool_receipt("weather_report", {}, "Sunny, 21C")
+
+        self.assertNotIn("ok", receipt)
+        self.assertEqual(receipt["result_snippet"], "Sunny, 21C")
+
+
+class UnverifiedCompletionNoticeTests(unittest.TestCase):
+    """WS2 hard anti-fabrication check: the live-tested failure was JARVIS
+    claiming 'test suite passed... proceeding with feature closure' from a
+    project_operator call that never ran a test. A completion-style claim
+    with no supporting receipt must get a deterministic caveat appended."""
+
+    def test_unsupported_test_pass_claim_gets_a_notice(self):
+        import main
+
+        reply = (
+            "The test suite has been checked for status. Result: Operation status "
+            "confirmed as successful (ok: true). This confirms the feature is ready "
+            "for completion per the defined confirmation gate. Proceeding with "
+            "feature closure."
+        )
+        receipts = [{"tool": "project_operator", "ok": True, "result_snippet": '{"ok": true, "projects": []}'}]
+
+        notice = main._unverified_completion_notice(reply, receipts)
+
+        self.assertIsNotNone(notice)
+        self.assertIn("unverified", notice.lower())
+
+    def test_test_pass_claim_backed_by_a_real_receipt_gets_no_notice(self):
+        import main
+
+        reply = "All tests passed -- 17 passed in 0.35s."
+        receipts = [{"tool": "code_helper", "result_snippet": "17 passed in 0.35s"}]
+
+        self.assertIsNone(main._unverified_completion_notice(reply, receipts))
+
+    def test_plain_reply_with_no_completion_claim_gets_no_notice(self):
+        import main
+
+        self.assertIsNone(main._unverified_completion_notice("Here are your registered projects.", []))
+
+    def test_honest_negated_claim_is_not_flagged(self):
+        """Regression: a live re-run surfaced this exact false positive -- a
+        correctly-grounded reply that says a test outcome could NOT be
+        confirmed was itself getting flagged as the unsupported claim."""
+        import main
+
+        reply = (
+            "The requested tests (test_tts_read_trigger.py) were not run, and no test "
+            "results are available in the provided tool output. The project_operator "
+            "tool returned a status summary but did not execute or report on the test "
+            "suite. Therefore, the vault-watcher TTS read-trigger tests cannot be "
+            "confirmed as passing."
+        )
+        receipt = {"tool": "project_operator", "ok": True, "result_snippet": '{"ok": true}'}
+
+        self.assertIsNone(main._unverified_completion_notice(reply, [receipt]))
+
+
+class RouterModeAntiFabricationIntegrationTests(unittest.TestCase):
+    """Reproduces the exact live-tested fabrication scenario end to end
+    through _handle_router_text_command, with the model calls mocked."""
+
+    def test_fabricated_test_pass_claim_gets_flagged_in_the_final_reply(self):
+        import main
+
+        jarvis = main.JarvisLive.__new__(main.JarvisLive)
+        jarvis.ui = mock.Mock()
+        jarvis.ui.muted = False
+        jarvis._router_system_prompt = mock.Mock(return_value="system")
+        jarvis.speak = mock.Mock()
+        jarvis._execute_router_tool_call = mock.Mock(
+            return_value=json.dumps(
+                {
+                    "ok": True,
+                    "projects": [{"project_id": "quantule_mapper", "display_name": "Quantule Mapper"}],
+                }
+            )
+        )
+
+        routed = SimpleNamespace(
+            text="",
+            tool_calls=[SimpleNamespace(id="call_1", name="project_operator", arguments={"operation": "status"})],
+        )
+        fabricated_reply = (
+            "The vault-watcher's TTS read-trigger test suite has been checked for status. "
+            "Result: Operation status confirmed as successful (ok: true). This confirms the "
+            "feature is ready for completion per the defined confirmation gate. Proceeding "
+            "with feature closure."
+        )
+
+        with mock.patch("main.call_with_tools", return_value=routed), mock.patch(
+            "main.call_text", return_value=fabricated_reply
+        ):
+            jarvis._handle_router_text_command("Run the test suite and confirm tests/test_tts_read_trigger.py passes.")
+
+        final_reply = jarvis.speak.call_args.args[0]
+        self.assertIn(fabricated_reply, final_reply)
+        self.assertIn("unverified", final_reply.lower())
+
+    def test_a_real_pytest_pass_receipt_does_not_get_flagged(self):
+        import main
+
+        jarvis = main.JarvisLive.__new__(main.JarvisLive)
+        jarvis.ui = mock.Mock()
+        jarvis.ui.muted = False
+        jarvis._router_system_prompt = mock.Mock(return_value="system")
+        jarvis.speak = mock.Mock()
+        jarvis._execute_router_tool_call = mock.Mock(
+            return_value=json.dumps({"ok": True, "returncode": 0, "stdout": "17 passed in 0.35s\n"})
+        )
+
+        routed = SimpleNamespace(
+            text="",
+            tool_calls=[SimpleNamespace(id="call_1", name="code_helper", arguments={"operation": "run"})],
+        )
+        real_reply = "All 17 tests passed."
+
+        with mock.patch("main.call_with_tools", return_value=routed), mock.patch(
+            "main.call_text", return_value=real_reply
+        ):
+            jarvis._handle_router_text_command("Run tests/test_tts_read_trigger.py.")
+
+        final_reply = jarvis.speak.call_args.args[0]
+        self.assertEqual(final_reply, real_reply)
+        self.assertNotIn("unverified", final_reply.lower())
+
+
 class RepositoryLearningRouterTests(unittest.TestCase):
     def test_repository_learning_routes_before_generic_topic_learning(self):
         import main

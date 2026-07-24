@@ -27,6 +27,7 @@ import sys
 import traceback
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 
 try:
     import sounddevice as sd
@@ -156,6 +157,90 @@ def _build_tool_summary_prompt(user_text: str, tool_results: list[dict]) -> str:
         "generic 'ok: true' status on an unrelated operation is not evidence of that. If the "
         "tools called do not actually address what the user asked, say so plainly instead of "
         "inferring success."
+    )
+
+
+def _tool_receipt(name: str, arguments: dict, raw_result: Any) -> dict[str, Any]:
+    """A factual, runtime-produced record of what a tool call actually did and
+    returned (WS2, 2026-07-24 planning roadmap, D4). This is what the process
+    trace shows for a tool row, and what the anti-fabrication check below
+    treats as ground truth -- unlike the model's prose, it cannot be
+    fabricated, since it is built straight from the tool's own return value.
+    """
+    receipt: dict[str, Any] = {"tool": str(name)}
+    if isinstance(arguments, dict) and arguments.get("operation"):
+        receipt["operation"] = arguments["operation"]
+    text = raw_result if isinstance(raw_result, str) else str(raw_result)
+    parsed: Any = None
+    try:
+        parsed = json.loads(text)
+    except (TypeError, ValueError):
+        parsed = None
+    if isinstance(parsed, dict):
+        if "ok" in parsed:
+            receipt["ok"] = bool(parsed["ok"])
+        for key in ("returncode", "error", "policy"):
+            if key in parsed:
+                receipt[key] = parsed[key]
+        receipt["result_snippet"] = json.dumps(parsed, ensure_ascii=False)[:800]
+    else:
+        receipt["result_snippet"] = text[:800]
+    return receipt
+
+
+_TEST_PASS_CLAIM_RE = re.compile(
+    r"\btests?\b[^.!?\n]{0,60}\b(passed|passing|succeeded|is green|are green)\b"
+    r"|\ball tests?\s+pass(ed)?\b"
+    r"|\b(build|compilation)\b[^.!?\n]{0,40}\b(succeeded|passed|completed successfully)\b"
+    r"|\bconfirmation gate\b"
+    r"|\bproceeding with\b[^.!?\n]{0,30}\b(closure|completion)\b"
+    r"|\bfeature is ready\b",
+    re.IGNORECASE,
+)
+_TEST_EVIDENCE_RE = re.compile(r"\b\d+\s+passed\b|\b\d+\s+failed\b", re.IGNORECASE)
+_CLAIM_NEGATION_RE = re.compile(
+    r"\b(not|cannot|can't|couldn't|didn't|doesn't|isn't|wasn't|weren't|never|unable|"
+    r"no evidence|without confirming|not yet|has not|have not|were not|was not)\b",
+    re.IGNORECASE,
+)
+
+
+def _sentence_start(text: str, pos: int) -> int:
+    """Start of the sentence containing `pos`, so negation-checking (below)
+    can't be thrown off by an unrelated earlier or later sentence."""
+    idx = max(text.rfind(".", 0, pos), text.rfind("!", 0, pos), text.rfind("?", 0, pos), text.rfind("\n", 0, pos))
+    return idx + 1 if idx >= 0 else 0
+
+
+def _unverified_completion_notice(reply: str, receipts: list[dict]) -> str | None:
+    """WS2 hard anti-fabrication check: the exact live-tested failure was a
+    reply that claimed 'test suite passed... proceeding with feature closure'
+    from a tool call that never ran a test at all. Rather than trying to
+    silently rewrite the model's prose (fragile, and gives false confidence
+    it was fully corrected), attach a clear, deterministic caveat whenever a
+    completion-style claim has no supporting receipt.
+
+    Negation-aware within the matched sentence: a correctly-grounded reply
+    that says a test outcome "cannot be confirmed" or "was not run" must not
+    be flagged as if it were the false-positive claim itself -- confirmed by
+    a live re-run that surfaced exactly this false positive before the fix.
+    """
+    text = reply or ""
+    has_unsupported_claim = False
+    for match in _TEST_PASS_CLAIM_RE.finditer(text):
+        sentence = text[_sentence_start(text, match.start()) : match.end()]
+        if not _CLAIM_NEGATION_RE.search(sentence):
+            has_unsupported_claim = True
+            break
+    if not has_unsupported_claim:
+        return None
+    for receipt in receipts:
+        if _TEST_EVIDENCE_RE.search(json.dumps(receipt, ensure_ascii=False)):
+            return None
+    return (
+        "\n\n⚠ JARVIS note: this reply describes a test, build, or completion-gate "
+        "outcome, but none of this turn's tool results contain direct evidence of one "
+        "(e.g. a pass/fail test summary). Treat that claim as unverified."
     )
 
 
@@ -2132,6 +2217,8 @@ class JarvisLive:
             )
             vault_context: dict = {}
             model_text = text
+            tool_receipts: list[dict[str, Any]] = []
+            generic_reply_path = False
             try:
                 try:
                     reply = self._handle_cancel_planning_workflow(text)
@@ -2150,6 +2237,7 @@ class JarvisLive:
                     if reply is None:
                         reply = self._handle_todo_template_workflow(text)
                     if reply is None:
+                        generic_reply_path = True
                         cfg = _load_runtime_config()
                         if turn_id is not None and cfg.get("vault_turn_awareness_enabled", True):
                             try:
@@ -2199,14 +2287,18 @@ class JarvisLive:
                                 summary=f"Calling {call.name}.",
                                 state="running",
                                 turn_id=turn_id or "",
+                                detail={"arguments": call.arguments},
                             )
                             result = self._execute_router_tool_call(call.id, call.name, call.arguments)
+                            receipt = _tool_receipt(call.name, call.arguments, result)
+                            tool_receipts.append(receipt)
                             emit_process_event(
                                 category="tool",
                                 source=call.name,
                                 summary=f"{call.name} returned a result.",
                                 state="completed",
                                 turn_id=turn_id or "",
+                                detail=receipt,
                             )
                             tool_results.append(
                                 {
@@ -2227,9 +2319,14 @@ class JarvisLive:
                 except Exception as planner_error:
                     print(f"[Router] Planner/tool route failed, falling back to worker text: {planner_error}")
                     reply = call_text(model_text, role="worker", system=self._router_system_prompt(), timeout=120)
+                    generic_reply_path = True
                 reply = (reply or "").strip()
                 if not reply:
                     reply = "Router mode is active, but the model returned no text."
+                if generic_reply_path:
+                    notice = _unverified_completion_notice(reply, tool_receipts)
+                    if notice:
+                        reply += notice
                 if self._is_stale_router_turn(turn_id):
                     self.ui.write_log(f"SYS: Suppressed stale {source} reply.")
                     return

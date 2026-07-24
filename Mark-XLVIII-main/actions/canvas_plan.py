@@ -1528,6 +1528,41 @@ def execute_canvas_plan(
     }
 
 
+def _canvas_execution_receipt(result: dict[str, Any]) -> dict[str, Any]:
+    """A per-item pass/fail record for the process trace (WS2, 2026-07-24
+    planning roadmap, D4): reads each item's already-written result file so
+    "did the last test/command actually pass" is visible without opening a
+    JSON file by hand.
+    """
+    run_status = result.get("run_status") if isinstance(result, dict) else None
+    items = (run_status or {}).get("items") or []
+    receipts: list[dict[str, Any]] = []
+    for item in items:
+        entry: dict[str, Any] = {"item_id": item.get("item_id"), "state": item.get("state")}
+        if item.get("error"):
+            entry["error"] = item["error"]
+        result_path = item.get("result_path")
+        if result_path:
+            try:
+                payload = json.loads(Path(result_path).read_text(encoding="utf-8"))
+                inner = payload.get("result") if isinstance(payload.get("result"), dict) else {}
+                if "ok" in inner:
+                    entry["ok"] = inner["ok"]
+                if "returncode" in inner:
+                    entry["returncode"] = inner["returncode"]
+                stdout = str(inner.get("stdout") or "").strip()
+                if stdout:
+                    entry["output_tail"] = stdout.splitlines()[-1][:200]
+            except Exception:
+                pass
+        receipts.append(entry)
+    return {
+        "run_id": result.get("run_id") if isinstance(result, dict) else None,
+        "execution_state": result.get("execution_state") if isinstance(result, dict) else None,
+        "items": receipts,
+    }
+
+
 def canvas_plan(
     parameters: dict[str, Any] | None = None,
     response=None,
@@ -1575,11 +1610,13 @@ def canvas_plan(
             result = {"ok": False, "error": f"Unknown canvas_plan operation: {operation}"}
     except Exception as exc:
         result = {"ok": False, "operation": operation, "error": str(exc)}
+    detail = _canvas_execution_receipt(result) if operation == "execute" and result.get("run_status") else None
     emit_process_event(
         category="canvas_plan",
         source="canvas_plan",
         summary=f"Canvas plan operation {operation} " + ("completed." if result.get("ok") else "did not complete."),
         state="completed" if result.get("ok") else "failed",
         severity="info" if result.get("ok") else "warning",
+        detail=detail,
     )
     return json.dumps(result, ensure_ascii=False, indent=2)

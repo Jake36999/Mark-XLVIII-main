@@ -1407,5 +1407,65 @@ class CanvasPlanDispatcherTests(unittest.TestCase):
         self.assertFalse(payload["ok"])
 
 
+class CanvasExecutionReceiptTests(unittest.TestCase):
+    """WS2 (2026-07-24 planning roadmap, D4): a per-item pass/fail record for
+    the process trace, built from each item's already-written result file."""
+
+    def test_reads_ok_returncode_and_output_tail_from_result_files(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            result_path = Path(tmp) / "01-v1.json"
+            result_path.write_text(
+                json.dumps({"result": {"ok": True, "returncode": 0, "stdout": "....\n17 passed in 0.35s\n"}}),
+                encoding="utf-8",
+            )
+            result = {
+                "run_id": "run-1",
+                "execution_state": "completed",
+                "run_status": {"items": [{"item_id": "v1", "state": "ACCEPTED", "result_path": str(result_path)}]},
+            }
+            receipt = canvas_plan._canvas_execution_receipt(result)
+
+        self.assertEqual(receipt["run_id"], "run-1")
+        item = receipt["items"][0]
+        self.assertEqual(item["state"], "ACCEPTED")
+        self.assertEqual(item["ok"], True)
+        self.assertEqual(item["returncode"], 0)
+        self.assertEqual(item["output_tail"], "17 passed in 0.35s")
+
+    def test_missing_result_file_does_not_crash(self):
+        result = {
+            "run_id": "run-2",
+            "execution_state": "blocked",
+            "run_status": {"items": [{"item_id": "v1", "state": "REJECT_REPLAN", "error": "boom", "result_path": "does/not/exist.json"}]},
+        }
+        receipt = canvas_plan._canvas_execution_receipt(result)
+        item = receipt["items"][0]
+        self.assertEqual(item["state"], "REJECT_REPLAN")
+        self.assertEqual(item["error"], "boom")
+        self.assertNotIn("ok", item)
+
+    def test_dispatcher_attaches_the_receipt_as_detail_on_execute(self):
+        fake_result = {
+            "ok": True,
+            "run_id": "run-3",
+            "execution_state": "completed",
+            "run_status": {"items": [{"item_id": "v1", "state": "ACCEPTED", "result_path": ""}]},
+        }
+        with mock.patch("actions.canvas_plan.execute_canvas_plan", return_value=fake_result), mock.patch(
+            "core.process_events.emit_process_event"
+        ) as emit:
+            canvas_plan.canvas_plan({"operation": "execute", "note_path": "some/note.md"})
+
+        completion_call = emit.call_args_list[-1]
+        self.assertEqual(completion_call.kwargs["detail"]["run_id"], "run-3")
+
+    def test_dispatcher_attaches_no_detail_for_non_execute_operations(self):
+        with mock.patch("core.process_events.emit_process_event") as emit:
+            canvas_plan.canvas_plan({"operation": "health"})
+
+        completion_call = emit.call_args_list[-1]
+        self.assertIsNone(completion_call.kwargs["detail"])
+
+
 if __name__ == "__main__":
     unittest.main()
