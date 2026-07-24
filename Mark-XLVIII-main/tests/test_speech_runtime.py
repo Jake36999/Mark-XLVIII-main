@@ -840,13 +840,20 @@ class SpeechConfigDefaultTests(unittest.TestCase):
 
         self.assertGreaterEqual(cfg["stt_turn_silence_seconds"], 2.5)
 
-    def test_runtime_config_preloads_orpheus_and_gates_filler_on_user_idle(self):
+    def test_runtime_config_gates_filler_on_user_idle(self):
         import json
 
         cfg = json.loads(Path("config/runtime.json").read_text(encoding="utf-8"))
 
         self.assertEqual(cfg["tts_lmstudio_model"], "orpeus_text_to_speech")
-        self.assertIn("orpeus_text_to_speech", cfg["baseline_models"])
+        # 2026-07-24: orpheus is deliberately NOT baseline anymore -- the owner
+        # found 3 always-resident models kept RAM at ~70% stationary. It now
+        # loads on demand and idles out via the existing task-model TTL
+        # (task_model_ttl_seconds, already 300s / 5 min) like any other task
+        # model, same as the new mistral-7b-instruct overseer.
+        self.assertNotIn("orpeus_text_to_speech", cfg["baseline_models"])
+        self.assertEqual(cfg["baseline_models"], ["qwen/qwen3-4b-2507"])
+        self.assertLessEqual(cfg["task_model_ttl_seconds"], 300)
         self.assertGreaterEqual(cfg["stt_filler_user_idle_seconds"], 900)
         self.assertGreaterEqual(cfg["stt_filler_cooldown_seconds"], 900)
 

@@ -89,9 +89,7 @@
   "lmstudio_url": "http://localhost:1234/v1",
   "lmstudio_native_url": "http://localhost:1234/api/v1",
   "baseline_models": [
-    "qwen/qwen3-4b-2507",
-    "orpeus_text_to_speech",
-    "mistralai/mistral-7b-instruct-v0.3"
+    "qwen/qwen3-4b-2507"
   ],
   "task_model_ttl_seconds": 300,
   "idle_cleanup_seconds": 300,
