@@ -995,13 +995,31 @@ class WorkflowRuntime:
         Deliberately narrow: only an item whose *current* state is literally
         ESCALATE is eligible; a genuine failure state (REJECT_REPLAN,
         UNKNOWN_OUTCOME, BLOCKED) or an already-pending item is refused rather
-        than silently reset. Does not touch attempt/repair_count, so the
-        item's existing max_attempts budget still applies to the retry.
+        than silently reset.
+
+        Refunds one `attempt` (floored at zero) when moving back to PENDING.
+        An ESCALATE is not a failed attempt in the same sense a REPAIR retry
+        is -- it means an external decision was needed (a reviewer call that
+        itself errored, or a human-in-the-loop gate awaiting a decision), not
+        that the dispatch itself was rejected. Without the refund, any item
+        whose role does not carry an inflated `max_attempts` (the schema
+        default is 1) becomes permanently unretryable the moment it first
+        escalates: resetting state to PENDING without resetting `attempt`
+        means `_execute_item`'s very next attempt-budget check immediately
+        converts it to REJECT_REPLAN without ever re-dispatching.
+
+        Note this means repeated ESCALATE-then-retry cycles do not accumulate
+        toward `max_attempts` -- each refund undoes the very attempt it is
+        resuming, so the counter never climbs from escalation alone. That is
+        intentional: `max_attempts` bounds automatic in-run REPAIR-retry
+        loops, not human-gated escalate/resume cycles, which are already
+        rate-limited by requiring one deliberate external call (a human
+        decision, or a driver acting on one) per retry.
         """
         with closing(self._connect()) as connection:
             connection.execute("BEGIN IMMEDIATE")
             row = connection.execute(
-                "SELECT state FROM workflow_items WHERE run_id=? AND item_id=?", (run_id, item_id)
+                "SELECT state, attempt FROM workflow_items WHERE run_id=? AND item_id=?", (run_id, item_id)
             ).fetchone()
             if row is None:
                 connection.rollback()
@@ -1009,18 +1027,19 @@ class WorkflowRuntime:
             if row["state"] != "ESCALATE":
                 connection.rollback()
                 return {"ok": False, "error": f"Item is not escalated (state={row['state']})"}
+            refunded_attempt = max(0, int(row["attempt"] or 0) - 1)
             connection.execute(
-                "UPDATE workflow_items SET state='PENDING', error=NULL, updated_at=? WHERE run_id=? AND item_id=?",
-                (_now(), run_id, item_id),
+                "UPDATE workflow_items SET state='PENDING', attempt=?, error=NULL, updated_at=? WHERE run_id=? AND item_id=?",
+                (refunded_attempt, _now(), run_id, item_id),
             )
             run_row = connection.execute("SELECT status FROM workflow_runs WHERE run_id=?", (run_id,)).fetchone()
             if run_row and run_row["status"] == "ESCALATED":
                 connection.execute(
                     "UPDATE workflow_runs SET status='APPROVED', updated_at=? WHERE run_id=?", (_now(), run_id)
                 )
-            self._event(connection, run_id, "item_retry_requested", {}, item_id)
+            self._event(connection, run_id, "item_retry_requested", {"refunded_attempt": refunded_attempt}, item_id)
             connection.commit()
-        return {"ok": True, "run_id": run_id, "item_id": item_id, "state": "PENDING"}
+        return {"ok": True, "run_id": run_id, "item_id": item_id, "state": "PENDING", "attempt": refunded_attempt}
 
     def status(self, run_id: str) -> dict[str, Any]:
         with closing(self._connect()) as connection:

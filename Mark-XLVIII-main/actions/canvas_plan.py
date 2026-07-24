@@ -67,10 +67,11 @@ _ROLE_SPECS: dict[str, dict[str, Any]] = {
         "target": "reviewer",
         "risk_tier": "T1",
         "side_effects": "none",
-        # A human gate (T5) may need to escalate-and-wait more than once while a
-        # person deliberates; retry_escalated_item consumes one attempt per
-        # resume, so a review gate needs headroom beyond the default budget of 1.
-        "retry_policy": {"safe": True, "max_attempts": 3},
+        # A human gate (T5) may escalate-and-wait more than once while a person
+        # deliberates. This no longer needs an inflated max_attempts: fixing the
+        # real bug found in live testing -- WorkflowRuntime.retry_escalated_item
+        # now refunds the attempt it resumes, so the schema default (1) already
+        # supports repeated escalate/retry cycles, one external retry call each.
     },
     "reference": {
         "orchestrator": "deterministic",

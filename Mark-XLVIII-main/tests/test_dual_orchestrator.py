@@ -240,13 +240,18 @@ class DualOrchestratorTests(unittest.TestCase):
         # and the run-level entry guard refuses a run whose status is
         # "ESCALATED" -- retry_escalated_item is the one entry point a human
         # (or a driver acting on a human's decision) has to unstick either.
+        # Deliberately uses the schema DEFAULT max_attempts (1), not an
+        # inflated one: this reproduces a real bug found in live testing --
+        # without refunding the attempt, an item whose role has no elevated
+        # max_attempts becomes permanently unretryable the instant it first
+        # escalates, since the very next attempt-budget check converts it
+        # straight to REJECT_REPLAN without ever re-dispatching.
         decisions = iter(["ESCALATE", "ACCEPT"])
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             hooks = self.hook_registry(lambda _: {"ok": True, "summary": "evidence"})
             raw = workflow()
             raw["steps"][0]["acceptance_criteria"] = {"required": True, "independent_review": True}
-            raw["steps"][0]["retry_policy"] = {"safe": True, "max_attempts": 3}
             manifest = do.compile_workflow(raw, hook_registry=hooks)
             bundle = self.write_bundle(root, raw, manifest)
             runtime = do.WorkflowRuntime(
@@ -259,6 +264,7 @@ class DualOrchestratorTests(unittest.TestCase):
 
             first = runtime.execute_run("run-test")
             self.assertEqual(first["run"]["status"], "ESCALATED")
+            self.assertEqual(first["items"][0]["attempt"], 1)
             # execute_run's own entry guard refuses a run whose status is
             # "ESCALATED" -- re-running without retrying first must not progress.
             stuck = runtime.execute_run("run-test")
@@ -266,10 +272,42 @@ class DualOrchestratorTests(unittest.TestCase):
 
             retried = runtime.retry_escalated_item("run-test", "first_step")
             self.assertTrue(retried["ok"])
+            self.assertEqual(retried["attempt"], 0)  # refunded, not left exhausted
             second = runtime.execute_run("run-test")
 
             self.assertEqual(second["run"]["status"], "COMPLETED")
             self.assertEqual(second["items"][0]["state"], "ACCEPTED")
+
+    def test_repeated_escalate_retry_cycles_do_not_exhaust_max_attempts(self):
+        # Each refund undoes the very attempt it resumes, so a role with the
+        # schema-default max_attempts=1 can still be escalated and retried
+        # more than once -- max_attempts bounds automatic in-run REPAIR
+        # loops, not human-gated escalate/resume cycles, which are already
+        # rate-limited by requiring one external retry call each time.
+        decisions = iter(["ESCALATE", "ESCALATE", "ACCEPT"])
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            hooks = self.hook_registry(lambda _: {"ok": True, "summary": "evidence"})
+            raw = workflow()
+            raw["steps"][0]["acceptance_criteria"] = {"required": True, "independent_review": True}
+            manifest = do.compile_workflow(raw, hook_registry=hooks)
+            bundle = self.write_bundle(root, raw, manifest)
+            runtime = do.WorkflowRuntime(
+                root,
+                hook_registry=hooks,
+                reviewer=lambda item, result, defects: (next(decisions), []),
+            )
+            self.register(runtime, bundle, manifest)
+            runtime.approve_run("run-test")
+
+            runtime.execute_run("run-test")
+            runtime.retry_escalated_item("run-test", "first_step")
+            runtime.execute_run("run-test")
+            runtime.retry_escalated_item("run-test", "first_step")
+            final = runtime.execute_run("run-test")
+
+            self.assertEqual(final["run"]["status"], "COMPLETED")
+            self.assertEqual(final["items"][0]["state"], "ACCEPTED")
 
     def test_retry_escalated_item_refuses_non_escalated_states(self):
         with tempfile.TemporaryDirectory() as tmp:
