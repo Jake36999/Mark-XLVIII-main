@@ -385,6 +385,208 @@ def compile_canvas(
         raise CanvasCompileError(f"Compiled canvas failed workflow validation: {exc}") from exc
 
 
+# WS4a (2026-07-24 planning roadmap): the decomposition pass. Turns a plain
+# goal into a real, drawn canvas using WS1's dual-purpose node format, so a
+# human never has to hand-author the graph for a routine goal. Deliberately
+# non-authoritative and inert beyond writing the file: nothing here proposes,
+# approves, or executes anything -- propose_canvas_plan/evaluate_canvas_approval
+# still gate everything downstream exactly as they do for a hand-drawn canvas.
+_DECOMPOSE_SYSTEM_PROMPT = (
+    "You are JARVIS's planning overseer. Decompose the user's goal into a small, "
+    "ordered set of canvas plan nodes. Return ONLY a JSON object -- no prose, no "
+    "markdown code fences, nothing before or after it. Schema:\n"
+    '{"nodes": [{"id": "short_snake_case_id", '
+    '"role": "plan|research|implementation|verification|review|reference", '
+    '"directives": {"scope": "optional test path(s), verification only", '
+    '"project": "optional registered project id, implementation only", '
+    '"file": "optional file path, reference/implementation only", '
+    '"recommended_model": "optional semantic or developer hint"}, '
+    '"prose": "the actual instruction for whichever agent executes this node", '
+    '"depends_on": ["ids of nodes that must complete first"]}], '
+    '"rationale": "one short paragraph explaining the decomposition"}\n\n'
+    "Rules:\n"
+    "- Exactly one node has role \"plan\" and an empty depends_on -- it anchors the goal.\n"
+    "- Every other node depends on at least one earlier node; no orphans besides the plan node.\n"
+    "- Leave a directive out entirely rather than inventing a project id, file path, or test path "
+    "you were not actually given.\n"
+    "- Prefer 3 to 7 nodes. Do not add a node whose only purpose is restating the goal.\n"
+    "- \"prose\" is read by whichever agent executes that node -- write it as a direct instruction, "
+    "not a description of the node."
+)
+
+_VALID_DECOMPOSE_ROLES = frozenset(_ROLE_SPECS.keys())
+
+
+def _slugify_node_id(raw: str, fallback: str) -> str:
+    slug = re.sub(r"[^a-z0-9_]+", "_", str(raw or "").strip().lower()).strip("_")
+    if not slug or not slug[0].isalpha():
+        slug = f"n_{slug}" if slug else fallback
+    return slug[:40]
+
+
+def _validate_decomposition(payload: dict[str, Any]) -> list[str]:
+    """Structural checks before anything gets written to disk. Returns a list
+    of problems; an empty list means the decomposition is safe to assemble."""
+    problems: list[str] = []
+    nodes = payload.get("nodes")
+    if not isinstance(nodes, list) or not nodes:
+        return ["Response contained no usable 'nodes' list."]
+
+    seen_ids: set[str] = set()
+    plan_count = 0
+    for index, node in enumerate(nodes):
+        if not isinstance(node, dict):
+            problems.append(f"Node at position {index} is not an object.")
+            continue
+        node_id = str(node.get("id") or "").strip()
+        if not node_id:
+            problems.append(f"Node at position {index} has no id.")
+            continue
+        if node_id in seen_ids:
+            problems.append(f"Duplicate node id: {node_id!r}.")
+        seen_ids.add(node_id)
+        role = str(node.get("role") or "").strip().lower()
+        if role not in _VALID_DECOMPOSE_ROLES:
+            problems.append(f"Node {node_id!r} has an unrecognised role: {role!r}.")
+        if role == "plan":
+            plan_count += 1
+
+    if plan_count != 1:
+        problems.append(f"Expected exactly one node with role 'plan', found {plan_count}.")
+
+    for node in nodes:
+        if not isinstance(node, dict):
+            continue
+        node_id = str(node.get("id") or "")
+        role = str(node.get("role") or "").strip().lower()
+        depends_on = node.get("depends_on") or []
+        for dep in depends_on:
+            if str(dep) not in seen_ids:
+                problems.append(f"Node {node_id!r} depends_on unknown id {dep!r}.")
+        # The prompt tells the model every non-plan node needs at least one
+        # dependency so the plan node actually anchors the graph. Models
+        # sometimes ignore this and leave a node floating with no incoming
+        # edge at all -- reject rather than silently write a disconnected canvas.
+        if role != "plan" and not depends_on:
+            problems.append(f"Node {node_id!r} has no depends_on -- only the 'plan' node may have none.")
+
+    return problems
+
+
+def decompose_goal_to_canvas(
+    goal: str,
+    *,
+    project_hint: str = "",
+    canvas_name: str | None = None,
+    cfg: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Ask the planner model to turn a goal into a real canvas file.
+
+    Non-authoritative and read-only beyond writing the new canvas: this does
+    not compile, propose, approve, or execute anything. The human still draws
+    the same T4/T5 approval gate afterward via `propose_canvas_plan`, exactly
+    as if they had hand-drawn the graph themselves. On any malformed or
+    structurally invalid model response, nothing is written and `ok` is False
+    with the raw text preserved for diagnosis.
+    """
+    from actions import jarvis_canvas as canvas_actions
+    from core.canvas_layout import layout_document
+    from core.model_router import _extract_json_object, call_text
+
+    goal = str(goal or "").strip()
+    if not goal:
+        return {"ok": False, "error": "A goal is required."}
+
+    prompt = f"Goal: {goal}"
+    if project_hint:
+        prompt += f"\nRegistered project hint (only use it if a node genuinely needs it): {project_hint}"
+
+    raw_text = call_text(
+        prompt,
+        role="planner",
+        system=_DECOMPOSE_SYSTEM_PROMPT,
+        timeout=300,
+        config=cfg,
+    )
+    payload = _extract_json_object(raw_text)
+    if not isinstance(payload, dict):
+        return {"ok": False, "error": "Planner response was not parseable JSON.", "raw_text": raw_text[:2000]}
+
+    problems = _validate_decomposition(payload)
+    if problems:
+        return {
+            "ok": False,
+            "error": "Decomposition failed validation: " + "; ".join(problems),
+            "raw_text": raw_text[:2000],
+        }
+
+    nodes_raw = payload["nodes"]
+    canvas_nodes: list[dict[str, Any]] = []
+    edges: list[dict[str, Any]] = []
+    used_ids: set[str] = set()
+    for index, node in enumerate(nodes_raw):
+        raw_id = str(node.get("id") or "")
+        node_id = _slugify_node_id(raw_id, f"node_{index}")
+        while node_id in used_ids:
+            node_id = f"{node_id}_{index}"
+        used_ids.add(node_id)
+
+        role = str(node.get("role") or "").strip().lower()
+        directives = node.get("directives") if isinstance(node.get("directives"), dict) else {}
+        lines = [f"role: {role}"]
+        for key, label in (("scope", "scope"), ("project", "project"), ("file", "file"), ("recommended_model", "recommended model")):
+            value = str(directives.get(key) or "").strip()
+            if value:
+                lines.append(f"{label}: {value}")
+        prose = str(node.get("prose") or "").strip() or f"{role} step for: {goal[:200]}"
+        text = "\n".join(lines) + "\n\n" + prose
+        canvas_nodes.append(canvas_actions._text_node(node_id, text, 0, 0))
+
+    # Resolve depends_on (which reference the model's original, pre-slug ids)
+    # against the actual slugged node ids assigned above -- a raw id and its
+    # slugified form can differ, and collision-suffixing can differ further.
+    raw_to_slug: dict[str, str] = {
+        str(raw_node.get("id") or ""): str(canvas_node["id"])
+        for raw_node, canvas_node in zip(nodes_raw, canvas_nodes)
+    }
+    for raw_node, canvas_node in zip(nodes_raw, canvas_nodes):
+        for dep in raw_node.get("depends_on") or []:
+            dep_slug = raw_to_slug.get(str(dep))
+            if dep_slug and dep_slug != canvas_node["id"]:
+                edges.append(canvas_actions._edge(dep_slug, str(canvas_node["id"])))
+
+    payload_canvas = {"nodes": canvas_nodes, "edges": edges}
+    cycle_check_nodes = [{"id": n["id"]} for n in canvas_nodes]
+    _layers, cycles = _dependency_layers(cycle_check_nodes, edges)
+    if cycles:
+        return {
+            "ok": False,
+            "error": f"Decomposition contains a dependency cycle through: {', '.join(cycles)}.",
+            "raw_text": raw_text[:2000],
+        }
+
+    # managed_prefix="" so every freshly generated node is treated as managed
+    # (i.e. repositioned) -- _is_pinned() pins any id that does NOT start with
+    # the given prefix, so a sentinel no real id matches would pin everything
+    # and silently leave every node at its (0, 0) placeholder.
+    laid_out, _metrics = layout_document(payload_canvas, profile="dependency", managed_prefix="")
+
+    resolved = canvas_actions.resolve_config(cfg)
+    slug_base = re.sub(r"[^a-z0-9]+", "_", goal[:40].lower()).strip("_") or "goal"
+    digest = hashlib.sha1(goal.encode("utf-8")).hexdigest()[:6]
+    default_name = f"{slug_base}_{digest}.canvas"
+    canvas_file = canvas_actions._safe_canvas_path(canvas_name, resolved, default_name=default_name)
+    canvas_actions.write_canvas(canvas_file, laid_out, vault_root=resolved["notes_root"])
+
+    return {
+        "ok": True,
+        "canvas_path": str(canvas_file),
+        "node_count": len(canvas_nodes),
+        "rationale": str(payload.get("rationale") or ""),
+        "goal": goal,
+    }
+
+
 def preview_plan(
     payload: dict[str, Any],
     *,

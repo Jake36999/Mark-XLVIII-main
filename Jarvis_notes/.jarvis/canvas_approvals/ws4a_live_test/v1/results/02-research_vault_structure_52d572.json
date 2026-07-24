@@ -1,0 +1,60 @@
+{
+  "schema_version": "jarvis_work_result/v1",
+  "run_id": "ws4a_live_test-v1",
+  "item_id": "research_vault_structure_52d572",
+  "verdict": "REJECT_REPLAN",
+  "defects": [
+    "{'type': 'insufficient_evidence', 'details': 'The provided evidence does not contain information about a publicly known or documented Jarvis_notes vault. Further investigation is required.'}",
+    "repair_budget_exhausted"
+  ],
+  "result": {
+    "ok": true,
+    "text": "The Jarvis_notes vault is not a publicly known or documented system, and no authoritative source provides information about its internal structure, data format, or how wikilinks are stored and referenced. As such, there is no verifiable evidence or trusted source to confirm the structure or behavior of wikilinks within such a vault.\n\nIf you are referring to a hypothetical, personal, or proprietary system named \"Jarvis_notes,\" further clarification or access to the system's documentation would be required to investigate its structure.\n\nIn general, wikilinks in knowledge systems (such as Obsidian or similar note-taking tools) are typically stored as plain text references (e.g., `[link](target)`) within markdown files, where the target is a filename or path. These links are resolved at render time using the system's internal mapping of note names to file paths.\n\nWithout direct access to the Jarvis_notes vault or its source code, any analysis would be speculative.\n\nPlease clarify your intent or confirm whether you are referring to a real, public, or documented system. Otherwise, no actionable or evidence-based response can be provided.",
+    "summary": "The Jarvis_notes vault is not a publicly known or documented system, and no authoritative source provides information about its internal structure, data format, or how wikilinks are stored and referenced. As such, there is no verifiable evidence or trusted source to confirm the structure or behavior of wikilinks within such a vault.\n\nIf you are referring to a hypothetical, personal, or proprietary system named \"Jarvis_notes,\" further clarification or access to the system's documentation would be",
+    "model_provenance": {
+      "provider": "lmstudio",
+      "model": "qwen/qwen3-4b-2507",
+      "role": "worker",
+      "fallback_reason": "",
+      "preferred_model_unavailable": false,
+      "metrics": {
+        "lease_id": "878d9d9f0c7041da8942a9a6933eae95",
+        "instance_id": "qwen/qwen3-4b-2507",
+        "route": "worker",
+        "queue_wait_seconds": 0.0,
+        "load_time_seconds": null,
+        "streaming": false,
+        "duration_seconds": 8.375,
+        "completion_tokens": 222,
+        "tokens_per_second": 26.507,
+        "first_token_seconds": null,
+        "finish_reason": "stop",
+        "reasoning_tokens": 0
+      },
+      "recorded_at": 1784921544.4480333
+    }
+  },
+  "model_provenance": {
+    "provider": "lmstudio",
+    "model": "qwen/qwen3-4b-2507",
+    "role": "worker",
+    "fallback_reason": "",
+    "preferred_model_unavailable": false,
+    "metrics": {
+      "lease_id": "878d9d9f0c7041da8942a9a6933eae95",
+      "instance_id": "qwen/qwen3-4b-2507",
+      "route": "worker",
+      "queue_wait_seconds": 0.0,
+      "load_time_seconds": null,
+      "streaming": false,
+      "duration_seconds": 8.375,
+      "completion_tokens": 222,
+      "tokens_per_second": 26.507,
+      "first_token_seconds": null,
+      "finish_reason": "stop",
+      "reasoning_tokens": 0
+    },
+    "recorded_at": 1784921544.4480333
+  },
+  "completed_at": "2026-07-24T19:34:13Z"
+}

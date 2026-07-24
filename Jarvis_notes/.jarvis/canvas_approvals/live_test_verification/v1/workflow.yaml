@@ -1,0 +1,74 @@
+schema_version: jarvis_dual_orchestrator/v1
+workflow_id: live_test_verification
+version: canvas-1
+name: Live Test Verification
+description: Compiled from an Obsidian Canvas graph (Mode 2 planning).
+max_steps: 3
+variables:
+  source: canvas
+  node_step_ids:
+    v1: v1_5a6df7
+    v2: v2_a1047e
+    v3: v3_c5e31d
+steps:
+- step_id: v1_5a6df7
+  orchestrator: deterministic
+  step_type: command
+  target: pytest_focused
+  description: Run the test suite and confirm the vault-watcher's TTS read-trigger
+    tests (tests/test_tts_read_trigger.py) all pass before this feature is considered
+    done.
+  risk_tier: T2
+  side_effects: local_read
+  depends_on: []
+  inputs:
+    canvas_role: verification
+    canvas_node_id: v1
+  outputs:
+    result: result.v1_5a6df7
+  acceptance_criteria:
+    required: true
+  requires_confirmation: false
+  retry_policy: &id001
+    safe: true
+    max_attempts: 2
+  on_failure: halt
+- step_id: v2_a1047e
+  orchestrator: deterministic
+  step_type: command
+  target: pytest_focused
+  description: Verify tests/test_vault_watch.py still passes after the scan_once wiring
+    change -- just that one file, not the whole suite, this is a quick pre-merge sanity
+    check.
+  risk_tier: T2
+  side_effects: local_read
+  depends_on: []
+  inputs:
+    canvas_role: verification
+    canvas_node_id: v2
+  outputs:
+    result: result.v2_a1047e
+  acceptance_criteria:
+    required: true
+  requires_confirmation: false
+  retry_policy: *id001
+  on_failure: halt
+- step_id: v3_c5e31d
+  orchestrator: deterministic
+  step_type: command
+  target: pytest_focused
+  description: Run the project's full pytest suite once and report whether everything
+    is green.
+  risk_tier: T2
+  side_effects: local_read
+  depends_on: []
+  inputs:
+    canvas_role: verification
+    canvas_node_id: v3
+  outputs:
+    result: result.v3_c5e31d
+  acceptance_criteria:
+    required: true
+  requires_confirmation: false
+  retry_policy: *id001
+  on_failure: halt

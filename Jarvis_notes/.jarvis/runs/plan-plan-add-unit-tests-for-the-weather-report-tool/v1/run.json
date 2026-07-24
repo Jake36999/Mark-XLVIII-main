@@ -1,0 +1,11 @@
+{
+  "schema_version": "jarvis_run_bundle/v1",
+  "run_id": "plan-plan-add-unit-tests-for-the-weather-report-tool-v1",
+  "plan_id": "plan-plan-add-unit-tests-for-the-weather-report-tool",
+  "plan_version": 1,
+  "plan_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-24-plan-add-unit-tests-for-the-weather-report-tool.md",
+  "approval_projection_hash": "bff1e1b534910e70c0da6e1d9f5ae1b59cf1ea17508ba5b328ddfc50d9a24f23",
+  "workflow_hash": "f6e3f679ca4ddd5488b62920b64fe447528c1b6eaadee76c6c84ba924bae110a",
+  "manifest_hash": "9a11e7bd02386414c86c0129338beda21de071493d924b9ed86d1cbc4c4cd3e8",
+  "created_at": "2026-07-24T18:45:31Z"
+}

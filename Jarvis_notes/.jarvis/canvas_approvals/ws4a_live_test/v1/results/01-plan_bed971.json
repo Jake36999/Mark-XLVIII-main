@@ -1,0 +1,14 @@
+{
+  "schema_version": "jarvis_work_result/v1",
+  "run_id": "ws4a_live_test-v1",
+  "item_id": "plan_bed971",
+  "verdict": "ACCEPT",
+  "defects": [],
+  "result": {
+    "ok": true,
+    "status": "passed",
+    "summary": "Define the task: scan Jarvis_notes vault for [[wikilinks]] that reference non-existent notes and report them."
+  },
+  "model_provenance": null,
+  "completed_at": "2026-07-24T19:32:13Z"
+}

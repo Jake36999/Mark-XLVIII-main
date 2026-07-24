@@ -1,0 +1,161 @@
+schema_version: jarvis_dual_orchestrator/v1
+workflow_id: ws4a_live_test
+version: canvas-1
+name: 'WS4a Live Test: Broken Wikilink Scanner'
+description: Compiled from an Obsidian Canvas graph (Mode 2 planning).
+max_steps: 7
+variables:
+  source: canvas
+  node_step_ids:
+    plan: plan_bed971
+    research_vault_structure: research_vault_structure_52d572
+    identify_wikilink_pattern: identify_wikilink_pattern_42a5f7
+    validate_note_resolution: validate_note_resolution_3359ef
+    scan_wikilinks_for_breaks: scan_wikilinks_for_breaks_721098
+    generate_report: generate_report_149d40
+    verify_output: verify_output_0f8a0b
+steps:
+- step_id: plan_bed971
+  orchestrator: deterministic
+  step_type: gate
+  target: plan_milestone
+  description: 'Define the task: scan Jarvis_notes vault for [[wikilinks]] that reference
+    non-existent notes and report them.'
+  risk_tier: T1
+  side_effects: none
+  depends_on: []
+  inputs:
+    canvas_role: plan
+    canvas_node_id: plan
+  outputs:
+    result: result.plan_bed971
+  acceptance_criteria:
+    required: true
+- step_id: research_vault_structure_52d572
+  orchestrator: cognitive
+  step_type: model_reasoning
+  target: reasoning
+  description: Investigate the structure and format of the Jarvis_notes vault to understand
+    how wikilinks are stored and referenced.
+  risk_tier: T1
+  side_effects: none
+  depends_on:
+  - plan_bed971
+  inputs:
+    canvas_role: research
+    canvas_node_id: research_vault_structure
+  outputs:
+    result: result.research_vault_structure_52d572
+  acceptance_criteria:
+    required: true
+- step_id: identify_wikilink_pattern_42a5f7
+  orchestrator: cognitive
+  step_type: model_reasoning
+  target: reasoning
+  description: Extract and analyze the pattern of [[wikilink]] syntax in the vault
+    files to determine how links are encoded.
+  risk_tier: T1
+  side_effects: none
+  depends_on:
+  - research_vault_structure_52d572
+  inputs:
+    canvas_role: research
+    canvas_node_id: identify_wikilink_pattern
+  outputs:
+    result: result.identify_wikilink_pattern_42a5f7
+  acceptance_criteria:
+    required: true
+- step_id: validate_note_resolution_3359ef
+  orchestrator: deterministic
+  step_type: tool
+  target: project_operator
+  description: Implement a function that checks whether a given wikilink resolves
+    to an existing note by looking up the note name in the vault directory structure.
+  risk_tier: T3
+  side_effects: external_write
+  depends_on:
+  - identify_wikilink_pattern_42a5f7
+  inputs:
+    canvas_role: implementation
+    canvas_node_id: validate_note_resolution
+    operation: delegate_openclaw
+    intent: Implement a function that checks whether a given wikilink resolves to
+      an existing note by looking up the note name in the vault directory structure.
+  outputs:
+    result: result.validate_note_resolution_3359ef
+  acceptance_criteria:
+    required: true
+  requires_confirmation: true
+  retry_policy: &id001
+    safe: false
+    max_attempts: 1
+  on_failure: halt
+- step_id: scan_wikilinks_for_breaks_721098
+  orchestrator: deterministic
+  step_type: tool
+  target: project_operator
+  description: Iterate through all files in the Jarvis_notes vault, extract all [[wikilink]]s,
+    and validate each one using the resolution function; collect any unresolved links.
+  risk_tier: T3
+  side_effects: external_write
+  depends_on:
+  - validate_note_resolution_3359ef
+  inputs:
+    canvas_role: implementation
+    canvas_node_id: scan_wikilinks_for_breaks
+    operation: delegate_openclaw
+    intent: Iterate through all files in the Jarvis_notes vault, extract all [[wikilink]]s,
+      and validate each one using the resolution function; collect any unresolved
+      links.
+  outputs:
+    result: result.scan_wikilinks_for_breaks_721098
+  acceptance_criteria:
+    required: true
+  requires_confirmation: true
+  retry_policy: *id001
+  on_failure: halt
+- step_id: generate_report_149d40
+  orchestrator: deterministic
+  step_type: tool
+  target: project_operator
+  description: Write a simple read-only script that outputs a list of broken wikilinks
+    with their source file and line number, formatted for human readability.
+  risk_tier: T3
+  side_effects: external_write
+  depends_on:
+  - scan_wikilinks_for_breaks_721098
+  inputs:
+    canvas_role: implementation
+    canvas_node_id: generate_report
+    operation: delegate_openclaw
+    intent: Write a simple read-only script that outputs a list of broken wikilinks
+      with their source file and line number, formatted for human readability.
+  outputs:
+    result: result.generate_report_149d40
+  acceptance_criteria:
+    required: true
+  requires_confirmation: true
+  retry_policy: *id001
+  on_failure: halt
+- step_id: verify_output_0f8a0b
+  orchestrator: deterministic
+  step_type: command
+  target: pytest_focused
+  description: Run the script on a test vault with known broken links and confirm
+    that it correctly identifies and reports all unresolved wikilinks.
+  risk_tier: T2
+  side_effects: local_read
+  depends_on:
+  - generate_report_149d40
+  inputs:
+    canvas_role: verification
+    canvas_node_id: verify_output
+  outputs:
+    result: result.verify_output_0f8a0b
+  acceptance_criteria:
+    required: true
+  requires_confirmation: false
+  retry_policy:
+    safe: true
+    max_attempts: 2
+  on_failure: halt

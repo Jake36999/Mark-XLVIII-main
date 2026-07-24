@@ -1,0 +1,23 @@
+{
+  "nodes": [
+    {
+      "id": "v1b",
+      "type": "text",
+      "x": 0,
+      "y": 0,
+      "width": 460,
+      "height": 220,
+      "text": "role: verification\nscope: tests/test_tts_read_trigger.py\nRun the vault-watcher TTS read-trigger tests only."
+    },
+    {
+      "id": "v2b",
+      "type": "text",
+      "x": 500,
+      "y": 0,
+      "width": 460,
+      "height": 220,
+      "text": "role: verification\nscope: tests/test_vault_watch.py\nRun just this one file, not the whole suite."
+    }
+  ],
+  "edges": []
+}

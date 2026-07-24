@@ -1,0 +1,93 @@
+{
+  "created_at": "2026-07-24T13:44:33Z",
+  "items": [
+    {
+      "acceptance_criteria": {
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [],
+      "description": "Run the vault-watcher TTS read-trigger tests only.",
+      "id": "v1b_d290ac",
+      "idempotency_key": "dccb53cb6d762e1c26e9f97f0a77e3e8a01cebdef493155b421c2c1264432f9f",
+      "inputs": {
+        "args": [
+          "tests/test_tts_read_trigger.py"
+        ],
+        "canvas_node_id": "v1b",
+        "canvas_role": "verification"
+      },
+      "max_attempts": 2,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "deterministic",
+      "outputs": {
+        "result": "result.v1b_d290ac"
+      },
+      "required_outputs": [],
+      "requires_confirmation": false,
+      "resource_class": "command",
+      "retry_safe": true,
+      "risk_tier": "T2",
+      "sequence": 1,
+      "side_effects": "local_read",
+      "step_type": "command",
+      "target": "pytest_focused"
+    },
+    {
+      "acceptance_criteria": {
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [],
+      "description": "Run just this one file, not the whole suite.",
+      "id": "v2b_358dd6",
+      "idempotency_key": "1fe10a414beee9e6ca72da628251f2daa1195406722292641fce1332001aa963",
+      "inputs": {
+        "args": [
+          "tests/test_vault_watch.py"
+        ],
+        "canvas_node_id": "v2b",
+        "canvas_role": "verification"
+      },
+      "max_attempts": 2,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "deterministic",
+      "outputs": {
+        "result": "result.v2b_358dd6"
+      },
+      "required_outputs": [],
+      "requires_confirmation": false,
+      "resource_class": "command",
+      "retry_safe": true,
+      "risk_tier": "T2",
+      "sequence": 2,
+      "side_effects": "local_read",
+      "step_type": "command",
+      "target": "pytest_focused"
+    }
+  ],
+  "manifest_hash": "7e5e639cccf40e39e3bf03fddb2e47306c6a7e4445a1b6475e78ab01105c6f03",
+  "preflight": {
+    "checked_at": "2026-07-24T13:44:33Z",
+    "checks": [
+      {
+        "command_id": "pytest_focused",
+        "item_id": "v1b_d290ac",
+        "ok": true
+      },
+      {
+        "command_id": "pytest_focused",
+        "item_id": "v2b_358dd6",
+        "ok": true
+      }
+    ],
+    "ok": true
+  },
+  "preview_only": false,
+  "schema_version": "jarvis_work_manifest/v1",
+  "workflow_hash": "8a858c911416d033e966f9178332adca95bff176fa596955a679d6fceda8559d",
+  "workflow_id": "ws1_verification_scoped",
+  "workflow_version": "canvas-1"
+}

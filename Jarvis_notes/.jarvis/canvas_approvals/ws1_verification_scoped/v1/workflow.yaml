@@ -1,0 +1,54 @@
+schema_version: jarvis_dual_orchestrator/v1
+workflow_id: ws1_verification_scoped
+version: canvas-1
+name: WS1 Scoped Verification
+description: Compiled from an Obsidian Canvas graph (Mode 2 planning).
+max_steps: 2
+variables:
+  source: canvas
+  node_step_ids:
+    v1b: v1b_d290ac
+    v2b: v2b_358dd6
+steps:
+- step_id: v1b_d290ac
+  orchestrator: deterministic
+  step_type: command
+  target: pytest_focused
+  description: Run the vault-watcher TTS read-trigger tests only.
+  risk_tier: T2
+  side_effects: local_read
+  depends_on: []
+  inputs:
+    canvas_role: verification
+    canvas_node_id: v1b
+    args:
+    - tests/test_tts_read_trigger.py
+  outputs:
+    result: result.v1b_d290ac
+  acceptance_criteria:
+    required: true
+  requires_confirmation: false
+  retry_policy: &id001
+    safe: true
+    max_attempts: 2
+  on_failure: halt
+- step_id: v2b_358dd6
+  orchestrator: deterministic
+  step_type: command
+  target: pytest_focused
+  description: Run just this one file, not the whole suite.
+  risk_tier: T2
+  side_effects: local_read
+  depends_on: []
+  inputs:
+    canvas_role: verification
+    canvas_node_id: v2b
+    args:
+    - tests/test_vault_watch.py
+  outputs:
+    result: result.v2b_358dd6
+  acceptance_criteria:
+    required: true
+  requires_confirmation: false
+  retry_policy: *id001
+  on_failure: halt

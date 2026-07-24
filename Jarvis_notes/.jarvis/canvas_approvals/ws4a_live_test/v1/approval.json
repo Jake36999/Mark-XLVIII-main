@@ -1,0 +1,19 @@
+{
+  "approval_projection_hash": "19bc8fe4d45d35366e5e8eb97a97386faf1365aaf07078983d3f252018d8d499",
+  "approved_action_ids": [
+    "generate_report_149d40",
+    "identify_wikilink_pattern_42a5f7",
+    "plan_bed971",
+    "research_vault_structure_52d572",
+    "scan_wikilinks_for_breaks_721098",
+    "validate_note_resolution_3359ef",
+    "verify_output_0f8a0b"
+  ],
+  "approved_at": "2026-07-24T19:32:03Z",
+  "manifest_hash": "944178e3b81bece4c57b3afb44747a365600bf45a4f55edb92fdf4b3467ea17a",
+  "plan_id": "ws4a_live_test",
+  "plan_version": 1,
+  "schema_version": "jarvis_approval/v1",
+  "signature": "7e1312b18c4f3dbb87d0e11fb2d254cc6062fb12e87a32909f59088b45b40a03",
+  "workflow_hash": "8a06feef220ac84d91cb204f43770c5ac08faedcc21c9385664b61a8edee94fe"
+}

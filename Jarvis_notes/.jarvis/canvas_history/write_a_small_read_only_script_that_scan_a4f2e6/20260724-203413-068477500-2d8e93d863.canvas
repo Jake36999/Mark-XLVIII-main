@@ -1,0 +1,174 @@
+{
+  "nodes": [
+    {
+      "id": "plan",
+      "type": "text",
+      "text": "role: plan\n\nDefine the task: scan Jarvis_notes vault for [[wikilinks]] that reference non-existent notes and report them.",
+      "x": 0,
+      "y": 0,
+      "width": 420,
+      "height": 180,
+      "jarvis": {
+        "layout_profile": "dependency",
+        "layout_baseline": {
+          "x": 0,
+          "y": 0,
+          "width": 420,
+          "height": 180
+        }
+      }
+    },
+    {
+      "id": "research_vault_structure",
+      "type": "text",
+      "text": "role: research\n\nInvestigate the structure and format of the Jarvis_notes vault to understand how wikilinks are stored and referenced.",
+      "x": 0,
+      "y": 320,
+      "width": 420,
+      "height": 180,
+      "jarvis": {
+        "layout_profile": "dependency",
+        "layout_baseline": {
+          "x": 0,
+          "y": 320,
+          "width": 420,
+          "height": 180
+        }
+      }
+    },
+    {
+      "id": "identify_wikilink_pattern",
+      "type": "text",
+      "text": "role: research\n\nExtract and analyze the pattern of [[wikilink]] syntax in the vault files to determine how links are encoded.",
+      "x": 0,
+      "y": 640,
+      "width": 420,
+      "height": 180,
+      "jarvis": {
+        "layout_profile": "dependency",
+        "layout_baseline": {
+          "x": 0,
+          "y": 640,
+          "width": 420,
+          "height": 180
+        }
+      }
+    },
+    {
+      "id": "validate_note_resolution",
+      "type": "text",
+      "text": "role: implementation\n\nImplement a function that checks whether a given wikilink resolves to an existing note by looking up the note name in the vault directory structure.",
+      "x": 0,
+      "y": 960,
+      "width": 420,
+      "height": 180,
+      "jarvis": {
+        "layout_profile": "dependency",
+        "layout_baseline": {
+          "x": 0,
+          "y": 960,
+          "width": 420,
+          "height": 180
+        }
+      }
+    },
+    {
+      "id": "scan_wikilinks_for_breaks",
+      "type": "text",
+      "text": "role: implementation\n\nIterate through all files in the Jarvis_notes vault, extract all [[wikilink]]s, and validate each one using the resolution function; collect any unresolved links.",
+      "x": 0,
+      "y": 1280,
+      "width": 420,
+      "height": 180,
+      "jarvis": {
+        "layout_profile": "dependency",
+        "layout_baseline": {
+          "x": 0,
+          "y": 1280,
+          "width": 420,
+          "height": 180
+        }
+      }
+    },
+    {
+      "id": "generate_report",
+      "type": "text",
+      "text": "role: implementation\n\nWrite a simple read-only script that outputs a list of broken wikilinks with their source file and line number, formatted for human readability.",
+      "x": 0,
+      "y": 1600,
+      "width": 420,
+      "height": 180,
+      "jarvis": {
+        "layout_profile": "dependency",
+        "layout_baseline": {
+          "x": 0,
+          "y": 1600,
+          "width": 420,
+          "height": 180
+        }
+      }
+    },
+    {
+      "id": "verify_output",
+      "type": "text",
+      "text": "role: verification\n\nRun the script on a test vault with known broken links and confirm that it correctly identifies and reports all unresolved wikilinks.",
+      "x": 0,
+      "y": 1920,
+      "width": 420,
+      "height": 180,
+      "jarvis": {
+        "layout_profile": "dependency",
+        "layout_baseline": {
+          "x": 0,
+          "y": 1920,
+          "width": 420,
+          "height": 180
+        }
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "jarvis-c5b88ab85545df05",
+      "fromNode": "plan",
+      "fromSide": "right",
+      "toNode": "research_vault_structure",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-52d8369f8499ecbd",
+      "fromNode": "research_vault_structure",
+      "fromSide": "right",
+      "toNode": "identify_wikilink_pattern",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-24f33037624f9896",
+      "fromNode": "identify_wikilink_pattern",
+      "fromSide": "right",
+      "toNode": "validate_note_resolution",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-6f11378ff19632ae",
+      "fromNode": "validate_note_resolution",
+      "fromSide": "right",
+      "toNode": "scan_wikilinks_for_breaks",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-45dc4a384aa509ec",
+      "fromNode": "scan_wikilinks_for_breaks",
+      "fromSide": "right",
+      "toNode": "generate_report",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-c2facfde2f7b15dc",
+      "fromNode": "generate_report",
+      "fromSide": "right",
+      "toNode": "verify_output",
+      "toSide": "left"
+    }
+  ]
+}

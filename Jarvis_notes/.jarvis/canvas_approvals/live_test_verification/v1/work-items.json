@@ -1,0 +1,122 @@
+{
+  "created_at": "2026-07-24T12:07:34Z",
+  "items": [
+    {
+      "acceptance_criteria": {
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [],
+      "description": "Run the test suite and confirm the vault-watcher's TTS read-trigger tests (tests/test_tts_read_trigger.py) all pass before this feature is considered done.",
+      "id": "v1_5a6df7",
+      "idempotency_key": "b9b3e92bd4d3c169dd18e2ba3f2083e23f639597770914f0ecef97af4b630299",
+      "inputs": {
+        "canvas_node_id": "v1",
+        "canvas_role": "verification"
+      },
+      "max_attempts": 2,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "deterministic",
+      "outputs": {
+        "result": "result.v1_5a6df7"
+      },
+      "required_outputs": [],
+      "requires_confirmation": false,
+      "resource_class": "command",
+      "retry_safe": true,
+      "risk_tier": "T2",
+      "sequence": 1,
+      "side_effects": "local_read",
+      "step_type": "command",
+      "target": "pytest_focused"
+    },
+    {
+      "acceptance_criteria": {
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [],
+      "description": "Verify tests/test_vault_watch.py still passes after the scan_once wiring change -- just that one file, not the whole suite, this is a quick pre-merge sanity check.",
+      "id": "v2_a1047e",
+      "idempotency_key": "ba403daf74511dc1066b0a7f9cad062854d3b2f17254a2131e704be9b65d9043",
+      "inputs": {
+        "canvas_node_id": "v2",
+        "canvas_role": "verification"
+      },
+      "max_attempts": 2,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "deterministic",
+      "outputs": {
+        "result": "result.v2_a1047e"
+      },
+      "required_outputs": [],
+      "requires_confirmation": false,
+      "resource_class": "command",
+      "retry_safe": true,
+      "risk_tier": "T2",
+      "sequence": 2,
+      "side_effects": "local_read",
+      "step_type": "command",
+      "target": "pytest_focused"
+    },
+    {
+      "acceptance_criteria": {
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [],
+      "description": "Run the project's full pytest suite once and report whether everything is green.",
+      "id": "v3_c5e31d",
+      "idempotency_key": "a16fcfedd4bac5e5550209f929cfea8b4f48a4380facb8c10d9b116164271980",
+      "inputs": {
+        "canvas_node_id": "v3",
+        "canvas_role": "verification"
+      },
+      "max_attempts": 2,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "deterministic",
+      "outputs": {
+        "result": "result.v3_c5e31d"
+      },
+      "required_outputs": [],
+      "requires_confirmation": false,
+      "resource_class": "command",
+      "retry_safe": true,
+      "risk_tier": "T2",
+      "sequence": 3,
+      "side_effects": "local_read",
+      "step_type": "command",
+      "target": "pytest_focused"
+    }
+  ],
+  "manifest_hash": "a1136a47837f45822029fbf7c9b398c394e58980c2a1de39450c19da1327031c",
+  "preflight": {
+    "checked_at": "2026-07-24T12:07:34Z",
+    "checks": [
+      {
+        "command_id": "pytest_focused",
+        "item_id": "v1_5a6df7",
+        "ok": true
+      },
+      {
+        "command_id": "pytest_focused",
+        "item_id": "v2_a1047e",
+        "ok": true
+      },
+      {
+        "command_id": "pytest_focused",
+        "item_id": "v3_c5e31d",
+        "ok": true
+      }
+    ],
+    "ok": true
+  },
+  "preview_only": false,
+  "schema_version": "jarvis_work_manifest/v1",
+  "workflow_hash": "cce52c0231dae28840e2ae91eef206d40e6925eda7858cad8f6411594e23ad66",
+  "workflow_id": "live_test_verification",
+  "workflow_version": "canvas-1"
+}

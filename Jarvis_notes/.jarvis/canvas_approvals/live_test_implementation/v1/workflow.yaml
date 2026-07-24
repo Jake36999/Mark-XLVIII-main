@@ -1,0 +1,76 @@
+schema_version: jarvis_dual_orchestrator/v1
+workflow_id: live_test_implementation
+version: canvas-1
+name: Live Test Implementation
+description: Compiled from an Obsidian Canvas graph (Mode 2 planning).
+max_steps: 3
+variables:
+  source: canvas
+  node_step_ids:
+    i1: i1_3795b5
+    i2: i2_ce4e91
+    i3: i3_c5f511
+steps:
+- step_id: i1_3795b5
+  orchestrator: deterministic
+  step_type: tool
+  target: project_operator
+  description: 'Create Mark-XLVIII-main/scratch/canvas_smoke_test.py containing a
+    function add(a, b): return a + b, plus a one-line pytest test for it in the same
+    file.'
+  risk_tier: T3
+  side_effects: external_write
+  depends_on: []
+  inputs:
+    canvas_role: implementation
+    canvas_node_id: i1
+    operation: delegate_openclaw
+  outputs:
+    result: result.i1_3795b5
+  acceptance_criteria:
+    required: true
+  requires_confirmation: true
+  retry_policy: &id001
+    safe: false
+    max_attempts: 1
+  on_failure: halt
+- step_id: i2_ce4e91
+  orchestrator: deterministic
+  step_type: tool
+  target: project_operator
+  description: Create a plain text file Mark-XLVIII-main/scratch/hello_from_canvas.txt
+    with the single line Hello from a live-tested implementation node.
+  risk_tier: T3
+  side_effects: external_write
+  depends_on: []
+  inputs:
+    canvas_role: implementation
+    canvas_node_id: i2
+    operation: delegate_openclaw
+  outputs:
+    result: result.i2_ce4e91
+  acceptance_criteria:
+    required: true
+  requires_confirmation: true
+  retry_policy: *id001
+  on_failure: halt
+- step_id: i3_c5f511
+  orchestrator: deterministic
+  step_type: tool
+  target: project_operator
+  description: Append a single dated bullet point to Mark-XLVIII-main/scratch/notes.md
+    noting that the canvas implementation-node live test ran today.
+  risk_tier: T3
+  side_effects: external_write
+  depends_on: []
+  inputs:
+    canvas_role: implementation
+    canvas_node_id: i3
+    operation: delegate_openclaw
+  outputs:
+    result: result.i3_c5f511
+  acceptance_criteria:
+    required: true
+  requires_confirmation: true
+  retry_policy: *id001
+  on_failure: halt

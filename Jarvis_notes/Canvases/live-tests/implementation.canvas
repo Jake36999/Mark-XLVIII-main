@@ -1,0 +1,62 @@
+{
+  "nodes": [
+    {
+      "id": "i1",
+      "type": "text",
+      "x": 0,
+      "y": 0,
+      "width": 460,
+      "height": 220,
+      "text": "role: implementation\nCreate Mark-XLVIII-main/scratch/canvas_smoke_test.py containing a function add(a, b): return a + b, plus a one-line pytest test for it in the same file.",
+      "jarvis": {
+        "kind": "plan_step",
+        "step_id": "i1_3795b5",
+        "workflow_id": "live_test_implementation",
+        "run_id": "live_test_implementation-v1",
+        "step_state": "ESCALATE",
+        "attempt": 1,
+        "updated_at": "2026-07-24T12:24:56Z"
+      },
+      "color": "1"
+    },
+    {
+      "id": "i2",
+      "type": "text",
+      "x": 500,
+      "y": 0,
+      "width": 460,
+      "height": 220,
+      "text": "role: implementation\nCreate a plain text file Mark-XLVIII-main/scratch/hello_from_canvas.txt with the single line Hello from a live-tested implementation node.",
+      "jarvis": {
+        "kind": "plan_step",
+        "step_id": "i2_ce4e91",
+        "workflow_id": "live_test_implementation",
+        "run_id": "live_test_implementation-v1",
+        "step_state": "ESCALATE",
+        "attempt": 1,
+        "updated_at": "2026-07-24T12:24:56Z"
+      },
+      "color": "1"
+    },
+    {
+      "id": "i3",
+      "type": "text",
+      "x": 1000,
+      "y": 0,
+      "width": 460,
+      "height": 220,
+      "text": "role: implementation\nAppend a single dated bullet point to Mark-XLVIII-main/scratch/notes.md noting that the canvas implementation-node live test ran today.",
+      "jarvis": {
+        "kind": "plan_step",
+        "step_id": "i3_c5f511",
+        "workflow_id": "live_test_implementation",
+        "run_id": "live_test_implementation-v1",
+        "step_state": "ESCALATE",
+        "attempt": 1,
+        "updated_at": "2026-07-24T12:24:56Z"
+      },
+      "color": "1"
+    }
+  ],
+  "edges": []
+}

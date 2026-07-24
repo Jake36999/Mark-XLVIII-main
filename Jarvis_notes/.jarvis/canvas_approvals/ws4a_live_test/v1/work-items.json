@@ -1,0 +1,250 @@
+{
+  "created_at": "2026-07-24T19:30:24Z",
+  "items": [
+    {
+      "acceptance_criteria": {
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [],
+      "description": "Define the task: scan Jarvis_notes vault for [[wikilinks]] that reference non-existent notes and report them.",
+      "id": "plan_bed971",
+      "idempotency_key": "4bbffdd9018631fc8033f5e73c9ddd26d867002f72125bf89d626ad0ed3d4a8a",
+      "inputs": {
+        "canvas_node_id": "plan",
+        "canvas_role": "plan"
+      },
+      "max_attempts": 1,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "deterministic",
+      "outputs": {
+        "result": "result.plan_bed971"
+      },
+      "required_outputs": [],
+      "requires_confirmation": false,
+      "resource_class": "io",
+      "retry_safe": true,
+      "risk_tier": "T1",
+      "sequence": 1,
+      "side_effects": "none",
+      "step_type": "gate",
+      "target": "plan_milestone"
+    },
+    {
+      "acceptance_criteria": {
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [
+        "plan_bed971"
+      ],
+      "description": "Investigate the structure and format of the Jarvis_notes vault to understand how wikilinks are stored and referenced.",
+      "id": "research_vault_structure_52d572",
+      "idempotency_key": "6ffb6df13660bc95796efeaac44bfca9ccf3c8a08c9e18c1032c92fd87a16337",
+      "inputs": {
+        "canvas_node_id": "research_vault_structure",
+        "canvas_role": "research"
+      },
+      "max_attempts": 1,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "cognitive",
+      "outputs": {
+        "result": "result.research_vault_structure_52d572"
+      },
+      "required_outputs": [],
+      "requires_confirmation": false,
+      "resource_class": "model",
+      "retry_safe": true,
+      "risk_tier": "T1",
+      "sequence": 2,
+      "side_effects": "none",
+      "step_type": "model_reasoning",
+      "target": "reasoning"
+    },
+    {
+      "acceptance_criteria": {
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [
+        "research_vault_structure_52d572"
+      ],
+      "description": "Extract and analyze the pattern of [[wikilink]] syntax in the vault files to determine how links are encoded.",
+      "id": "identify_wikilink_pattern_42a5f7",
+      "idempotency_key": "78eac263b13f5c617dc9176bd28b58f694e3d1e739837bf34863bd7a98b3ade5",
+      "inputs": {
+        "canvas_node_id": "identify_wikilink_pattern",
+        "canvas_role": "research"
+      },
+      "max_attempts": 1,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "cognitive",
+      "outputs": {
+        "result": "result.identify_wikilink_pattern_42a5f7"
+      },
+      "required_outputs": [],
+      "requires_confirmation": false,
+      "resource_class": "model",
+      "retry_safe": true,
+      "risk_tier": "T1",
+      "sequence": 3,
+      "side_effects": "none",
+      "step_type": "model_reasoning",
+      "target": "reasoning"
+    },
+    {
+      "acceptance_criteria": {
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [
+        "identify_wikilink_pattern_42a5f7"
+      ],
+      "description": "Implement a function that checks whether a given wikilink resolves to an existing note by looking up the note name in the vault directory structure.",
+      "id": "validate_note_resolution_3359ef",
+      "idempotency_key": "c9930dbc1e598e92f606571467a8429bc08cc056b3c5ccb3ca6e2c7eb17f7118",
+      "inputs": {
+        "canvas_node_id": "validate_note_resolution",
+        "canvas_role": "implementation",
+        "intent": "Implement a function that checks whether a given wikilink resolves to an existing note by looking up the note name in the vault directory structure.",
+        "operation": "delegate_openclaw"
+      },
+      "max_attempts": 1,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "deterministic",
+      "outputs": {
+        "result": "result.validate_note_resolution_3359ef"
+      },
+      "required_outputs": [],
+      "requires_confirmation": true,
+      "resource_class": "openclaw",
+      "retry_safe": false,
+      "risk_tier": "T3",
+      "sequence": 4,
+      "side_effects": "external_write",
+      "step_type": "tool",
+      "target": "project_operator"
+    },
+    {
+      "acceptance_criteria": {
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [
+        "validate_note_resolution_3359ef"
+      ],
+      "description": "Iterate through all files in the Jarvis_notes vault, extract all [[wikilink]]s, and validate each one using the resolution function; collect any unresolved links.",
+      "id": "scan_wikilinks_for_breaks_721098",
+      "idempotency_key": "1e5eb1ff8c61ed6a6a9fdd295f077b924d35bdb7b78a21ab52f70c75f83db4a7",
+      "inputs": {
+        "canvas_node_id": "scan_wikilinks_for_breaks",
+        "canvas_role": "implementation",
+        "intent": "Iterate through all files in the Jarvis_notes vault, extract all [[wikilink]]s, and validate each one using the resolution function; collect any unresolved links.",
+        "operation": "delegate_openclaw"
+      },
+      "max_attempts": 1,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "deterministic",
+      "outputs": {
+        "result": "result.scan_wikilinks_for_breaks_721098"
+      },
+      "required_outputs": [],
+      "requires_confirmation": true,
+      "resource_class": "openclaw",
+      "retry_safe": false,
+      "risk_tier": "T3",
+      "sequence": 5,
+      "side_effects": "external_write",
+      "step_type": "tool",
+      "target": "project_operator"
+    },
+    {
+      "acceptance_criteria": {
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [
+        "scan_wikilinks_for_breaks_721098"
+      ],
+      "description": "Write a simple read-only script that outputs a list of broken wikilinks with their source file and line number, formatted for human readability.",
+      "id": "generate_report_149d40",
+      "idempotency_key": "e8deb7e459c92d909023caaa0d9de37a948644fd6326a0b78d8685b39ec9375b",
+      "inputs": {
+        "canvas_node_id": "generate_report",
+        "canvas_role": "implementation",
+        "intent": "Write a simple read-only script that outputs a list of broken wikilinks with their source file and line number, formatted for human readability.",
+        "operation": "delegate_openclaw"
+      },
+      "max_attempts": 1,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "deterministic",
+      "outputs": {
+        "result": "result.generate_report_149d40"
+      },
+      "required_outputs": [],
+      "requires_confirmation": true,
+      "resource_class": "openclaw",
+      "retry_safe": false,
+      "risk_tier": "T3",
+      "sequence": 6,
+      "side_effects": "external_write",
+      "step_type": "tool",
+      "target": "project_operator"
+    },
+    {
+      "acceptance_criteria": {
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [
+        "generate_report_149d40"
+      ],
+      "description": "Run the script on a test vault with known broken links and confirm that it correctly identifies and reports all unresolved wikilinks.",
+      "id": "verify_output_0f8a0b",
+      "idempotency_key": "ed56574e2caeb55f7e1b0ab98aac6442c40d9292b47c713693e68ddcf0deff0c",
+      "inputs": {
+        "canvas_node_id": "verify_output",
+        "canvas_role": "verification"
+      },
+      "max_attempts": 2,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "deterministic",
+      "outputs": {
+        "result": "result.verify_output_0f8a0b"
+      },
+      "required_outputs": [],
+      "requires_confirmation": false,
+      "resource_class": "command",
+      "retry_safe": true,
+      "risk_tier": "T2",
+      "sequence": 7,
+      "side_effects": "local_read",
+      "step_type": "command",
+      "target": "pytest_focused"
+    }
+  ],
+  "manifest_hash": "944178e3b81bece4c57b3afb44747a365600bf45a4f55edb92fdf4b3467ea17a",
+  "preflight": {
+    "checked_at": "2026-07-24T19:30:24Z",
+    "checks": [
+      {
+        "command_id": "pytest_focused",
+        "item_id": "verify_output_0f8a0b",
+        "ok": true
+      }
+    ],
+    "ok": true
+  },
+  "preview_only": false,
+  "schema_version": "jarvis_work_manifest/v1",
+  "workflow_hash": "8a06feef220ac84d91cb204f43770c5ac08faedcc21c9385664b61a8edee94fe",
+  "workflow_id": "ws4a_live_test",
+  "workflow_version": "canvas-1"
+}

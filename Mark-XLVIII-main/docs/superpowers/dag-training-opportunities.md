@@ -15,6 +15,7 @@
 - **Why dedicated:** `core/model_router._route_from_context` is hand-written keyword heuristics; a tiny classifier would route better and is a bounded, low-risk utility.
 - **Signal already present:** every generation logs role + provenance + outcome in the health store (`model_health`) and provenance records. Label = which model actually succeeded well. That's a ready-made routing dataset.
 - **Confidence:** high. Bounded output space, abundant labels, low blast radius.
+- **2026-07-24 update:** a 16-prompt live test found `_route_from_context` misclassifying almost every `worker`-role call as `route: "vision"`, because its keyword scan includes the *system prompt* text, and the standing system prompt (`core/prompt.txt`) always contains a `screen_process` capability line mentioning "image" — a real, previously-unknown contamination bug, not just a hand-tuning gap. Same test also found a keyword-substring collision in the unrelated `plan_workflow._steps_from_prompt` router (`"repo"` matched inside `"weather_report"`, misrouting a plan). Both are additional concrete, labeled failure examples for this candidate. See `Jarvis_notes/Validation/2026-07-24-live-prompt-testing-16-prompts.md`.
 
 ### 2. Memory-type / fact classifier
 - **Task:** classify an extracted fact as `episodic | semantic | preference` (Mnemosyne's `MemoryClassifier`), and whether a note is `promote | merge | archive | flag` (my `memory_consolidation` detection).

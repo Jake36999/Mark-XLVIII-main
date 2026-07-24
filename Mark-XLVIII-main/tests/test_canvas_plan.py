@@ -1467,5 +1467,215 @@ class CanvasExecutionReceiptTests(unittest.TestCase):
         self.assertIsNone(completion_call.kwargs["detail"])
 
 
+class DecomposeGoalToCanvasTests(unittest.TestCase):
+    """WS4a: turning a plain goal into a real, drawn canvas."""
+
+    def _good_payload(self) -> dict:
+        return {
+            "nodes": [
+                {"id": "root", "role": "plan", "prose": "Ship the thing.", "depends_on": []},
+                {
+                    "id": "look_around",
+                    "role": "research",
+                    "directives": {"recommended_model": "research"},
+                    "prose": "Find the existing auth module.",
+                    "depends_on": ["root"],
+                },
+                {
+                    "id": "make_change",
+                    "role": "implementation",
+                    "directives": {"project": "demo_project", "file": "auth.py"},
+                    "prose": "Apply the fix.",
+                    "depends_on": ["look_around"],
+                },
+                {
+                    "id": "check_it",
+                    "role": "verification",
+                    "directives": {"scope": "tests/test_auth.py"},
+                    "prose": "Run the auth tests.",
+                    "depends_on": ["make_change"],
+                },
+            ],
+            "rationale": "Research first, then change, then verify.",
+        }
+
+    def test_well_formed_response_assembles_a_valid_canvas(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            cfg = _cfg(root)
+            with mock.patch("core.model_router.call_text", return_value=json.dumps(self._good_payload())) as call_text:
+                result = canvas_plan.decompose_goal_to_canvas("Fix the login bug", cfg=cfg)
+
+            self.assertTrue(result["ok"], result)
+            self.assertEqual(result["node_count"], 4)
+            self.assertEqual(result["rationale"], "Research first, then change, then verify.")
+            call_text.assert_called_once()
+            self.assertEqual(call_text.call_args.kwargs["role"], "planner")
+
+            canvas_path = Path(result["canvas_path"])
+            self.assertTrue(canvas_path.exists())
+            self.assertTrue(canvas_path.is_relative_to(root))
+            # a caller-less default name must still land under the canvas
+            # folder, not directly in the vault root
+            self.assertTrue(canvas_path.is_relative_to(root / "Canvases" / "JARVIS"))
+
+            document = canvas.load_canvas(canvas_path)
+            self.assertEqual(len(document["nodes"]), 4)
+            self.assertEqual(len(document["edges"]), 3)
+
+            by_id = {node["id"]: node for node in document["nodes"]}
+            self.assertIn("root", by_id)
+            self.assertIn("role: implementation", by_id["make_change"]["text"])
+            self.assertIn("project: demo_project", by_id["make_change"]["text"])
+            self.assertIn("file: auth.py", by_id["make_change"]["text"])
+            self.assertIn("scope: tests/test_auth.py", by_id["check_it"]["text"])
+            self.assertIn("Run the auth tests.", by_id["check_it"]["text"])
+
+            # layout_document must actually run: a linear dependency chain should
+            # land each node in its own layer, strictly increasing in y, not all
+            # four stacked on the (0, 0) placeholder.
+            ys = [by_id[nid]["y"] for nid in ("root", "look_around", "make_change", "check_it")]
+            self.assertEqual(ys, sorted(ys))
+            self.assertEqual(len(set(ys)), 4)
+
+            edge_pairs = {(edge["fromNode"], edge["toNode"]) for edge in document["edges"]}
+            self.assertEqual(edge_pairs, {("root", "look_around"), ("look_around", "make_change"), ("make_change", "check_it")})
+
+    def test_project_hint_is_forwarded_into_the_prompt(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            cfg = _cfg(Path(tmp))
+            with mock.patch("core.model_router.call_text", return_value=json.dumps(self._good_payload())) as call_text:
+                canvas_plan.decompose_goal_to_canvas("Fix the login bug", project_hint="demo_project", cfg=cfg)
+
+            prompt_arg = call_text.call_args.args[0]
+            self.assertIn("demo_project", prompt_arg)
+
+    def test_empty_goal_is_rejected_without_calling_the_model(self):
+        with mock.patch("core.model_router.call_text") as call_text:
+            result = canvas_plan.decompose_goal_to_canvas("   ")
+
+        self.assertFalse(result["ok"])
+        call_text.assert_not_called()
+
+    def test_non_json_response_is_rejected_and_nothing_is_written(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            cfg = _cfg(root)
+            with mock.patch("core.model_router.call_text", return_value="Sure, here's a plan: step one, step two."):
+                result = canvas_plan.decompose_goal_to_canvas("Fix the login bug", cfg=cfg)
+
+            self.assertFalse(result["ok"])
+            self.assertIn("not parseable JSON", result["error"])
+            self.assertEqual(result["raw_text"], "Sure, here's a plan: step one, step two.")
+            self.assertFalse((root / "Canvases").exists())
+
+    def test_missing_plan_node_is_rejected(self):
+        payload = self._good_payload()
+        for node in payload["nodes"]:
+            if node["role"] == "plan":
+                node["role"] = "research"
+        with tempfile.TemporaryDirectory() as tmp:
+            cfg = _cfg(Path(tmp))
+            with mock.patch("core.model_router.call_text", return_value=json.dumps(payload)):
+                result = canvas_plan.decompose_goal_to_canvas("Fix the login bug", cfg=cfg)
+
+        self.assertFalse(result["ok"])
+        self.assertIn("Expected exactly one node with role 'plan'", result["error"])
+
+    def test_unrecognised_role_is_rejected(self):
+        payload = self._good_payload()
+        payload["nodes"][1]["role"] = "not_a_real_role"
+        with tempfile.TemporaryDirectory() as tmp:
+            cfg = _cfg(Path(tmp))
+            with mock.patch("core.model_router.call_text", return_value=json.dumps(payload)):
+                result = canvas_plan.decompose_goal_to_canvas("Fix the login bug", cfg=cfg)
+
+        self.assertFalse(result["ok"])
+        self.assertIn("unrecognised role", result["error"])
+
+    def test_orphan_non_plan_node_is_rejected(self):
+        # Caught live: the model left a research node with no depends_on,
+        # leaving the plan node disconnected from the rest of the graph.
+        payload = self._good_payload()
+        payload["nodes"][1]["depends_on"] = []
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            cfg = _cfg(root)
+            with mock.patch("core.model_router.call_text", return_value=json.dumps(payload)):
+                result = canvas_plan.decompose_goal_to_canvas("Fix the login bug", cfg=cfg)
+
+        self.assertFalse(result["ok"])
+        self.assertIn("has no depends_on", result["error"])
+        self.assertFalse((root / "Canvases").exists())
+
+    def test_dangling_depends_on_is_rejected(self):
+        payload = self._good_payload()
+        payload["nodes"][1]["depends_on"] = ["some_node_that_does_not_exist"]
+        with tempfile.TemporaryDirectory() as tmp:
+            cfg = _cfg(Path(tmp))
+            with mock.patch("core.model_router.call_text", return_value=json.dumps(payload)):
+                result = canvas_plan.decompose_goal_to_canvas("Fix the login bug", cfg=cfg)
+
+        self.assertFalse(result["ok"])
+        self.assertIn("depends_on unknown id", result["error"])
+
+    def test_dependency_cycle_is_rejected(self):
+        payload = {
+            "nodes": [
+                {"id": "root", "role": "plan", "prose": "Anchor.", "depends_on": []},
+                {"id": "a", "role": "research", "prose": "Step A.", "depends_on": ["root", "b"]},
+                {"id": "b", "role": "implementation", "prose": "Step B.", "depends_on": ["a"]},
+            ],
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            cfg = _cfg(root)
+            with mock.patch("core.model_router.call_text", return_value=json.dumps(payload)):
+                result = canvas_plan.decompose_goal_to_canvas("Fix the login bug", cfg=cfg)
+
+        self.assertFalse(result["ok"])
+        self.assertIn("cycle", result["error"])
+        self.assertFalse((root / "Canvases").exists())
+
+    def test_duplicate_slugified_ids_are_disambiguated_and_edges_still_resolve(self):
+        # Two raw ids that collide once slugified ("Step 1!" and "Step 1?" both
+        # become "step_1") must not silently merge into one node, and any
+        # depends_on referencing either original id must still land on the
+        # correct (disambiguated) node -- this is the exact bug caught and
+        # fixed mid-implementation.
+        payload = {
+            "nodes": [
+                {"id": "root", "role": "plan", "prose": "Anchor.", "depends_on": []},
+                {"id": "Step 1!", "role": "research", "prose": "First.", "depends_on": ["root"]},
+                {"id": "Step 1?", "role": "implementation", "prose": "Second.", "depends_on": ["Step 1!"]},
+            ],
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            cfg = _cfg(root)
+            with mock.patch("core.model_router.call_text", return_value=json.dumps(payload)):
+                result = canvas_plan.decompose_goal_to_canvas("Fix the login bug", cfg=cfg)
+
+            self.assertTrue(result["ok"], result)
+            self.assertEqual(result["node_count"], 3)
+            document = canvas.load_canvas(Path(result["canvas_path"]))
+            self.assertEqual(len(document["nodes"]), 3)
+            node_ids = {node["id"] for node in document["nodes"]}
+            self.assertEqual(len(node_ids), 3)
+            self.assertEqual(len(document["edges"]), 2)
+
+    def test_canvas_name_override_is_respected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            cfg = _cfg(root)
+            with mock.patch("core.model_router.call_text", return_value=json.dumps(self._good_payload())):
+                result = canvas_plan.decompose_goal_to_canvas(
+                    "Fix the login bug", canvas_name="Canvases/JARVIS/custom_name.canvas", cfg=cfg
+                )
+
+            self.assertTrue(result["ok"], result)
+            self.assertTrue(Path(result["canvas_path"]).name, "custom_name.canvas")
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -1,0 +1,15 @@
+{
+  "approval_projection_hash": "782a6bbfb576438d0fbe26d57d40c251583b5adb7bdccf88bcff8be233cee33c",
+  "approved_action_ids": [
+    "v1_5a6df7",
+    "v2_a1047e",
+    "v3_c5e31d"
+  ],
+  "approved_at": "2026-07-24T12:08:19Z",
+  "manifest_hash": "a1136a47837f45822029fbf7c9b398c394e58980c2a1de39450c19da1327031c",
+  "plan_id": "live_test_verification",
+  "plan_version": 1,
+  "schema_version": "jarvis_approval/v1",
+  "signature": "c39941d915da1933e239b9cd0ec29f9eb9bdcf4709c371d41fd315bdc10146b0",
+  "workflow_hash": "cce52c0231dae28840e2ae91eef206d40e6925eda7858cad8f6411594e23ad66"
+}

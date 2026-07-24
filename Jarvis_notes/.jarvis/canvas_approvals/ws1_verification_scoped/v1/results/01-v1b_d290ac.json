@@ -1,0 +1,18 @@
+{
+  "schema_version": "jarvis_work_result/v1",
+  "run_id": "ws1_verification_scoped-v1",
+  "item_id": "v1b_d290ac",
+  "verdict": "ACCEPT",
+  "defects": [],
+  "result": {
+    "ok": true,
+    "returncode": 0,
+    "stdout": ".................                                                        [100%]\n17 passed in 0.35s\n",
+    "stderr": "",
+    "command_id": "pytest_focused",
+    "cancelled": false,
+    "timed_out": false
+  },
+  "model_provenance": null,
+  "completed_at": "2026-07-24T13:45:01Z"
+}

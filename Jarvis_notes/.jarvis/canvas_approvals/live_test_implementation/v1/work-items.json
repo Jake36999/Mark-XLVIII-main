@@ -1,0 +1,109 @@
+{
+  "created_at": "2026-07-24T12:07:45Z",
+  "items": [
+    {
+      "acceptance_criteria": {
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [],
+      "description": "Create Mark-XLVIII-main/scratch/canvas_smoke_test.py containing a function add(a, b): return a + b, plus a one-line pytest test for it in the same file.",
+      "id": "i1_3795b5",
+      "idempotency_key": "7e25ded2237730a1c643e564dd7643b7bd0edb424e4dfe443592c8de1ea2464c",
+      "inputs": {
+        "canvas_node_id": "i1",
+        "canvas_role": "implementation",
+        "operation": "delegate_openclaw"
+      },
+      "max_attempts": 1,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "deterministic",
+      "outputs": {
+        "result": "result.i1_3795b5"
+      },
+      "required_outputs": [],
+      "requires_confirmation": true,
+      "resource_class": "openclaw",
+      "retry_safe": false,
+      "risk_tier": "T3",
+      "sequence": 1,
+      "side_effects": "external_write",
+      "step_type": "tool",
+      "target": "project_operator"
+    },
+    {
+      "acceptance_criteria": {
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [],
+      "description": "Create a plain text file Mark-XLVIII-main/scratch/hello_from_canvas.txt with the single line Hello from a live-tested implementation node.",
+      "id": "i2_ce4e91",
+      "idempotency_key": "e1efb47f1f6e2d6f5e15d9f735384a08a6aba39b11eedaf183c3da40bacb06ac",
+      "inputs": {
+        "canvas_node_id": "i2",
+        "canvas_role": "implementation",
+        "operation": "delegate_openclaw"
+      },
+      "max_attempts": 1,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "deterministic",
+      "outputs": {
+        "result": "result.i2_ce4e91"
+      },
+      "required_outputs": [],
+      "requires_confirmation": true,
+      "resource_class": "openclaw",
+      "retry_safe": false,
+      "risk_tier": "T3",
+      "sequence": 2,
+      "side_effects": "external_write",
+      "step_type": "tool",
+      "target": "project_operator"
+    },
+    {
+      "acceptance_criteria": {
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [],
+      "description": "Append a single dated bullet point to Mark-XLVIII-main/scratch/notes.md noting that the canvas implementation-node live test ran today.",
+      "id": "i3_c5f511",
+      "idempotency_key": "d0bf438b27a71b5edff661e60aacafb30f1cf652ef0115652c2c17b0f768112c",
+      "inputs": {
+        "canvas_node_id": "i3",
+        "canvas_role": "implementation",
+        "operation": "delegate_openclaw"
+      },
+      "max_attempts": 1,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "deterministic",
+      "outputs": {
+        "result": "result.i3_c5f511"
+      },
+      "required_outputs": [],
+      "requires_confirmation": true,
+      "resource_class": "openclaw",
+      "retry_safe": false,
+      "risk_tier": "T3",
+      "sequence": 3,
+      "side_effects": "external_write",
+      "step_type": "tool",
+      "target": "project_operator"
+    }
+  ],
+  "manifest_hash": "f2ea61b62cfe138a82d15eda679ac27c6cbc37bb498180c362b373f3debeb2e3",
+  "preflight": {
+    "checked_at": "2026-07-24T12:07:45Z",
+    "checks": [],
+    "ok": true
+  },
+  "preview_only": false,
+  "schema_version": "jarvis_work_manifest/v1",
+  "workflow_hash": "6469d5e47288379b0d38bd6e0e6bde9adec6166740cedcc431e56de1cab68210",
+  "workflow_id": "live_test_implementation",
+  "workflow_version": "canvas-1"
+}
