@@ -45,20 +45,23 @@
       "qwen/qwen3-vl-4b"
     ],
     "main": [
-      "qwen/qwen3.5-9b",
       "mistralai/mistral-7b-instruct-v0.3",
-      "deepseek-r1-0528-qwen3-8b",
-      "google/gemma-4-e4b"
+      "google/gemma-4-e4b",
+      "qwen2.5-14b-deepresearch-i1",
+      "qwen/qwen3.5-9b",
+      "deepseek-r1-0528-qwen3-8b"
     ],
     "reasoning": [
+      "mistralai/mistral-7b-instruct-v0.3",
+      "qwen2.5-14b-deepresearch-i1",
       "deepseek-r1-0528-qwen3-8b",
-      "qwen/qwen3.5-9b",
-      "mistralai/mistral-7b-instruct-v0.3"
+      "qwen/qwen3.5-9b"
     ],
     "code": [
+      "mistralai/mistral-7b-instruct-v0.3",
+      "qwen2.5-14b-deepresearch-i1",
       "deepseek-r1-0528-qwen3-8b",
-      "qwen/qwen3.5-9b",
-      "mistralai/mistral-7b-instruct-v0.3"
+      "qwen/qwen3.5-9b"
     ],
     "vision": [
       "qwen/qwen3-vl-4b"
@@ -87,7 +90,8 @@
   "lmstudio_native_url": "http://localhost:1234/api/v1",
   "baseline_models": [
     "qwen/qwen3-4b-2507",
-    "orpeus_text_to_speech"
+    "orpeus_text_to_speech",
+    "mistralai/mistral-7b-instruct-v0.3"
   ],
   "task_model_ttl_seconds": 300,
   "idle_cleanup_seconds": 300,

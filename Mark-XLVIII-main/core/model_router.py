@@ -43,21 +43,33 @@ DEFAULT_LMSTUDIO_ROUTES = {
         "google/gemma-4-e4b",
         "qwen/qwen3-vl-4b",
     ],
+    # Ordering below reflects the 2026-07-24 characterization benchmark
+    # (Jarvis_notes/Validation/2026-07-24-model-characterization-benchmark.md):
+    # mistral-7b-instruct completed every bounded/structured/tool probe cleanly
+    # with no reasoning-token bloat, while deepseek-r1-0528-qwen3-8b and
+    # qwen/qwen3.5-9b both reason past their token budget and frequently never
+    # emit a final answer at all -- confirmed as the root cause of this
+    # session's live-test timeout cascades (they were tried first). qwen2.5-14b
+    # is highest quality but slow (~5 tok/s); kept as a second-tier fallback,
+    # not first, for interactive roles.
     "main": [
-        "qwen/qwen3.5-9b",
         "mistralai/mistral-7b-instruct-v0.3",
-        "deepseek-r1-0528-qwen3-8b",
         "google/gemma-4-e4b",
+        "qwen2.5-14b-deepresearch-i1",
+        "qwen/qwen3.5-9b",
+        "deepseek-r1-0528-qwen3-8b",
     ],
     "reasoning": [
+        "mistralai/mistral-7b-instruct-v0.3",
+        "qwen2.5-14b-deepresearch-i1",
         "deepseek-r1-0528-qwen3-8b",
         "qwen/qwen3.5-9b",
-        "mistralai/mistral-7b-instruct-v0.3",
     ],
     "code": [
+        "mistralai/mistral-7b-instruct-v0.3",
+        "qwen2.5-14b-deepresearch-i1",
         "deepseek-r1-0528-qwen3-8b",
         "qwen/qwen3.5-9b",
-        "mistralai/mistral-7b-instruct-v0.3",
     ],
     "vision": [
         "qwen/qwen3-vl-4b",
@@ -189,7 +201,14 @@ def _route_from_context(prompt: str, role: str, system: str | None = None) -> st
     )
     if trusted_route:
         return trusted_route.group(1).lower()
-    text = f"{system or ''}\n{prompt or ''}".lower()
+    # Keyword routing below must only ever look at the user's own words. The
+    # standing system prompt (core/prompt.txt) documents capabilities like
+    # "Vision (screen_process): ... wait for the image result" -- if system
+    # text were included here, every call would match "vision" or whichever
+    # route the boilerplate happens to mention, regardless of what was asked.
+    # Confirmed live: this previously misclassified nearly every worker-role
+    # call as route=vision (see Jarvis_notes/Validation/2026-07-24-live-prompt-testing-16-prompts.md).
+    text = (prompt or "").lower()
     stripped = (prompt or "").strip().lower()
     if stripped in {"hi", "hello", "hey", "hello jarvis", "hey jarvis", "hi jarvis"}:
         return "quick"

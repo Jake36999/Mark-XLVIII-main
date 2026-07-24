@@ -1865,6 +1865,33 @@ class SystemRoleSeparationTests(unittest.TestCase):
             "research",
         )
 
+    def test_keyword_routing_ignores_system_prompt_boilerplate(self):
+        """Regression: core/prompt.txt documents the screen_process capability
+        with the word "image" in it, and _route_from_context used to scan the
+        system text too -- so every call with that system prompt misclassified
+        as route=vision regardless of topic. Confirmed live across an entire
+        16-prompt test run (weather, memory, project-status, research, etc.
+        all showed route:vision). Keyword routing must only look at the user's
+        own words; the system channel stays reserved for the trusted directive."""
+        from core import model_router
+
+        vision_flavored_system = (
+            "Vision (screen_process): call it once per request, then wait for the image result."
+        )
+        self.assertEqual(
+            model_router._route_from_context("What's my current memory usage?", "worker", vision_flavored_system),
+            "worker",
+        )
+        self.assertEqual(
+            model_router._route_from_context("Explain the tradeoffs of this architecture.", "worker", vision_flavored_system),
+            "reasoning",
+        )
+        # A genuinely vision-flavored user prompt still correctly routes to vision.
+        self.assertEqual(
+            model_router._route_from_context("Look at this screenshot and describe it.", "worker", vision_flavored_system),
+            "vision",
+        )
+
     def test_system_role_falls_back_when_the_template_rejects_it(self):
         from core import model_router
 
