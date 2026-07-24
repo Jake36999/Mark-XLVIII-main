@@ -14,7 +14,7 @@ from pathlib import Path
 import psutil
 
 from core.runtime_config import RUNTIME_CONFIG_PATH, load_runtime_config, save_runtime_config
-from core.session_credentials import get_session_broker
+from core.session_credentials import detect_key_provider, get_session_broker
 
 if platform.system() == "Windows":
     _WIN_HIDE: dict = {"creationflags": subprocess.CREATE_NO_WINDOW}
@@ -2041,21 +2041,21 @@ class MainWindow(QMainWindow):
         lay.addWidget(info_panel)
         lay.addSpacing(4)
 
-        key_hdr = QLabel("OPENAI API KEY")
+        key_hdr = QLabel("API KEY (OPENAI / ANTHROPIC)")
         key_hdr.setFont(QFont("Courier New", 7, QFont.Weight.Bold))
         key_hdr.setStyleSheet(f"color: {C.PRI}; background: transparent; border: none;")
         lay.addWidget(key_hdr)
 
         self._openai_session_key = QLineEdit()
         self._openai_session_key.setEchoMode(QLineEdit.EchoMode.Password)
-        self._openai_session_key.setPlaceholderText("session key")
+        self._openai_session_key.setPlaceholderText("sk-... or sk-ant-...")
         self._openai_session_key.setFixedHeight(26)
         self._openai_session_key.setFont(QFont("Courier New", 8))
         self._openai_session_key.setStyleSheet(
             f"background: #000d12; color: {C.TEXT}; border: 1px solid {C.BORDER}; "
             "border-radius: 3px; padding: 3px 5px;"
         )
-        self._openai_session_key.returnPressed.connect(self._link_openai_key)
+        self._openai_session_key.returnPressed.connect(self._link_api_key)
         lay.addWidget(self._openai_session_key)
 
         key_buttons = QHBoxLayout()
@@ -2071,8 +2071,8 @@ class MainWindow(QMainWindow):
                 "border-radius: 3px; } QPushButton:hover { border-color: #00d9ff; }"
             )
             key_buttons.addWidget(button)
-        self._link_key_btn.clicked.connect(self._link_openai_key)
-        self._unlink_key_btn.clicked.connect(self._unlink_openai_key)
+        self._link_key_btn.clicked.connect(self._link_api_key)
+        self._unlink_key_btn.clicked.connect(self._unlink_api_key)
         lay.addLayout(key_buttons)
 
         self._openai_key_status = QLabel("UNLINKED")
@@ -2081,6 +2081,7 @@ class MainWindow(QMainWindow):
         self._openai_key_status.setStyleSheet(f"color: {C.TEXT_DIM}; background: transparent; border: none;")
         lay.addWidget(self._openai_key_status)
         lay.addSpacing(4)
+        self._linked_key_provider = "openai"
 
         lay.addStretch()
 
@@ -2102,12 +2103,14 @@ class MainWindow(QMainWindow):
 
         return w
 
-    def _link_openai_key(self) -> None:
+    def _link_api_key(self) -> None:
         key = self._openai_session_key.text().strip()
         self._openai_session_key.clear()
         if not key:
             self._apply_credential_status({"state": "invalid", "reason": "empty_key"})
             return
+        provider = detect_key_provider(key)
+        self._linked_key_provider = provider
         self._link_key_btn.setEnabled(False)
         self._openai_key_status.setText("CHECKING")
         self._openai_key_status.setStyleSheet(f"color: {C.ACC2}; background: transparent; border: none;")
@@ -2116,32 +2119,37 @@ class MainWindow(QMainWindow):
         def _link() -> None:
             secret = key
             try:
-                result = get_session_broker().link_openai(
-                    secret,
-                    base_url=str(cfg.get("openai_url") or "https://api.openai.com/v1"),
-                    model=str(cfg.get("planner_model") or cfg.get("openai_model") or "gpt-5.5"),
-                )
+                if provider == "anthropic":
+                    base_url = str(cfg.get("anthropic_url") or "https://api.anthropic.com/v1")
+                    model = str(cfg.get("anthropic_model") or "claude-sonnet-5")
+                else:
+                    base_url = str(cfg.get("openai_url") or "https://api.openai.com/v1")
+                    model = str(cfg.get("planner_model") or cfg.get("openai_model") or "gpt-5.5")
+                result = get_session_broker().link(provider, secret, base_url=base_url, model=model)
             except Exception as exc:
-                result = {"ok": False, "state": "degraded", "reason": f"broker_error: {exc}"}
+                result = {"ok": False, "provider": provider, "state": "degraded", "reason": f"broker_error: {exc}"}
             finally:
                 secret = ""
             self._credential_sig.emit(result)
 
-        threading.Thread(target=_link, name="openai-key-link", daemon=True).start()
+        threading.Thread(target=_link, name=f"{provider}-key-link", daemon=True).start()
 
-    def _unlink_openai_key(self) -> None:
+    def _unlink_api_key(self) -> None:
+        provider = self._linked_key_provider
+
         def _unlink() -> None:
             try:
-                result = get_session_broker().unlink("openai")
+                result = get_session_broker().unlink(provider)
             except Exception as exc:
-                result = {"ok": False, "state": "degraded", "reason": f"broker_error: {exc}"}
+                result = {"ok": False, "provider": provider, "state": "degraded", "reason": f"broker_error: {exc}"}
             self._credential_sig.emit(result)
 
-        threading.Thread(target=_unlink, name="openai-key-unlink", daemon=True).start()
+        threading.Thread(target=_unlink, name=f"{provider}-key-unlink", daemon=True).start()
 
     def _apply_credential_status(self, result: object) -> None:
         data = result if isinstance(result, dict) else {}
         state = str(data.get("state") or "degraded").lower()
+        provider = str(data.get("provider") or self._linked_key_provider or "openai").upper()
         labels = {
             "linked": ("LINKED", C.GREEN),
             "degraded": ("DEGRADED", C.ACC2),
@@ -2149,7 +2157,7 @@ class MainWindow(QMainWindow):
             "unlinked": ("UNLINKED", C.TEXT_DIM),
         }
         label, color = labels.get(state, (state.upper(), C.TEXT_DIM))
-        self._openai_key_status.setText(label)
+        self._openai_key_status.setText(f"{label} ({provider})" if state != "unlinked" else label)
         self._openai_key_status.setToolTip(str(data.get("reason") or ""))
         self._openai_key_status.setStyleSheet(f"color: {color}; background: transparent; border: none;")
         self._link_key_btn.setEnabled(True)

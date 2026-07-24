@@ -8,6 +8,14 @@ from dataclasses import dataclass
 from typing import Any
 
 
+def detect_key_provider(key: str) -> str:
+    """Guess which provider a pasted session key belongs to, purely from its
+    shape -- Anthropic keys are always prefixed `sk-ant-`; everything else
+    (plain `sk-...`, project-scoped `sk-proj-...`, etc.) is treated as OpenAI,
+    preserving the box's original behavior for existing users."""
+    return "anthropic" if str(key or "").strip().lower().startswith("sk-ant-") else "openai"
+
+
 def classify_provider_failure(status_code: int | None, payload: Any = None, error: str = "") -> dict[str, Any]:
     code = int(status_code or 0)
     payload_text = str(payload or "").lower()
@@ -43,11 +51,39 @@ def _safe_json(response) -> Any:
         return {"message": str(getattr(response, "text", ""))[:500]}
 
 
-def _provider_headers(key: bytearray) -> dict[str, str]:
+_ANTHROPIC_VERSION = "2023-06-01"
+_PROVIDER_DEFAULT_BASE_URL = {
+    "openai": "https://api.openai.com/v1",
+    "anthropic": "https://api.anthropic.com/v1",
+}
+
+
+def _provider_headers(key: bytearray, provider: str = "openai") -> dict[str, str]:
+    # Anthropic authenticates via x-api-key + a version header, not a bearer
+    # token -- everything else (openai and openai-compatible) uses Bearer.
+    if provider == "anthropic":
+        return {
+            "x-api-key": bytes(key).decode("utf-8"),
+            "anthropic-version": _ANTHROPIC_VERSION,
+            "Content-Type": "application/json",
+        }
     return {
         "Authorization": f"Bearer {bytes(key).decode('utf-8')}",
         "Content-Type": "application/json",
     }
+
+
+def _link_validation_request(provider: str, model: str) -> tuple[str, dict]:
+    """(path, payload) for the tiny probe call that validates a freshly-linked
+    key against the real API -- provider-specific because Anthropic's Messages
+    API has no /responses endpoint and always requires max_tokens."""
+    if provider == "anthropic":
+        return "messages", {
+            "model": model,
+            "max_tokens": 8,
+            "messages": [{"role": "user", "content": "Reply with OK."}],
+        }
+    return "responses", {"model": model, "input": "Reply with OK.", "max_output_tokens": 8}
 
 
 def _broker_main(connection) -> None:
@@ -79,45 +115,47 @@ def _broker_main(connection) -> None:
                     continue
                 _wipe(credentials.pop(provider, None))
                 credentials[provider] = bytearray(raw.encode("utf-8"))
-                base_url = str(request.get("base_url") or "https://api.openai.com/v1").rstrip("/")
+                default_base = _PROVIDER_DEFAULT_BASE_URL.get(provider, _PROVIDER_DEFAULT_BASE_URL["openai"])
+                base_url = str(request.get("base_url") or default_base).rstrip("/")
                 model = str(request.get("model") or "").strip()
+                headers = _provider_headers(credentials[provider], provider)
+                model_count = 0
                 try:
-                    models_response = requests.get(
-                        f"{base_url}/models",
-                        headers=_provider_headers(credentials[provider]),
-                        timeout=15,
-                    )
-                    models_payload = _safe_json(models_response)
-                    if not 200 <= models_response.status_code < 300:
-                        failure = classify_provider_failure(models_response.status_code, models_payload)
-                        if failure["clear_key"]:
-                            _wipe(credentials.pop(provider, None))
-                        states[provider] = {**failure, "model": model}
-                        connection.send({"ok": False, "provider": provider, **states[provider]})
-                        continue
-                    model_ids = {
-                        str(item.get("id"))
-                        for item in (models_payload.get("data") or [])
-                        if isinstance(item, dict) and item.get("id")
-                    }
-                    if model and model_ids and model not in model_ids:
-                        states[provider] = {
-                            "state": "degraded",
-                            "reason": "configured_model_unavailable",
-                            "model": model,
-                            "model_count": len(model_ids),
+                    # Anthropic: skip the /models list check and validate with the
+                    # real message probe below instead -- its exact list-endpoint
+                    # response shape hasn't been verified against a live key, and a
+                    # wrong assumption there would reject an otherwise-valid key
+                    # before ever reaching the probe that actually proves it works.
+                    if provider != "anthropic":
+                        models_response = requests.get(f"{base_url}/models", headers=headers, timeout=15)
+                        models_payload = _safe_json(models_response)
+                        if not 200 <= models_response.status_code < 300:
+                            failure = classify_provider_failure(models_response.status_code, models_payload)
+                            if failure["clear_key"]:
+                                _wipe(credentials.pop(provider, None))
+                            states[provider] = {**failure, "model": model}
+                            connection.send({"ok": False, "provider": provider, **states[provider]})
+                            continue
+                        model_ids = {
+                            str(item.get("id"))
+                            for item in (models_payload.get("data") or [])
+                            if isinstance(item, dict) and item.get("id")
                         }
-                        connection.send({"ok": True, "provider": provider, **states[provider]})
-                        continue
-                    probe_payload = {
-                        "model": model,
-                        "input": "Reply with OK.",
-                        "max_output_tokens": 8,
-                    }
+                        model_count = len(model_ids)
+                        if model and model_ids and model not in model_ids:
+                            states[provider] = {
+                                "state": "degraded",
+                                "reason": "configured_model_unavailable",
+                                "model": model,
+                                "model_count": model_count,
+                            }
+                            connection.send({"ok": True, "provider": provider, **states[provider]})
+                            continue
+                    probe_path, probe_payload = _link_validation_request(provider, model)
                     probe_response = requests.post(
-                        f"{base_url}/responses",
+                        f"{base_url}/{probe_path}",
                         json=probe_payload,
-                        headers=_provider_headers(credentials[provider]),
+                        headers=headers,
                         timeout=30,
                     )
                     probe_data = _safe_json(probe_response)
@@ -125,14 +163,14 @@ def _broker_main(connection) -> None:
                         failure = classify_provider_failure(probe_response.status_code, probe_data)
                         if failure["clear_key"]:
                             _wipe(credentials.pop(provider, None))
-                        states[provider] = {**failure, "model": model, "model_count": len(model_ids)}
+                        states[provider] = {**failure, "model": model, "model_count": model_count}
                         connection.send({"ok": False, "provider": provider, **states[provider]})
                         continue
                     states[provider] = {
                         "state": "linked",
                         "reason": "validated",
                         "model": model,
-                        "model_count": len(model_ids),
+                        "model_count": model_count,
                     }
                     connection.send({"ok": True, "provider": provider, **states[provider]})
                 except Exception as exc:
@@ -145,13 +183,14 @@ def _broker_main(connection) -> None:
                 if key is None:
                     connection.send({"ok": False, "provider": provider, "state": "unlinked", "reason": "no_session_key"})
                     continue
-                base_url = str(request.get("base_url") or "https://api.openai.com/v1").rstrip("/")
+                default_base = _PROVIDER_DEFAULT_BASE_URL.get(provider, _PROVIDER_DEFAULT_BASE_URL["openai"])
+                base_url = str(request.get("base_url") or default_base).rstrip("/")
                 path = "/" + str(request.get("path") or "responses").lstrip("/")
                 try:
                     response = requests.post(
                         f"{base_url}{path}",
                         json=request.get("payload") or {},
-                        headers=_provider_headers(key),
+                        headers=_provider_headers(key, provider),
                         timeout=int(request.get("timeout") or 120),
                     )
                     data = _safe_json(response)
@@ -209,10 +248,13 @@ class SessionCredentialBroker:
             self._connection.send(payload)
             return dict(self._connection.recv())
 
-    def link_openai(self, key: str, *, base_url: str, model: str) -> dict[str, Any]:
-        result = self._send({"operation": "link", "provider": "openai", "key": key, "base_url": base_url, "model": model})
-        result["handle"] = CredentialHandle("openai", self.session_id).__dict__
+    def link(self, provider: str, key: str, *, base_url: str, model: str) -> dict[str, Any]:
+        result = self._send({"operation": "link", "provider": provider, "key": key, "base_url": base_url, "model": model})
+        result["handle"] = CredentialHandle(provider, self.session_id).__dict__
         return result
+
+    def link_openai(self, key: str, *, base_url: str, model: str) -> dict[str, Any]:
+        return self.link("openai", key, base_url=base_url, model=model)
 
     def status(self, provider: str = "openai") -> dict[str, Any]:
         return self._send({"operation": "status", "provider": provider})

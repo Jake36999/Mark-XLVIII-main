@@ -32,6 +32,8 @@ DEFAULT_WORKER_MODEL = "qwen/qwen3-4b"
 DEFAULT_OPENAI_URL = "https://api.openai.com/v1"
 DEFAULT_LMSTUDIO_URL = "http://localhost:1234/v1"
 DEFAULT_GEMINI_MODEL = "gemini-2.5-flash"
+DEFAULT_ANTHROPIC_MODEL = "claude-sonnet-5"
+DEFAULT_ANTHROPIC_URL = "https://api.anthropic.com/v1"
 OPENAI_KEY_CHECK_TTL_SECONDS = 600
 _OPENAI_KEY_CHECK_CACHE: dict[tuple[str, str], tuple[bool, float]] = {}
 _PROVENANCE = threading.local()
@@ -146,6 +148,8 @@ def _clean_provider(value: str | None, default: str) -> str:
     provider = (value or default).strip().lower().replace("-", "_")
     if provider in {"lm_studio", "lmstudio", "localai", "jan", "llamacpp", "openai_compatible"}:
         return "lmstudio"
+    if provider in {"claude", "anthropic"}:
+        return "anthropic"
     if provider in {"openai", "gemini", "ollama"}:
         return provider
     return default
@@ -288,21 +292,27 @@ def resolve_settings(
     cfg = load_config() if config is None else config
     normalized_role = (role or "worker").strip().lower()
 
+    # Deliberately no cross-provider default baked in here (e.g. an OpenAI
+    # model id) -- each provider branch below supplies its own correct
+    # default. Baking DEFAULT_OPENAI_MODEL in at this point used to leak into
+    # the gemini/anthropic branches whenever no role-specific model was
+    # configured, since a truthy fallback wins over `or` regardless of which
+    # provider actually got selected.
     if normalized_role == "planner":
         provider = _clean_provider(cfg.get("planner_provider"), "openai")
-        selected_model = model or cfg.get("planner_model") or cfg.get("openai_model") or DEFAULT_OPENAI_MODEL
+        selected_model = model or cfg.get("planner_model")
     elif normalized_role == "worker":
         provider = _clean_provider(cfg.get("worker_provider"), "lmstudio")
-        selected_model = model or cfg.get("worker_model") or cfg.get("llm_model") or DEFAULT_WORKER_MODEL
+        selected_model = model or cfg.get("worker_model") or cfg.get("llm_model")
     else:
         provider = _clean_provider(cfg.get(f"{normalized_role}_provider"), "lmstudio")
-        selected_model = model or cfg.get(f"{normalized_role}_model") or cfg.get("worker_model") or DEFAULT_WORKER_MODEL
+        selected_model = model or cfg.get(f"{normalized_role}_model") or cfg.get("worker_model")
 
     if provider == "openai":
         return ProviderSettings(
             role=normalized_role,
             provider=provider,
-            model=str(selected_model),
+            model=str(selected_model or cfg.get("openai_model") or DEFAULT_OPENAI_MODEL),
             base_url=_clean_base_url(cfg.get("openai_url"), DEFAULT_OPENAI_URL),
             api_key=None,
         )
@@ -316,10 +326,19 @@ def resolve_settings(
             api_key=None,
         )
 
+    if provider == "anthropic":
+        return ProviderSettings(
+            role=normalized_role,
+            provider=provider,
+            model=str(selected_model or cfg.get("anthropic_model") or DEFAULT_ANTHROPIC_MODEL),
+            base_url=_clean_base_url(cfg.get("anthropic_url"), DEFAULT_ANTHROPIC_URL),
+            api_key=None,
+        )
+
     return ProviderSettings(
         role=normalized_role,
         provider="lmstudio",
-        model=str(selected_model),
+        model=str(selected_model or DEFAULT_WORKER_MODEL),
         base_url=_clean_base_url(cfg.get("lmstudio_url") or cfg.get("llm_url"), DEFAULT_LMSTUDIO_URL),
         api_key=None,
     )
@@ -567,6 +586,142 @@ def _call_openai_with_tools(
     if not parsed.text and not parsed.tool_calls:
         raise RuntimeError("OpenAI broker tools request returned no text or tool calls.")
     _record_provenance(provider="openai", model=settings.model, role=settings.role)
+    return parsed
+
+
+def _anthropic_key_is_valid(
+    settings: ProviderSettings,
+    *,
+    credential_broker=None,
+) -> bool:
+    try:
+        broker = credential_broker or get_session_broker()
+        status = broker.status("anthropic")
+        return status.get("state") in {"linked", "degraded"}
+    except Exception:
+        return False
+
+
+def _parse_anthropic_response(data: dict) -> str:
+    parts: list[str] = []
+    for block in data.get("content") or []:
+        if isinstance(block, dict) and block.get("type") == "text":
+            text = block.get("text")
+            if isinstance(text, str):
+                parts.append(text)
+    return "\n".join(parts).strip()
+
+
+def _anthropic_tools_schema(tools: list[dict]) -> list[dict]:
+    """Anthropic's Messages API describes tools as {name, description,
+    input_schema}, not OpenAI's {type: function, function: {..., parameters}}."""
+    converted: list[dict] = []
+    for tool in tools:
+        function = tool.get("function") or {}
+        name = str(function.get("name") or "").strip()
+        if not name:
+            continue
+        converted.append(
+            {
+                "name": name,
+                "description": str(function.get("description") or ""),
+                "input_schema": function.get("parameters") or {"type": "object", "properties": {}},
+            }
+        )
+    return converted
+
+
+def _parse_anthropic_tool_response(data: dict) -> ToolModelResponse:
+    text_parts: list[str] = []
+    tool_calls: list[ToolCall] = []
+    for block in data.get("content") or []:
+        if not isinstance(block, dict):
+            continue
+        block_type = block.get("type")
+        if block_type == "text" and isinstance(block.get("text"), str):
+            text_parts.append(block["text"])
+        elif block_type == "tool_use":
+            name = str(block.get("name") or "").strip()
+            if not name:
+                continue
+            arguments = block.get("input")
+            tool_calls.append(
+                ToolCall(
+                    id=str(block.get("id") or f"call_{len(tool_calls) + 1}"),
+                    name=name,
+                    arguments=arguments if isinstance(arguments, dict) else {},
+                )
+            )
+    return ToolModelResponse(text="\n".join(text_parts).strip(), tool_calls=tool_calls)
+
+
+def _call_anthropic_responses(
+    prompt: str,
+    settings: ProviderSettings,
+    *,
+    system: str | None,
+    timeout: int,
+    max_tokens: int | None = None,
+    credential_broker=None,
+) -> str:
+    payload: dict = {
+        "model": settings.model,
+        "max_tokens": max(1, int(max_tokens)) if max_tokens is not None else 1024,
+        "messages": [{"role": "user", "content": prompt}],
+    }
+    if system:
+        payload["system"] = system
+
+    broker = credential_broker or get_session_broker()
+    result = broker.request(
+        provider="anthropic",
+        base_url=settings.base_url,
+        path="messages",
+        payload=payload,
+        timeout=timeout,
+    )
+    if not result.get("ok"):
+        raise RuntimeError(f"Anthropic broker request failed: {result.get('reason') or result.get('error')}")
+    text = _parse_anthropic_response(result.get("data") or {})
+    if not text:
+        raise RuntimeError("Anthropic Messages request returned no text.")
+    _record_provenance(provider="anthropic", model=settings.model, role=settings.role)
+    return text
+
+
+def _call_anthropic_with_tools(
+    prompt: str,
+    settings: ProviderSettings,
+    *,
+    system: str | None,
+    tools: list[dict],
+    timeout: int,
+    credential_broker=None,
+    max_tokens: int = 1024,
+) -> ToolModelResponse:
+    payload: dict = {
+        "model": settings.model,
+        "max_tokens": max(1, int(max_tokens)),
+        "messages": [{"role": "user", "content": prompt}],
+        "tools": _anthropic_tools_schema(tools),
+    }
+    if system:
+        payload["system"] = system
+
+    broker = credential_broker or get_session_broker()
+    result = broker.request(
+        provider="anthropic",
+        base_url=settings.base_url,
+        path="messages",
+        payload=payload,
+        timeout=timeout,
+    )
+    if not result.get("ok"):
+        raise RuntimeError(f"Anthropic broker tools request failed: {result.get('reason') or result.get('error')}")
+    parsed = _parse_anthropic_tool_response(result.get("data") or {})
+    if not parsed.text and not parsed.tool_calls:
+        raise RuntimeError("Anthropic broker tools request returned no text or tool calls.")
+    _record_provenance(provider="anthropic", model=settings.model, role=settings.role)
     return parsed
 
 
@@ -1335,7 +1490,7 @@ def _call_lmstudio_fallback(
     fallback_cfg[f"{normalized_role}_provider"] = "lmstudio"
     if normalized_role == "planner":
         fallback_cfg["planner_provider"] = "lmstudio"
-        if str(fallback_cfg.get("planner_model", "")).lower().startswith(("gpt-", "o1", "o3", "o4")):
+        if str(fallback_cfg.get("planner_model", "")).lower().startswith(("gpt-", "o1", "o3", "o4", "claude")):
             fallback_cfg.pop("planner_model", None)
     elif normalized_role == "worker":
         fallback_cfg["worker_provider"] = "lmstudio"
@@ -1387,7 +1542,7 @@ def _call_lmstudio_tools_fallback(
     fallback_cfg[f"{normalized_role}_provider"] = "lmstudio"
     if normalized_role == "planner":
         fallback_cfg["planner_provider"] = "lmstudio"
-        if str(fallback_cfg.get("planner_model", "")).lower().startswith(("gpt-", "o1", "o3", "o4")):
+        if str(fallback_cfg.get("planner_model", "")).lower().startswith(("gpt-", "o1", "o3", "o4", "claude")):
             fallback_cfg.pop("planner_model", None)
     elif normalized_role == "worker":
         fallback_cfg["worker_provider"] = "lmstudio"
@@ -1486,6 +1641,40 @@ def call_text(
                 fallback_reason=f"openai_request_failed:{type(exc).__name__}",
                 max_tokens=max_tokens,
             )
+    if settings.provider == "anthropic":
+        if not _anthropic_key_is_valid(settings, credential_broker=credential_broker):
+            return _call_lmstudio_fallback(
+                prompt,
+                role=role,
+                system=system,
+                timeout=timeout,
+                config=cfg,
+                environ=environ,
+                post=post,
+                fallback_reason="anthropic_session_unlinked_or_unavailable",
+                max_tokens=max_tokens,
+            )
+        try:
+            return _call_anthropic_responses(
+                prompt,
+                settings,
+                system=system,
+                timeout=timeout,
+                max_tokens=max_tokens,
+                credential_broker=credential_broker,
+            )
+        except Exception as exc:
+            return _call_lmstudio_fallback(
+                prompt,
+                role=role,
+                system=system,
+                timeout=timeout,
+                config=cfg,
+                environ=environ,
+                post=post,
+                fallback_reason=f"anthropic_request_failed:{type(exc).__name__}",
+                max_tokens=max_tokens,
+            )
     if settings.provider == "gemini":
         return _call_gemini(prompt, settings)
     candidates = select_lmstudio_models(
@@ -1556,6 +1745,40 @@ def call_with_tools(
                 post=post,
                 tools=tools,
                 fallback_reason=f"openai_request_failed:{type(exc).__name__}",
+            )
+    if settings.provider == "anthropic":
+        if not _anthropic_key_is_valid(settings, credential_broker=credential_broker):
+            return _call_lmstudio_tools_fallback(
+                prompt,
+                role=role,
+                system=system,
+                timeout=timeout,
+                config=cfg,
+                environ=environ,
+                post=post,
+                tools=tools,
+                fallback_reason="anthropic_session_unlinked_or_unavailable",
+            )
+        try:
+            return _call_anthropic_with_tools(
+                prompt,
+                settings,
+                system=system,
+                tools=tools,
+                timeout=timeout,
+                credential_broker=credential_broker,
+            )
+        except Exception as exc:
+            return _call_lmstudio_tools_fallback(
+                prompt,
+                role=role,
+                system=system,
+                timeout=timeout,
+                config=cfg,
+                environ=environ,
+                post=post,
+                tools=tools,
+                fallback_reason=f"anthropic_request_failed:{type(exc).__name__}",
             )
     if settings.provider == "gemini":
         text = _call_gemini(prompt, settings)

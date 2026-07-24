@@ -982,6 +982,239 @@ class ModelRouterTests(unittest.TestCase):
         self.assertEqual(response.text, "world")
 
 
+class AnthropicProviderTests(unittest.TestCase):
+    """WS3 (2026-07-24 planning roadmap, D3): Anthropic as a first-class cloud
+    overseer alongside OpenAI, with the same lmstudio-fallback safety net."""
+
+    def test_detect_key_provider_recognises_anthropic_prefix(self):
+        from core.session_credentials import detect_key_provider
+
+        self.assertEqual(detect_key_provider("sk-ant-api03-abc123"), "anthropic")
+        self.assertEqual(detect_key_provider("sk-proj-abc123"), "openai")
+        self.assertEqual(detect_key_provider("sk-abc123"), "openai")
+        self.assertEqual(detect_key_provider(""), "openai")
+
+    def test_resolve_settings_routes_planner_to_anthropic(self):
+        from core import model_router
+
+        settings = model_router.resolve_settings(
+            "planner",
+            config={"planner_provider": "anthropic", "planner_model": "claude-sonnet-5"},
+        )
+
+        self.assertEqual(settings.provider, "anthropic")
+        self.assertEqual(settings.model, "claude-sonnet-5")
+        self.assertEqual(settings.base_url, "https://api.anthropic.com/v1")
+        self.assertIsNone(settings.api_key)
+
+    def test_resolve_settings_anthropic_default_model_does_not_leak_from_openai(self):
+        """Regression: an unconfigured planner_model used to fall back to
+        DEFAULT_OPENAI_MODEL before the provider branch ever ran, so a
+        planner_provider of anthropic (or gemini) silently got 'gpt-5.5' as
+        its model id instead of its own correct default."""
+        from core import model_router
+
+        settings = model_router.resolve_settings("planner", config={"planner_provider": "anthropic"})
+
+        self.assertEqual(settings.model, model_router.DEFAULT_ANTHROPIC_MODEL)
+        self.assertNotEqual(settings.model, model_router.DEFAULT_OPENAI_MODEL)
+
+    def test_resolve_settings_gemini_default_model_does_not_leak_from_openai(self):
+        from core import model_router
+
+        settings = model_router.resolve_settings("planner", config={"planner_provider": "gemini"})
+
+        self.assertEqual(settings.model, model_router.DEFAULT_GEMINI_MODEL)
+        self.assertNotEqual(settings.model, model_router.DEFAULT_OPENAI_MODEL)
+
+    def test_claude_alias_normalises_to_anthropic(self):
+        from core import model_router
+
+        settings = model_router.resolve_settings("planner", config={"planner_provider": "claude"})
+
+        self.assertEqual(settings.provider, "anthropic")
+
+    def test_parse_anthropic_response_extracts_text_blocks(self):
+        from core import model_router
+
+        text = model_router._parse_anthropic_response(
+            {"content": [{"type": "text", "text": "Hello"}, {"type": "text", "text": "world"}]}
+        )
+
+        self.assertEqual(text, "Hello\nworld")
+
+    def test_anthropic_tools_schema_converts_parameters_to_input_schema(self):
+        from core import model_router
+
+        openai_shaped = [
+            {
+                "type": "function",
+                "function": {
+                    "name": "project_operator",
+                    "description": "Operates registered projects.",
+                    "parameters": {"type": "object", "properties": {"operation": {"type": "string"}}},
+                },
+            }
+        ]
+
+        converted = model_router._anthropic_tools_schema(openai_shaped)
+
+        self.assertEqual(
+            converted,
+            [
+                {
+                    "name": "project_operator",
+                    "description": "Operates registered projects.",
+                    "input_schema": {"type": "object", "properties": {"operation": {"type": "string"}}},
+                }
+            ],
+        )
+
+    def test_parse_anthropic_tool_response_separates_text_and_tool_use_blocks(self):
+        from core import model_router
+
+        parsed = model_router._parse_anthropic_tool_response(
+            {
+                "content": [
+                    {"type": "text", "text": "Checking your projects."},
+                    {"type": "tool_use", "id": "toolu_1", "name": "project_operator", "input": {"operation": "list"}},
+                ]
+            }
+        )
+
+        self.assertEqual(parsed.text, "Checking your projects.")
+        self.assertEqual(len(parsed.tool_calls), 1)
+        self.assertEqual(parsed.tool_calls[0].name, "project_operator")
+        self.assertEqual(parsed.tool_calls[0].arguments, {"operation": "list"})
+
+    def test_anthropic_call_uses_messages_api_and_returns_text(self):
+        from core import model_router
+
+        broker = FakeBroker(response={"ok": True, "data": {"content": [{"type": "text", "text": "planned"}]}})
+
+        result = model_router.call_text(
+            "make a plan",
+            role="planner",
+            config={"planner_provider": "anthropic", "planner_model": "claude-sonnet-5"},
+            environ={},
+            credential_broker=broker,
+        )
+
+        self.assertEqual(result, "planned")
+        self.assertEqual(broker.requests[0]["base_url"], "https://api.anthropic.com/v1")
+        self.assertEqual(broker.requests[0]["path"], "messages")
+        self.assertEqual(broker.requests[0]["payload"]["model"], "claude-sonnet-5")
+        self.assertEqual(broker.requests[0]["payload"]["messages"], [{"role": "user", "content": "make a plan"}])
+
+    def test_invalid_anthropic_key_falls_back_to_local_models(self):
+        from core import model_router
+
+        def fake_post(url, **kwargs):
+            return FakeResponse({"choices": [{"message": {"content": "local fallback"}}]})
+
+        result = model_router.call_text(
+            "hello jarvis",
+            role="planner",
+            config={
+                "planner_provider": "anthropic",
+                "planner_model": "claude-sonnet-5",
+                "lmstudio_url": "http://localhost:1234/v1",
+                "model_routes": {"quick": ["mistralai/mistral-7b-instruct-v0.3"]},
+            },
+            environ={},
+            post=fake_post,
+            credential_broker=FakeBroker(state="invalid"),
+        )
+
+        self.assertEqual(result, "local fallback")
+
+    def test_planner_anthropic_fallback_does_not_try_anthropic_model_id_in_lmstudio(self):
+        from core import model_router
+
+        calls = []
+
+        def fake_post(url, **kwargs):
+            calls.append(kwargs["json"]["model"])
+            return FakeResponse({"choices": [{"message": {"content": "local fallback"}}]})
+
+        result = model_router.call_text(
+            "Summarize these tool results for the user in a concise answer.",
+            role="planner",
+            config={
+                "planner_provider": "anthropic",
+                "planner_model": "claude-sonnet-5",
+                "lmstudio_url": "http://localhost:1234/v1",
+                "model_routes": {"main": ["qwen/qwen3.5-9b"], "quick": ["qwen/qwen3-4b-2507"]},
+            },
+            environ={},
+            post=fake_post,
+            credential_broker=FakeBroker(state="invalid"),
+        )
+
+        self.assertEqual(result, "local fallback")
+        self.assertNotIn("claude-sonnet-5", calls)
+
+    def test_anthropic_response_error_falls_back_to_local_models(self):
+        from core import model_router
+
+        def fake_post(url, **kwargs):
+            return FakeResponse({"choices": [{"message": {"content": "local after anthropic error"}}]})
+
+        broker = FakeBroker(
+            state="degraded",
+            response={"ok": False, "state": "degraded", "reason": "quota_exhausted", "clear_key": False},
+        )
+
+        result = model_router.call_text(
+            "hello jarvis",
+            role="planner",
+            config={
+                "planner_provider": "anthropic",
+                "planner_model": "claude-sonnet-5",
+                "lmstudio_url": "http://localhost:1234/v1",
+                "model_routes": {"quick": ["mistralai/mistral-7b-instruct-v0.3"]},
+            },
+            environ={},
+            post=fake_post,
+            credential_broker=broker,
+        )
+
+        self.assertEqual(result, "local after anthropic error")
+        self.assertEqual(broker.requests[0]["path"], "messages")
+
+    def test_anthropic_call_with_tools_parses_tool_use_blocks(self):
+        from core import model_router
+
+        broker = FakeBroker(
+            response={
+                "ok": True,
+                "data": {
+                    "content": [
+                        {"type": "tool_use", "id": "toolu_1", "name": "project_operator", "input": {"operation": "list"}},
+                    ]
+                },
+            }
+        )
+
+        result = model_router.call_with_tools(
+            "list my projects",
+            tools=[
+                {
+                    "type": "function",
+                    "function": {"name": "project_operator", "description": "", "parameters": {"type": "object", "properties": {}}},
+                }
+            ],
+            role="planner",
+            config={"planner_provider": "anthropic", "planner_model": "claude-sonnet-5"},
+            environ={},
+            credential_broker=broker,
+        )
+
+        self.assertEqual(len(result.tool_calls), 1)
+        self.assertEqual(result.tool_calls[0].name, "project_operator")
+        self.assertEqual(broker.requests[0]["payload"]["tools"][0]["input_schema"], {"type": "object", "properties": {}})
+
+
 class ModelHealthTelemetryTests(unittest.TestCase):
     """Task A3: every LM Studio generation records an attributable health outcome."""
 
