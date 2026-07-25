@@ -217,6 +217,7 @@
   },
   "active": "ea62c2cafe2845db",
   "lastOpenFiles": [
+    "Validation/2026-07-25-session-closing-summary.md.tmp.23168.eb54e03f2cc8",
     "Validation/2026-07-25-session-closing-summary.md",
     "Validation/2026-07-25-chat-confirmation-gate-validation.md",
     "Validation/_confirmation_gate_test/safe_to_delete.txt",
@@ -256,7 +257,6 @@
     "Validation/2026-07-25-ws4d-context-inheritance-build-and-live-test.md",
     "Canvases/JARVIS/write_a_small_read_only_script_that_repo_739699.canvas",
     "Canvases/live-tests/verification-ws1.canvas",
-    "Validation/2026-07-24-ws4b-critique-pass-build-and-live-test.md",
     "Canvases/JARVIS/user-made node planning example..canvas",
     "Canvases/JARVIS/design_a_notification_feature_for_jarvis_3a1067.canvas",
     "Canvases/live-tests/verification.canvas",

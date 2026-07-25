@@ -4,7 +4,7 @@ title: "Session Closing Summary - 2026-07-25 Live Validation Results"
 type: "report"
 status: "active"
 created: "2026-07-25T20:31:59Z"
-updated: "2026-07-25T20:32:08Z"
+updated: "2026-07-25T20:46:52Z"
 project_id: "jarvis_notes"
 source: "claude"
 tags: ["validation", "live-test", "summary", "session-closing", "tier-short-term", "tier/short-term"]
@@ -17,7 +17,7 @@ confidence: 0.5
 valid_from: "2026-07-25T20:31:59Z"
 review_after: ""
 source_version: 1
-content_hash: "ac5b719fa79b682ab3937c2ed96721cfe90286f237b97b969217a9ebf5d1ea1e"
+content_hash: "f0cb1ba76e928cb7bc4bc72cd30fa6c8b9a332e607308ff15d2936a6f9fc2de9"
 supersedes: []
 contradicts: []
 depends_on: []
@@ -62,6 +62,20 @@ Traced the `dev_agent` incident to its real cause: `main.py`'s plain-chat tool d
 **Verification**: full test suite (880 tests) clean after fixing two real bugs caught during implementation (not after shipping) -- a design-review catch and a test-suite catch, both documented in the detailed report. Live re-tests against the real running system confirmed the fix holds: a real `file_controller` delete request paused correctly and only executed (with the exact originally-proposed arguments) after a real confirming reply; a real `code_helper` write request paused correctly too. The specific `dev_agent`-to-canvas branch wasn't exercised live (model tool selection is non-deterministic run to run) but is proven deterministically by a mocked test that isn't subject to that luck.
 
 Full detail: [[Validation/2026-07-25-chat-confirmation-gate-validation]].
+
+## What's stable (live-verified, safe to build on)
+
+Everything below was confirmed against real disk state, real test runs, or a real end-to-end round trip -- not asserted from a model's own reply.
+
+- **Canvas Mode 2 planning pipeline** (`decompose_goal_to_canvas` -> `critique_canvas_plan` -> `propose_canvas_plan`): clean end to end today, real multi-node canvas + real approval note verified on disk, vocabulary aliases (`workflow`/`task`/`mode`) threading correctly.
+- **Chat tool confirmation gate** (new today): the ask-then-confirm round trip works correctly against the real running system for at least two different tools (`file_controller`, `code_helper`) -- pauses before executing, resumes only on a real affirmative reply, and executes with the *exact* arguments captured at ask-time. `dev_agent` is unreachable from direct chat execution, proven deterministically.
+- **The 21-tool confirmation gate's regression safety**: the ~11 deterministic workflow bootstraps (todo-template creation, plan dispatch, etc.) are confirmed unaffected by the new gate -- both by a dedicated regression test and by the full suite passing.
+- **`graphify_query` tool itself** (`query`/`explain`/`path` modes): registered, low-risk, no-approval, and live-verified against the real graph earlier this session.
+- **Deterministic repo-learning augmentation** (graphify-informed file/symbol ranking): the path-prefix bug is fixed and the symbol-level reranking effect has now been reconfirmed twice on separate runs with unchanged numbers.
+- **Lifecycle field migration**: 115 vault notes migrated, integrity scan came back clean, zero corruption.
+- **Anti-fabrication hardening**: held up live twice today on real, unscripted repeats of the original bug shape -- once when asked about test status it couldn't verify (correctly declined rather than guessed), once on a real evidenced test-pass claim (correctly did not flag genuine evidence as unverified).
+- **Multi-tool task chains and real `learn_repository` runs**: both completed correctly under real load today (B1, B2) -- slow (10-20+ min, the known local-model timeout-cascade tax), but the actual outputs were verified genuine on disk, not fabricated.
+- **Developer Handbook / User Guide documentation**: 15/15 live-validation checks passed against actual running behavior earlier this session.
 
 ## State as of pausing (2026-07-25)
 
