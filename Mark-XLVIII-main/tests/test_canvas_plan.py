@@ -1890,6 +1890,70 @@ class DecomposeGoalToCanvasTests(unittest.TestCase):
         self.assertIn("has no depends_on", result["error"])
         self.assertFalse((root / "Canvases").exists())
 
+    def test_retry_succeeds_after_a_failed_first_attempt(self):
+        broken = self._good_payload()
+        broken["nodes"][1]["depends_on"] = []
+        fixed = self._good_payload()
+        with tempfile.TemporaryDirectory() as tmp:
+            cfg = _cfg(Path(tmp))
+            with mock.patch(
+                "core.model_router.call_text", side_effect=[json.dumps(broken), json.dumps(fixed)]
+            ) as call_text:
+                result = canvas_plan.decompose_goal_to_canvas("Fix the login bug", cfg=cfg)
+
+            self.assertTrue(result["ok"], result)
+            self.assertEqual(result["attempts"], 2)
+            self.assertEqual(call_text.call_count, 2)
+            # the second attempt's prompt must carry the first attempt's
+            # validation failure back to the model
+            second_prompt = call_text.call_args_list[1].args[0]
+            self.assertIn("A prior attempt was rejected", second_prompt)
+            self.assertIn("has no depends_on", second_prompt)
+
+    def test_retry_gives_up_after_max_attempts_and_reports_the_final_failure(self):
+        broken = self._good_payload()
+        broken["nodes"][1]["depends_on"] = []
+        with tempfile.TemporaryDirectory() as tmp:
+            cfg = _cfg(Path(tmp))
+            with mock.patch("core.model_router.call_text", return_value=json.dumps(broken)) as call_text:
+                result = canvas_plan.decompose_goal_to_canvas("Fix the login bug", cfg=cfg, max_attempts=2)
+
+            self.assertFalse(result["ok"])
+            self.assertEqual(result["attempts"], 2)
+            self.assertEqual(call_text.call_count, 2)
+            self.assertIn("has no depends_on", result["error"])
+
+    def test_first_attempt_success_makes_only_one_call(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            cfg = _cfg(Path(tmp))
+            with mock.patch(
+                "core.model_router.call_text", return_value=json.dumps(self._good_payload())
+            ) as call_text:
+                result = canvas_plan.decompose_goal_to_canvas("Fix the login bug", cfg=cfg)
+
+            self.assertTrue(result["ok"], result)
+            self.assertEqual(result["attempts"], 1)
+            call_text.assert_called_once()
+
+    def test_dependency_cycle_is_not_retried(self):
+        # A cycle is a different failure class than the validation problems
+        # the retry loop targets -- deliberately a one-shot failure.
+        payload = {
+            "nodes": [
+                {"id": "root", "role": "plan", "prose": "Anchor.", "depends_on": []},
+                {"id": "a", "role": "research", "prose": "Step A.", "depends_on": ["root", "b"]},
+                {"id": "b", "role": "implementation", "prose": "Step B.", "depends_on": ["a"]},
+            ],
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            cfg = _cfg(Path(tmp))
+            with mock.patch("core.model_router.call_text", return_value=json.dumps(payload)) as call_text:
+                result = canvas_plan.decompose_goal_to_canvas("Fix the login bug", cfg=cfg)
+
+            self.assertFalse(result["ok"])
+            self.assertIn("cycle", result["error"])
+            call_text.assert_called_once()
+
     def test_dangling_depends_on_is_rejected(self):
         payload = self._good_payload()
         payload["nodes"][1]["depends_on"] = ["some_node_that_does_not_exist"]

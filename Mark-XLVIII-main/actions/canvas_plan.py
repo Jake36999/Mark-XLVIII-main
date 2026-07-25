@@ -677,6 +677,7 @@ def decompose_goal_to_canvas(
     project_hint: str = "",
     canvas_name: str | None = None,
     cfg: dict[str, Any] | None = None,
+    max_attempts: int = 3,
 ) -> dict[str, Any]:
     """Ask the planner model to turn a goal into a real canvas file.
 
@@ -686,6 +687,19 @@ def decompose_goal_to_canvas(
     as if they had hand-drawn the graph themselves. On any malformed or
     structurally invalid model response, nothing is written and `ok` is False
     with the raw text preserved for diagnosis.
+
+    `max_attempts` bounds an automatic retry loop (default 3): live testing
+    of WS4c found multi-branch decomposition succeeding only ~2 times in 6
+    attempts against the local overseer, concentrated on the same validation
+    failure every time (a branch's entry node missing `depends_on`) -- rather
+    than surfacing that to the caller as a one-shot failure, the specific
+    validation problems are fed back into the next attempt's prompt, the same
+    feedback-and-retry shape WS4b's `re_review` loop already uses. A
+    dependency cycle is deliberately NOT retried here -- it's a different
+    class of problem (a structural graph error, not "forgot a rule") that
+    wasn't the one live testing actually found, so it stays a one-shot
+    failure rather than being folded into a mechanism tuned for the other
+    failure class.
     """
     from actions import jarvis_canvas as canvas_actions
     from core.canvas_layout import layout_document
@@ -695,29 +709,50 @@ def decompose_goal_to_canvas(
     if not goal:
         return {"ok": False, "error": "A goal is required."}
 
-    prompt = f"Goal: {goal}"
+    base_prompt = f"Goal: {goal}"
     if project_hint:
-        prompt += f"\nRegistered project hint (only use it if a node genuinely needs it): {project_hint}"
+        base_prompt += f"\nRegistered project hint (only use it if a node genuinely needs it): {project_hint}"
 
-    raw_text = call_text(
-        prompt,
-        role="planner",
-        system=_DECOMPOSE_SYSTEM_PROMPT,
-        timeout=300,
-        config=cfg,
-    )
-    payload = _extract_json_object(raw_text)
-    if not isinstance(payload, dict):
-        return {"ok": False, "error": "Planner response was not parseable JSON.", "raw_text": raw_text[:2000]}
-    _normalize_decomposition_payload(payload)
+    payload: dict[str, Any] | None = None
+    raw_text = ""
+    failure: dict[str, Any] | None = None
+    feedback = ""
+    attempts = max(1, int(max_attempts))
+    for attempt in range(1, attempts + 1):
+        prompt = base_prompt
+        if feedback:
+            prompt += (
+                f"\n\nA prior attempt was rejected for this reason: {feedback} "
+                "Fix this and resubmit a complete, corrected decomposition."
+            )
+        raw_text = call_text(prompt, role="planner", system=_DECOMPOSE_SYSTEM_PROMPT, timeout=300, config=cfg)
+        candidate = _extract_json_object(raw_text)
+        if not isinstance(candidate, dict):
+            feedback = "Response was not parseable JSON -- return ONLY the JSON object, nothing else."
+            failure = {
+                "ok": False,
+                "error": "Planner response was not parseable JSON.",
+                "raw_text": raw_text[:2000],
+                "attempts": attempt,
+            }
+            continue
+        _normalize_decomposition_payload(candidate)
+        problems = _validate_decomposition(candidate)
+        if problems:
+            feedback = "; ".join(problems)
+            failure = {
+                "ok": False,
+                "error": "Decomposition failed validation: " + feedback,
+                "raw_text": raw_text[:2000],
+                "attempts": attempt,
+            }
+            continue
+        payload = candidate
+        failure = None
+        break
 
-    problems = _validate_decomposition(payload)
-    if problems:
-        return {
-            "ok": False,
-            "error": "Decomposition failed validation: " + "; ".join(problems),
-            "raw_text": raw_text[:2000],
-        }
+    if payload is None:
+        return failure or {"ok": False, "error": "Decomposition failed for an unknown reason.", "attempts": attempts}
 
     nodes_raw = payload["nodes"]
     canvas_nodes: list[dict[str, Any]] = []
@@ -806,6 +841,7 @@ def decompose_goal_to_canvas(
         "node_count": len(canvas_nodes),
         "rationale": str(payload.get("rationale") or ""),
         "goal": goal,
+        "attempts": attempt,
     }
 
 
