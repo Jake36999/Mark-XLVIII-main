@@ -1,43 +1,27 @@
 {
-  "nodes": [
-    {
-      "id": "v1b",
-      "type": "text",
-      "x": 0,
-      "y": 0,
-      "width": 460,
-      "height": 220,
-      "text": "role: verification\nscope: tests/test_tts_read_trigger.py\nRun the vault-watcher TTS read-trigger tests only.",
-      "jarvis": {
-        "kind": "plan_step",
-        "step_id": "v1b_d290ac",
-        "workflow_id": "ws1_verification_scoped",
-        "run_id": "ws1_verification_scoped-v1",
-        "step_state": "ACCEPTED",
-        "attempt": 1,
-        "updated_at": "2026-07-24T13:45:02Z"
-      },
-      "color": "4"
-    },
-    {
-      "id": "v2b",
-      "type": "text",
-      "x": 500,
-      "y": 0,
-      "width": 460,
-      "height": 220,
-      "text": "role: verification\nscope: tests/test_vault_watch.py\nRun just this one file, not the whole suite.",
-      "jarvis": {
-        "kind": "plan_step",
-        "step_id": "v2b_358dd6",
-        "workflow_id": "ws1_verification_scoped",
-        "run_id": "ws1_verification_scoped-v1",
-        "step_state": "ACCEPTED",
-        "attempt": 1,
-        "updated_at": "2026-07-24T13:45:02Z"
-      },
-      "color": "4"
-    }
-  ],
-  "edges": []
+	"nodes":[
+		{
+			"id":"v1b",
+			"type":"text",
+			"x":0,
+			"y":0,
+			"width":460,
+			"height":220,
+			"text":"role: verification\nscope: tests/test_tts_read_trigger.py\nRun the vault-watcher TTS read-trigger tests only.",
+			"jarvis":{"kind":"plan_step","step_id":"v1b_d290ac","workflow_id":"ws1_verification_scoped","run_id":"ws1_verification_scoped-v1","step_state":"ACCEPTED","attempt":1,"updated_at":"2026-07-24T13:45:02Z"},
+			"color":"4"
+		},
+		{
+			"id":"v2b",
+			"type":"text",
+			"x":500,
+			"y":0,
+			"width":460,
+			"height":220,
+			"text":"role: verification\nscope: tests/test_vault_watch.py\nRun just this one file, not the whole suite.",
+			"jarvis":{"kind":"plan_step","step_id":"v2b_358dd6","workflow_id":"ws1_verification_scoped","run_id":"ws1_verification_scoped-v1","step_state":"ACCEPTED","attempt":1,"updated_at":"2026-07-24T13:45:02Z"},
+			"color":"4"
+		}
+	],
+	"edges":[]
 }

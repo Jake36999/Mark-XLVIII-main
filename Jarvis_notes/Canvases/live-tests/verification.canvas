@@ -1,62 +1,38 @@
 {
-  "nodes": [
-    {
-      "id": "v1",
-      "type": "text",
-      "x": 0,
-      "y": 0,
-      "width": 460,
-      "height": 220,
-      "text": "role: verification\nRun the test suite and confirm the vault-watcher's TTS read-trigger tests (tests/test_tts_read_trigger.py) all pass before this feature is considered done.",
-      "jarvis": {
-        "kind": "plan_step",
-        "step_id": "v1_5a6df7",
-        "workflow_id": "live_test_verification",
-        "run_id": "live_test_verification-v1",
-        "step_state": "REJECT_REPLAN",
-        "attempt": 2,
-        "updated_at": "2026-07-24T12:18:30Z"
-      },
-      "color": "1"
-    },
-    {
-      "id": "v2",
-      "type": "text",
-      "x": 500,
-      "y": 0,
-      "width": 460,
-      "height": 220,
-      "text": "role: verification\nVerify tests/test_vault_watch.py still passes after the scan_once wiring change -- just that one file, not the whole suite, this is a quick pre-merge sanity check.",
-      "jarvis": {
-        "kind": "plan_step",
-        "step_id": "v2_a1047e",
-        "workflow_id": "live_test_verification",
-        "run_id": "live_test_verification-v1",
-        "step_state": "REJECT_REPLAN",
-        "attempt": 2,
-        "updated_at": "2026-07-24T12:18:30Z"
-      },
-      "color": "1"
-    },
-    {
-      "id": "v3",
-      "type": "text",
-      "x": 1000,
-      "y": 0,
-      "width": 460,
-      "height": 220,
-      "text": "role: verification\nRun the project's full pytest suite once and report whether everything is green.",
-      "jarvis": {
-        "kind": "plan_step",
-        "step_id": "v3_c5e31d",
-        "workflow_id": "live_test_verification",
-        "run_id": "live_test_verification-v1",
-        "step_state": "REJECT_REPLAN",
-        "attempt": 2,
-        "updated_at": "2026-07-24T12:18:30Z"
-      },
-      "color": "1"
-    }
-  ],
-  "edges": []
+	"nodes":[
+		{
+			"id":"v1",
+			"type":"text",
+			"x":0,
+			"y":0,
+			"width":460,
+			"height":220,
+			"text":"role: verification\nRun the test suite and confirm the vault-watcher's TTS read-trigger tests (tests/test_tts_read_trigger.py) all pass before this feature is considered done.",
+			"jarvis":{"kind":"plan_step","step_id":"v1_5a6df7","workflow_id":"live_test_verification","run_id":"live_test_verification-v1","step_state":"REJECT_REPLAN","attempt":2,"updated_at":"2026-07-24T12:18:30Z"},
+			"color":"1"
+		},
+		{
+			"id":"v2",
+			"type":"text",
+			"x":500,
+			"y":0,
+			"width":460,
+			"height":220,
+			"text":"role: verification\nVerify tests/test_vault_watch.py still passes after the scan_once wiring change -- just that one file, not the whole suite, this is a quick pre-merge sanity check.",
+			"jarvis":{"kind":"plan_step","step_id":"v2_a1047e","workflow_id":"live_test_verification","run_id":"live_test_verification-v1","step_state":"REJECT_REPLAN","attempt":2,"updated_at":"2026-07-24T12:18:30Z"},
+			"color":"1"
+		},
+		{
+			"id":"v3",
+			"type":"text",
+			"x":1000,
+			"y":0,
+			"width":460,
+			"height":220,
+			"text":"role: verification\nRun the project's full pytest suite once and report whether everything is green.",
+			"jarvis":{"kind":"plan_step","step_id":"v3_c5e31d","workflow_id":"live_test_verification","run_id":"live_test_verification-v1","step_state":"REJECT_REPLAN","attempt":2,"updated_at":"2026-07-24T12:18:30Z"},
+			"color":"1"
+		}
+	],
+	"edges":[]
 }

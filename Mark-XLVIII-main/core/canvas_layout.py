@@ -161,18 +161,138 @@ def layout_document(
 
     if profile in {"dependency", "evidence"}:
         layers, cycle_nodes = _dependency_layers(managed, edges)
-        grouped: dict[int, list[dict[str, Any]]] = defaultdict(list)
-        for node in managed:
-            grouped[layers.get(str(node.get("id")), 0)].append(node)
-        y = 0
-        for layer in sorted(grouped):
-            x = 0
-            row_height = 0
-            for node in sorted(grouped[layer], key=lambda item: str(item.get("id"))):
-                _place_without_overlap(node, occupied, x, y)
-                x += int(node["width"]) + LANE_GAP
-                row_height = max(row_height, int(node["height"]))
-            y += row_height + ROW_GAP + 70
+        branch_of = {str(node.get("id")): str(node.get("branch") or "") for node in managed}
+        distinct_branches = list(dict.fromkeys(branch_of.values()))
+
+        if len(distinct_branches) <= 1:
+            # No `branch` directive anywhere (WS4c, 2026-07-24 fan-out
+            # planning) -- unchanged from the original single-chain layout.
+            grouped: dict[int, list[dict[str, Any]]] = defaultdict(list)
+            for node in managed:
+                grouped[layers.get(str(node.get("id")), 0)].append(node)
+            y = 0
+            for layer in sorted(grouped):
+                x = 0
+                row_height = 0
+                for node in sorted(grouped[layer], key=lambda item: str(item.get("id"))):
+                    _place_without_overlap(node, occupied, x, y)
+                    x += int(node["width"]) + LANE_GAP
+                    row_height = max(row_height, int(node["height"]))
+                y += row_height + ROW_GAP + 70
+        else:
+            # 2+ branches: lay out as columns (one per branch, in declaration
+            # order) with each branch's own dependency chain stacked inside
+            # its column -- the shallowest (most-synthesized) node on top,
+            # deeper prerequisites below, mirroring the hand-drawn reference
+            # this profile is generalising.
+            #
+            # A node's own explicit `branch` tag always wins: it stays in
+            # that column no matter what feeds it, including the normal
+            # backbone edges (plan -> a branch's entry node; one branch's
+            # root -> the next branch's root). Only a node with NO branch
+            # tag of its own is a candidate for the reference's other
+            # placement rule -- sitting at the x-midpoint between whichever
+            # tagged branches feed it (a genuine shared/wrap-up node, like a
+            # final wire-up step depending on two branches' output). Trying
+            # to detect "shared" via edge-counting heuristics on *tagged*
+            # nodes was tried and abandoned: a live decomposition proved a
+            # branch's own entry node (fed only by the plan node, from
+            # outside its column) is indistinguishable that way from a
+            # genuinely shared node -- the explicit tag is the only
+            # unambiguous signal.
+            column_width = max((int(node["width"]) for node in managed), default=420) + LANE_GAP
+            column_x = {branch: index * column_width for index, branch in enumerate(distinct_branches)}
+
+            by_branch: dict[str, list[dict[str, Any]]] = defaultdict(list)
+            untagged: list[dict[str, Any]] = []
+            for node in managed:
+                branch = branch_of[str(node.get("id"))]
+                (by_branch[branch] if branch else untagged).append(node)
+
+            in_branch_depth: dict[str, int] = {}
+            for branch, branch_nodes in by_branch.items():
+                branch_ids = {str(node.get("id")) for node in branch_nodes}
+                branch_edges = [
+                    edge for edge in edges
+                    if str(edge.get("fromNode")) in branch_ids and str(edge.get("toNode")) in branch_ids
+                ]
+                depths, _branch_cycles = _dependency_layers(branch_nodes, branch_edges)
+                in_branch_depth.update(depths)
+
+            incoming_tagged_branches: dict[str, set[str]] = defaultdict(set)
+            for edge in edges:
+                src, dst = str(edge.get("fromNode") or ""), str(edge.get("toNode") or "")
+                if branch_of.get(src) and dst in branch_of:
+                    incoming_tagged_branches[dst].add(branch_of[src])
+
+            def _row_offsets(nodes_by_depth: dict[int, list[dict[str, Any]]]) -> dict[str, int]:
+                # Same accumulation as the single-branch path above (dynamic
+                # per-level height, not a flat step), just over an arbitrary
+                # depth grouping instead of the one global layering. Callers
+                # pass an already-*inverted* depth (root/synthesis = 0) so
+                # ascending iteration here still means "top row first" --
+                # see the inversion below for why.
+                offsets: dict[str, int] = {}
+                row_y = 0
+                for depth in sorted(nodes_by_depth):
+                    row_height = 0
+                    for node in nodes_by_depth[depth]:
+                        offsets[str(node.get("id"))] = row_y
+                        row_height = max(row_height, int(node["height"]))
+                    row_y += row_height + ROW_GAP + 70
+                return offsets
+
+            # _dependency_layers numbers layer 0 as "no prerequisites" (the
+            # deepest/first-to-run node). The fan-out reference reads the
+            # opposite way on both its axes: decomposition flows outward
+            # (down a column, right across columns) while *execution* flows
+            # inward back to the root/goal -- so the root (highest raw
+            # layer, since everything else must finish before it) belongs at
+            # the TOP (row 0), and the deepest prerequisite (raw layer 0)
+            # belongs at the BOTTOM. Invert before grouping so `_row_offsets`
+            # can stay a plain ascending accumulator.
+            def _inverted_by_depth(raw_depth: dict[str, int], nodes: list[dict[str, Any]]) -> dict[int, list[dict[str, Any]]]:
+                max_depth = max((raw_depth.get(str(n.get("id")), 0) for n in nodes), default=0)
+                grouped: dict[int, list[dict[str, Any]]] = defaultdict(list)
+                for n in nodes:
+                    grouped[max_depth - raw_depth.get(str(n.get("id")), 0)].append(n)
+                return grouped
+
+            # Untagged nodes (the plan node, any shared wrap-up node) read in
+            # *normal* top-to-bottom execution order, unlike the inverted
+            # per-branch convention above -- they aren't part of a column's
+            # "decomposition reads outward" visual language, so raw depth 0
+            # (the plan node, first in execution order) belongs at the top,
+            # not the bottom.
+            untagged_by_depth: dict[int, list[dict[str, Any]]] = defaultdict(list)
+            for node in managed:
+                untagged_by_depth[layers.get(str(node.get("id")), 0)].append(node)
+            global_y = _row_offsets(untagged_by_depth)
+
+            for branch, branch_nodes in by_branch.items():
+                branch_y = _row_offsets(_inverted_by_depth(in_branch_depth, branch_nodes))
+                for node in sorted(
+                    branch_nodes,
+                    key=lambda item: (-in_branch_depth.get(str(item.get("id")), 0), str(item.get("id"))),
+                ):
+                    node_id = str(node.get("id"))
+                    _place_without_overlap(node, occupied, column_x[branch], branch_y.get(node_id, 0))
+
+            # Untagged nodes: the plan node and any genuinely shared/wrap-up
+            # node. Placed at the x-midpoint of whichever tagged branches
+            # feed them (a single feeding branch collapses to that branch's
+            # own x; zero feeders -- e.g. the plan node itself -- falls one
+            # column to the left of the first branch, matching the
+            # reference's node-0-leftmost convention).
+            for node in sorted(untagged, key=lambda item: (-layers.get(str(item.get("id")), 0), str(item.get("id")))):
+                node_id = str(node.get("id"))
+                feeders = incoming_tagged_branches.get(node_id, set())
+                if feeders:
+                    xs = sorted(column_x[b] for b in feeders)
+                    x = (xs[0] + xs[-1]) // 2
+                else:
+                    x = -column_width
+                _place_without_overlap(node, occupied, x, global_y.get(node_id, 0))
     elif profile == "relationship":
         columns = max(1, min(4, int(len(managed) ** 0.5) or 1))
         for index, node in enumerate(sorted(managed, key=lambda item: str(item.get("id")))):

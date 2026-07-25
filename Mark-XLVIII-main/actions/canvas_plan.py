@@ -21,6 +21,7 @@ from __future__ import annotations
 import json
 import hashlib
 import re
+from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
@@ -80,6 +81,20 @@ _ROLE_SPECS: dict[str, dict[str, Any]] = {
         "risk_tier": "T1",
         "side_effects": "local_read",
     },
+    # WS4c (2026-07-24 fan-out planning): a "pass forward note" -- carries one
+    # fact across the graph (often across branches) for a human or the
+    # critique pass to read. compile_canvas excludes every `note`-role node
+    # from the compiled steps entirely (resolving any depends_on that points
+    # through one to the real upstream step instead) rather than dispatching
+    # it, so this spec only matters as a harmless fallback if that exclusion
+    # is ever bypassed.
+    "note": {
+        "orchestrator": "cognitive",
+        "step_type": "model_reasoning",
+        "target": "reasoning",
+        "risk_tier": "T1",
+        "side_effects": "none",
+    },
     "verification": {
         "orchestrator": "deterministic",
         "step_type": "command",
@@ -132,10 +147,11 @@ _ROLE_ALIASES = {
     "verify": "verification", "test": "verification", "check": "verification",
     "critic": "review", "gate": "review", "approve": "review",
     "file": "reference", "ref": "reference", "context": "reference",
+    "annotation": "note", "signal": "note", "pass_forward": "note",
 }
 
 _ROLE_DIRECTIVE_RE = re.compile(r"^\s*(?:type|role)\s*:\s*([a-zA-Z_]+)\s*$", re.IGNORECASE)
-_ROLE_HASHTAG_RE = re.compile(r"#(plan|research|implementation|verification|review|reference)\b", re.IGNORECASE)
+_ROLE_HASHTAG_RE = re.compile(r"#(plan|research|implementation|verification|review|reference|note)\b", re.IGNORECASE)
 
 # D1 (2026-07-24 planning roadmap): every node is both a workflow step and a
 # self-contained prompt, so its leading lines can declare several directives,
@@ -144,8 +160,13 @@ _ROLE_HASHTAG_RE = re.compile(r"#(plan|research|implementation|verification|revi
 # after is the node's actual prose/instruction. Order among directives does
 # not matter, matching the existing `role:` convention of "first N lines are
 # structure, the rest is the prompt."
+#
+# `branch` (WS4c, 2026-07-24 fan-out planning): which macro column a node
+# belongs to. Nodes without it share a single implicit branch, so every
+# existing single-chain canvas is completely unaffected -- see compile_canvas
+# and core.canvas_layout's branch-aware "dependency" profile.
 _DIRECTIVE_LINE_RE = re.compile(
-    r"^\s*(role|type|scope|test|project|file|recommended\s+model)\s*:\s*(.*?)\s*$",
+    r"^\s*(role|type|scope|test|project|file|recommended\s+model|branch)\s*:\s*(.*?)\s*$",
     re.IGNORECASE,
 )
 _DIRECTIVE_ALIASES = {"type": "role", "test": "scope"}
@@ -246,6 +267,47 @@ def _sanitise_workflow_id(value: str, fallback: str = "canvas_plan") -> str:
     return slug[:60]
 
 
+# WS4d (2026-07-25 planning roadmap): deterministic context inheritance. Only
+# `review` steps got any automatic context from their dependencies (the
+# `evidence` binding below); every other node ran off its own self-authored
+# prose alone, with zero visibility into the overall goal, its branch, or
+# sibling branches -- D1's "every node is a self-contained prompt" put the
+# whole burden on the decomposition model remembering to write a complete
+# node. This is a compile-time-only, no-model-call preamble assembled purely
+# from prose already on the canvas -- budget-capped, since this session's own
+# WS4c testing showed a longer prompt measurably hurts the local overseer.
+_PREAMBLE_FIELD_BUDGET = 220
+_CONTEXT_PREAMBLE_ROLES = frozenset({"research", "review", "implementation"})
+_RELIABLE_SUMMARY_ROLES = frozenset({"research", "note", "review", "plan", "reference"})
+
+
+def _truncate(text: str, limit: int = _PREAMBLE_FIELD_BUDGET) -> str:
+    text = str(text or "").strip()
+    return text if len(text) <= limit else text[: limit - 1].rstrip() + "…"
+
+
+def _context_preamble(
+    node: dict[str, Any],
+    *,
+    plan_node: dict[str, Any] | None,
+    branch_roots: dict[str, dict[str, Any]],
+    own_branch: str,
+) -> str:
+    """Deterministic, compile-time only -- no model call. `""` for a node
+    with nothing to add (the plan node itself, or a single-branch plan with
+    no siblings)."""
+    lines: list[str] = []
+    if plan_node is not None and node is not plan_node:
+        lines.append(f"System goal: {_truncate(_instruction_text(plan_node))}")
+    root = branch_roots.get(own_branch)
+    if own_branch and root is not None and root is not node:
+        lines.append(f"This step is part of component {own_branch}: {_truncate(_instruction_text(root))}")
+    for branch, sibling_root in sorted(branch_roots.items()):
+        if branch and branch != own_branch:
+            lines.append(f"Also in this plan, component {branch}: {_truncate(_instruction_text(sibling_root))}")
+    return "\n".join(lines)
+
+
 def compile_canvas(
     payload: dict[str, Any],
     *,
@@ -280,6 +342,28 @@ def compile_canvas(
         if src in node_ids and dst in node_ids and src != dst:
             incoming[dst].append(src)
 
+    # WS4c (2026-07-24 fan-out planning): `note`-role nodes never become a
+    # compiled step (see _ROLE_SPECS["note"]), so a real step's depends_on
+    # must resolve *through* any note in its ancestry to the nearest real
+    # upstream node -- otherwise it would reference a step id that was never
+    # built, which validate_workflow does NOT catch (only compile_workflow's
+    # later depends_on-integrity check does, surfacing a confusing failure at
+    # propose/execute time instead of a clean one here). Recursion is safe
+    # from infinite loops: the whole-graph cycle check above already ran over
+    # every node, notes included.
+    note_ids = {str(n["id"]) for n in nodes if _resolve_role(n) == "note"}
+
+    def _resolve_through_notes(nid: str, seen: frozenset[str] = frozenset()) -> list[str]:
+        resolved: list[str] = []
+        for src in incoming.get(nid, []):
+            if src in note_ids:
+                if src in seen:
+                    continue
+                resolved.extend(_resolve_through_notes(src, seen | {src}))
+            else:
+                resolved.append(src)
+        return resolved
+
     # WS1 (2026-07-24 planning roadmap, D2): "one canvas = one plan target" --
     # an implementation node's `project:` directive is optional because the
     # canvas's own `plan`-role root node can declare the default for the whole
@@ -306,17 +390,47 @@ def compile_canvas(
                 f"Known projects: {', '.join(sorted(registered_project_ids)) or '(none registered)'}."
             )
 
+    # WS4d: context-preamble bookkeeping. `plan_node` anchors "System goal:";
+    # `branch_roots` picks one representative node per branch (the deepest by
+    # global layer among that branch's own members -- an approximation of
+    # WS4c's own layout-side root detection, fine here since this only feeds
+    # presentational context, not a correctness-critical binding) for the
+    # "this step is part of component X" / "also in this plan, component Y"
+    # lines.
+    role_by_nid = {str(n["id"]): _resolve_role(n) for n in nodes}
+    plan_node = next((n for n in nodes if role_by_nid[str(n["id"])] == "plan"), None)
+    branch_of_node = {str(n["id"]): _node_directives(n).get("branch", "") for n in nodes}
+    branch_roots: dict[str, dict[str, Any]] = {}
+    for node in nodes:
+        branch = branch_of_node[str(node["id"])]
+        if not branch:
+            continue
+        current = branch_roots.get(branch)
+        if current is None or layers.get(str(node["id"]), 0) > layers.get(str(current["id"]), 0):
+            branch_roots[branch] = node
+
     ordered = sorted(nodes, key=lambda n: (layers.get(str(n["id"]), 0), str(n["id"])))
     steps: list[dict[str, Any]] = []
     node_to_step: dict[str, str] = {}
     for node in ordered:
         nid = str(node["id"])
         role = _resolve_role(node)
+        if role == "note":
+            # Canvas-only annotation -- never dispatched, never appears in
+            # node_to_step or the approval preview. Anything that depends on
+            # it was already re-pointed at the real upstream node above.
+            continue
         spec = _ROLE_SPECS[role]
         step_id = node_step_id(nid)
         node_to_step[nid] = step_id
         description = _instruction_text(node) or f"{role} step"
         directives = _node_directives(node)
+        resolved_dep_nids = list(dict.fromkeys(_resolve_through_notes(nid)))
+        preamble = (
+            _context_preamble(node, plan_node=plan_node, branch_roots=branch_roots, own_branch=branch_of_node[nid])
+            if role in _CONTEXT_PREAMBLE_ROLES
+            else ""
+        )
         inputs: dict[str, Any] = {"canvas_role": role, "canvas_node_id": nid}
         inputs.update(spec.get("inputs") or {})
         if role == "verification" and directives.get("scope"):
@@ -333,14 +447,30 @@ def compile_canvas(
                     )
                 inputs["project_id"] = project_id
             # The dual-purpose prose (D1) is the agent's actual task -- forward it
-            # so delegate_openclaw never dispatches with an empty intent.
-            inputs["intent"] = description
+            # so delegate_openclaw never dispatches with an empty intent. WS4d:
+            # a deterministic context preamble rides along on the same field.
+            inputs["intent"] = f"{preamble}\n\n{description}" if preamble else description
+            if preamble:
+                inputs["context_injected"] = True
+        elif role in {"research", "review"} and preamble:
+            # WS4d: research/review dispatch reads inputs.prompt in preference
+            # to the bare step description (dual_orchestrator.py's
+            # model_reasoning/review branch) -- this is how the preamble
+            # actually reaches the executing model, not just the canvas file.
+            inputs["prompt"] = f"{preamble}\n\n{description}"
+            inputs["context_injected"] = True
         if directives.get("file"):
             inputs["file"] = directives["file"]
         if directives.get("recommended_model"):
             # Inert for now -- WS4 is what will generate this; WS1 only parses,
             # threads it through, and surfaces it in the approval preview.
             inputs["recommended_model"] = directives["recommended_model"]
+        acceptance_criteria: dict[str, Any] = {"required": True}
+        node_deliverables = node.get("deliverables")
+        if isinstance(node_deliverables, list) and node_deliverables:
+            # WS4d: real, node-specific success criteria instead of the
+            # universally-identical (and unfalsifiable) bare "required: true".
+            acceptance_criteria["deliverables"] = [str(item) for item in node_deliverables]
         step: dict[str, Any] = {
             "step_id": step_id,
             "orchestrator": spec["orchestrator"],
@@ -349,21 +479,30 @@ def compile_canvas(
             "description": description[:2000],
             "risk_tier": spec["risk_tier"],
             "side_effects": spec["side_effects"],
-            "depends_on": sorted(node_step_id(src) for src in incoming[nid]),
+            "depends_on": sorted(node_step_id(src) for src in resolved_dep_nids),
             "inputs": inputs,
             "outputs": {"result": f"result.{step_id}"},
-            "acceptance_criteria": {"required": True},
+            "acceptance_criteria": acceptance_criteria,
         }
         for optional in ("requires_confirmation", "retry_policy", "on_failure"):
             if optional in spec:
                 step[optional] = spec[optional]
-        if role == "review" and step["depends_on"]:
-            # T5: bind the critique to what it is actually meant to review -- its
-            # upstream node(s)' own output -- instead of dispatching with only the
-            # human's review instruction and no evidence at all.
-            step["inputs"]["evidence"] = [
-                {"bind": {"from_step": dep, "path": "result.summary"}} for dep in step["depends_on"]
+        if role in {"research", "review", "implementation"}:
+            # T5 originally bound this for review only. WS4d extends it to any
+            # step type that consumes free-form instruction, but only for
+            # dependencies whose own role produces a reliably `summary`-shaped
+            # result (dual_orchestrator.py's command/tool results have no
+            # common `summary` field -- binding to one would just resolve to
+            # None, so verification/implementation dependencies are skipped
+            # here rather than wired up to a binding that silently resolves
+            # to nothing).
+            reliable_deps = [
+                node_step_id(src) for src in resolved_dep_nids if role_by_nid.get(src) in _RELIABLE_SUMMARY_ROLES
             ]
+            if reliable_deps:
+                step["inputs"]["evidence"] = [
+                    {"bind": {"from_step": dep, "path": "result.summary"}} for dep in reliable_deps
+                ]
         steps.append(step)
 
     workflow = {
@@ -396,25 +535,65 @@ _DECOMPOSE_SYSTEM_PROMPT = (
     "ordered set of canvas plan nodes. Return ONLY a JSON object -- no prose, no "
     "markdown code fences, nothing before or after it. Schema:\n"
     '{"nodes": [{"id": "short_snake_case_id", '
-    '"role": "plan|research|implementation|verification|review|reference", '
+    '"role": "plan|research|implementation|verification|review|reference|note", '
     '"directives": {"scope": "optional test path(s), verification only", '
     '"project": "optional registered project id, implementation only", '
     '"file": "optional file path, reference/implementation only", '
-    '"recommended_model": "optional semantic or developer hint"}, '
+    '"recommended_model": "optional semantic or developer hint", '
+    '"branch": "optional macro-component tag, e.g. \\"A\\" -- see below"}, '
     '"prose": "the actual instruction for whichever agent executes this node", '
-    '"depends_on": ["ids of nodes that must complete first"]}], '
+    '"depends_on": ["ids of nodes that must complete first"], '
+    '"deliverables": ["optional: concrete description of what \\"done\\" looks like for this node"]}], '
     '"rationale": "one short paragraph explaining the decomposition"}\n\n'
     "Rules:\n"
     "- Exactly one node has role \"plan\" and an empty depends_on -- it anchors the goal.\n"
-    "- Every other node depends on at least one earlier node; no orphans besides the plan node.\n"
+    "- Every other node depends on at least one earlier node; no orphans besides the plan node. This "
+    "includes the very first node of every independent chain or branch: if nothing else produced it, "
+    "it still depends_on the plan node itself. An empty or missing \"depends_on\" is only ever correct "
+    "on the one \"plan\" node -- double-check every other node has at least one entry before answering.\n"
     "- Leave a directive out entirely rather than inventing a project id, file path, or test path "
     "you were not actually given.\n"
-    "- Prefer 3 to 7 nodes. Do not add a node whose only purpose is restating the goal.\n"
+    "- Prefer 3 to 7 nodes for a simple goal. Do not add a node whose only purpose is restating the goal.\n"
     "- \"prose\" is read by whichever agent executes that node -- write it as a direct instruction, "
-    "not a description of the node."
+    "not a description of the node.\n"
+    "- \"deliverables\" is optional -- omit it entirely rather than inventing generic filler like "
+    "\"passes review\". Only include it when you can name something concrete and checkable (a file that "
+    "should exist, a specific behavior a test should confirm, a specific fact a research step should "
+    "answer). Most useful on implementation and verification nodes; skip it on note/reference nodes.\n\n"
+    "Branches (only for a goal with 2+ largely-independent macro components -- most goals should stay "
+    "single-branch, i.e. omit \"branch\" entirely):\n"
+    "- Tag every node in a macro component with the same short \"branch\" value (e.g. \"A\", \"B\").\n"
+    "- Within a branch, order nodes so the branch's own most-synthesized node (no in-branch depends_on) "
+    "sits at the top of that component's own chain.\n"
+    "- Across branches, each branch's own root should depends_on the *next* branch's root -- the branch "
+    "that is worked deepest-first should be depended on by the branch closer to the overall goal. The "
+    "single deepest branch's root has no next branch to chain to, so it depends_on the plan node "
+    "directly instead -- it still needs a depends_on entry, exactly like every other node.\n"
+    "- \"note\" role: a pass-forward note -- one fact discovered while doing one branch's work that "
+    "matters to a \"review\" node elsewhere (often a different branch). It depends_on whatever produced "
+    "the fact; a \"review\" node reacting to it depends_on the note. A note is never itself a real "
+    "execution step -- keep its prose to one factual sentence.\n"
+    "- Single-direction depends_on only -- there is no bidirectional edge convention."
 )
 
 _VALID_DECOMPOSE_ROLES = frozenset(_ROLE_SPECS.keys())
+
+
+def _normalize_decomposition_payload(payload: dict[str, Any]) -> None:
+    """Fix up common, forgivable model formatting slips in-place, before
+    validation runs. Live testing showed the model reliably writes a single
+    "deliverables" entry as a bare string instead of a one-item list, despite
+    the schema showing an array -- coerce rather than reject a decomposition
+    outright over this one forgivable shape mismatch."""
+    nodes = payload.get("nodes")
+    if not isinstance(nodes, list):
+        return
+    for node in nodes:
+        if not isinstance(node, dict):
+            continue
+        deliverables = node.get("deliverables")
+        if isinstance(deliverables, str) and deliverables.strip():
+            node["deliverables"] = [deliverables]
 
 
 def _slugify_node_id(raw: str, fallback: str) -> str:
@@ -450,6 +629,25 @@ def _validate_decomposition(payload: dict[str, Any]) -> list[str]:
             problems.append(f"Node {node_id!r} has an unrecognised role: {role!r}.")
         if role == "plan":
             plan_count += 1
+        # WS4c: `branch` is optional (omit it entirely for a single-branch
+        # plan -- the common case). When present, only a cheap format check
+        # -- whether a multi-branch decomposition actually holds together
+        # structurally is the critique pass's job, not a hard validation gate.
+        directives = node.get("directives") if isinstance(node.get("directives"), dict) else {}
+        branch = directives.get("branch")
+        if branch is not None:
+            branch_value = str(branch).strip()
+            if not branch_value or len(branch_value) > 40:
+                problems.append(f"Node {node_id!r} has an invalid branch value: {branch!r}.")
+        # WS4d: `deliverables` is optional -- format-only check here. Whether
+        # a deliverable is actually concrete/checkable (vs. vague filler) is
+        # the critique pass's job, not a hard validation gate.
+        deliverables = node.get("deliverables")
+        if deliverables is not None:
+            if not isinstance(deliverables, list) or len(deliverables) > 5:
+                problems.append(f"Node {node_id!r} has an invalid deliverables list: {deliverables!r}.")
+            elif any(not isinstance(item, str) or not item.strip() or len(item) > 200 for item in deliverables):
+                problems.append(f"Node {node_id!r} has a malformed deliverable entry.")
 
     if plan_count != 1:
         problems.append(f"Expected exactly one node with role 'plan', found {plan_count}.")
@@ -511,6 +709,7 @@ def decompose_goal_to_canvas(
     payload = _extract_json_object(raw_text)
     if not isinstance(payload, dict):
         return {"ok": False, "error": "Planner response was not parseable JSON.", "raw_text": raw_text[:2000]}
+    _normalize_decomposition_payload(payload)
 
     problems = _validate_decomposition(payload)
     if problems:
@@ -534,13 +733,36 @@ def decompose_goal_to_canvas(
         role = str(node.get("role") or "").strip().lower()
         directives = node.get("directives") if isinstance(node.get("directives"), dict) else {}
         lines = [f"role: {role}"]
-        for key, label in (("scope", "scope"), ("project", "project"), ("file", "file"), ("recommended_model", "recommended model")):
+        for key, label in (
+            ("scope", "scope"), ("project", "project"), ("file", "file"),
+            ("recommended_model", "recommended model"), ("branch", "branch"),
+        ):
             value = str(directives.get(key) or "").strip()
             if value:
                 lines.append(f"{label}: {value}")
         prose = str(node.get("prose") or "").strip() or f"{role} step for: {goal[:200]}"
         text = "\n".join(lines) + "\n\n" + prose
-        canvas_nodes.append(canvas_actions._text_node(node_id, text, 0, 0))
+        deliverables_raw = node.get("deliverables")
+        deliverables = (
+            [str(item).strip() for item in deliverables_raw if str(item).strip()][:5]
+            if isinstance(deliverables_raw, list)
+            else []
+        )
+        if deliverables:
+            text += "\n\nDeliverables:\n" + "\n".join(f"- {item}" for item in deliverables)
+        canvas_node = canvas_actions._text_node(node_id, text, 0, 0)
+        branch_value = str(directives.get("branch") or "").strip()[:40]
+        if branch_value:
+            # Mirrored as a plain top-level key (in addition to the text
+            # directive above) so core.canvas_layout's branch-aware layout
+            # can read it without re-parsing node text -- see WS4c.
+            canvas_node["branch"] = branch_value
+        if deliverables:
+            # WS4d: same top-level-key precedent as `branch` -- a list value
+            # doesn't fit the single-line directive convention, so it's read
+            # directly by compile_canvas rather than via _node_directives.
+            canvas_node["deliverables"] = deliverables
+        canvas_nodes.append(canvas_node)
 
     # Resolve depends_on (which reference the model's original, pre-slug ids)
     # against the actual slugged node ids assigned above -- a raw id and its
@@ -584,6 +806,328 @@ def decompose_goal_to_canvas(
         "node_count": len(canvas_nodes),
         "rationale": str(payload.get("rationale") or ""),
         "goal": goal,
+    }
+
+
+# WS4b (2026-07-24 planning roadmap): the critique pass + D5's weighted refine
+# loop. Extends T5's per-node dual-critic pattern (build_canvas_dual_reviewer,
+# above) up to whole-plan level: a second planner-role call reads *any* canvas
+# -- hand-drawn or WS4a-decomposed, the critic does not care which -- and
+# judges the decomposition itself, not a step's execution result. Critique is
+# a linked Obsidian note (D5), not a JARVIS-UI panel. Non-authoritative
+# throughout: T4/T5 still bind and gate exactly as they do for any other
+# canvas; this only decides whether (and with what visible caveat) a plan
+# reaches propose_canvas_plan at all.
+_CRITIQUE_SYSTEM_PROMPT = (
+    "You are JARVIS's planning critic. You will be shown a goal and a proposed "
+    "decomposition of that goal into ordered canvas plan nodes (id, role, any "
+    "directives -- including an optional \"branch\" tag grouping nodes into a macro "
+    "component -- the node's instruction, and which earlier nodes it depends on). "
+    "Assess whether the decomposition is complete, correctly ordered, and safe. "
+    "Return ONLY a JSON object -- no prose, no markdown code fences. Schema:\n"
+    '{"verdict": "approve|caution|re_review|reject", '
+    '"missing_steps": ["short description of a step that should exist but does not", ...], '
+    '"concerns": ["short description of a risk, ordering issue, or ambiguity", ...], '
+    '"rationale": "one short paragraph explaining the verdict"}\n\n'
+    "Rules:\n"
+    "- approve: the decomposition is complete, correctly ordered, and ready for a human to review.\n"
+    "- caution: usable as-is, but flag a real concern the human approver should see before deciding.\n"
+    "- re_review: a genuine, concrete gap exists (a missing prerequisite step, wrong ordering) that "
+    "should be fixed automatically before this goes to a human.\n"
+    "- reject: the decomposition is fundamentally unworkable for this goal -- a human needs to look "
+    "at the goal itself, not just have the plan rewritten again.\n"
+    "- Do not flag a missing `project:`/`scope:`/`file:` directive as a gap -- leaving one out when it "
+    "was never given is WS1's own correct behaviour, not a structural defect.\n"
+    "- If nodes carry different `branch` tags, check the cross-branch relationships specifically: a "
+    "\"note\"-role node should have a \"review\"-role node depending on it somewhere -- a note nobody "
+    "reacts to, or a review that should exist but doesn't, is a real gap worth flagging.\n"
+    "- Each node may carry \"deliverables\" -- concrete success criteria. An implementation or "
+    "verification node with vague or missing deliverables (nothing checkable named) is worth a concern, "
+    "but a missing \"deliverables\" list on its own is not a defect -- it is always optional.\n"
+    "- Be conservative: prefer approve/caution over re_review/reject unless you can name a concrete gap."
+)
+
+_VALID_CRITIQUE_VERDICTS = frozenset({"approve", "caution", "re_review", "reject"})
+
+
+def _plan_summary_for_critique(payload: dict[str, Any]) -> list[dict[str, Any]]:
+    """A compact, model-readable structural summary of any canvas's plan --
+    id, role, directives, instruction, depends_on -- reusing WS1's own parsing
+    helpers so a critique of a hand-drawn canvas and a WS4a-decomposed one are
+    built identically."""
+    nodes = [node for node in payload.get("nodes", []) if isinstance(node, dict)]
+    edges = [edge for edge in payload.get("edges", []) if isinstance(edge, dict)]
+    depends_on: dict[str, list[str]] = defaultdict(list)
+    for edge in edges:
+        source, target = str(edge.get("fromNode") or ""), str(edge.get("toNode") or "")
+        if source and target:
+            depends_on[target].append(source)
+
+    summary = []
+    for node in nodes:
+        node_id = str(node.get("id") or "")
+        summary.append(
+            {
+                "id": node_id,
+                "role": _resolve_role(node),
+                "directives": _node_directives(node),
+                "instruction": _instruction_text(node)[:500],
+                "depends_on": sorted(depends_on.get(node_id, [])),
+                "deliverables": node.get("deliverables") or [],
+            }
+        )
+    return summary
+
+
+_CRITIQUE_VERDICT_RANK = {"approve": 0, "caution": 1, "re_review": 2, "reject": 3}
+
+
+def _plan_role_ordering_violations(plan_nodes: list[dict[str, Any]]) -> list[str]:
+    """Deterministic backstop underneath the model critique, mirroring WS2's
+    receipt-based post-check pattern: a `verification` node whose transitive
+    dependencies include no `implementation` node would run before anything
+    exists to verify. This is a mechanical graph property, not a judgment
+    call -- worth checking outright rather than trusting a model critic to
+    always notice it (one did not, in live testing)."""
+    by_id = {str(node["id"]): node for node in plan_nodes}
+
+    def ancestors(node_id: str, seen: set[str]) -> set[str]:
+        if node_id in seen:
+            return seen
+        seen.add(node_id)
+        for dep in by_id.get(node_id, {}).get("depends_on") or []:
+            ancestors(str(dep), seen)
+        return seen
+
+    violations = []
+    for node in plan_nodes:
+        if node.get("role") != "verification":
+            continue
+        node_id = str(node["id"])
+        upstream = ancestors(node_id, set()) - {node_id}
+        if not any(by_id.get(dep, {}).get("role") == "implementation" for dep in upstream):
+            violations.append(
+                f"Verification node {node_id!r} does not depend (even transitively) on any "
+                "implementation node -- it would run before anything exists to verify."
+            )
+    return violations
+
+
+def critique_canvas_plan(
+    canvas_path: str | Path,
+    *,
+    goal: str = "",
+    cfg: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Ask the planner model to critique an already-drawn canvas's structure.
+
+    Works on any canvas, hand-drawn or WS4a-decomposed -- it reads the file
+    back and reconstructs role/directives/prose/depends_on the same way
+    `compile_canvas` does, rather than trusting a caller's in-memory copy.
+    Purely advisory: returns a verdict, never writes or changes anything.
+    """
+    from actions import jarvis_canvas as canvas_actions
+    from core.model_router import _extract_json_object, call_text
+
+    resolved = canvas_actions.resolve_config(cfg)
+    path = canvas_actions._safe_canvas_path(canvas_path, resolved, default_name="canvas.canvas")
+    payload = canvas_actions.load_canvas(path)
+    plan_nodes = _plan_summary_for_critique(payload)
+    if not plan_nodes:
+        return {"ok": False, "error": "Canvas has no nodes to critique."}
+
+    prompt = (f"Goal: {goal}\n\n" if goal else "") + "Proposed plan nodes (JSON):\n" + json.dumps(
+        plan_nodes, ensure_ascii=True
+    )
+    raw_text = call_text(prompt, role="planner", system=_CRITIQUE_SYSTEM_PROMPT, timeout=300, config=cfg)
+    critique = _extract_json_object(raw_text)
+    if not isinstance(critique, dict):
+        return {"ok": False, "error": "Critique response was not parseable JSON.", "raw_text": raw_text[:2000]}
+
+    verdict = str(critique.get("verdict") or "").strip().lower()
+    if verdict not in _VALID_CRITIQUE_VERDICTS:
+        return {
+            "ok": False,
+            "error": f"Critique returned an unrecognised verdict: {verdict!r}.",
+            "raw_text": raw_text[:2000],
+        }
+
+    concerns = [str(item).strip() for item in (critique.get("concerns") or []) if str(item).strip()][:20]
+    rationale = str(critique.get("rationale") or "").strip()
+
+    violations = _plan_role_ordering_violations(plan_nodes)
+    if violations:
+        concerns = list(dict.fromkeys([*concerns, *violations]))[:20]
+        if _CRITIQUE_VERDICT_RANK[verdict] < _CRITIQUE_VERDICT_RANK["re_review"]:
+            verdict = "re_review"
+            rationale = (rationale + " " if rationale else "") + "Escalated automatically: " + "; ".join(violations)
+
+    return {
+        "ok": True,
+        "verdict": verdict,
+        "missing_steps": [str(item).strip() for item in (critique.get("missing_steps") or []) if str(item).strip()][:20],
+        "concerns": concerns,
+        "rationale": rationale,
+    }
+
+
+def _plan_critique_note_path(notes_root: Path, workflow_id: str, revision: int) -> Path:
+    return Path(notes_root) / "Plans" / f"canvas-critique-{_sanitise_workflow_id(workflow_id)}-r{revision}.md"
+
+
+def _write_plan_critique_note(
+    *,
+    workflow_id: str,
+    name: str,
+    canvas_path: Path,
+    critique: dict[str, Any],
+    revision: int,
+    cfg: dict[str, Any] | None = None,
+) -> Path:
+    """Write the critique as a linked Obsidian review note (D5) -- the
+    substrate is Obsidian's own linking, not a JARVIS-UI panel."""
+    from actions import jarvis_canvas as canvas_actions
+    from actions import jarvis_memory as memory
+
+    resolved = canvas_actions.resolve_config(cfg)
+    note_path = _plan_critique_note_path(Path(resolved["notes_root"]), workflow_id, revision)
+    memory_cfg = memory.resolve_config({"jarvis_notes_root": str(resolved["notes_root"]), "remember_enabled": False})
+
+    try:
+        canvas_display = canvas_path.resolve().relative_to(Path(resolved["notes_root"]).resolve()).as_posix()
+    except ValueError:
+        canvas_display = str(canvas_path)
+
+    lines = [
+        f"# Plan Critique — {name or workflow_id} (revision {revision})",
+        "",
+        f"**Verdict:** `{critique['verdict']}`",
+        f"**Canvas:** `{canvas_display}`",
+        "",
+        "## Rationale",
+        critique.get("rationale") or "_No rationale returned._",
+    ]
+    if critique.get("missing_steps"):
+        lines += ["", "## Missing Steps Flagged"] + [f"- {item}" for item in critique["missing_steps"]]
+    if critique.get("concerns"):
+        lines += ["", "## Concerns Flagged"] + [f"- {item}" for item in critique["concerns"]]
+
+    memory.create_note(
+        note_type="plan",
+        title=f"Plan Critique — {workflow_id} (r{revision})",
+        content="\n".join(lines),
+        content_mode="full_body",
+        tags=["canvas-plan", "critique", workflow_id],
+        status="active",
+        source="canvas_plan",
+        sync=False,
+        path=note_path,
+        metadata_extra={"workflow_id": workflow_id, "revision": revision, "verdict": critique["verdict"]},
+        cfg=memory_cfg,
+    )
+    return note_path
+
+
+def _link_critique_into_approval_note(note_path: Path, critique_note_path: Path, critique: dict[str, Any]) -> None:
+    """Connect the critique to the plan by an inline wikilink (D5) -- always,
+    not only on `caution`, since D5 frames the link itself as the substrate,
+    with the visible warning callout as an *additional* flourish reserved for
+    a verdict the human approver should specifically notice before deciding.
+    """
+    from actions import jarvis_memory as memory
+
+    metadata, body, _ = memory.read_note(note_path)
+    link_target = Path(critique_note_path).stem
+    prefix = ""
+    if critique["verdict"] == "caution":
+        prefix = (
+            "> [!warning] Plan critique flagged a concern\n"
+            f"> {critique.get('rationale') or 'The plan critic flagged this plan for caution.'} "
+            f"See [[{link_target}]] for the full critique.\n\n"
+        )
+    footer = f"\n\n**Plan critique:** [[{link_target}]] (verdict: `{critique['verdict']}`)\n"
+    if f"[[{link_target}]]" not in body:
+        Path(note_path).write_text(f"{memory.render_frontmatter(metadata)}\n\n{prefix}{body}{footer}", encoding="utf-8")
+
+
+def critique_and_propose_plan(
+    goal: str,
+    *,
+    project_hint: str = "",
+    canvas_name: str | None = None,
+    workflow_id: str | None = None,
+    name: str | None = None,
+    cfg: dict[str, Any] | None = None,
+    max_rewrites: int = 2,
+) -> dict[str, Any]:
+    """WS4b: decompose -> critique -> D5's weighted refine loop -> propose.
+
+    Automatic within the planning phase: a `re_review` verdict feeds the
+    critique's own `missing_steps`/`concerns` back into a fresh decomposition
+    and re-critiques, up to `max_rewrites` times, with no human involved. Only
+    `caution` and `reject` pull a human in (D5): `caution` still proposes the
+    plan through the normal T4 approval gate but with a warning callout
+    linking the critique note prepended to that same note; `reject` -- or an
+    unresolved `re_review` after the rewrite budget runs out -- does NOT call
+    `propose_canvas_plan` at all. The critique note is what a human looks at
+    in that case, not a half-proposed plan.
+    """
+    decomposition = decompose_goal_to_canvas(goal, project_hint=project_hint, canvas_name=canvas_name, cfg=cfg)
+    if not decomposition.get("ok"):
+        return decomposition
+
+    canvas_path = Path(decomposition["canvas_path"])
+    workflow_id = workflow_id or _sanitise_workflow_id(goal[:40])
+    name = name or goal[:80]
+
+    critique = critique_canvas_plan(canvas_path, goal=goal, cfg=cfg)
+    if not critique.get("ok"):
+        return {**critique, "canvas_path": str(canvas_path)}
+
+    revision = 1
+    critique_note_path: Path | None = None
+    while critique["verdict"] == "re_review" and revision <= max_rewrites:
+        critique_note_path = _write_plan_critique_note(
+            workflow_id=workflow_id, name=name, canvas_path=canvas_path, critique=critique, revision=revision, cfg=cfg
+        )
+        feedback = "; ".join([*critique.get("missing_steps", []), *critique.get("concerns", [])])
+        revised_goal = goal + (f"\n\nA prior draft was reviewed and found lacking: {feedback}. Revise accordingly." if feedback else "")
+        decomposition = decompose_goal_to_canvas(revised_goal, project_hint=project_hint, canvas_name=canvas_name, cfg=cfg)
+        if not decomposition.get("ok"):
+            return decomposition
+        canvas_path = Path(decomposition["canvas_path"])
+        revision += 1
+        critique = critique_canvas_plan(canvas_path, goal=goal, cfg=cfg)
+        if not critique.get("ok"):
+            return {**critique, "canvas_path": str(canvas_path)}
+
+    critique_note_path = _write_plan_critique_note(
+        workflow_id=workflow_id, name=name, canvas_path=canvas_path, critique=critique, revision=revision, cfg=cfg
+    )
+
+    if critique["verdict"] in {"reject", "re_review"}:
+        # A lingering `re_review` here means the rewrite budget ran out without
+        # reaching approve/caution -- treated the same as reject: a human is
+        # pulled in rather than silently proposing a plan that never passed
+        # critique.
+        return {
+            "ok": True,
+            "proposed": False,
+            "verdict": critique["verdict"],
+            "canvas_path": str(canvas_path),
+            "critique_note_path": str(critique_note_path),
+            "rationale": critique.get("rationale", ""),
+        }
+
+    proposal = propose_canvas_plan(canvas_path, workflow_id=workflow_id, name=name, cfg=cfg)
+    if proposal.get("ok"):
+        _link_critique_into_approval_note(Path(proposal["note_path"]), critique_note_path, critique)
+
+    return {
+        **proposal,
+        "proposed": bool(proposal.get("ok")),
+        "verdict": critique["verdict"],
+        "critique_note_path": str(critique_note_path),
     }
 
 
@@ -1099,6 +1643,13 @@ def _resolved_target_summary(item: dict[str, Any]) -> str:
         parts.append(f"file: {inputs['file']}")
     if inputs.get("recommended_model"):
         parts.append(f"recommended model: {inputs['recommended_model']}")
+    if inputs.get("context_injected"):
+        # WS4d (2026-07-25): D2 requires an injected context preamble stay
+        # visible to the human approver, not a silent addition -- this is a
+        # short indicator, not the full preamble text, so the table stays
+        # scannable. The full text is in the compiled step's inputs.prompt/
+        # inputs.intent for anyone who wants to inspect it.
+        parts.append("+ context")
     return "; ".join(parts).replace("|", "\\|") or "—"
 
 

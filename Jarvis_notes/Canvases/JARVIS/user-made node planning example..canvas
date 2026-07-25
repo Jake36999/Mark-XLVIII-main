@@ -1,0 +1,39 @@
+{
+	"nodes":[
+		{"id":"9d25d022effdbb97","x":80,"y":-520,"width":270,"height":440,"type":"text","text":"node value = A1\nThese tasks shouldnt be too large, they should be \"what immediately deducable components of the end result\" - in a sorta way, varying context dependant on whether a coding / development or writing / research  task. \n\nfor example: \nFor the runtime to work in the way we need it too, it will need to do A, B and C with pre-requisites \"that thing\", \"this thing\", and \"those\""},
+		{"id":"af962766705967de","x":-301,"y":114,"width":250,"height":348,"type":"text","text":"review of A2 example: you didnt consider those enough..\n-- would trigger a re-write of A2 when its relevant\n\nTask C completed, but \"that thing\" being a pre-requisite lead to a change in runtime shape\n-- would trigger a re-write of A1 when relevant as runtime shape changed. \n"},
+		{"id":"ec4f802ae5516c07","x":90,"y":114,"width":250,"height":290,"type":"text","text":"node value = A2\nThis should be a sub task of A.\nfor example:\nIn order to do A, both B and C need to be complete before completing task A2. and functional so we can move forward while still considering \"those\"\n"},
+		{"id":"bd62d0eb415dd574","x":90,"y":520,"width":250,"height":220,"type":"text","text":"node value = A3 \nThis should again be a subtask of A. \n\nfor example:\ndetails needed to complete task B"},
+		{"id":"35d5c279cb23ba48","x":90,"y":960,"width":250,"height":60,"type":"text","text":"node value = A4\ndetails needed to complete task C"},
+		{"id":"4d2a840c40f1eaf4","x":420,"y":914,"width":180,"height":152,"type":"text","text":"pass forward note -- Task C completed, but runtime shape changed"},
+		{"id":"e030683336fed536","x":1220,"y":-297,"width":250,"height":257,"type":"text","text":"node value = C1\n\nagain this should be a decomposition of the main task relatively simple in comparison and broken down into tasks that need to be completed before you can reach this point. "},
+		{"id":"92cccb5f82f9f922","x":800,"y":-297,"width":250,"height":257,"type":"text","text":"node value = B1 \n\nAgain, shouldn't bee too complex of a task, more of an overarching goal defined by decomposing the main goal.\nthis task will most likely be a \"wrap up\" of its sub-tasks "},
+		{"id":"b77f698a274e12bf","x":800,"y":78,"width":250,"height":130,"type":"text","text":"node value = B2 \nshould be a subtask of B, with same expected pattern as the A column"},
+		{"id":"b3d9753c0af40bcc","x":800,"y":374,"width":250,"height":60,"type":"text","text":"node value = B3"},
+		{"id":"fca64e522189f5f6","x":800,"y":600,"width":250,"height":60,"type":"text","text":"node value = B3"},
+		{"id":"c4c997dc097d2108","x":414,"y":404,"width":250,"height":116,"type":"text","text":"nodes should be placed between two nodes who are heavily tied to each others completion.\n\nexample: \nfor node A2 to be completed, we must have first complete A3 & B3"},
+		{"id":"51a7c07f50cf01e3","x":1220,"y":114,"width":250,"height":60,"type":"text","text":"node value = c2"},
+		{"id":"641ef10f4d54ca2c","x":1220,"y":374,"width":250,"height":60,"type":"text","text":"node value = c3"},
+		{"id":"fdc77eed4bee66fe","x":-1120,"y":-645,"width":250,"height":889,"type":"text","text":"value - 0 \nThis node should contain the main plan. \nIt can only be altered if the steps leading up too it end up changing the shape of the end product. \nThis should be a breakdown of each component of the end product and what its intended to do or how its inteded too work ect. any links to informative documentation should be held here as this tab helps define the end goal.\n\n\nexample: to build a thing, we will need it to do the following things... look like the following... and work in the following ways... for us to understand this we should look into.... to build it we will need to assemble the following back end services... For it to be functional the UI should be ... for it to be pleasant to use, we should expect the user to take the following workflow... The expected runtime of the thing is... "}
+	],
+	"edges":[
+		{"id":"804bef12ce7a8f37","fromNode":"fdc77eed4bee66fe","fromSide":"right","toNode":"9d25d022effdbb97","toSide":"left","label":"The X axis, along this axis the main components, or pre-requisites too reaching the goals of node 0 should be decomposed as much as reasonably possible. arrows go both ways to resemble A1 being a final synthesis node. \n\"does it match shape of node 0's goals?\"\n\n"},
+		{"id":"e5e86927b07109d1","fromNode":"9d25d022effdbb97","fromSide":"left","toNode":"fdc77eed4bee66fe","toSide":"right"},
+		{"id":"c017b9b9b6a1aa4f","fromNode":"92cccb5f82f9f922","fromSide":"left","toNode":"9d25d022effdbb97","toSide":"right","label":"arrow direction\nreverses to reflect worklflow"},
+		{"id":"1318dfd7a791bec0","fromNode":"ec4f802ae5516c07","fromSide":"top","toNode":"9d25d022effdbb97","toSide":"bottom","label":"This is a Y axis expansion, these should be subtasks of the larger tasks logged on the X axis. "},
+		{"id":"a15354201521c4bb","fromNode":"af962766705967de","fromSide":"right","toNode":"ec4f802ae5516c07","toSide":"left"},
+		{"id":"35ed0adc497cff30","fromNode":"35d5c279cb23ba48","fromSide":"top","toNode":"bd62d0eb415dd574","toSide":"bottom"},
+		{"id":"4053193bf356354d","fromNode":"bd62d0eb415dd574","fromSide":"top","toNode":"ec4f802ae5516c07","toSide":"bottom"},
+		{"id":"55364a1dc6a60770","fromNode":"35d5c279cb23ba48","fromSide":"right","toNode":"4d2a840c40f1eaf4","toSide":"left"},
+		{"id":"29b306dfe4568b16","fromNode":"4d2a840c40f1eaf4","fromSide":"bottom","toNode":"af962766705967de","toSide":"bottom"},
+		{"id":"f2d0db82d38a5573","fromNode":"b77f698a274e12bf","fromSide":"top","toNode":"92cccb5f82f9f922","toSide":"bottom"},
+		{"id":"25f3bfe43a08b943","fromNode":"e030683336fed536","fromSide":"left","toNode":"92cccb5f82f9f922","toSide":"right"},
+		{"id":"c78e899d889a1075","fromNode":"fca64e522189f5f6","fromSide":"top","toNode":"b3d9753c0af40bcc","toSide":"bottom"},
+		{"id":"7f151afa5955c44d","fromNode":"b3d9753c0af40bcc","fromSide":"top","toNode":"b77f698a274e12bf","toSide":"bottom"},
+		{"id":"5bc6b356dec4ed90","fromNode":"fca64e522189f5f6","fromSide":"left","toNode":"c4c997dc097d2108","toSide":"right"},
+		{"id":"aebefbe1ffe4b274","fromNode":"bd62d0eb415dd574","fromSide":"right","toNode":"c4c997dc097d2108","toSide":"left"},
+		{"id":"b9235eb4c4a2a466","fromNode":"c4c997dc097d2108","fromSide":"top","toNode":"ec4f802ae5516c07","toSide":"right"},
+		{"id":"b3c830b715f633ae","fromNode":"641ef10f4d54ca2c","fromSide":"top","toNode":"51a7c07f50cf01e3","toSide":"bottom"},
+		{"id":"f5ba5338892c68f1","fromNode":"51a7c07f50cf01e3","fromSide":"top","toNode":"e030683336fed536","toSide":"bottom"}
+	]
+}

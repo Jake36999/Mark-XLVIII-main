@@ -1,0 +1,190 @@
+{
+  "created_at": "2026-07-24T19:57:22Z",
+  "items": [
+    {
+      "acceptance_criteria": {
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [],
+      "description": "Analyze config/runtime.json to identify route directories and count local models per route.",
+      "id": "plan_bed971",
+      "idempotency_key": "c4486bb47ea696512c6f869dcc357ee6f9e8487ebc98a973ee4ed524bad8076f",
+      "inputs": {
+        "canvas_node_id": "plan",
+        "canvas_role": "plan"
+      },
+      "max_attempts": 1,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "deterministic",
+      "outputs": {
+        "result": "result.plan_bed971"
+      },
+      "required_outputs": [],
+      "requires_confirmation": false,
+      "resource_class": "io",
+      "retry_safe": true,
+      "risk_tier": "T1",
+      "sequence": 1,
+      "side_effects": "none",
+      "step_type": "gate",
+      "target": "plan_milestone"
+    },
+    {
+      "acceptance_criteria": {
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [
+        "plan_bed971"
+      ],
+      "description": "Locate and parse config/runtime.json to extract route definitions and associated local model configurations.",
+      "id": "research_2c7bf1",
+      "idempotency_key": "1638d2e8270c2feef355d1cddcb325f87869858ca6811cfeb97be32114cb9518",
+      "inputs": {
+        "canvas_node_id": "research",
+        "canvas_role": "research"
+      },
+      "max_attempts": 1,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "cognitive",
+      "outputs": {
+        "result": "result.research_2c7bf1"
+      },
+      "required_outputs": [],
+      "requires_confirmation": false,
+      "resource_class": "model",
+      "retry_safe": true,
+      "risk_tier": "T1",
+      "sequence": 2,
+      "side_effects": "none",
+      "step_type": "model_reasoning",
+      "target": "reasoning"
+    },
+    {
+      "acceptance_criteria": {
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [
+        "research_2c7bf1"
+      ],
+      "description": "Write a read-only script that iterates over routes and counts local models, outputting results per route.",
+      "id": "implementation_797efd",
+      "idempotency_key": "4b73f0a7ee0d9beb76315295445be081d04ee29081a2f28ac3c026aa108b5bc9",
+      "inputs": {
+        "canvas_node_id": "implementation",
+        "canvas_role": "implementation",
+        "intent": "Write a read-only script that iterates over routes and counts local models, outputting results per route.",
+        "operation": "delegate_openclaw"
+      },
+      "max_attempts": 1,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "deterministic",
+      "outputs": {
+        "result": "result.implementation_797efd"
+      },
+      "required_outputs": [],
+      "requires_confirmation": true,
+      "resource_class": "openclaw",
+      "retry_safe": false,
+      "risk_tier": "T3",
+      "sequence": 3,
+      "side_effects": "external_write",
+      "step_type": "tool",
+      "target": "project_operator"
+    },
+    {
+      "acceptance_criteria": {
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [
+        "implementation_797efd"
+      ],
+      "description": "Run the script and validate output matches expected counts per route.",
+      "id": "verification_65279e",
+      "idempotency_key": "16618b153fe76856d589c38c480d575ac2670d09fcb79008fd32739583a66c8e",
+      "inputs": {
+        "canvas_node_id": "verification",
+        "canvas_role": "verification"
+      },
+      "max_attempts": 2,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "deterministic",
+      "outputs": {
+        "result": "result.verification_65279e"
+      },
+      "required_outputs": [],
+      "requires_confirmation": false,
+      "resource_class": "command",
+      "retry_safe": true,
+      "risk_tier": "T2",
+      "sequence": 4,
+      "side_effects": "local_read",
+      "step_type": "command",
+      "target": "pytest_focused"
+    },
+    {
+      "acceptance_criteria": {
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [
+        "verification_65279e"
+      ],
+      "description": "Review script for correctness, readability, and adherence to read-only requirement.",
+      "id": "review_61e62b",
+      "idempotency_key": "5afa37155445769b7549d890e83efc4b09308d8ad50b338ab7535ef281d2395f",
+      "inputs": {
+        "canvas_node_id": "review",
+        "canvas_role": "review",
+        "evidence": [
+          {
+            "bind": {
+              "from_step": "verification_65279e",
+              "path": "result.summary"
+            }
+          }
+        ]
+      },
+      "max_attempts": 1,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "cognitive",
+      "outputs": {
+        "result": "result.review_61e62b"
+      },
+      "required_outputs": [],
+      "requires_confirmation": false,
+      "resource_class": "model",
+      "retry_safe": true,
+      "risk_tier": "T1",
+      "sequence": 5,
+      "side_effects": "none",
+      "step_type": "review",
+      "target": "reviewer"
+    }
+  ],
+  "manifest_hash": "84ff3c9c0e6d1922eed512933ffc74c649cc6621917480a169203cc96e9666df",
+  "preflight": {
+    "checked_at": "2026-07-24T19:57:22Z",
+    "checks": [
+      {
+        "command_id": "pytest_focused",
+        "item_id": "verification_65279e",
+        "ok": true
+      }
+    ],
+    "ok": true
+  },
+  "preview_only": false,
+  "schema_version": "jarvis_work_manifest/v1",
+  "workflow_hash": "71dae83778f9fb80527ecfe377e3bb617c7d199e5995310262eee29096362a35",
+  "workflow_id": "ws4b_live_test3",
+  "workflow_version": "canvas-1"
+}

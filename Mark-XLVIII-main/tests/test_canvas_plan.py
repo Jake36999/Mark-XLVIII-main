@@ -193,6 +193,148 @@ class CompileCanvasTests(unittest.TestCase):
             canvas_plan.compile_canvas({"nodes": [], "edges": []}, workflow_id="empty", name="Empty")
 
 
+class NoteRoleAndBranchCompileTests(unittest.TestCase):
+    """WS4c: pass-forward notes are canvas-only, never a compiled step, and a
+    real step's depends_on resolves through them to the real upstream node."""
+
+    def test_note_is_excluded_and_downstream_depends_on_resolves_through_it(self):
+        payload = {
+            "nodes": [
+                _node("a", "role: research\nInvestigate.", role="research"),
+                _node("n", "role: note\nTask C completed, runtime shape changed.", role="note"),
+                _node("r", "role: review\nReconsider the plan.", role="review"),
+            ],
+            "edges": [_edge("e1", "a", "n"), _edge("e2", "n", "r")],
+        }
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="notes", name="Notes")
+
+        step_ids = {step["step_id"] for step in workflow["steps"]}
+        self.assertEqual(len(workflow["steps"]), 2)  # the note never becomes a step
+        self.assertNotIn(canvas_plan.node_step_id("n"), step_ids)
+
+        review_step = next(s for s in workflow["steps"] if s["step_type"] == "review")
+        research_step_id = canvas_plan.node_step_id("a")
+        self.assertEqual(review_step["depends_on"], [research_step_id])
+
+        # the compiled workflow must still pass the real orchestrator validator
+        validate_workflow(workflow)
+
+    def test_note_chain_resolves_through_multiple_notes(self):
+        payload = {
+            "nodes": [
+                _node("a", "role: research\nInvestigate.", role="research"),
+                _node("n1", "role: note\nFirst fact.", role="note"),
+                _node("n2", "role: note\nSecond fact, derived from the first.", role="note"),
+                _node("r", "role: review\nReconsider.", role="review"),
+            ],
+            "edges": [_edge("e1", "a", "n1"), _edge("e2", "n1", "n2"), _edge("e3", "n2", "r")],
+        }
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="notechain", name="NoteChain")
+
+        self.assertEqual(len(workflow["steps"]), 2)
+        review_step = next(s for s in workflow["steps"] if s["step_type"] == "review")
+        self.assertEqual(review_step["depends_on"], [canvas_plan.node_step_id("a")])
+
+    def test_note_with_no_downstream_consumer_still_compiles(self):
+        payload = {
+            "nodes": [
+                _node("a", "role: research\nInvestigate.", role="research"),
+                _node("n", "role: note\nAn observation nobody reacts to.", role="note"),
+            ],
+            "edges": [_edge("e1", "a", "n")],
+        }
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="danglingnote", name="DanglingNote")
+        self.assertEqual(len(workflow["steps"]), 1)
+        validate_workflow(workflow)
+
+    def test_note_role_resolves_from_hashtag_and_alias(self):
+        payload = {
+            "nodes": [
+                _node("a", "role: research\nInvestigate.", role="research"),
+                {"id": "n", "type": "text", "text": "#note\nAn aside.", "x": 0, "y": 0, "width": 400, "height": 180},
+                _node("b", "role: annotation\nAlso an aside.", role="annotation"),
+            ],
+            "edges": [_edge("e1", "a", "n"), _edge("e2", "n", "b")],
+        }
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="notealias", name="NoteAlias")
+        # both "n" (hashtag) and "b" (alias) resolve to role "note" -- neither compiles
+        self.assertEqual(len(workflow["steps"]), 1)
+
+
+class DecomposeValidationBranchTests(unittest.TestCase):
+    """WS4c: minimal, format-only validation of the optional `branch` field
+    in a raw (not-yet-assembled) model decomposition response."""
+
+    def _payload_with_branch(self, branch) -> dict:
+        node = {"id": "a", "role": "research", "prose": "Do a thing.", "depends_on": ["root"]}
+        if branch is not None:
+            node["directives"] = {"branch": branch}
+        return {
+            "nodes": [
+                {"id": "root", "role": "plan", "prose": "Goal.", "depends_on": []},
+                node,
+            ],
+        }
+
+    def test_valid_branch_value_is_accepted(self):
+        problems = canvas_plan._validate_decomposition(self._payload_with_branch("A"))
+        self.assertEqual(problems, [])
+
+    def test_missing_branch_is_fine(self):
+        problems = canvas_plan._validate_decomposition(self._payload_with_branch(None))
+        self.assertEqual(problems, [])
+
+    def test_empty_branch_value_is_rejected(self):
+        problems = canvas_plan._validate_decomposition(self._payload_with_branch("   "))
+        self.assertTrue(any("invalid branch value" in p for p in problems))
+
+    def test_overlong_branch_value_is_rejected(self):
+        problems = canvas_plan._validate_decomposition(self._payload_with_branch("x" * 41))
+        self.assertTrue(any("invalid branch value" in p for p in problems))
+
+
+class DecomposeValidationDeliverablesTests(unittest.TestCase):
+    """WS4d: minimal, format-only validation of the optional `deliverables`
+    field in a raw (not-yet-assembled) model decomposition response."""
+
+    def _payload_with_deliverables(self, deliverables) -> dict:
+        node = {"id": "a", "role": "implementation", "prose": "Build it.", "depends_on": ["root"]}
+        if deliverables is not None:
+            node["deliverables"] = deliverables
+        return {
+            "nodes": [
+                {"id": "root", "role": "plan", "prose": "Goal.", "depends_on": []},
+                node,
+            ],
+        }
+
+    def test_valid_deliverables_are_accepted(self):
+        problems = canvas_plan._validate_decomposition(
+            self._payload_with_deliverables(["The script exists at scripts/foo.py.", "It prints a summary."])
+        )
+        self.assertEqual(problems, [])
+
+    def test_missing_deliverables_is_fine(self):
+        problems = canvas_plan._validate_decomposition(self._payload_with_deliverables(None))
+        self.assertEqual(problems, [])
+
+    def test_non_list_deliverables_is_rejected(self):
+        problems = canvas_plan._validate_decomposition(self._payload_with_deliverables("just a string"))
+        self.assertTrue(any("invalid deliverables list" in p for p in problems))
+
+    def test_too_many_deliverables_is_rejected(self):
+        problems = canvas_plan._validate_decomposition(self._payload_with_deliverables([f"item {i}" for i in range(6)]))
+        self.assertTrue(any("invalid deliverables list" in p for p in problems))
+
+    def test_empty_deliverable_entry_is_rejected(self):
+        problems = canvas_plan._validate_decomposition(self._payload_with_deliverables(["Real one.", "   "]))
+        self.assertTrue(any("malformed deliverable entry" in p for p in problems))
+
+    def test_overlong_deliverable_entry_is_rejected(self):
+        problems = canvas_plan._validate_decomposition(self._payload_with_deliverables(["x" * 201]))
+        self.assertTrue(any("malformed deliverable entry" in p for p in problems))
+
+
 class NodeDirectiveParsingTests(unittest.TestCase):
     """WS1 (2026-07-24 planning roadmap, D1): a node's leading `key: value`
     lines are directives; everything after is the agent's actual prompt."""
@@ -369,6 +511,146 @@ class CompileCanvasDirectiveWiringTests(unittest.TestCase):
         self.assertEqual(workflow["steps"][0]["inputs"]["recommended_model"], "developer (openclaw)")
         # Inert: it doesn't change the role, target, or any other compiled field.
         self.assertEqual(workflow["steps"][0]["target"], "project_operator")
+
+
+class ContextPreambleTests(unittest.TestCase):
+    """WS4d: deterministic, compile-time-only context inheritance -- no
+    model call, assembled purely from prose already on the canvas."""
+
+    def _step(self, workflow: dict, node_id: str) -> dict:
+        return next(s for s in workflow["steps"] if s["step_id"] == canvas_plan.node_step_id(node_id))
+
+    def test_single_node_plan_gets_no_preamble(self):
+        payload = {"nodes": [_node("root", "role: plan\nShip it.", role="plan")], "edges": []}
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="solo")
+        # the plan node itself is never a _CONTEXT_PREAMBLE_ROLES role, so
+        # nothing to check on inputs.prompt/intent -- just confirm no crash
+        # and no context_injected marker anywhere.
+        self.assertNotIn("context_injected", workflow["steps"][0]["inputs"])
+
+    def test_single_branch_research_gets_system_goal_only(self):
+        payload = {
+            "nodes": [
+                _node("root", "role: plan\nShip the login page.", role="plan"),
+                _node("r", "role: research\nInvestigate options.", role="research"),
+            ],
+            "edges": [_edge("e1", "root", "r")],
+        }
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="single_branch")
+        r_step = self._step(workflow, "r")
+        self.assertTrue(r_step["inputs"]["context_injected"])
+        self.assertIn("System goal: Ship the login page.", r_step["inputs"]["prompt"])
+        self.assertIn("Investigate options.", r_step["inputs"]["prompt"])
+        # no branch/sibling lines for a single-branch plan
+        self.assertNotIn("component", r_step["inputs"]["prompt"])
+
+    def test_multi_branch_node_gets_own_and_sibling_branch_lines(self):
+        payload = {
+            "nodes": [
+                _node("root", "role: plan\nShip the notification feature.", role="plan"),
+                _node("a_root", "role: implementation\nbranch: A\nBuild the detector.", role="implementation"),
+                _node(
+                    "a_sub",
+                    "role: research\nbranch: A\nInvestigate process-trace events.",
+                    role="research",
+                ),
+                _node("b_root", "role: implementation\nbranch: B\nBuild the TTS delivery.", role="implementation"),
+            ],
+            "edges": [_edge("e1", "a_sub", "a_root"), _edge("e2", "root", "a_sub"), _edge("e3", "root", "b_root")],
+        }
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="multi_branch")
+        a_sub_step = self._step(workflow, "a_sub")
+        prompt = a_sub_step["inputs"]["prompt"]
+        self.assertIn("System goal: Ship the notification feature.", prompt)
+        self.assertIn("component A: Build the detector.", prompt)
+        self.assertIn("component B: Build the TTS delivery.", prompt)
+
+    def test_branch_root_does_not_reference_itself(self):
+        payload = {
+            "nodes": [
+                _node("root", "role: plan\nShip it.", role="plan"),
+                _node("a_root", "role: implementation\nbranch: A\nBuild the thing.", role="implementation"),
+            ],
+            "edges": [_edge("e1", "root", "a_root")],
+        }
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="root_self")
+        a_root_step = self._step(workflow, "a_root")
+        intent = a_root_step["inputs"]["intent"]
+        # a_root IS branch A's root -- must not describe itself as "part of component A: Build the thing."
+        self.assertNotIn("This step is part of component A", intent)
+        self.assertIn("System goal: Ship it.", intent)
+
+    def test_preamble_fields_are_truncated_to_budget(self):
+        long_goal = "x" * 500
+        payload = {
+            "nodes": [
+                _node("root", f"role: plan\n{long_goal}", role="plan"),
+                _node("r", "role: research\nDo it.", role="research"),
+            ],
+            "edges": [_edge("e1", "root", "r")],
+        }
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="truncate")
+        prompt = self._step(workflow, "r")["inputs"]["prompt"]
+        system_line = next(line for line in prompt.splitlines() if line.startswith("System goal:"))
+        self.assertLessEqual(len(system_line), len("System goal: ") + canvas_plan._PREAMBLE_FIELD_BUDGET)
+
+    def test_verification_and_reference_roles_get_no_preamble(self):
+        payload = {
+            "nodes": [
+                _node("root", "role: plan\nShip it.", role="plan"),
+                _node("v", "role: verification\nRun tests.", role="verification"),
+                _node("f", "role: reference\nSee the docs.", role="reference"),
+            ],
+            "edges": [_edge("e1", "root", "v"), _edge("e2", "root", "f")],
+        }
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="no_preamble_roles")
+        self.assertNotIn("context_injected", self._step(workflow, "v")["inputs"])
+        self.assertNotIn("context_injected", self._step(workflow, "f")["inputs"])
+
+    def test_evidence_extends_to_research_and_implementation_for_reliable_dependencies(self):
+        payload = {
+            "nodes": [
+                _node("r", "role: research\nInvestigate.", role="research"),
+                _node("i", "role: implementation\nBuild it.", role="implementation"),
+            ],
+            "edges": [_edge("e1", "r", "i")],
+        }
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="evidence_extend")
+        i_step = self._step(workflow, "i")
+        r_step_id = canvas_plan.node_step_id("r")
+        self.assertEqual(
+            i_step["inputs"]["evidence"],
+            [{"bind": {"from_step": r_step_id, "path": "result.summary"}}],
+        )
+
+    def test_evidence_is_not_bound_to_unreliably_shaped_dependency(self):
+        # a review depending on a verification (command-shaped result, no
+        # reliable `summary` key) must not get a binding that would just
+        # silently resolve to None at runtime.
+        payload = {
+            "nodes": [
+                _node("v", "role: verification\nRun tests.", role="verification"),
+                _node("rev", "role: review\nReview the results.", role="review"),
+            ],
+            "edges": [_edge("e1", "v", "rev")],
+        }
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="unreliable_evidence")
+        rev_step = self._step(workflow, "rev")
+        self.assertNotIn("evidence", rev_step["inputs"])
+
+    def test_resolved_target_summary_shows_context_indicator(self):
+        payload = {
+            "nodes": [
+                _node("root", "role: plan\nShip the login page.", role="plan"),
+                _node("r", "role: research\nInvestigate options.", role="research"),
+            ],
+            "edges": [_edge("e1", "root", "r")],
+        }
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="preview_indicator")
+        r_step = self._step(workflow, "r")
+        self.assertIn("+ context", canvas_plan._resolved_target_summary(r_step))
+        root_step = self._step(workflow, "root")
+        self.assertNotIn("+ context", canvas_plan._resolved_target_summary(root_step))
 
 
 class PreviewResolvedTargetTests(unittest.TestCase):
@@ -1675,6 +1957,455 @@ class DecomposeGoalToCanvasTests(unittest.TestCase):
 
             self.assertTrue(result["ok"], result)
             self.assertTrue(Path(result["canvas_path"]).name, "custom_name.canvas")
+
+
+class DecomposeBranchAndNoteTests(unittest.TestCase):
+    """WS4c: a multi-branch decomposition round-trips through
+    decompose_goal_to_canvas -- branch mirrored to a top-level key, note
+    nodes excluded only at compile time (still present in the canvas)."""
+
+    def _branched_payload(self) -> dict:
+        return {
+            "nodes": [
+                {"id": "root", "role": "plan", "prose": "Ship a login page with OAuth.", "depends_on": []},
+                {
+                    "id": "b_login_ui",
+                    "role": "research",
+                    "directives": {"branch": "B"},
+                    "prose": "Design the login page UI.",
+                    "depends_on": ["root"],
+                },
+                {
+                    "id": "a_oauth_flow",
+                    "role": "research",
+                    "directives": {"branch": "A"},
+                    "prose": "Investigate the OAuth provider's flow.",
+                    "depends_on": ["b_login_ui"],
+                },
+                {
+                    "id": "a_oauth_note",
+                    "role": "note",
+                    "directives": {"branch": "A"},
+                    "prose": "The provider requires a callback URL registered up front.",
+                    "depends_on": ["a_oauth_flow"],
+                },
+                {
+                    "id": "b_review_callback",
+                    "role": "review",
+                    "directives": {"branch": "B"},
+                    "prose": "Reconsider the login UI given the callback URL requirement.",
+                    "depends_on": ["a_oauth_note"],
+                },
+            ],
+            "rationale": "Two branches: OAuth investigation (A) feeds a note back to the login UI branch (B).",
+        }
+
+    def test_branch_directive_is_mirrored_to_a_top_level_key(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            cfg = _cfg(Path(tmp))
+            with mock.patch("core.model_router.call_text", return_value=json.dumps(self._branched_payload())):
+                result = canvas_plan.decompose_goal_to_canvas("Ship a login page with OAuth", cfg=cfg)
+
+            self.assertTrue(result["ok"], result)
+            document = canvas.load_canvas(Path(result["canvas_path"]))
+            by_id = {node["id"]: node for node in document["nodes"]}
+            self.assertEqual(by_id["a_oauth_flow"]["branch"], "A")
+            self.assertEqual(by_id["b_login_ui"]["branch"], "B")
+            self.assertIn("branch: A", by_id["a_oauth_flow"]["text"])
+
+            # a note node still exists as a real canvas node (readable by a
+            # human/critique-model) even though compile_canvas will exclude
+            # it from the executed steps
+            note_node = by_id["a_oauth_note"]
+            self.assertIn("role: note", note_node["text"])
+
+            # the canvas as a whole must still compile cleanly, with the
+            # review's depends_on resolving through the note
+            workflow = canvas_plan.compile_canvas(document, workflow_id="branched", name="Branched")
+            review_step = next(s for s in workflow["steps"] if s["step_type"] == "review")
+            oauth_step_id = canvas_plan.node_step_id("a_oauth_flow")
+            self.assertEqual(review_step["depends_on"], [oauth_step_id])
+
+    def test_two_branches_land_in_distinct_columns_after_layout(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            cfg = _cfg(Path(tmp))
+            with mock.patch("core.model_router.call_text", return_value=json.dumps(self._branched_payload())):
+                result = canvas_plan.decompose_goal_to_canvas("Ship a login page with OAuth", cfg=cfg)
+
+            document = canvas.load_canvas(Path(result["canvas_path"]))
+            by_id = {node["id"]: node for node in document["nodes"]}
+            a_x = by_id["a_oauth_flow"]["x"]
+            b_x = by_id["b_login_ui"]["x"]
+            self.assertNotEqual(a_x, b_x)
+
+
+class DecomposeDeliverablesTests(unittest.TestCase):
+    """WS4d: deliverables round-trip through decompose_goal_to_canvas into
+    real acceptance_criteria, and are surfaced to the critique pass."""
+
+    def _payload_with_deliverables(self) -> dict:
+        return {
+            "nodes": [
+                {"id": "root", "role": "plan", "prose": "Ship the report script.", "depends_on": []},
+                {
+                    "id": "build_script",
+                    "role": "implementation",
+                    "prose": "Write the report-generating script.",
+                    "depends_on": ["root"],
+                    "deliverables": ["A script exists at scripts/report.py.", "Running it prints a summary table."],
+                },
+            ],
+        }
+
+    def test_deliverables_are_mirrored_and_rendered_in_text(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            cfg = _cfg(Path(tmp))
+            with mock.patch("core.model_router.call_text", return_value=json.dumps(self._payload_with_deliverables())):
+                result = canvas_plan.decompose_goal_to_canvas("Ship the report script", cfg=cfg)
+
+            self.assertTrue(result["ok"], result)
+            document = canvas.load_canvas(Path(result["canvas_path"]))
+            by_id = {node["id"]: node for node in document["nodes"]}
+            build_node = by_id["build_script"]
+            self.assertEqual(
+                build_node["deliverables"],
+                ["A script exists at scripts/report.py.", "Running it prints a summary table."],
+            )
+            self.assertIn("Deliverables:", build_node["text"])
+            self.assertIn("A script exists at scripts/report.py.", build_node["text"])
+
+    def test_deliverables_compile_into_real_acceptance_criteria(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            cfg = _cfg(Path(tmp))
+            with mock.patch("core.model_router.call_text", return_value=json.dumps(self._payload_with_deliverables())):
+                result = canvas_plan.decompose_goal_to_canvas("Ship the report script", cfg=cfg)
+
+            document = canvas.load_canvas(Path(result["canvas_path"]))
+            workflow = canvas_plan.compile_canvas(document, workflow_id="deliverables_test")
+            build_step = next(s for s in workflow["steps"] if s["step_type"] == "tool")
+            self.assertEqual(
+                build_step["acceptance_criteria"]["deliverables"],
+                ["A script exists at scripts/report.py.", "Running it prints a summary table."],
+            )
+
+    def test_deliverables_surface_in_critique_summary(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            cfg = _cfg(Path(tmp))
+            with mock.patch("core.model_router.call_text", return_value=json.dumps(self._payload_with_deliverables())):
+                result = canvas_plan.decompose_goal_to_canvas("Ship the report script", cfg=cfg)
+
+            document = canvas.load_canvas(Path(result["canvas_path"]))
+            summary = canvas_plan._plan_summary_for_critique(document)
+            build_entry = next(item for item in summary if item["id"] == "build_script")
+            self.assertEqual(
+                build_entry["deliverables"],
+                ["A script exists at scripts/report.py.", "Running it prints a summary table."],
+            )
+
+    def test_node_without_deliverables_gets_bare_acceptance_criteria(self):
+        payload = {
+            "nodes": [_node("a", "role: research\nInvestigate.", role="research")],
+            "edges": [],
+        }
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="no_deliverables")
+        self.assertEqual(workflow["steps"][0]["acceptance_criteria"], {"required": True})
+
+    def test_bare_string_deliverable_is_coerced_not_rejected(self):
+        # Caught live: the model reliably writes a single deliverable as a
+        # bare string despite the schema showing an array. Coerce rather
+        # than fail the whole decomposition over one forgivable format slip.
+        payload = {
+            "nodes": [
+                {"id": "root", "role": "plan", "prose": "Ship it.", "depends_on": []},
+                {
+                    "id": "build",
+                    "role": "implementation",
+                    "prose": "Build it.",
+                    "depends_on": ["root"],
+                    "deliverables": "config loaded into memory as Python dict.",
+                },
+            ],
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            cfg = _cfg(Path(tmp))
+            with mock.patch("core.model_router.call_text", return_value=json.dumps(payload)):
+                result = canvas_plan.decompose_goal_to_canvas("Ship it", cfg=cfg)
+
+            self.assertTrue(result["ok"], result)
+            document = canvas.load_canvas(Path(result["canvas_path"]))
+            by_id = {node["id"]: node for node in document["nodes"]}
+            self.assertEqual(by_id["build"]["deliverables"], ["config loaded into memory as Python dict."])
+
+
+def _critique_json(verdict: str, *, missing_steps=None, concerns=None, rationale: str = "") -> str:
+    return json.dumps(
+        {
+            "verdict": verdict,
+            "missing_steps": missing_steps or [],
+            "concerns": concerns or [],
+            "rationale": rationale or f"Verdict is {verdict}.",
+        }
+    )
+
+
+class CritiqueCanvasPlanTests(unittest.TestCase):
+    """WS4b: the plan-level critique pass (extends T5's per-node review)."""
+
+    def _write_plan_canvas(self, root: Path) -> Path:
+        path = root / "Canvases" / "JARVIS" / "plan.canvas"
+        payload = {
+            "nodes": [
+                _node("root", "role: plan\nShip the thing.", role="plan"),
+                _node("a", "role: research\nInvestigate.", role="research"),
+            ],
+            "edges": [_edge("e1", "root", "a")],
+        }
+        canvas.write_canvas(path, payload)
+        return path
+
+    def test_well_formed_critique_is_parsed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            cfg = _cfg(root)
+            canvas_path = self._write_plan_canvas(root)
+            response = _critique_json(
+                "caution", concerns=["No rollback step if the change fails."], rationale="Usable but risky."
+            )
+            with mock.patch("core.model_router.call_text", return_value=response) as call_text:
+                result = canvas_plan.critique_canvas_plan(canvas_path, goal="Ship the thing", cfg=cfg)
+
+            self.assertTrue(result["ok"], result)
+            self.assertEqual(result["verdict"], "caution")
+            self.assertEqual(result["concerns"], ["No rollback step if the change fails."])
+            self.assertEqual(result["rationale"], "Usable but risky.")
+            self.assertEqual(call_text.call_args.kwargs["role"], "planner")
+            # the critic sees the plan's actual structure, not just the goal text
+            prompt_arg = call_text.call_args.args[0]
+            self.assertIn('"role": "research"', prompt_arg.replace("'", '"'))
+
+    def test_non_json_response_is_rejected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            cfg = _cfg(root)
+            canvas_path = self._write_plan_canvas(root)
+            with mock.patch("core.model_router.call_text", return_value="Looks fine to me!"):
+                result = canvas_plan.critique_canvas_plan(canvas_path, cfg=cfg)
+
+        self.assertFalse(result["ok"])
+        self.assertIn("not parseable JSON", result["error"])
+
+    def test_unrecognised_verdict_is_rejected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            cfg = _cfg(root)
+            canvas_path = self._write_plan_canvas(root)
+            with mock.patch("core.model_router.call_text", return_value=_critique_json("maybe")):
+                result = canvas_plan.critique_canvas_plan(canvas_path, cfg=cfg)
+
+        self.assertFalse(result["ok"])
+        self.assertIn("unrecognised verdict", result["error"])
+
+    def test_verification_before_implementation_escalates_even_if_the_model_approves(self):
+        # Caught live: the model itself rubber-stamped a plan where the
+        # verification node ran before the implementation node it was meant
+        # to verify even existed. Deterministic backstop must catch this
+        # regardless of what the model says.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            cfg = _cfg(root)
+            path = root / "Canvases" / "JARVIS" / "bad_order.canvas"
+            payload = {
+                "nodes": [
+                    _node("root", "role: plan\nShip it.", role="plan"),
+                    _node("verify", "role: verification\nRun the tests.", role="verification"),
+                    _node("build", "role: implementation\nBuild it.", role="implementation"),
+                ],
+                "edges": [_edge("e1", "root", "verify"), _edge("e2", "verify", "build")],
+            }
+            canvas.write_canvas(path, payload)
+            with mock.patch(
+                "core.model_router.call_text",
+                return_value=_critique_json("approve", rationale="Looks fine."),
+            ):
+                result = canvas_plan.critique_canvas_plan(path, cfg=cfg)
+
+            self.assertTrue(result["ok"], result)
+            self.assertEqual(result["verdict"], "re_review")
+            self.assertTrue(any("does not depend" in c for c in result["concerns"]))
+
+    def test_correctly_ordered_verification_does_not_trigger_the_backstop(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            cfg = _cfg(root)
+            path = root / "Canvases" / "JARVIS" / "good_order.canvas"
+            payload = {
+                "nodes": [
+                    _node("root", "role: plan\nShip it.", role="plan"),
+                    _node("build", "role: implementation\nBuild it.", role="implementation"),
+                    _node("verify", "role: verification\nRun the tests.", role="verification"),
+                ],
+                "edges": [_edge("e1", "root", "build"), _edge("e2", "build", "verify")],
+            }
+            canvas.write_canvas(path, payload)
+            with mock.patch(
+                "core.model_router.call_text",
+                return_value=_critique_json("approve", rationale="Looks fine."),
+            ):
+                result = canvas_plan.critique_canvas_plan(path, cfg=cfg)
+
+            self.assertTrue(result["ok"], result)
+            self.assertEqual(result["verdict"], "approve")
+            self.assertEqual(result["concerns"], [])
+
+    def test_empty_canvas_is_rejected_without_calling_the_model(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            cfg = _cfg(root)
+            path = root / "Canvases" / "JARVIS" / "empty.canvas"
+            canvas.write_canvas(path, {"nodes": [], "edges": []})
+            with mock.patch("core.model_router.call_text") as call_text:
+                result = canvas_plan.critique_canvas_plan(path, cfg=cfg)
+
+        self.assertFalse(result["ok"])
+        call_text.assert_not_called()
+
+
+class CritiqueAndProposePlanTests(unittest.TestCase):
+    """WS4b: D5's weighted refine loop -- decompose -> critique -> (re_review
+    loops, caution/reject pull a human in) -> propose."""
+
+    def _decompose_json(self, *, second_node_id: str = "a") -> str:
+        return json.dumps(
+            {
+                "nodes": [
+                    {"id": "root", "role": "plan", "prose": "Ship it.", "depends_on": []},
+                    {"id": second_node_id, "role": "research", "prose": "Look into it.", "depends_on": ["root"]},
+                ],
+                "rationale": "Simple two-step plan.",
+            }
+        )
+
+    def test_approve_verdict_proposes_the_plan(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            cfg = _cfg(root)
+            with mock.patch(
+                "core.model_router.call_text",
+                side_effect=[self._decompose_json(), _critique_json("approve", rationale="Looks complete.")],
+            ):
+                result = canvas_plan.critique_and_propose_plan("Ship the thing", workflow_id="demo", cfg=cfg)
+
+            self.assertTrue(result["ok"], result)
+            self.assertTrue(result["proposed"])
+            self.assertEqual(result["verdict"], "approve")
+            self.assertTrue(Path(result["note_path"]).exists())
+            self.assertTrue(Path(result["critique_note_path"]).exists())
+            critique_text = Path(result["critique_note_path"]).read_text(encoding="utf-8")
+            self.assertIn("Looks complete.", critique_text)
+            # D5: the critique is a linked Obsidian note connected to the plan --
+            # always, not only when there's something to warn about.
+            approval_text = Path(result["note_path"]).read_text(encoding="utf-8")
+            critique_stem = Path(result["critique_note_path"]).stem
+            self.assertIn(f"[[{critique_stem}]]", approval_text)
+            self.assertNotIn("Plan critique flagged a concern", approval_text)
+
+    def test_caution_verdict_proposes_with_a_warning_callout(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            cfg = _cfg(root)
+            with mock.patch(
+                "core.model_router.call_text",
+                side_effect=[
+                    self._decompose_json(),
+                    _critique_json("caution", rationale="No rollback plan.", concerns=["No rollback plan."]),
+                ],
+            ):
+                result = canvas_plan.critique_and_propose_plan("Ship the thing", workflow_id="demo", cfg=cfg)
+
+            self.assertTrue(result["proposed"])
+            self.assertEqual(result["verdict"], "caution")
+            approval_text = Path(result["note_path"]).read_text(encoding="utf-8")
+            self.assertIn("Plan critique flagged a concern", approval_text)
+            self.assertIn("No rollback plan.", approval_text)
+            critique_stem = Path(result["critique_note_path"]).stem
+            self.assertIn(f"[[{critique_stem}]]", approval_text)
+
+    def test_reject_verdict_does_not_propose(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            cfg = _cfg(root)
+            with mock.patch(
+                "core.model_router.call_text",
+                side_effect=[self._decompose_json(), _critique_json("reject", rationale="Goal is unclear.")],
+            ):
+                result = canvas_plan.critique_and_propose_plan("Ship the thing", workflow_id="demo", cfg=cfg)
+
+            self.assertTrue(result["ok"], result)
+            self.assertFalse(result["proposed"])
+            self.assertEqual(result["verdict"], "reject")
+            self.assertTrue(Path(result["critique_note_path"]).exists())
+            # the critique note itself lives in Plans/, but no approval note
+            # should have been created -- reject must not call propose
+            self.assertFalse((root / "Plans" / "canvas-approval-demo.md").exists())
+
+    def test_re_review_loops_back_and_then_approves(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            cfg = _cfg(root)
+            responses = [
+                self._decompose_json(second_node_id="a"),
+                _critique_json("re_review", missing_steps=["add a verification step"], rationale="Missing verification."),
+                self._decompose_json(second_node_id="b"),
+                _critique_json("approve", rationale="Now complete."),
+            ]
+            with mock.patch("core.model_router.call_text", side_effect=responses) as call_text:
+                result = canvas_plan.critique_and_propose_plan(
+                    "Ship the thing", workflow_id="demo", max_rewrites=2, cfg=cfg
+                )
+
+            self.assertTrue(result["proposed"])
+            self.assertEqual(result["verdict"], "approve")
+            # both critique revisions should exist as separate linked notes
+            self.assertTrue((root / "Plans" / "canvas-critique-demo-r1.md").exists())
+            self.assertTrue((root / "Plans" / "canvas-critique-demo-r2.md").exists())
+            # the rewrite's decompose call must have seen the critique's own feedback
+            second_decompose_prompt = call_text.call_args_list[2].args[0]
+            self.assertIn("add a verification step", second_decompose_prompt)
+
+    def test_re_review_exhausting_rewrite_budget_is_treated_as_reject(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            cfg = _cfg(root)
+            responses = [
+                self._decompose_json(second_node_id="a"),
+                _critique_json("re_review", missing_steps=["still missing something"]),
+                self._decompose_json(second_node_id="b"),
+                _critique_json("re_review", missing_steps=["still missing something"]),
+            ]
+            with mock.patch("core.model_router.call_text", side_effect=responses):
+                result = canvas_plan.critique_and_propose_plan(
+                    "Ship the thing", workflow_id="demo", max_rewrites=1, cfg=cfg
+                )
+
+            self.assertTrue(result["ok"], result)
+            self.assertFalse(result["proposed"])
+            self.assertEqual(result["verdict"], "re_review")
+            self.assertTrue((root / "Plans" / "canvas-critique-demo-r1.md").exists())
+            self.assertTrue((root / "Plans" / "canvas-critique-demo-r2.md").exists())
+            self.assertFalse((root / "Plans" / "canvas-approval-demo.md").exists())
+
+    def test_critique_failure_short_circuits_without_proposing(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            cfg = _cfg(root)
+            with mock.patch(
+                "core.model_router.call_text", side_effect=[self._decompose_json(), "not json at all"]
+            ):
+                result = canvas_plan.critique_and_propose_plan("Ship the thing", workflow_id="demo", cfg=cfg)
+
+            self.assertFalse(result["ok"])
+            self.assertIn("canvas_path", result)
+            self.assertFalse((root / "Plans").exists())
 
 
 if __name__ == "__main__":

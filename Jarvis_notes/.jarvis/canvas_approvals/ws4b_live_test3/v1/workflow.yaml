@@ -1,0 +1,115 @@
+schema_version: jarvis_dual_orchestrator/v1
+workflow_id: ws4b_live_test3
+version: canvas-1
+name: Write a small read-only script that reports how many local models are configured
+description: Compiled from an Obsidian Canvas graph (Mode 2 planning).
+max_steps: 5
+variables:
+  source: canvas
+  node_step_ids:
+    plan: plan_bed971
+    research: research_2c7bf1
+    implementation: implementation_797efd
+    verification: verification_65279e
+    review: review_61e62b
+steps:
+- step_id: plan_bed971
+  orchestrator: deterministic
+  step_type: gate
+  target: plan_milestone
+  description: Analyze config/runtime.json to identify route directories and count
+    local models per route.
+  risk_tier: T1
+  side_effects: none
+  depends_on: []
+  inputs:
+    canvas_role: plan
+    canvas_node_id: plan
+  outputs:
+    result: result.plan_bed971
+  acceptance_criteria:
+    required: true
+- step_id: research_2c7bf1
+  orchestrator: cognitive
+  step_type: model_reasoning
+  target: reasoning
+  description: Locate and parse config/runtime.json to extract route definitions and
+    associated local model configurations.
+  risk_tier: T1
+  side_effects: none
+  depends_on:
+  - plan_bed971
+  inputs:
+    canvas_role: research
+    canvas_node_id: research
+  outputs:
+    result: result.research_2c7bf1
+  acceptance_criteria:
+    required: true
+- step_id: implementation_797efd
+  orchestrator: deterministic
+  step_type: tool
+  target: project_operator
+  description: Write a read-only script that iterates over routes and counts local
+    models, outputting results per route.
+  risk_tier: T3
+  side_effects: external_write
+  depends_on:
+  - research_2c7bf1
+  inputs:
+    canvas_role: implementation
+    canvas_node_id: implementation
+    operation: delegate_openclaw
+    intent: Write a read-only script that iterates over routes and counts local models,
+      outputting results per route.
+  outputs:
+    result: result.implementation_797efd
+  acceptance_criteria:
+    required: true
+  requires_confirmation: true
+  retry_policy:
+    safe: false
+    max_attempts: 1
+  on_failure: halt
+- step_id: verification_65279e
+  orchestrator: deterministic
+  step_type: command
+  target: pytest_focused
+  description: Run the script and validate output matches expected counts per route.
+  risk_tier: T2
+  side_effects: local_read
+  depends_on:
+  - implementation_797efd
+  inputs:
+    canvas_role: verification
+    canvas_node_id: verification
+  outputs:
+    result: result.verification_65279e
+  acceptance_criteria:
+    required: true
+  requires_confirmation: false
+  retry_policy:
+    safe: true
+    max_attempts: 2
+  on_failure: halt
+- step_id: review_61e62b
+  orchestrator: cognitive
+  step_type: review
+  target: reviewer
+  description: Review script for correctness, readability, and adherence to read-only
+    requirement.
+  risk_tier: T1
+  side_effects: none
+  depends_on:
+  - verification_65279e
+  inputs:
+    canvas_role: review
+    canvas_node_id: review
+    evidence:
+    - bind:
+        from_step: verification_65279e
+        path: result.summary
+  outputs:
+    result: result.review_61e62b
+  acceptance_criteria:
+    required: true
