@@ -1,0 +1,149 @@
+{
+  "nodes": [
+    {
+      "id": "design_caching_layer",
+      "type": "text",
+      "text": "role: plan\nmode: development\n\nDesign the caching layer for graphify_query that persists results across repeated queries within a session.",
+      "x": 0,
+      "y": 0,
+      "width": 420,
+      "height": 180,
+      "jarvis": {
+        "layout_profile": "dependency",
+        "layout_baseline": {
+          "x": 0,
+          "y": 0,
+          "width": 420,
+          "height": 180
+        }
+      }
+    },
+    {
+      "id": "implement_caching_layer_design",
+      "type": "text",
+      "text": "role: implementation\nproject: mark_platform\n\nImplement the caching layer design for graphify_query.",
+      "x": 0,
+      "y": 320,
+      "width": 420,
+      "height": 180,
+      "jarvis": {
+        "layout_profile": "dependency",
+        "layout_baseline": {
+          "x": 0,
+          "y": 320,
+          "width": 420,
+          "height": 180
+        }
+      }
+    },
+    {
+      "id": "test_local_caching",
+      "type": "text",
+      "text": "role: verification\nproject: mark_platform\n\nWrite and run tests to ensure local caching works correctly for graphify_query within a session.",
+      "x": 0,
+      "y": 640,
+      "width": 420,
+      "height": 180,
+      "jarvis": {
+        "layout_profile": "dependency",
+        "layout_baseline": {
+          "x": 0,
+          "y": 640,
+          "width": 420,
+          "height": 180
+        }
+      }
+    },
+    {
+      "id": "test_external_caching",
+      "type": "text",
+      "text": "role: verification\nproject: mark_platform\n\nWrite and run tests to ensure external caching works correctly for graphify_query within a session.",
+      "x": 0,
+      "y": 960,
+      "width": 420,
+      "height": 180,
+      "jarvis": {
+        "layout_profile": "dependency",
+        "layout_baseline": {
+          "x": 0,
+          "y": 960,
+          "width": 420,
+          "height": 180
+        }
+      }
+    },
+    {
+      "id": "check_against_real_graph",
+      "type": "text",
+      "text": "role: verification\nproject: mark_platform\n\nCheck the caching layer implementation against the real graphify graph to ensure correct results.",
+      "x": 0,
+      "y": 1280,
+      "width": 420,
+      "height": 180,
+      "jarvis": {
+        "layout_profile": "dependency",
+        "layout_baseline": {
+          "x": 0,
+          "y": 1280,
+          "width": 420,
+          "height": 180
+        }
+      }
+    },
+    {
+      "id": "note_real_graph_check_result",
+      "type": "text",
+      "text": "role: note\n\nRecord the result of the check against the real graphify graph for future reference.",
+      "x": 0,
+      "y": 1600,
+      "width": 420,
+      "height": 180,
+      "jarvis": {
+        "layout_profile": "dependency",
+        "layout_baseline": {
+          "x": 0,
+          "y": 1600,
+          "width": 420,
+          "height": 180
+        }
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "jarvis-bb03b22b5c3a8e2a",
+      "fromNode": "design_caching_layer",
+      "fromSide": "right",
+      "toNode": "implement_caching_layer_design",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-57104475b87a3f84",
+      "fromNode": "implement_caching_layer_design",
+      "fromSide": "right",
+      "toNode": "test_local_caching",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-9dd30b382e9bd805",
+      "fromNode": "test_local_caching",
+      "fromSide": "right",
+      "toNode": "test_external_caching",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-2e412a75f94f49a2",
+      "fromNode": "test_external_caching",
+      "fromSide": "right",
+      "toNode": "check_against_real_graph",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-04194b770eacafae",
+      "fromNode": "check_against_real_graph",
+      "fromSide": "right",
+      "toNode": "note_real_graph_check_result",
+      "toSide": "left"
+    }
+  ]
+}

@@ -1,0 +1,202 @@
+{
+  "created_at": "2026-07-25T16:54:44Z",
+  "items": [
+    {
+      "acceptance_criteria": {
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [],
+      "description": "Design the caching layer for graphify_query that persists results across repeated queries within a session.",
+      "id": "design_caching_layer_41aed8",
+      "idempotency_key": "67d8c438f2a688eebd264c4224a32d61ed22a267db4c99e9f2d358681b76a379",
+      "inputs": {
+        "canvas_node_id": "design_caching_layer",
+        "canvas_role": "plan"
+      },
+      "max_attempts": 1,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "deterministic",
+      "outputs": {
+        "result": "result.design_caching_layer_41aed8"
+      },
+      "required_outputs": [],
+      "requires_confirmation": false,
+      "resource_class": "io",
+      "retry_safe": true,
+      "risk_tier": "T1",
+      "sequence": 1,
+      "side_effects": "none",
+      "step_type": "gate",
+      "target": "plan_milestone"
+    },
+    {
+      "acceptance_criteria": {
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [
+        "design_caching_layer_41aed8"
+      ],
+      "description": "Implement the caching layer design for graphify_query.",
+      "id": "implement_caching_layer_design_9cb435",
+      "idempotency_key": "55dc6763680b5ad1acdc68c24a3495baaf2ede8f55232681b5790c2e430a79be",
+      "inputs": {
+        "canvas_node_id": "implement_caching_layer_design",
+        "canvas_role": "implementation",
+        "context_injected": true,
+        "evidence": [
+          {
+            "bind": {
+              "from_step": "design_caching_layer_41aed8",
+              "path": "result.summary"
+            }
+          }
+        ],
+        "intent": "System goal: Design the caching layer for graphify_query that persists results across repeated queries within a session.\n\nImplement the caching layer design for graphify_query.",
+        "operation": "delegate_openclaw",
+        "project_id": "mark_platform"
+      },
+      "max_attempts": 1,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "deterministic",
+      "outputs": {
+        "result": "result.implement_caching_layer_design_9cb435"
+      },
+      "required_outputs": [],
+      "requires_confirmation": true,
+      "resource_class": "openclaw",
+      "retry_safe": false,
+      "risk_tier": "T3",
+      "sequence": 2,
+      "side_effects": "external_write",
+      "step_type": "tool",
+      "target": "project_operator"
+    },
+    {
+      "acceptance_criteria": {
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [
+        "implement_caching_layer_design_9cb435"
+      ],
+      "description": "Write and run tests to ensure local caching works correctly for graphify_query within a session.",
+      "id": "test_local_caching_d967f9",
+      "idempotency_key": "2fd5ae9b609f397b5b48c1713860cf263ca38cf89d93fde2e2a737a10edd5b6c",
+      "inputs": {
+        "canvas_node_id": "test_local_caching",
+        "canvas_role": "verification"
+      },
+      "max_attempts": 2,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "deterministic",
+      "outputs": {
+        "result": "result.test_local_caching_d967f9"
+      },
+      "required_outputs": [],
+      "requires_confirmation": false,
+      "resource_class": "command",
+      "retry_safe": true,
+      "risk_tier": "T2",
+      "sequence": 3,
+      "side_effects": "local_read",
+      "step_type": "command",
+      "target": "pytest_focused"
+    },
+    {
+      "acceptance_criteria": {
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [
+        "test_local_caching_d967f9"
+      ],
+      "description": "Write and run tests to ensure external caching works correctly for graphify_query within a session.",
+      "id": "test_external_caching_7a689a",
+      "idempotency_key": "aa3b7c2f61b8bfcc0091a5fb8faf6b9e3dd5d87659cfa70a21e5ea8b69a11f6e",
+      "inputs": {
+        "canvas_node_id": "test_external_caching",
+        "canvas_role": "verification"
+      },
+      "max_attempts": 2,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "deterministic",
+      "outputs": {
+        "result": "result.test_external_caching_7a689a"
+      },
+      "required_outputs": [],
+      "requires_confirmation": false,
+      "resource_class": "command",
+      "retry_safe": true,
+      "risk_tier": "T2",
+      "sequence": 4,
+      "side_effects": "local_read",
+      "step_type": "command",
+      "target": "pytest_focused"
+    },
+    {
+      "acceptance_criteria": {
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [
+        "test_external_caching_7a689a"
+      ],
+      "description": "Check the caching layer implementation against the real graphify graph to ensure correct results.",
+      "id": "check_against_real_graph_1b2f8e",
+      "idempotency_key": "c6fc8bfd09531d89f6547a796c207e02ecb39f4e9832897ef2768c7e533edc64",
+      "inputs": {
+        "canvas_node_id": "check_against_real_graph",
+        "canvas_role": "verification"
+      },
+      "max_attempts": 2,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "deterministic",
+      "outputs": {
+        "result": "result.check_against_real_graph_1b2f8e"
+      },
+      "required_outputs": [],
+      "requires_confirmation": false,
+      "resource_class": "command",
+      "retry_safe": true,
+      "risk_tier": "T2",
+      "sequence": 5,
+      "side_effects": "local_read",
+      "step_type": "command",
+      "target": "pytest_focused"
+    }
+  ],
+  "manifest_hash": "080af2958ab0f7ad5db5ea40e98f6592ab7c73ea32f83cb799f2db92b4cbfbf8",
+  "preflight": {
+    "checked_at": "2026-07-25T16:54:44Z",
+    "checks": [
+      {
+        "command_id": "pytest_focused",
+        "item_id": "test_local_caching_d967f9",
+        "ok": true
+      },
+      {
+        "command_id": "pytest_focused",
+        "item_id": "test_external_caching_7a689a",
+        "ok": true
+      },
+      {
+        "command_id": "pytest_focused",
+        "item_id": "check_against_real_graph_1b2f8e",
+        "ok": true
+      }
+    ],
+    "ok": true
+  },
+  "preview_only": false,
+  "schema_version": "jarvis_work_manifest/v1",
+  "workflow_hash": "46a4bb1f81c65c0d61eead9a0aeaa8264105751337e204df732e7aa80c18930f",
+  "workflow_id": "injection_test_graphify_cache",
+  "workflow_version": "canvas-1"
+}

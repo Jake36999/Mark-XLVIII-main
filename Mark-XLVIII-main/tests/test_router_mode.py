@@ -853,11 +853,18 @@ class RouterModeAntiFabricationIntegrationTests(unittest.TestCase):
     def test_a_real_pytest_pass_receipt_does_not_get_flagged(self):
         import main
 
+        # code_helper's "run" operation is one of the tools the chat
+        # confirmation gate now pauses (requires_approval per
+        # core.tool_dispatcher.classify_effect) -- so this now takes two
+        # turns: the first pauses for confirmation, the second (an
+        # affirmative reply) actually executes and produces the grounded
+        # reply this test is really checking for.
         jarvis = main.JarvisLive.__new__(main.JarvisLive)
         jarvis.ui = mock.Mock()
         jarvis.ui.muted = False
         jarvis._router_system_prompt = mock.Mock(return_value="system")
         jarvis.speak = mock.Mock()
+        jarvis._pending_tool_confirmation = None
         jarvis._execute_router_tool_call = mock.Mock(
             return_value=json.dumps({"ok": True, "returncode": 0, "stdout": "17 passed in 0.35s\n"})
         )
@@ -873,6 +880,16 @@ class RouterModeAntiFabricationIntegrationTests(unittest.TestCase):
         ):
             jarvis._handle_router_text_command("Run tests/test_tts_read_trigger.py.")
 
+        jarvis._execute_router_tool_call.assert_not_called()
+        self.assertIsNotNone(jarvis._pending_tool_confirmation)
+
+        with mock.patch("main.call_with_tools") as fake_call_with_tools, mock.patch(
+            "main.call_text", return_value=real_reply
+        ):
+            jarvis._handle_router_text_command("yes")
+
+        fake_call_with_tools.assert_not_called()
+        jarvis._execute_router_tool_call.assert_called_once()
         final_reply = jarvis.speak.call_args.args[0]
         self.assertEqual(final_reply, real_reply)
         self.assertNotIn("unverified", final_reply.lower())

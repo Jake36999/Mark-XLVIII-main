@@ -1,0 +1,116 @@
+{
+  "off": {
+    "label": "graphify_off",
+    "total_selected": 409,
+    "total_bytes": 5178851,
+    "targets": {
+      "Mark-XLVIII-main/actions/graphify_query.py": {
+        "rank": 128,
+        "cumulative_bytes_to_reach": 3226179
+      },
+      "Mark-XLVIII-main/actions/project_learning.py": {
+        "rank": 40,
+        "cumulative_bytes_to_reach": 1517840
+      },
+      "Mark-XLVIII-main/core/repo_slicer.py": {
+        "rank": 129,
+        "cumulative_bytes_to_reach": 3235578
+      },
+      "Mark-XLVIII-main/actions/capability_registry.py": {
+        "rank": 28,
+        "cumulative_bytes_to_reach": 1286015
+      },
+      "Mark-XLVIII-main/actions/canvas_plan.py": {
+        "rank": 80,
+        "cumulative_bytes_to_reach": 2290237
+      },
+      "Mark-XLVIII-main/actions/jarvis_memory.py": {
+        "rank": 10,
+        "cumulative_bytes_to_reach": 529155
+      }
+    },
+    "scores": {
+      "Mark-XLVIII-main/actions/canvas_plan.py": {
+        "score": 132,
+        "graphify_centrality": null
+      },
+      "Mark-XLVIII-main/actions/capability_registry.py": {
+        "score": 248,
+        "graphify_centrality": null
+      },
+      "Mark-XLVIII-main/actions/graphify_query.py": {
+        "score": 101,
+        "graphify_centrality": null
+      },
+      "Mark-XLVIII-main/actions/jarvis_memory.py": {
+        "score": 272,
+        "graphify_centrality": null
+      },
+      "Mark-XLVIII-main/actions/project_learning.py": {
+        "score": 202,
+        "graphify_centrality": null
+      },
+      "Mark-XLVIII-main/core/repo_slicer.py": {
+        "score": 100,
+        "graphify_centrality": null
+      }
+    }
+  },
+  "on": {
+    "label": "graphify_on",
+    "total_selected": 409,
+    "total_bytes": 5178851,
+    "targets": {
+      "Mark-XLVIII-main/actions/graphify_query.py": {
+        "rank": 88,
+        "cumulative_bytes_to_reach": 2277373
+      },
+      "Mark-XLVIII-main/actions/project_learning.py": {
+        "rank": 28,
+        "cumulative_bytes_to_reach": 1075271
+      },
+      "Mark-XLVIII-main/core/repo_slicer.py": {
+        "rank": 129,
+        "cumulative_bytes_to_reach": 3211834
+      },
+      "Mark-XLVIII-main/actions/capability_registry.py": {
+        "rank": 27,
+        "cumulative_bytes_to_reach": 1010055
+      },
+      "Mark-XLVIII-main/actions/canvas_plan.py": {
+        "rank": 117,
+        "cumulative_bytes_to_reach": 3044027
+      },
+      "Mark-XLVIII-main/actions/jarvis_memory.py": {
+        "rank": 10,
+        "cumulative_bytes_to_reach": 491127
+      }
+    },
+    "scores": {
+      "Mark-XLVIII-main/actions/canvas_plan.py": {
+        "score": 138,
+        "graphify_centrality": 2
+      },
+      "Mark-XLVIII-main/actions/capability_registry.py": {
+        "score": 380,
+        "graphify_centrality": 44
+      },
+      "Mark-XLVIII-main/actions/graphify_query.py": {
+        "score": 158,
+        "graphify_centrality": 19
+      },
+      "Mark-XLVIII-main/actions/jarvis_memory.py": {
+        "score": 422,
+        "graphify_centrality": 159
+      },
+      "Mark-XLVIII-main/actions/project_learning.py": {
+        "score": 352,
+        "graphify_centrality": 69
+      },
+      "Mark-XLVIII-main/core/repo_slicer.py": {
+        "score": 121,
+        "graphify_centrality": 7
+      }
+    }
+  }
+}

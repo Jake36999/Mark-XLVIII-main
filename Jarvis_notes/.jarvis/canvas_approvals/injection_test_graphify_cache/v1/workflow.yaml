@@ -1,0 +1,127 @@
+schema_version: jarvis_dual_orchestrator/v1
+workflow_id: injection_test_graphify_cache
+version: canvas-1
+name: Canvas Plan
+description: Compiled from an Obsidian Canvas graph (Mode 2 planning).
+max_steps: 5
+variables:
+  source: canvas
+  node_step_ids:
+    design_caching_layer: design_caching_layer_41aed8
+    implement_caching_layer_design: implement_caching_layer_design_9cb435
+    test_local_caching: test_local_caching_d967f9
+    test_external_caching: test_external_caching_7a689a
+    check_against_real_graph: check_against_real_graph_1b2f8e
+  mode: development
+steps:
+- step_id: design_caching_layer_41aed8
+  orchestrator: deterministic
+  step_type: gate
+  target: plan_milestone
+  description: Design the caching layer for graphify_query that persists results across
+    repeated queries within a session.
+  risk_tier: T1
+  side_effects: none
+  depends_on: []
+  inputs:
+    canvas_role: plan
+    canvas_node_id: design_caching_layer
+  outputs:
+    result: result.design_caching_layer_41aed8
+  acceptance_criteria:
+    required: true
+- step_id: implement_caching_layer_design_9cb435
+  orchestrator: deterministic
+  step_type: tool
+  target: project_operator
+  description: Implement the caching layer design for graphify_query.
+  risk_tier: T3
+  side_effects: external_write
+  depends_on:
+  - design_caching_layer_41aed8
+  inputs:
+    canvas_role: implementation
+    canvas_node_id: implement_caching_layer_design
+    operation: delegate_openclaw
+    project_id: mark_platform
+    intent: 'System goal: Design the caching layer for graphify_query that persists
+      results across repeated queries within a session.
+
+
+      Implement the caching layer design for graphify_query.'
+    context_injected: true
+    evidence:
+    - bind:
+        from_step: design_caching_layer_41aed8
+        path: result.summary
+  outputs:
+    result: result.implement_caching_layer_design_9cb435
+  acceptance_criteria:
+    required: true
+  requires_confirmation: true
+  retry_policy:
+    safe: false
+    max_attempts: 1
+  on_failure: halt
+- step_id: test_local_caching_d967f9
+  orchestrator: deterministic
+  step_type: command
+  target: pytest_focused
+  description: Write and run tests to ensure local caching works correctly for graphify_query
+    within a session.
+  risk_tier: T2
+  side_effects: local_read
+  depends_on:
+  - implement_caching_layer_design_9cb435
+  inputs:
+    canvas_role: verification
+    canvas_node_id: test_local_caching
+  outputs:
+    result: result.test_local_caching_d967f9
+  acceptance_criteria:
+    required: true
+  requires_confirmation: false
+  retry_policy: &id001
+    safe: true
+    max_attempts: 2
+  on_failure: halt
+- step_id: test_external_caching_7a689a
+  orchestrator: deterministic
+  step_type: command
+  target: pytest_focused
+  description: Write and run tests to ensure external caching works correctly for
+    graphify_query within a session.
+  risk_tier: T2
+  side_effects: local_read
+  depends_on:
+  - test_local_caching_d967f9
+  inputs:
+    canvas_role: verification
+    canvas_node_id: test_external_caching
+  outputs:
+    result: result.test_external_caching_7a689a
+  acceptance_criteria:
+    required: true
+  requires_confirmation: false
+  retry_policy: *id001
+  on_failure: halt
+- step_id: check_against_real_graph_1b2f8e
+  orchestrator: deterministic
+  step_type: command
+  target: pytest_focused
+  description: Check the caching layer implementation against the real graphify graph
+    to ensure correct results.
+  risk_tier: T2
+  side_effects: local_read
+  depends_on:
+  - test_external_caching_7a689a
+  inputs:
+    canvas_role: verification
+    canvas_node_id: check_against_real_graph
+  outputs:
+    result: result.check_against_real_graph_1b2f8e
+  acceptance_criteria:
+    required: true
+  requires_confirmation: false
+  retry_policy: *id001
+  on_failure: halt

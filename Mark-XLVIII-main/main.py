@@ -86,6 +86,8 @@ from core.runtime_config import load_runtime_config, migrate_legacy_config
 from core.evidence import evidence_block
 from core.process_events import emit_process_event
 from core.vault_activity import acknowledge_changes, turn_change_context
+from core.tool_dispatcher import classify_effect
+from core.chat_confirmation import is_affirmative_reply, describe_pending_action
 
 
 def get_base_dir():
@@ -1584,6 +1586,7 @@ class JarvisLive:
         self._pending_plan_run_id = ""
         self._active_plan_run_id = ""
         self._planning_mode_active = False
+        self._pending_tool_confirmation: dict[str, Any] | None = None
 
     def _make_remote_key(self):
         """Called from Qt main thread when user presses Remote Control."""
@@ -1938,6 +1941,53 @@ class JarvisLive:
             "It is back in review state. Add more edits, or click Start Plan when it looks right."
         )
 
+    def _handle_pending_tool_confirmation(self, text: str, turn_id: int | None = None) -> str | None:
+        """Resume a tool call that was paused for confirmation (see the
+        `classify_effect`/`requires_approval` gate in the tool-calls loop).
+        One-shot: the pending record is always cleared here, whether the
+        reply confirms it or not, so a stale confirmation can never be
+        replayed by a later, unrelated affirmative-sounding message.
+        Execution uses the frozen arguments captured when confirmation was
+        first requested -- never a freshly model-generated call -- so the
+        action that runs is exactly the one the user was told about."""
+        pending = getattr(self, "_pending_tool_confirmation", None)
+        if not pending:
+            return None
+        if time.monotonic() > float(pending.get("expires_at") or 0):
+            self._pending_tool_confirmation = None
+            return None
+        self._pending_tool_confirmation = None
+        if not is_affirmative_reply(text):
+            return None
+        tool_name = str(pending["tool_name"])
+        arguments = pending["arguments"]
+        self.ui.write_log(f"TOOL: {tool_name} (confirmed)")
+        emit_process_event(
+            category="tool",
+            source=tool_name,
+            summary=f"Calling {tool_name} (user-confirmed).",
+            state="running",
+            turn_id=turn_id or "",
+            detail={"arguments": arguments},
+        )
+        result = self._execute_router_tool_call(pending["call_id"], tool_name, arguments)
+        receipt = _tool_receipt(tool_name, arguments, result)
+        emit_process_event(
+            category="tool",
+            source=tool_name,
+            summary=f"{tool_name} returned a result.",
+            state="completed",
+            turn_id=turn_id or "",
+            detail=receipt,
+        )
+        summary_prompt = _build_tool_summary_prompt(
+            text, [{"tool": tool_name, "arguments": arguments, "result": str(result)[:4000]}]
+        )
+        try:
+            return call_text(summary_prompt, role="worker", system=self._router_system_prompt(), timeout=120)
+        except Exception:
+            return f"Done -- {tool_name} completed: {str(result)[:400]}"
+
     def _handle_cancel_planning_workflow(self, text: str) -> str | None:
         if not _is_cancel_planning_prompt(text):
             return None
@@ -2246,7 +2296,9 @@ class JarvisLive:
             generic_reply_path = False
             try:
                 try:
-                    reply = self._handle_cancel_planning_workflow(text)
+                    reply = self._handle_pending_tool_confirmation(text, turn_id)
+                    if reply is None:
+                        reply = self._handle_cancel_planning_workflow(text)
                     if reply is None:
                         reply = self._handle_start_plan_workflow(text)
                     if reply is None:
@@ -2305,6 +2357,23 @@ class JarvisLive:
                         )
                         tool_results = []
                         for call in routed.tool_calls[:5]:
+                            if call.name == "dev_agent":
+                                self.ui.write_log("TOOL: dev_agent (redirected to canvas plan review)")
+                                reply = self._redirect_dev_agent_to_canvas(text, turn_id)
+                                break
+                            classification = classify_effect(call.name, call.arguments or {})
+                            if classification.get("requires_approval"):
+                                self._pending_tool_confirmation = {
+                                    "tool_name": call.name,
+                                    "arguments": dict(call.arguments or {}),
+                                    "call_id": call.id,
+                                    "created_turn_id": turn_id,
+                                    "created_at": time.monotonic(),
+                                    "expires_at": time.monotonic() + 120.0,
+                                }
+                                self.ui.write_log(f"TOOL: {call.name} (awaiting confirmation)")
+                                reply = describe_pending_action(call.name, call.arguments or {}, classification)
+                                break
                             self.ui.write_log(f"TOOL: {call.name}")
                             emit_process_event(
                                 category="tool",
@@ -2332,13 +2401,14 @@ class JarvisLive:
                                     "result": str(result)[:4000],
                                 }
                             )
-                        summary_prompt = _build_tool_summary_prompt(model_text, tool_results)
-                        reply = call_text(
-                            summary_prompt,
-                            role="worker",
-                            system=self._router_system_prompt(),
-                            timeout=120,
-                        )
+                        else:
+                            summary_prompt = _build_tool_summary_prompt(model_text, tool_results)
+                            reply = call_text(
+                                summary_prompt,
+                                role="worker",
+                                system=self._router_system_prompt(),
+                                timeout=120,
+                            )
                     elif routed:
                         reply = routed.text
                 except Exception as planner_error:
@@ -2391,12 +2461,69 @@ class JarvisLive:
                 self._schedule_listening_check(0.1)
 
     def _execute_router_tool_call(self, call_id: str, name: str, args: dict) -> str:
+        # Every caller of this helper has already been authorized by
+        # construction: the gated routed.tool_calls loop only reaches it for
+        # calls classify_effect already cleared, _handle_pending_tool_confirmation
+        # only reaches it after a real user confirmation, and the ~11
+        # deterministic workflow bootstraps (_handle_start_plan_workflow,
+        # _handle_todo_template_workflow, etc.) call it for a specific action
+        # a matched literal phrase already authorized, not free model choice.
+        # pre_approved=True here reflects that; the fail-closed check in
+        # _execute_tool exists for callers that DON'T go through this helper
+        # (currently only the dormant Gemini Live _receive_audio path).
         fc = _RouterFunctionCall(call_id, name, args)
-        response = asyncio.run(self._execute_tool(fc))
+        response = asyncio.run(self._execute_tool(fc, pre_approved=True))
         payload = getattr(response, "response", {}) or {}
         if isinstance(payload, dict):
             return str(payload.get("result", payload))
         return str(payload)
+
+    def _redirect_dev_agent_to_canvas(self, goal_text: str, turn_id: int | None) -> str:
+        """`dev_agent` always does real filesystem writes/process execution --
+        every real call is a genuine multi-step autonomous coding task, not a
+        single action, so it never dispatches directly from plain chat.
+        Instead this drafts a reviewable Canvas plan (the same
+        decompose -> propose pipeline this session's own live testing
+        verified end to end) and hands the human the resulting approval note
+        instead of executing anything."""
+        from actions.canvas_plan import decompose_goal_to_canvas, propose_canvas_plan
+
+        try:
+            decomposition = decompose_goal_to_canvas(goal_text, user_workflow_mode="development")
+        except Exception as exc:
+            return (
+                "This looks like a coding task, which requires a reviewable plan before I touch any files -- "
+                f"but drafting one failed: {exc}. Nothing was written."
+            )
+        if not decomposition.get("ok"):
+            return (
+                "This looks like a coding task, which requires a reviewable plan before I touch any files -- "
+                f"but drafting one failed: {decomposition.get('error') or 'unknown error'}. Nothing was written."
+            )
+        canvas_path = decomposition["canvas_path"]
+        try:
+            proposal = propose_canvas_plan(canvas_path)
+        except Exception as exc:
+            proposal = {"ok": False, "error": f"{type(exc).__name__}: {exc}"}
+        emit_process_event(
+            category="capability",
+            source="dev_agent",
+            summary="dev_agent request redirected to a reviewable canvas plan.",
+            state="completed",
+            turn_id=turn_id or "",
+            detail={"canvas_path": canvas_path, "proposal_ok": bool(proposal.get("ok"))},
+        )
+        if proposal.get("ok"):
+            note_path = proposal.get("note_path") or ""
+            return (
+                f"This is a coding task, so I drafted a {decomposition.get('node_count')}-step plan for your review "
+                f"instead of writing anything directly: `{canvas_path}`. An approval note is waiting at `{note_path}` -- "
+                "review and approve it there before anything actually runs."
+            )
+        return (
+            f"I drafted a plan at `{canvas_path}` but couldn't write its approval note: "
+            f"{proposal.get('error') or 'unknown error'}. Nothing was executed."
+        )
 
     def _dispatch_pending_plan_after_turn(self) -> None:
         run_id = self._pending_plan_run_id
@@ -2459,6 +2586,7 @@ class JarvisLive:
         self._invalidate_router_turns("interrupt")
         run_ids = {run_id for run_id in (self._pending_plan_run_id, self._active_plan_run_id) if run_id}
         self._pending_plan_run_id = ""
+        self._pending_tool_confirmation = None
         for run_id in run_ids:
             try:
                 plan_workflow({"operation": "cancel", "run_id": run_id, "reason": "user_interrupt"})
@@ -2593,12 +2721,37 @@ class JarvisLive:
             ),
         )
 
-    async def _execute_tool(self, fc) -> types.FunctionResponse:
+    async def _execute_tool(self, fc, pre_approved: bool = False) -> types.FunctionResponse:
         name = fc.name
         args = dict(fc.args or {})
 
         print(f"[JARVIS] TOOL {name} {args}")
         self.ui.set_state("THINKING")
+
+        if name != "save_memory" and not pre_approved:
+            # Defensive backstop: the plain-chat path (routed.tool_calls loop
+            # in _handle_router_text_command) already gates requires_approval
+            # tools before ever reaching here, passing pre_approved=True only
+            # for an already-confirmed resume. This check exists for any
+            # OTHER caller of _execute_tool (currently only the dormant
+            # Gemini Live _receive_audio path, disabled via
+            # _gemini_live_enabled()'s hardcoded `and False`) so that if that
+            # path is ever re-enabled, it fails closed by default instead of
+            # silently reopening the exact gap this session found live.
+            classification = classify_effect(name, args)
+            if classification.get("requires_approval"):
+                self._set_listening_if_idle()
+                return types.FunctionResponse(
+                    id=fc.id,
+                    name=name,
+                    response={
+                        "result": (
+                            f"{name} requires explicit confirmation and cannot run from this path. "
+                            "Ask again through the main chat so it can be confirmed properly."
+                        ),
+                        "ok": False,
+                    },
+                )
 
         if name == "save_memory":
             category = args.get("category", "notes")

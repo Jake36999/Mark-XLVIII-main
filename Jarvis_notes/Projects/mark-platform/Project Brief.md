@@ -4,7 +4,7 @@ title: "Project Brief - Mark Platform"
 type: "report"
 status: "complete_degraded"
 created: "2026-07-22T00:08:36Z"
-updated: "2026-07-25T14:33:57Z"
+updated: "2026-07-25T16:21:10Z"
 project_id: "jarvis_notes"
 source: "F:\\Mark-XLVIII-main"
 tags: ["project-learning", "repository", "read-only", "mark-platform", "tier/short-term"]
@@ -14,10 +14,10 @@ remember_note_id: ""
 rag_index: true
 sensitivity: "internal"
 confidence: 0.55
-valid_from: "2026-07-25T10:23:46Z"
+valid_from: "2026-07-25T16:20:58Z"
 review_after: ""
-source_version: 13
-content_hash: "8cfd8af511e7878b8fc821ad6b3fda63d91698379f03c362e1298c03da32d506"
+source_version: 14
+content_hash: "fa47762610ea1b3a99797da8b209745f03aa6902d182a922b5e95ad4fdf07336"
 supersedes: []
 contradicts: []
 depends_on: []
@@ -32,13 +32,13 @@ related: []
 deleted: false
 deleted_at: ""
 files_read_count: 35
-inventory_file_count: 437
+inventory_file_count: 436
 lifecycle: "short_term"
 project_key: "mark_platform"
 project_root: "F:\\Mark-XLVIII-main"
-quality_state: "degraded"
+quality_state: "repaired"
 read_only: true
-snapshot_hash: "fad61a7de8afe10963769c3236c990b1164d2b9a4a1dac80e2cd5f18ccd20f6a"
+snapshot_hash: "60f4f3ac977d0e64980ddd09f762d30c726d0693be368d377ae6fb3230288c03"
 workflow_id: "project_repository_learning/v1"
 ---
 
@@ -49,23 +49,23 @@ workflow_id: "project_repository_learning/v1"
 
 ## Executive Summary
 
-The repository contains 437 inventoried files. This brief is grounded in 35 selected text files and the repository metadata below.
+The repository contains 436 inventoried files. This brief is grounded in 35 selected text files and the repository metadata below.
 
 ## Repository Profile
 
 - Root: `F:\Mark-XLVIII-main`
-- Snapshot: `fad61a7de8afe10963769c3236c990b1164d2b9a4a1dac80e2cd5f18ccd20f6a`
-- Inventoried files: 437
-- Inventoried bytes: 15765807
+- Snapshot: `60f4f3ac977d0e64980ddd09f762d30c726d0693be368d377ae6fb3230288c03`
+- Inventoried files: 436
+- Inventoried bytes: 15787430
 - Sensitive files skipped: 3
 
 ### File types
 
-- `.py`: 307
+- `.py`: 308
 - `.md`: 47
 - `.png`: 16
 - `.json`: 14
-- `<none>`: 11
+- `<none>`: 9
 - `.toml`: 8
 - `.ps1`: 7
 - `.sh`: 5
@@ -130,17 +130,12 @@ Use the cited entry points and configuration files for follow-up. Validate comma
 
 ## Risks, Gaps, And Questions
 
-- Repository final synthesis conflict: report denied the test suite despite 95 inventoried test files.
-- Repository final synthesis conflict: unknown file citations: ClawTeam
-
-## Files Read
-
-- [file:.claude/settings.json.
+- Repository final synthesis omitted RAG Takeaways; JARVIS repaired it from cited report sections.
+- Repository final synthesis conflict: unknown file citations: git, root.
 - Repository final synthesis conflict: section lacks a source citation: Risks, Gaps, And Questions.
-- Repository final synthesis conflict: RAG takeaways contain an incomplete sentence.
 
 ## RAG Takeaways
 
 - The canonical project root is `F:\Mark-XLVIII-main`.
-- The current repository snapshot is `fad61a7de8afe10963769c3236c990b1164d2b9a4a1dac80e2cd5f18ccd20f6a`.
+- The current repository snapshot is `60f4f3ac977d0e64980ddd09f762d30c726d0693be368d377ae6fb3230288c03`.
 - JARVIS read 35 selected files and skipped 3 sensitive files.
