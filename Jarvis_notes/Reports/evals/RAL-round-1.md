@@ -4,7 +4,7 @@ title: "RAL Round 1 - Discovery and Capability Contracts"
 type: "evaluation_report"
 status: "complete"
 created: "2026-07-21T14:55:00Z"
-updated: "2026-07-23T09:44:38Z"
+updated: "2026-07-25T14:33:57Z"
 project_id: "jarvis_notes"
 source: "codex_controlled_eval"
 tags: ["evaluation", "red-team", "ral", "round-1", "tier/short-term"]
@@ -14,7 +14,7 @@ rag_index: false
 sensitivity: "internal"
 content_hash: "f9fbdd80abc771542cdd399eea6f601660ebd8e4fbc259797b49e15c42c5c4a1"
 attack_fixture_persisted: false
-memory_tier: "short_term"
+lifecycle: "short_term"
 ---
 
 # RAL Round 1 - Discovery and Capability Contracts

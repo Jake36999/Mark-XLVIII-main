@@ -4,15 +4,15 @@ title: "JARVIS User Guide Overview"
 type: "guide"
 status: "draft"
 created: "2026-07-21"
-updated: "2026-07-23T02:52:44Z"
+updated: "2026-07-25T14:33:57Z"
 project_id: "jarvis_notes"
 source: "codex"
 tags: ["user-guide", "jarvis", "overview", "tier/short-term"]
 sync_state: "local_only"
 index_state: "indexed_local"
 remember_note_id: ""
-content_hash: "cb8e24e04d20cc020af1b03dd45818da1a9fb6477d32c5fe0b2ec36099347b73"
-memory_tier: "short_term"
+content_hash: "8634c4a00fe7b4d9e55669e311fc0101ab4b7c6d439bbf7d58f86d770f616f6c"
+lifecycle: "short_term"
 ---
 
 # JARVIS User Guide Overview
@@ -39,6 +39,7 @@ memory_tier: "short_term"
 - How to ask for reports, memory saves, project handoffs, file analysis, web searches, reminders, model status, and speech checks.
 - How to ask for vault-native Obsidian templates such as blank Markdown to-do lists.
 - How to ask JARVIS to learn a topic by creating a cited report, retaining key points in RAG memory, and reusing those notes in later answers.
+- How to ask JARVIS to turn a goal into a real, multi-step plan on an Obsidian Canvas — it reasons about the steps, critiques its own draft, and always stops for your approval before anything with real side effects runs. See [[Developer Handbook/13 Canvas Planning Engine and Reasoning-Backed Decomposition|the Canvas Planning Engine]] for how this works under the hood.
 - How JARVIS should decide between tools, workflows, local models, and optional cloud models.
 - Where generated artifacts are stored in the vault.
 - Which actions are low risk and which should pause for confirmation.
@@ -82,6 +83,10 @@ Learn about WiFi sensing datasets so I can query you about them later.
 
 ```text
 Place a blank to-do list template in the Obsidian vault using .md formatting.
+```
+
+```text
+Turn this into a real plan on a canvas, then show me the steps before you run anything.
 ```
 
 ## Safety Model

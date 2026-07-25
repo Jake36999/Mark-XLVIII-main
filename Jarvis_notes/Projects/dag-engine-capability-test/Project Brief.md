@@ -4,7 +4,7 @@ title: "Project Brief - DAG Engine (capability test)"
 type: "report"
 status: "complete_degraded"
 created: "2026-07-24T01:55:52Z"
-updated: "2026-07-24T01:59:41Z"
+updated: "2026-07-25T14:33:56Z"
 project_id: "jarvis_notes"
 source: "F:\\knowledge_compiler_engine (DAG Engine)"
 tags: ["project-learning", "repository", "read-only", "dag-engine-capability-test", "tier-short-term", "capability-test"]
@@ -33,7 +33,7 @@ deleted: false
 deleted_at: ""
 files_read_count: 36
 inventory_file_count: 123
-memory_tier: "short_term"
+lifecycle: "short_term"
 project_key: "dag-engine-capability-test"
 project_root: "F:\\knowledge_compiler_engine (DAG Engine)"
 quality_state: "degraded"

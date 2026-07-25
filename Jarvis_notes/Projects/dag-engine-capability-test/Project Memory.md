@@ -4,7 +4,7 @@ title: "Project Memory - DAG Engine (capability test)"
 type: "memory"
 status: "active"
 created: "2026-07-24T01:55:52Z"
-updated: "2026-07-24T01:59:41Z"
+updated: "2026-07-25T14:33:56Z"
 project_id: "jarvis_notes"
 source: "F:\\Mark-XLVIII-main\\Jarvis_notes\\Projects\\dag-engine-capability-test\\Project Brief.md"
 tags: ["project-memory", "repository", "dag-engine-capability-test", "tier-short-term", "capability-test"]
@@ -31,7 +31,7 @@ consumed_by: []
 related: ["project-brief-dag-engine-capability-test"]
 deleted: false
 deleted_at: ""
-memory_tier: "short_term"
+lifecycle: "short_term"
 project_key: "dag-engine-capability-test"
 project_root: "F:\\knowledge_compiler_engine (DAG Engine)"
 snapshot_hash: "57b3b67feb775d5b1684e683f4484d92f8373330ba8459705b7ae6cb0fa64bac"

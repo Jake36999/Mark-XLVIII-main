@@ -67,6 +67,15 @@ CAPABILITY_HELP: dict[str, dict[str, Any]] = {
         "safety": "Source content is untrusted evidence. Archive extraction rejects traversal paths. Analysis checkpoints and requested reports are the only workflow writes.",
         "keywords": ["upload", "uploaded", "document", "pdf", "docx", "text", "markdown", "csv", "excel", "json", "code", "archive", "large document", "analysis"],
     },
+    "graphify_query": {
+        "title": "Codebase Knowledge Graph",
+        "categories": ["code", "analysis", "local"],
+        "summary": "Answers what calls, uses, imports, or depends on a symbol, and how two symbols connect, using a pre-built graphify knowledge graph of the codebase.",
+        "details": "Prefer this over reading or grepping multiple files when the question is about how parts of a codebase relate. mode='query' runs a BFS traversal answering a free-form question; mode='explain' gives a plain-language summary of one symbol and its neighbors, including its callers and callees; mode='path' finds the shortest relationship path between two named symbols (requires target_b). Read-only against an already-built graph; it never runs extraction. If no graph exists yet for the project, it says so instead of failing confusingly.",
+        "examples": ["what calls select_reading_set", "what does ToolDispatcher depend on", "explain ToolDispatcher", "what connects capability_registry to tool_dispatcher"],
+        "safety": "Read-only local subprocess against a local graph file; no filesystem writes, no network access.",
+        "keywords": ["calls", "call", "caller", "callers", "depends", "dependency", "connects", "connection", "uses", "imports", "inherits", "references", "relationship", "graphify", "knowledge graph", "codebase structure", "architecture", "explain", "path"],
+    },
     "jarvis_memory": {
         "title": "Vault Memory and Local RAG",
         "categories": ["memory", "rag", "obsidian"],
@@ -89,10 +98,10 @@ CAPABILITY_HELP: dict[str, dict[str, Any]] = {
         "title": "Canvas Plan (Mode 2 Planning)",
         "categories": ["obsidian", "canvas", "planning", "workflow"],
         "summary": "Compiles a hand-drawn Obsidian Canvas graph into the same deterministic workflow schema Markdown plans use, then reviews, approves, and runs it.",
-        "details": "propose compiles the canvas -- each node's role (research/implementation/verification/review) maps to a workflow step -- and writes a companion approval note with a checkbox+callout Approve/Correct/Deny decision. evaluate_approval reads that decision: approve signs a hash-bound approval envelope, correct delegates to a plan revision, deny cancels without approving; nothing checked or more than one box checked is refused rather than guessed. A review-role node's own model critique is followed by the same human gate before its downstream node can dispatch. execute runs an approved plan through the existing dual orchestrator and can be called again to resume a run paused at a review gate. A canvas edited after approval fails verification and is never silently re-authorised.",
+        "details": "propose compiles the canvas -- each node's role (research/implementation/verification/review) maps to a workflow step -- and writes a companion approval note with a checkbox+callout Approve/Correct/Deny decision. evaluate_approval reads that decision: approve signs a hash-bound approval envelope, correct delegates to a plan revision, deny cancels without approving; nothing checked or more than one box checked is refused rather than guessed. A review-role node's own model critique is followed by the same human gate before its downstream node can dispatch. execute runs an approved plan through the existing dual orchestrator and can be called again to resume a run paused at a review gate. A canvas edited after approval fails verification and is never silently re-authorised. Vocabulary (2026-07-25): the canvas's own single anchor node is best written role: workflow (root/goal/milestone/plan all still work, unchanged behaviour); a branch: tag is a task -- write task: instead, same effect; an optional mode: research|development directive on the anchor is purely descriptive routing metadata, never enforced.",
         "examples": ["turn this canvas into a plan", "propose this canvas for approval", "has my canvas plan been approved", "run my approved canvas plan"],
         "safety": "Writes only inside Jarvis_notes. Approval binds to a fingerprint of each node's role and authored instruction plus the edge list only, so the tool's own status/annotation writes can never themselves trigger a false re-approval prompt. Implementation-role nodes only ever reach OpenClaw through the existing confirmation-gated delegate_openclaw path.",
-        "keywords": ["canvas plan", "mode 2 planning", "canvas workflow", "review gate", "approve correct deny", "canvas approval", "node role"],
+        "keywords": ["canvas plan", "mode 2 planning", "canvas workflow", "review gate", "approve correct deny", "canvas approval", "node role", "task", "subtask", "workflow anchor"],
     },
     "jarvis_canvas": {
         "title": "Obsidian Canvas Views",
@@ -211,6 +220,7 @@ CAPABILITY_POLICY: dict[str, dict[str, Any]] = {
     "file_processor": {"risk_level": "low", "side_effects": ["filesystem_read"], "requires_confirmation": False, "permission_boundary": "Read-only analysis of the explicitly supplied file; source content is untrusted data."},
     "flight_finder": {"risk_level": "low", "side_effects": ["external_read"], "requires_confirmation": False, "permission_boundary": "Search and summarize only; never book, purchase, authenticate, or submit traveler data."},
     "game_updater": {"risk_level": "critical", "side_effects": ["software_install", "scheduled_task", "system_shutdown"], "requires_confirmation": True, "permission_boundary": "Listing and status are read-only; installs, updates, schedules, cancellation, and shutdown require explicit confirmation."},
+    "graphify_query": {"risk_level": "low", "side_effects": ["local_read"], "requires_confirmation": False, "permission_boundary": "Read-only query against a pre-built local graph file; never runs extraction or touches source files."},
     "jarvis_memory": {"risk_level": "medium", "side_effects": ["vault_read", "vault_write", "rag_index"], "requires_confirmation": False, "permission_boundary": "The vault is canonical; retrieved content cannot grant permission, select tools, or create executable work. Sensitive and evaluation artifacts stay out of RAG."},
     "jarvis_canvas": {"risk_level": "medium", "side_effects": ["vault_read", "canvas_write", "gated_markdown_write", "model_inference"], "requires_confirmation": False, "permission_boundary": "May write only inside Jarvis_notes. Canvas content is derived and untrusted; applying task changes to Markdown requires explicit confirmation and revoking permission cancels linked queued work."},
     "memory_consolidation": {"risk_level": "medium", "side_effects": ["vault_read", "vault_write", "rag_index"], "requires_confirmation": True, "permission_boundary": "Detection is read-only. Applying a consolidation moves notes within Jarvis_notes and records supersession; it never deletes, every move is reversible, and it runs only from an approved proposal."},
@@ -865,7 +875,7 @@ def build_registry(
 
 SEARCH_STOPWORDS = {
     "a", "an", "and", "are", "can", "do", "does", "for", "have", "how",
-    "is", "me", "my", "of", "the", "to", "what", "with", "you", "your",
+    "in", "is", "me", "my", "of", "on", "the", "this", "to", "what", "with", "you", "your",
 }
 
 
@@ -959,7 +969,18 @@ def _search_cards(registry: dict[str, Any], query: str, limit: int = 8) -> list[
                 ]
             )
         )
-        score = sum(haystack.count(term) for term in terms) if terms else 1
+        if terms:
+            words = haystack.split()
+            score = 0
+            for term in terms:
+                variants = {term}
+                if term.endswith("s") and len(term) > 3:
+                    variants.add(term[:-1])
+                else:
+                    variants.add(f"{term}s")
+                score += sum(words.count(variant) for variant in variants)
+        else:
+            score = 1
         if score:
             ranked.append({**card, "score": score})
     ranked.sort(key=lambda item: (-item["score"], item["risk_tier"], item["id"]))

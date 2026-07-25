@@ -4,7 +4,7 @@ title: "Safe Canvas Service and Relationships"
 type: "guide"
 status: "active"
 created: "2026-07-22"
-updated: "2026-07-23T09:44:38Z"
+updated: "2026-07-25T14:33:58Z"
 project_id: "jarvis_notes"
 source: "codex"
 tags: ["developer-handbook", "canvas", "layout", "relationships", "obsidian", "tier/short-term"]
@@ -14,7 +14,7 @@ remember_note_id: ""
 rag_index: true
 confidence: 0.98
 content_hash: "22abd930dca5380160373097a67b69d49cb04e92edb7185150b043bffe247f16"
-memory_tier: "short_term"
+lifecycle: "short_term"
 schema_version: "jarvis_developer_handbook/v1"
 ---
 

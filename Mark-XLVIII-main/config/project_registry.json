@@ -106,6 +106,18 @@
         "RF backend safety invariants are authoritative.",
         "Deploy, stop, service restart, and mode changes require confirmation."
       ]
+    },
+    "archive": {
+      "display_name": "Vault Archive (Tier 3)",
+      "root": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Archive",
+      "summary": "Structural Tier 3 archive -- user-led, redundant/stale information removed. Registered only so graphify_query can resolve project_id='archive' for location indexing; not a code project. No safe_operations are granted, so every project_operator operation against it defaults to requiring confirmation.",
+      "safe_operations": [],
+      "confirmation_operations": [],
+      "blocked_operations": [],
+      "notes": [
+        "The agent must never record information from here into active memory without explicit user permission -- see Workflow 2 (Jarvis_notes/workflows/memory-tiering-and-graphify-index/Plan.md).",
+        "graphify has not been extracted against this root as of 2026-07-25 -- the archive holds one placeholder note (Archive Map.md); graphify_query correctly returns a 'no graph built yet' guard message until real content accumulates and extraction becomes worthwhile."
+      ]
     }
   }
 }

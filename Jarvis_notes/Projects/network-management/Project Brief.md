@@ -4,7 +4,7 @@ title: "Project Brief - network_management"
 type: "report"
 status: "reviewed"
 created: "2026-07-22T02:42:11Z"
-updated: "2026-07-23T09:35:03Z"
+updated: "2026-07-25T14:33:57Z"
 project_id: "jarvis_notes"
 source: "F:\\network_management"
 tags: ["project-learning", "repository", "read-only", "verified", "network-management", "tier/short-term"]
@@ -34,7 +34,7 @@ deleted_at: ""
 audit_status: "verified_read_only"
 files_read_count: 36
 inventory_file_count: 711
-memory_tier: "short_term"
+lifecycle: "short_term"
 project_root: "F:\\network_management"
 read_only: true
 snapshot_hash: "47dd7c39c3b69c4a81d97d4b27896b2af86248d5726701a035d13ec7f8aa16e4"

@@ -4,7 +4,7 @@ title: "Live Prompt Testing - 16 Prompts Across Topics and Workflows"
 type: "report"
 status: "active"
 created: "2026-07-24T16:04:47Z"
-updated: "2026-07-24T16:06:00Z"
+updated: "2026-07-25T14:33:58Z"
 project_id: "jarvis_notes"
 source: "claude"
 tags: ["validation", "live-test", "capability-test", "lmstudio-performance", "tier/short-term"]
@@ -17,7 +17,7 @@ confidence: 0.5
 valid_from: "2026-07-24T16:04:47Z"
 review_after: ""
 source_version: 1
-content_hash: "460bacea64c1b2de2e2d57428b7b4c24c1ee5d3470a9c9d9376f65beecb5c12e"
+content_hash: "d08c4c84b2aab1f7c90544bc783eb58b2f4710fcac3cae9b50adf65e2df559a1"
 supersedes: []
 contradicts: []
 depends_on: []
@@ -31,7 +31,7 @@ consumed_by: []
 related: []
 deleted: false
 deleted_at: ""
-memory_tier: "short_term"
+lifecycle: "short_term"
 ---
 
 > [!info] Scope

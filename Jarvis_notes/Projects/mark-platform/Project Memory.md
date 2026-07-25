@@ -4,7 +4,7 @@ title: "Project Memory - Mark Platform"
 type: "memory"
 status: "active"
 created: "2026-07-22T00:08:36Z"
-updated: "2026-07-23T03:00:54Z"
+updated: "2026-07-25T14:33:57Z"
 project_id: "jarvis_notes"
 source: "F:\\Mark-XLVIII-main\\Jarvis_notes\\Projects\\mark-platform\\Project Brief.md"
 tags: ["project-memory", "repository", "mark-platform", "tier/short-term"]
@@ -13,11 +13,11 @@ index_state: "indexed_local"
 remember_note_id: ""
 rag_index: true
 sensitivity: "internal"
-confidence: 0.8
-valid_from: "2026-07-22T01:24:58Z"
+confidence: 0.55
+valid_from: "2026-07-25T10:23:47Z"
 review_after: ""
-source_version: 9
-content_hash: "3deb55c16b0137a08866080f14bdf652dfefa700b74a1cbe1c2065ecfb20a643"
+source_version: 13
+content_hash: "f4d84ccdcb1ac4a70e60d6ae97efef54741dabb527e4c93645a5c0eb8f301c98"
 supersedes: []
 contradicts: []
 depends_on: []
@@ -31,9 +31,10 @@ consumed_by: []
 related: ["project-brief-mark-platform"]
 deleted: false
 deleted_at: ""
-memory_tier: "short_term"
+lifecycle: "short_term"
+project_key: "mark_platform"
 project_root: "F:\\Mark-XLVIII-main"
-snapshot_hash: "a90bcc490f1e510695496e511e86ccc36bb23b74274df791b1a7012005934c58"
+snapshot_hash: "fad61a7de8afe10963769c3236c990b1164d2b9a4a1dac80e2cd5f18ccd20f6a"
 workflow_id: "project_repository_learning/v1"
 ---
 
@@ -44,11 +45,9 @@ workflow_id: "project_repository_learning/v1"
 
 ## Accepted Takeaways
 
-- `project_operator.py` is planned but not implemented.
-- `dual_orchestrator` workflow exists in schema but not in code.
-- `clawteam` CLI is actively developed with live file edits.
-- `capability_registry` uses stateless selectors for efficiency.
-- `document_workflow.py` supports resumable, chunked file analysis.
+- The canonical project root is `F:\Mark-XLVIII-main`.
+- The current repository snapshot is `fad61a7de8afe10963769c3236c990b1164d2b9a4a1dac80e2cd5f18ccd20f6a`.
+- JARVIS read 35 selected files and skipped 3 sensitive files.
 
 ## Retrieval Guidance
 

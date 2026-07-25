@@ -4,7 +4,7 @@ title: "Capability Test - VRAM Admission"
 type: "plan"
 status: "pending_review"
 created: "2026-07-24T01:41:33Z"
-updated: "2026-07-24T01:59:41Z"
+updated: "2026-07-25T14:33:56Z"
 project_id: "jarvis_notes"
 source: "jarvis"
 tags: ["plan", "workflow", "pending-approval", "tier-short-term", "capability-test"]
@@ -37,9 +37,9 @@ approval_state: "pending_review"
 approved_action_ids: ["p01", "p02", "p03", "p04"]
 decision_gates: []
 execution_state: "not_started"
+lifecycle: "short_term"
 local_context_count: 5
 manifest_hash: "84fe2401432741274d9cd48a31cb1f506a3f11d17c73588c29ebde52c79f4405"
-memory_tier: "short_term"
 original_prompt: "Design VRAM-aware model admission for MARK. Right now max_task_models_loaded is a flat count of 1, even though model_registry.MODEL_PROFILES already declares vram_gb per model and runtime.json declares a full lmstudio_host_profile with two GPUs (an 8GB GTX 1080 and an 8GB RX 5500 XT), neither of which is read by any selection or load path today. Replace the count-based budget with a byte-based budget so a small worker model and a larger VL model can coexist when their combined VRAM fits, treating the two GPUs as separate pools given the mixed-vendor Vulkan backend. Produce an actionable plan."
 plan_version: 1
 research_state: "complete"

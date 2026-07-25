@@ -4,7 +4,7 @@ title: "JARVIS Developer Handbook"
 type: "guide"
 status: "active"
 created: "2026-07-22"
-updated: "2026-07-23T02:52:44Z"
+updated: "2026-07-25T14:55:11Z"
 project_id: "jarvis_notes"
 source: "codex"
 tags: ["developer-handbook", "jarvis", "architecture", "index", "tier/short-term"]
@@ -13,8 +13,8 @@ index_state: "indexed_local"
 remember_note_id: ""
 rag_index: true
 confidence: 0.97
-content_hash: "400c781c1ede519aaae2df47da8d1129c6f034801d5e848dcdccdbad6406faf6"
-memory_tier: "short_term"
+content_hash: "bf726e7ddfa3505d18d8e716edf128313f67f33be0d929911973a2e4f83291ac"
+lifecycle: "short_term"
 project_key: "mark_xlviii"
 schema_version: "jarvis_developer_handbook/v1"
 ---
@@ -43,6 +43,8 @@ schema_version: "jarvis_developer_handbook/v1"
 | [[10 Vault Change Awareness]] | Persistent change journal, self-write receipts, structural diffs, indexing, and turn acknowledgement |
 | [[11 Safe Canvas Service and Relationships]] | JSON Canvas validation, revision-bound layout, pinned nodes, and cross-Canvas indexing |
 | [[12 Process Trace and Operational UI]] | Redacted event stream, Router trace, command palette, Operations, and verified health |
+| [[13 Canvas Planning Engine and Reasoning-Backed Decomposition]] | Mode 2 planning: dual-purpose nodes, model-reasoned decomposition, critique and refine loop, branch-aware fan-out, context inheritance |
+| [[14 Graphify Knowledge Graph Integration]] | External knowledge-graph tool: deterministic repo-learning centrality boost, the `graphify_query` on-demand tool, `repo_slicer` symbol-ranking synergy, the graph-freshness git hook, and measured RAG-vs-knowledge-graph routing guidance |
 
 ## System At A Glance
 
@@ -88,8 +90,11 @@ flowchart LR
 | `Mark-XLVIII-main/actions/capability_registry.py` | L0 cards, L1 manifests, workflow metadata, MCP-style discovery |
 | `Mark-XLVIII-main/actions/plan_workflow.py` | Plan creation, revision, approval, bundle creation, dispatch, summary, blockers |
 | `Mark-XLVIII-main/actions/dual_orchestrator.py` | Workflow validation, compilation, execution, fan-out, review, leases, recovery |
+| `Mark-XLVIII-main/actions/canvas_plan.py` | Mode 2: canvas-to-workflow compiler, goal decomposition, critique/refine loop, branch-aware fan-out |
 | `Mark-XLVIII-main/actions/jarvis_memory.py` | Markdown services, reports, local RAG, graph, tasks, learning, reconciliation |
-| `Mark-XLVIII-main/actions/project_learning.py` | Read-only repository inventory, evidence selection, cited synthesis, project memory |
+| `Mark-XLVIII-main/actions/project_learning.py` | Read-only repository inventory, evidence selection, cited synthesis, project memory, graphify-informed centrality |
+| `Mark-XLVIII-main/actions/graphify_query.py` | On-demand knowledge-graph query/explain/path tool, subprocess-wrapped |
+| `Mark-XLVIII-main/core/repo_slicer.py` | AST code slicing into ranked, deduplicated function/class units, graphify-degree-aware |
 | `Mark-XLVIII-main/actions/document_workflow.py` | Resumable extraction and chunk/map/reduce analysis |
 | `Mark-XLVIII-main/actions/model_lifecycle.py` | LM Studio model inventory, loading, TTL, generation leases, cleanup |
 | `Mark-XLVIII-main/core/tts.py` and `core/stt.py` | Local speech engines and turn-safe playback/capture |

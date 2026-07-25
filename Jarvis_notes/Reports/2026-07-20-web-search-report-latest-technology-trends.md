@@ -4,7 +4,7 @@ title: "Web Search Report - Latest Technology Trends"
 type: "report"
 status: "draft"
 created: "2026-07-20T22:11:02Z"
-updated: "2026-07-23T03:00:54Z"
+updated: "2026-07-25T14:33:57Z"
 project_id: "jarvis_notes"
 source: "user"
 tags: ["technology", "trends", "research", "tier/short-term"]
@@ -12,7 +12,7 @@ sync_state: "local_only"
 index_state: "indexed_local"
 remember_note_id: ""
 content_hash: "e630868e8497d7d4a968bc529235c1cb4c593e460881316bb42afb0ab3782a50"
-memory_tier: "short_term"
+lifecycle: "short_term"
 sync_error: ""
 ---
 

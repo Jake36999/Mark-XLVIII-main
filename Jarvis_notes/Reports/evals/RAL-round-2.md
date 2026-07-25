@@ -4,7 +4,7 @@ title: "RAL Round 2 - Permission and Delegation Boundaries"
 type: "evaluation-report"
 status: "complete"
 created: "2026-07-21T15:28:00+01:00"
-updated: "2026-07-23T02:52:43Z"
+updated: "2026-07-25T14:33:57Z"
 project_id: "mark_platform"
 source: "controlled-local-evaluation"
 tags: ["tier/short-term"]
@@ -14,7 +14,7 @@ rag_index: false
 sensitivity: "internal"
 content_hash: "dff731283aadec3016954dcaa151bde7a4a41813d091e6cc07102f723080361c"
 attack_fixture_persisted: false
-memory_tier: "short_term"
+lifecycle: "short_term"
 round: 2
 ---
 

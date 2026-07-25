@@ -4,7 +4,7 @@ title: "RAL Round 3 - Vault and RAG Integrity"
 type: "evaluation-report"
 status: "complete"
 created: "2026-07-21T15:48:00+01:00"
-updated: "2026-07-23T02:52:44Z"
+updated: "2026-07-25T14:33:57Z"
 project_id: "mark_platform"
 source: "controlled-local-evaluation"
 tags: ["tier/short-term"]
@@ -14,7 +14,7 @@ rag_index: false
 sensitivity: "internal"
 content_hash: "45934efe82cf712efcb22a4fb7948f0c61de0fef87f35f3413a92f68f4c1a312"
 attack_fixture_persisted: false
-memory_tier: "short_term"
+lifecycle: "short_term"
 round: 3
 ---
 

@@ -4,15 +4,15 @@ title: "Glossary"
 type: "guide"
 status: "draft"
 created: "2026-07-21"
-updated: "2026-07-23T03:00:54Z"
+updated: "2026-07-25T14:59:49Z"
 project_id: "jarvis_notes"
 source: "codex"
 tags: ["user-guide", "glossary", "tier/short-term"]
 sync_state: "local_only"
 index_state: "indexed_local"
 remember_note_id: ""
-content_hash: "0702114cbe46e21537e6869a1a629f2e870453a4e5f74f97cc56c361ded354e2"
-memory_tier: "short_term"
+content_hash: "a7f20512b8a9bacd59bbb8cc7d1812ecc4d729cce8de2aa3447dd85e81879a6e"
+lifecycle: "short_term"
 ---
 
 # Glossary
@@ -63,6 +63,10 @@ Generated vault notes should include frontmatter fields such as:
 | `sync_state` | Local/backend sync status |
 | `index_state` | Local RAG index status |
 | `remember_note_id` | Optional Remember Me backend id |
+| `lifecycle` | How long a note has been useful — `short_term`, `long_term`, or `archive` (renamed from `memory_tier` 2026-07-25; see "Lifecycle vs. Structural Tier" below) |
+
+> [!warning] Lifecycle vs. Structural Tier
+> `lifecycle` (above) is a per-note field. A separate, unrelated idea — "structural tier" (Tier 0-3: immediate context, general documentation, project/workflow-specific, archive) — describes *where* a category of information sits, not any one note's own age. Both use the word "tier" in conversation; they are not the same axis.
 
 ## Tools And Workflows
 
@@ -77,12 +81,29 @@ Generated vault notes should include frontmatter fields such as:
 | Approval State | Plan frontmatter value showing whether a plan is pending review, revised, approved, or ready |
 | Blocker Note | Vault note explaining why execution cannot continue without user input |
 | Execution Summary | Vault note recording completed work, evidence, artifacts, and follow-ups |
+| Knowledge Graph | A pre-built local map of a codebase's structure (via `graphify_query`) — answers "what calls/depends on X," not "what do you know about X" |
 
 > [!example] Workflow example
 > `current_news_report` resolves the date, searches cited news, creates a Markdown report, and reindexes the vault.
 
 > [!example] Planning example
 > `long_form_plan_execution` creates a plan note, waits for review, then executes approved milestones through existing guarded tools.
+
+### Canvas Planning Terms (Mode 2)
+
+> [!warning] "Workflow" now means two related-but-distinct things
+> Above, "Workflow" is a registered multi-tool pattern like `current_news_report` (Mode 1). Below, "Workflow" is the top-level anchor of a Mode 2 canvas plan. Both are real, current usages — context (which mode you're in) disambiguates which one is meant; this glossary isn't picking a winner between them.
+
+| Term | Meaning |
+| --- | --- |
+| Workflow (Mode 2) | A canvas's own single anchor — the top-level unit of Mode 2 planning (`role: workflow`, was called `plan`/`goal`/`root` interchangeably before 2026-07-25) |
+| Goal | The workflow's own stated objective — currently 1:1 with the workflow itself |
+| Task | A macro pillar — a `branch:`-tagged group of largely-independent nodes (`task:` is now the preferred spelling of `branch:`) |
+| Subtask | An individual node within a task/branch |
+| Mode | Optional `research`/`development` framing on a workflow's anchor node — purely descriptive, never enforced |
+
+> [!note] Vocabulary is additive, not a rename
+> `role: workflow` and `task:` are new accepted spellings, not replacements — a canvas written with the older `role: plan`/`branch:` words still works identically. See [[Developer Handbook/13 Canvas Planning Engine and Reasoning-Backed Decomposition|Note 13]].
 
 ## Models And Speech
 

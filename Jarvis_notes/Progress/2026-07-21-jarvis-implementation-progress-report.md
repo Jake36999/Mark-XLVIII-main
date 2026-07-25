@@ -4,7 +4,7 @@ title: "JARVIS Implementation and Live Validation Progress - 2026-07-21"
 type: "progress_tracker"
 status: "complete"
 created: "2026-07-21T20:41:43Z"
-updated: "2026-07-23T02:52:43Z"
+updated: "2026-07-25T14:33:56Z"
 project_id: "jarvis_notes"
 source: "codex"
 tags: ["jarvis", "mark-xl-viii", "implementation", "live-validation", "progress", "tier/short-term"]
@@ -19,7 +19,7 @@ review_after: "2026-07-28"
 source_version: 3
 content_hash: "31fff82e41268ae66e0c829cdcfe1b1351b6203ce4a2e6095cb12443d37bb40e"
 related: ""
-memory_tier: "short_term"
+lifecycle: "short_term"
 workflow_id: "jarvis-finalization"
 ---
 

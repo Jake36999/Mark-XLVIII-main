@@ -140,7 +140,12 @@ _ROLE_SPECS: dict[str, dict[str, Any]] = {
 _DEFAULT_ROLE = "research"
 
 _ROLE_ALIASES = {
-    "root": "plan", "goal": "plan", "milestone": "plan",
+    # "workflow" (2026-07-25 terminology workflow) is the preferred spelling for
+    # the canvas's own single anchor node going forward -- see the developer
+    # handbook. "root"/"goal"/"milestone" stay as accepted synonyms so no
+    # existing hand-drawn canvas breaks; nothing downstream changes behaviour,
+    # this only affects which word an author is allowed to type.
+    "workflow": "plan", "root": "plan", "goal": "plan", "milestone": "plan",
     "reason": "research", "scout": "research", "investigate": "research",
     "impl": "implementation", "implement": "implementation", "build": "implementation",
     "code": "implementation", "execute": "implementation",
@@ -164,12 +169,20 @@ _ROLE_HASHTAG_RE = re.compile(r"#(plan|research|implementation|verification|revi
 # `branch` (WS4c, 2026-07-24 fan-out planning): which macro column a node
 # belongs to. Nodes without it share a single implicit branch, so every
 # existing single-chain canvas is completely unaffected -- see compile_canvas
-# and core.canvas_layout's branch-aware "dependency" profile.
+# and core.canvas_layout's branch-aware "dependency" profile. `task` (2026-07-25
+# terminology workflow) is the preferred spelling going forward -- a branch
+# *is* a macro task/pillar, this only changes which word an author types.
+#
+# `mode` (2026-07-25 terminology workflow): the workflow's research/development
+# framing, read only off the plan/workflow-anchor node and stored as
+# `workflow["variables"]["mode"]` by compile_canvas. Purely descriptive routing
+# metadata -- never validated or enforced, absent by default, no effect on
+# compilation if omitted or misspelled.
 _DIRECTIVE_LINE_RE = re.compile(
-    r"^\s*(role|type|scope|test|project|file|recommended\s+model|branch)\s*:\s*(.*?)\s*$",
+    r"^\s*(role|type|scope|test|project|file|recommended\s+model|branch|task|mode)\s*:\s*(.*?)\s*$",
     re.IGNORECASE,
 )
-_DIRECTIVE_ALIASES = {"type": "role", "test": "scope"}
+_DIRECTIVE_ALIASES = {"type": "role", "test": "scope", "task": "branch"}
 
 
 def _parse_node_directives(text: str) -> tuple[dict[str, str], str]:
@@ -369,11 +382,13 @@ def compile_canvas(
     # canvas's own `plan`-role root node can declare the default for the whole
     # plan. A node-level `project:` still overrides it.
     canvas_project_id = ""
+    canvas_mode = ""
     for node in nodes:
         if _resolve_role(node) == "plan":
-            candidate = _node_directives(node).get("project", "")
-            if candidate:
-                canvas_project_id = candidate
+            node_directives = _node_directives(node)
+            canvas_project_id = canvas_project_id or node_directives.get("project", "")
+            canvas_mode = canvas_mode or node_directives.get("mode", "")
+            if canvas_project_id and canvas_mode:
                 break
 
     registered_project_ids: set[str] | None = None
@@ -515,6 +530,7 @@ def compile_canvas(
         "variables": {
             "source": "canvas",
             "node_step_ids": node_to_step,
+            **({"mode": canvas_mode} if canvas_mode else {}),
         },
         "steps": steps,
     }
@@ -678,6 +694,7 @@ def decompose_goal_to_canvas(
     canvas_name: str | None = None,
     cfg: dict[str, Any] | None = None,
     max_attempts: int = 3,
+    user_workflow_mode: str = "",
 ) -> dict[str, Any]:
     """Ask the planner model to turn a goal into a real canvas file.
 
@@ -700,6 +717,12 @@ def decompose_goal_to_canvas(
     wasn't the one live testing actually found, so it stays a one-shot
     failure rather than being folded into a mechanism tuned for the other
     failure class.
+
+    `user_workflow_mode` (2026-07-25 terminology workflow, optional): written
+    as a `mode:` directive onto the generated plan/workflow-anchor node when
+    given, so `compile_canvas` later threads it into `workflow["variables"]
+    ["mode"]`. Purely descriptive -- not validated against a fixed set, never
+    blocks decomposition, absent by default.
     """
     from actions import jarvis_canvas as canvas_actions
     from core.canvas_layout import layout_document
@@ -775,6 +798,8 @@ def decompose_goal_to_canvas(
             value = str(directives.get(key) or "").strip()
             if value:
                 lines.append(f"{label}: {value}")
+        if role == "plan" and user_workflow_mode.strip():
+            lines.append(f"mode: {user_workflow_mode.strip()}")
         prose = str(node.get("prose") or "").strip() or f"{role} step for: {goal[:200]}"
         text = "\n".join(lines) + "\n\n" + prose
         deliverables_raw = node.get("deliverables")
@@ -841,6 +866,7 @@ def decompose_goal_to_canvas(
         "node_count": len(canvas_nodes),
         "rationale": str(payload.get("rationale") or ""),
         "goal": goal,
+        "mode": user_workflow_mode.strip(),
         "attempts": attempt,
     }
 

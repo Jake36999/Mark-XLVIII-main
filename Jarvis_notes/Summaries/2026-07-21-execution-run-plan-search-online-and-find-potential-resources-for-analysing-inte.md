@@ -4,7 +4,7 @@ title: "Execution Run - Plan - Search online and find potential resources for an
 type: "execution_summary"
 status: "queued"
 created: "2026-07-21T23:46:21Z"
-updated: "2026-07-23T03:00:54Z"
+updated: "2026-07-25T14:33:57Z"
 project_id: "jarvis_notes"
 source: "jarvis"
 tags: ["plan-execution", "subagents", "synthesis", "tier/short-term"]
@@ -34,7 +34,7 @@ deleted_at: ""
 agent_count: 1
 approval_state: "approved"
 execution_state: "queued"
-memory_tier: "short_term"
+lifecycle: "short_term"
 packet_count: 4
 plan_id: "plan-plan-search-online-and-find-potential-resources-for-analysing-intel-5300"
 plan_path: "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-21-plan-search-online-and-find-potential-resources-for-analysing-intel-5300-csi-pac.md"

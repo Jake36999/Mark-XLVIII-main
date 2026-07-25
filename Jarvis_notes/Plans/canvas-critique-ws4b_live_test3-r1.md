@@ -4,7 +4,7 @@ title: "Plan Critique — ws4b_live_test3 (r1)"
 type: "plan"
 status: "active"
 created: "2026-07-24T19:57:22Z"
-updated: "2026-07-24T20:04:24Z"
+updated: "2026-07-25T14:33:56Z"
 project_id: "jarvis_notes"
 source: "canvas_plan"
 tags: ["canvas-plan", "critique", "ws4b-live-test3", "tier/short-term"]
@@ -31,7 +31,7 @@ consumed_by: []
 related: []
 deleted: false
 deleted_at: ""
-memory_tier: "short_term"
+lifecycle: "short_term"
 revision: 1
 verdict: "approve"
 workflow_id: "ws4b_live_test3"

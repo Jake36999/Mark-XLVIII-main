@@ -78,7 +78,7 @@ def _all_notes(cfg: dict[str, Any]) -> list[dict[str, Any]]:
                 "review_after": row["review_after"] or metadata.get("review_after") or "",
                 "snapshot_hash": str(metadata.get("snapshot_hash") or ""),
                 "project_root": str(metadata.get("project_root") or ""),
-                "memory_tier": jm.note_tier(metadata, path, cfg),
+                "lifecycle": jm.note_tier(metadata, path, cfg),
                 "supersedes": metadata.get("supersedes") or [],
                 "tokens": _tokens(f"{title} {row['body'] or ''}"),
             }
@@ -142,7 +142,7 @@ def detect_candidates(cfg: dict[str, Any] | None = None, *, now: float | None = 
     check_drift = bool(cfg.get("memory_consolidation_check_snapshot_drift", True))
 
     for note in notes:
-        if note["memory_tier"] == "archive":
+        if note["lifecycle"] == "archive":
             continue
         review_ts = _parse_iso(note["review_after"])
         if review_ts is not None and review_ts < now:
@@ -161,7 +161,7 @@ def detect_candidates(cfg: dict[str, Any] | None = None, *, now: float | None = 
             })
 
         if (
-            note["memory_tier"] == "short_term"
+            note["lifecycle"] == "short_term"
             and note["project_id"]
             and note["project_id"] != default_project
             and note["updated_ts"] is not None
@@ -266,7 +266,7 @@ def propose(cfg: dict[str, Any] | None = None, *, now: float | None = None) -> d
         note_type="memory", title=title, content=body, content_mode="full_body",
         cfg=cfg, sync=False, reindex=True,
         metadata_extra={
-            "type": "consolidation_proposal", "rag_index": False, "memory_tier": "short_term",
+            "type": "consolidation_proposal", "rag_index": False, "lifecycle": "short_term",
             "consolidation_actions": actions,
         },
         path=root / "Consolidations" / f"{jm._now()[:10]}-consolidation-proposal.md",
@@ -296,7 +296,7 @@ def apply_action(action: dict[str, Any], *, cfg: dict[str, Any] | None = None) -
 
     if kind == "archive":
         note_type = jm.read_note(src)[0].get("type") if src.exists() else "memory"
-        moved = jm.move_note(src, _archive_dir(note_type, cfg), cfg=cfg, memory_tier="archive")
+        moved = jm.move_note(src, _archive_dir(note_type, cfg), cfg=cfg, lifecycle="archive")
         return {"ok": moved["ok"], "kind": "archive", "path": moved.get("path", str(src)), **({} if moved["ok"] else {"error": moved.get("error")})}
 
     if kind == "promote":
@@ -314,10 +314,10 @@ def apply_action(action: dict[str, Any], *, cfg: dict[str, Any] | None = None) -
         long_note = jm.create_note(
             note_type="memory", title=title, content=f"# {title}\n\n{distilled}",
             content_mode="full_body", cfg=cfg, sync=False, reindex=True,
-            metadata_extra={"memory_tier": "long_term", "project_id": project, "supersedes": [src.stem]},
+            metadata_extra={"lifecycle": "long_term", "project_id": project, "supersedes": [src.stem]},
             path=long_dir / f"{jm._slug(title, 'note')}.md",
         )
-        archived = jm.move_note(src, _archive_dir(meta.get("type") or "memory", cfg), cfg=cfg, memory_tier="archive")
+        archived = jm.move_note(src, _archive_dir(meta.get("type") or "memory", cfg), cfg=cfg, lifecycle="archive")
         return {"ok": True, "kind": "promote", "long_term_path": long_note["path"], "path": archived.get("path", str(src))}
 
     if kind == "merge":
@@ -331,7 +331,7 @@ def apply_action(action: dict[str, Any], *, cfg: dict[str, Any] | None = None) -
             mode="append", cfg=cfg,
         )
         note_type = jm.read_note(src)[0].get("type") if src.exists() else "memory"
-        archived = jm.move_note(src, _archive_dir(note_type, cfg), cfg=cfg, memory_tier="archive")
+        archived = jm.move_note(src, _archive_dir(note_type, cfg), cfg=cfg, lifecycle="archive")
         return {"ok": True, "kind": "merge", "path": archived.get("path", str(src)), "into": str(survivor)}
 
     if kind == "review_stale":
@@ -388,7 +388,7 @@ def _detect_duplicates(
     """
     duplicate: list[dict[str, Any]] = []
     contradiction: list[dict[str, Any]] = []
-    live = [n for n in notes if n["memory_tier"] != "archive" and n["tokens"]]
+    live = [n for n in notes if n["lifecycle"] != "archive" and n["tokens"]]
 
     for i, note in enumerate(live):
         for other in live[i + 1:]:

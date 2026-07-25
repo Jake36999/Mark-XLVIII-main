@@ -4,7 +4,7 @@ title: "Implementation Log and Known Boundaries"
 type: "log"
 status: "active"
 created: "2026-07-22"
-updated: "2026-07-23T03:00:54Z"
+updated: "2026-07-25T14:33:58Z"
 project_id: "jarvis_notes"
 source: "codex"
 tags: ["developer-handbook", "implementation-log", "validation", "known-boundaries", "tier/short-term"]
@@ -14,7 +14,7 @@ remember_note_id: ""
 rag_index: true
 confidence: 0.98
 content_hash: "2e7f08c6d8046d0d7faf21acde707cc82925b7deb607df2367d9112f1066dd17"
-memory_tier: "short_term"
+lifecycle: "short_term"
 project_key: "mark_xlviii"
 schema_version: "jarvis_developer_handbook/v1"
 ---

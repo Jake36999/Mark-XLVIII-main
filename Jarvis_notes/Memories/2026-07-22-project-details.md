@@ -4,7 +4,7 @@ title: "Project Details"
 type: "memory"
 status: "draft"
 created: "2026-07-22T12:15:55Z"
-updated: "2026-07-23T03:00:54Z"
+updated: "2026-07-25T14:33:56Z"
 project_id: "jarvis_notes"
 source: "user"
 tags: ["project", "details", "tier/short-term"]
@@ -31,7 +31,7 @@ consumed_by: []
 related: []
 deleted: false
 deleted_at: ""
-memory_tier: "short_term"
+lifecycle: "short_term"
 sync_error: ""
 ---
 

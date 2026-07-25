@@ -177,11 +177,26 @@ def dedupe_slices(slices: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return list(by_content.values())
 
 
-def render_slices(slices: list[dict[str, Any]], *, max_chars: int = 6000, cite: bool = True) -> str:
+def render_slices(
+    slices: list[dict[str, Any]],
+    *,
+    max_chars: int = 6000,
+    cite: bool = True,
+    symbol_degree: dict[tuple[str, str], int] | None = None,
+) -> str:
     """Render slices as compact, code-bearing model-input text within a char budget.
 
-    Higher-complexity slices are shown first so a truncated budget keeps the most
-    informative units; those that no longer fit degrade to a signature-only line.
+    Ranked by real cross-file usage first, then complexity: a function with many
+    callers elsewhere in the codebase outranks a complex-but-unused private
+    helper, and among equally-(un)used slices the higher-complexity one still
+    goes first so a truncated budget keeps the most informative units. Slices
+    that no longer fit degrade to a signature-only line.
+
+    ``symbol_degree`` (optional): a ``{(file, name): cross_file_caller_count}``
+    map, typically built from a pre-built graphify knowledge graph
+    (``project_learning._graphify_symbol_degree``). Omit it (default) for
+    byte-identical behaviour to before this signal existed -- every slice's
+    degree defaults to 0 and the ranking collapses back to complexity-only.
 
     ``cite=True`` (default) keeps the ``[file:path]`` prefix so the standalone
     citation convention and clickable-link rendering both still work. Set
@@ -189,7 +204,11 @@ def render_slices(slices: list[dict[str, Any]], *, max_chars: int = 6000, cite: 
     ``project_learning`` batch wrapper, whose ``_defuse_source_text`` step would
     otherwise strip the ``[file:`` token out of the source body).
     """
-    ranked = sorted(slices, key=lambda s: (-s["complexity"], s["file"], s["start_line"]))
+    degree = symbol_degree or {}
+    ranked = sorted(
+        slices,
+        key=lambda s: (-degree.get((s["file"], s["name"]), 0), -s["complexity"], s["file"], s["start_line"]),
+    )
     parts: list[str] = []
     used = 0
     for item in ranked:

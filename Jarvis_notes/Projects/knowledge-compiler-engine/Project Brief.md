@@ -4,7 +4,7 @@ title: "Project Brief - Knowledge Compiler Engine"
 type: "report"
 status: "reviewed"
 created: "2026-07-22T11:42:34Z"
-updated: "2026-07-23T09:35:03Z"
+updated: "2026-07-25T14:33:57Z"
 project_id: "jarvis_notes"
 source: "F:\\knowledge_compiler_engine (DAG Engine)"
 tags: ["project-learning", "repository", "read-only", "verified", "knowledge-compiler-engine", "tier/short-term"]
@@ -34,7 +34,7 @@ deleted_at: ""
 audit_status: "verified_read_only"
 files_read_count: 36
 inventory_file_count: 123
-memory_tier: "short_term"
+lifecycle: "short_term"
 project_key: "knowledge_compiler_engine"
 project_root: "F:\\knowledge_compiler_engine (DAG Engine)"
 quality_state: "audited"

@@ -4,7 +4,7 @@ title: "Local Model Characterization Benchmark - Timeout Diagnosis and Overseer 
 type: "report"
 status: "active"
 created: "2026-07-24T17:41:46Z"
-updated: "2026-07-24T17:48:19Z"
+updated: "2026-07-25T14:33:58Z"
 project_id: "jarvis_notes"
 source: "claude"
 tags: ["validation", "lmstudio-performance", "model-benchmark", "vram", "overseer", "tier/short-term"]
@@ -31,7 +31,7 @@ consumed_by: []
 related: []
 deleted: false
 deleted_at: ""
-memory_tier: "short_term"
+lifecycle: "short_term"
 ---
 
 > [!info] Scope

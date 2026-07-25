@@ -1,11 +1,15 @@
 """One-time, idempotent migration to the tiered memory model.
 
-Backfills `memory_tier: short_term` (and the `#tier/short-term` tag) onto existing
+Backfills `lifecycle: short_term` (and the `#tier/short-term` tag) onto existing
 notes that lack the field, and seeds an empty Map-of-Content per tier. It moves
 nothing: existing notes stay exactly where they are, which is why re-running is
 safe.
 
 Supports Task B3 of docs/superpowers/plans/2026-07-22-mark-memory-consolidation-and-tiers.md.
+Field renamed from `memory_tier` to `lifecycle` 2026-07-25 (Phase 0 of
+docs/superpowers/plans/2026-07-23-mark-project-knowledge-cartridges.md) to stop
+colliding with the unrelated structural Tier 0-3 axis -- see
+scripts/migrate-lifecycle-field.py for that one-time rename.
 
 Usage:
     python scripts/migrate-memory-tiers.py            # dry run
@@ -42,7 +46,7 @@ def backfill(root: Path, cfg: dict, *, apply: bool) -> dict:
         except Exception:
             skipped += 1
             continue
-        if str(metadata.get("memory_tier") or "").strip():
+        if str(metadata.get("lifecycle") or "").strip():
             already += 1
             continue
         tier = jm.note_tier(metadata, md, cfg)  # honour folder placement
@@ -52,7 +56,7 @@ def backfill(root: Path, cfg: dict, *, apply: bool) -> dict:
             for tag in obs.tier_tags(tier):
                 if tag not in tags:
                     tags.append(tag)
-            jm.update_note_frontmatter(md, {"memory_tier": tier, "tags": tags})
+            jm.update_note_frontmatter(md, {"lifecycle": tier, "tags": tags})
         changed.append((str(md.relative_to(root)), tier))
     return {"changed": changed, "already_tiered": already, "skipped": skipped}
 
@@ -80,7 +84,7 @@ def seed_mocs(root: Path, cfg: dict, *, apply: bool) -> list[str]:
             jm.create_note(
                 note_type="memory", title=title, content=f"# {title}\n\n{body}", content_mode="full_body",
                 cfg=cfg, sync=False,
-                metadata_extra={"memory_tier": tier, "type": "map_of_content", "rag_index": False},
+                metadata_extra={"lifecycle": tier, "type": "map_of_content", "rag_index": False},
                 path=moc,
             )
     return created

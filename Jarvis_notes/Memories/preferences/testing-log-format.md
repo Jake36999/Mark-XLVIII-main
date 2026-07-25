@@ -4,7 +4,7 @@ title: "Preferences: Testing Log Format"
 type: "memory"
 status: "draft"
 created: "2026-07-24T15:20:41Z"
-updated: "2026-07-24T15:26:08Z"
+updated: "2026-07-25T14:33:56Z"
 project_id: "jarvis_notes"
 source: "daemon"
 tags: ["memory", "preferences", "tier/short-term"]
@@ -31,7 +31,7 @@ consumed_by: []
 related: []
 deleted: false
 deleted_at: ""
-memory_tier: "short_term"
+lifecycle: "short_term"
 sync_error: ""
 ---
 

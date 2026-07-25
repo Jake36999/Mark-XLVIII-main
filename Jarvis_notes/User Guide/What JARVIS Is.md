@@ -4,7 +4,7 @@ title: "What JARVIS Is"
 type: "guide"
 status: "draft"
 created: "2026-07-22"
-updated: "2026-07-23T02:52:44Z"
+updated: "2026-07-25T14:33:58Z"
 project_id: "jarvis_notes"
 source: "claude"
 tags: ["user-guide", "jarvis", "overview", "non-technical", "tier/short-term"]
@@ -14,7 +14,7 @@ remember_note_id: ""
 rag_index: true
 confidence: 0.9
 content_hash: "ed561a394a55725d45b5a68fe82a32fafdce1533dcb1e7da2ae4a6b3f81be843"
-memory_tier: "short_term"
+lifecycle: "short_term"
 ---
 
 # What JARVIS Is

@@ -4,7 +4,7 @@ title: "Storage, Configuration, and Operations"
 type: "guide"
 status: "active"
 created: "2026-07-22"
-updated: "2026-07-23T03:00:54Z"
+updated: "2026-07-25T14:33:58Z"
 project_id: "jarvis_notes"
 source: "codex"
 tags: ["developer-handbook", "storage", "configuration", "operations", "troubleshooting", "tier/short-term"]
@@ -14,7 +14,7 @@ remember_note_id: ""
 rag_index: true
 confidence: 0.96
 content_hash: "b6c215fc1b0ea1a25f2a2e5e32b9032fcefd558a09438aec3fc049662a747241"
-memory_tier: "short_term"
+lifecycle: "short_term"
 project_key: "mark_xlviii"
 schema_version: "jarvis_developer_handbook/v1"
 ---

@@ -4,7 +4,7 @@ title: "Fan-Out, Workers, Review, and Recovery"
 type: "guide"
 status: "active"
 created: "2026-07-22"
-updated: "2026-07-23T02:52:44Z"
+updated: "2026-07-25T14:33:58Z"
 project_id: "jarvis_notes"
 source: "codex"
 tags: ["developer-handbook", "fan-out", "workers", "review", "recovery", "tier/short-term"]
@@ -14,7 +14,7 @@ remember_note_id: ""
 rag_index: true
 confidence: 0.97
 content_hash: "13ccc8a9c1188e34fb401656804ef2f67b36be9ae8f6b97d6b762a7f7883761b"
-memory_tier: "short_term"
+lifecycle: "short_term"
 project_key: "mark_xlviii"
 schema_version: "jarvis_developer_handbook/v1"
 ---

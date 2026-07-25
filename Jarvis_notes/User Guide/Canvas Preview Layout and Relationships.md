@@ -4,7 +4,7 @@ title: "Canvas Preview Layout and Relationships"
 type: "guide"
 status: "active"
 created: "2026-07-22"
-updated: "2026-07-23T09:44:38Z"
+updated: "2026-07-25T14:33:57Z"
 project_id: "jarvis_notes"
 source: "codex"
 tags: ["user-guide", "canvas", "layout", "obsidian", "tier/short-term"]
@@ -14,7 +14,7 @@ remember_note_id: ""
 rag_index: true
 confidence: 0.98
 content_hash: "5e19394623583a5d4215b198e0ab280c170a487319a7e83dd6c61796299f532f"
-memory_tier: "short_term"
+lifecycle: "short_term"
 schema_version: "jarvis_user_guide/v1"
 ---
 

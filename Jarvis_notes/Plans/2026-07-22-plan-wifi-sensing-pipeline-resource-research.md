@@ -4,7 +4,7 @@ title: "Plan - WiFi Sensing Pipeline Resource Research"
 type: "plan"
 status: "pending_review"
 created: "2026-07-22T02:18:27Z"
-updated: "2026-07-23T02:52:43Z"
+updated: "2026-07-25T14:33:56Z"
 project_id: "jarvis_notes"
 source: "jarvis"
 tags: ["plan", "workflow", "pending-approval", "tier/short-term"]
@@ -37,9 +37,9 @@ approval_state: "pending_review"
 approved_action_ids: ["p01", "p02", "p03", "p04"]
 decision_gates: []
 execution_state: "not_started"
+lifecycle: "short_term"
 local_context_count: 2
 manifest_hash: "3b75fa0d6246a2cc524e3c293f63f4c4f2fecde94b3231e317f3bc48a77fde55"
-memory_tier: "short_term"
 original_prompt: "conduct a deep research task and gather resources for using wifi for a sensing pipeline and how others are doing it, with or without a camera"
 plan_version: 1
 research_state: "complete"

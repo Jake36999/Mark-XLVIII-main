@@ -4,7 +4,7 @@ title: "Credential Exposure Audit - 2026-07-21"
 type: "log"
 status: "action_required"
 created: "2026-07-21T13:10:47Z"
-updated: "2026-07-23T02:52:43Z"
+updated: "2026-07-25T14:33:56Z"
 project_id: "jarvis_notes"
 source: "security_audit"
 tags: ["security", "credential-audit", "private", "tier/short-term"]
@@ -23,7 +23,7 @@ contradicts: []
 deleted: false
 deleted_at: ""
 finding_count: 21
-memory_tier: "short_term"
+lifecycle: "short_term"
 revocation_acknowledged: false
 ---
 

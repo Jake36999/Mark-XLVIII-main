@@ -4,7 +4,7 @@ title: "JARVIS Functional Evaluation Plan"
 type: "evaluation_plan"
 status: "complete"
 created: "2026-07-21T16:45:00Z"
-updated: "2026-07-23T02:52:44Z"
+updated: "2026-07-25T14:33:57Z"
 project_id: "jarvis-functional-eval"
 source: "codex-functional-evaluator"
 tags: ["evaluation", "functional-quality", "jarvis", "baseline-rerun", "tier/short-term"]
@@ -23,7 +23,7 @@ contradicts: []
 related: []
 deleted: false
 deleted_at: ""
-memory_tier: "short_term"
+lifecycle: "short_term"
 ---
 
 # JARVIS Functional Evaluation Plan

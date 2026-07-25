@@ -4,7 +4,7 @@ title: "Learned Topic: Dispatcher Learning"
 type: "memory"
 status: "draft"
 created: "2026-07-21T19:13:48Z"
-updated: "2026-07-23T02:52:43Z"
+updated: "2026-07-25T14:33:56Z"
 project_id: "jarvis_notes"
 source: "daemon"
 tags: ["learning", "learned-topic", "rag", "dispatcher-learning", "tier/short-term"]
@@ -32,7 +32,7 @@ related: ["learning-dispatcher-learning-map"]
 deleted: false
 deleted_at: ""
 learning_state: "memory_created"
-memory_tier: "short_term"
+lifecycle: "short_term"
 report_path: "F:\\Mark-XLVIII-main\\Jarvis_notes\\Deep Research\\2026-07-21-learning-report-dispatcher-learning.md"
 report_title: "Learning Report - Dispatcher Learning"
 retrieved_at: "2026-07-21T09:00:00Z"

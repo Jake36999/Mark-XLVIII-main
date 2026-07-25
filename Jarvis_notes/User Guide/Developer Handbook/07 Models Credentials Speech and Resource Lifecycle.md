@@ -4,7 +4,7 @@ title: "Models, Credentials, Speech, and Resource Lifecycle"
 type: "guide"
 status: "active"
 created: "2026-07-22"
-updated: "2026-07-23T03:00:54Z"
+updated: "2026-07-25T14:33:58Z"
 project_id: "jarvis_notes"
 source: "codex"
 tags: ["developer-handbook", "models", "lmstudio", "credentials", "speech", "tier/short-term"]
@@ -14,7 +14,7 @@ remember_note_id: ""
 rag_index: true
 confidence: 0.97
 content_hash: "ea7902aa06e2102c272308369ab59e9a84d7c85f53516182450383b40113c224"
-memory_tier: "short_term"
+lifecycle: "short_term"
 project_key: "mark_xlviii"
 schema_version: "jarvis_developer_handbook/v1"
 ---

@@ -4,7 +4,7 @@ title: "Vault, Canvas, and Operational UI Hardening Assessment"
 type: "report"
 status: "awaiting_review"
 created: "2026-07-22"
-updated: "2026-07-23T09:44:38Z"
+updated: "2026-07-25T14:33:57Z"
 project_id: "mark_xlviii"
 source: "codex"
 tags: ["security", "reliability", "hardening", "review", "tier/short-term"]
@@ -15,7 +15,7 @@ rag_index: false
 sensitivity: "private"
 confidence: 0.9
 content_hash: "3f81f35a44c860b7ac088b23fdd1f1b58f67cf1a0ba92777910be2a100bb7883"
-memory_tier: "short_term"
+lifecycle: "short_term"
 schema_version: "jarvis_hardening_report/v1"
 ---
 

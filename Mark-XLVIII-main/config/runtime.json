@@ -184,6 +184,9 @@
       "offload_kv_cache_to_gpu": true
     }
   },
+  "graphify_enabled": true,
+  "graphify_bin": "F:\\uv-data\\bin\\graphify.exe",
+  "graphify_timeout_seconds": 30,
   "jarvis_notes_root": "F:\\Mark-XLVIII-main\\Jarvis_notes",
   "jarvis_canvas_folder": "Canvases/JARVIS",
   "jarvis_canvas_max_plan_nodes": 24,

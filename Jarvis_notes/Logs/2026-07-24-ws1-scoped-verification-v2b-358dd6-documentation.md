@@ -4,7 +4,7 @@ title: "WS1 Scoped Verification — v2b_358dd6 — documentation"
 type: "log"
 status: "draft"
 created: "2026-07-24T13:45:02Z"
-updated: "2026-07-24T13:57:59Z"
+updated: "2026-07-25T14:33:56Z"
 project_id: "jarvis_notes"
 source: "canvas_plan"
 tags: ["canvas-plan", "node-doc", "ws1-verification-scoped", "tier/short-term"]
@@ -31,7 +31,7 @@ consumed_by: []
 related: []
 deleted: false
 deleted_at: ""
-memory_tier: "short_term"
+lifecycle: "short_term"
 ---
 
 # WS1 Scoped Verification — verification — `v2b_358dd6`

@@ -4,7 +4,7 @@ title: "Vault Awareness, Canvas, and Operational UI Implementation"
 type: "progress_tracker"
 status: "complete"
 created: "2026-07-22"
-updated: "2026-07-23T09:44:38Z"
+updated: "2026-07-25T14:33:56Z"
 project_id: "mark_xlviii"
 source: "codex"
 tags: ["jarvis", "vault", "canvas", "ui", "validation", "tier/short-term"]
@@ -14,7 +14,7 @@ remember_note_id: ""
 rag_index: true
 confidence: 0.98
 content_hash: "f77839996c81c703e214cb3f007035e80170d4918df5a9a779e73367303a332e"
-memory_tier: "short_term"
+lifecycle: "short_term"
 schema_version: "jarvis_progress/v1"
 ---
 

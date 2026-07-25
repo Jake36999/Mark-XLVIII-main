@@ -4,7 +4,7 @@ title: "Functional Evaluation - Planned Coding"
 type: "evaluation_report"
 status: "complete_with_blocker"
 created: "2026-07-21T18:12:38+01:00"
-updated: "2026-07-23T02:52:44Z"
+updated: "2026-07-25T14:33:57Z"
 project_id: "jarvis-functional-eval"
 source: "codex-functional-evaluator"
 tags: ["evaluation", "coding", "workflow", "telemetry", "tier/short-term"]
@@ -23,7 +23,7 @@ contradicts: []
 related: ["[[functional-eval-plan]]", "[[functional-eval-final]]"]
 deleted: false
 deleted_at: ""
-memory_tier: "short_term"
+lifecycle: "short_term"
 ---
 
 # Functional Evaluation - Planned Coding

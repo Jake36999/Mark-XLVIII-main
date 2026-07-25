@@ -4,7 +4,7 @@ title: "Project Memory - network_management"
 type: "memory"
 status: "active"
 created: "2026-07-22T02:42:11Z"
-updated: "2026-07-23T09:35:03Z"
+updated: "2026-07-25T14:33:57Z"
 project_id: "jarvis_notes"
 source: "F:\\Mark-XLVIII-main\\Jarvis_notes\\Projects\\network-management\\Project Brief.md"
 tags: ["project-memory", "repository", "verified", "network-management", "tier/short-term"]
@@ -32,7 +32,7 @@ related: ["project-brief-network-management"]
 deleted: false
 deleted_at: ""
 audit_status: "verified_read_only"
-memory_tier: "short_term"
+lifecycle: "short_term"
 project_root: "F:\\network_management"
 snapshot_hash: "47dd7c39c3b69c4a81d97d4b27896b2af86248d5726701a035d13ec7f8aa16e4"
 workflow_id: "project_repository_learning/v1"

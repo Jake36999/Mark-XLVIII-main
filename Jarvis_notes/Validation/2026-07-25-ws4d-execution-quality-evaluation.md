@@ -4,12 +4,12 @@ title: "WS4d Execution-Quality Evaluation — Context Preamble Before/After"
 type: "report"
 status: "active"
 created: "2026-07-25T07:20:40Z"
-updated: "2026-07-25T07:20:40Z"
+updated: "2026-07-25T14:33:58Z"
 project_id: "jarvis_notes"
 source: "claude"
 tags: ["validation", "live-test", "ws4d", "canvas-planning", "tier-short-term", "tier/short-term"]
 sync_state: "local_only"
-index_state: "index_pending"
+index_state: "indexed_local"
 remember_note_id: ""
 rag_index: true
 sensitivity: "internal"
@@ -31,7 +31,7 @@ consumed_by: []
 related: []
 deleted: false
 deleted_at: ""
-memory_tier: "short_term"
+lifecycle: "short_term"
 sync_error: ""
 ---
 

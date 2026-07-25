@@ -69,7 +69,7 @@ The general container indexes Tiers 1–2 only: enough for JARVIS to know every 
 
 ## Build phases
 
-- [ ] **Phase 0 — tier reconciliation.** `memory_tier` → `lifecycle` rename; adopt the 0–4 structural vocabulary. Backup-first migration + integrity self-check. (After YAML hardening.)
+- [x] **Phase 0 — tier reconciliation.** `memory_tier` → `lifecycle` rename; adopt the structural vocabulary (confirmed **0-3**, not 0-4 -- that was a mistype). Done 2026-07-25: full `Jarvis_notes` backup taken, dry-run counted 115 notes, `scripts/migrate-lifecycle-field.py --apply` run, post-migration `core.note_integrity.scan_vault()` reported clean (160 notes, 0 errors). Code updated to match: `actions/jarvis_memory.py` (`note_tier`, `create_note`, `move_note`, `query_local`), `actions/memory_consolidation.py`, `main.py`'s tool schema (accepts `lifecycle`, with `memory_tier`/`tier` kept as tool-call synonyms only). See [[Jarvis_notes/workflows/memory-tiering-and-graphify-index/Plan|Workflow 2]] for the full write-up.
 - [ ] **Phase 1 — general/cartridge scopes.** Add a `cartridge` (project) dimension to `query_local`; mount API (a turn declares its cartridge set); general scope = Tiers 1–2 only. Explicit selector.
 - [ ] **Phase 2 — provisioning + UX.** Watcher hook: new project → build cartridge with progress `ProcessEvent`s. Registry-confidence selector with confirm-below-threshold.
 - [ ] **Phase 3 — episodic event log.** A bounded, structured per-project recent-activity log in the general space, sourced from `vault_activity`.

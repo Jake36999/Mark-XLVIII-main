@@ -114,6 +114,25 @@ class ContextRenderTests(unittest.TestCase):
         text = rs.render_slices(slices, max_chars=800)
         self.assertLessEqual(len(text), 800)
 
+    def test_render_ranks_by_symbol_degree_before_complexity(self):
+        # beta (has a loop) outranks alpha on complexity alone (2 vs 1) -- confirm
+        # that baseline first, then confirm a real cross-file caller signal
+        # (a pre-built graphify graph) can override it.
+        slices = rs.slice_python_source(SAMPLE, "sample.py")
+        baseline = rs.render_slices(slices, max_chars=4000)
+        self.assertLess(baseline.index("async def beta"), baseline.index("def alpha"))
+
+        boosted = rs.render_slices(
+            slices, max_chars=4000, symbol_degree={("sample.py", "beta"): 0, ("sample.py", "alpha"): 9}
+        )
+        self.assertLess(boosted.index("def alpha"), boosted.index("async def beta"))
+
+    def test_render_without_symbol_degree_is_unchanged(self):
+        slices = rs.slice_python_source(SAMPLE, "sample.py")
+        with_none = rs.render_slices(slices, max_chars=4000, symbol_degree=None)
+        omitted = rs.render_slices(slices, max_chars=4000)
+        self.assertEqual(with_none, omitted)
+
     def test_render_without_citation_omits_file_token(self):
         # project_learning renders with cite=False so _defuse_source_text does not
         # strip a [file: token out of the source body; provenance is the batch wrapper.

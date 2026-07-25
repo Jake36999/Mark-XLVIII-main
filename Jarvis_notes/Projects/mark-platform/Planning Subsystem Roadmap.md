@@ -4,7 +4,7 @@ title: "Planning Subsystem Roadmap"
 type: "report"
 status: "active"
 created: "2026-07-24T13:24:43Z"
-updated: "2026-07-24T13:25:04Z"
+updated: "2026-07-25T14:33:57Z"
 project_id: "jarvis_notes"
 source: "claude"
 tags: ["mark-platform", "planning", "roadmap", "architecture", "canvas-plan", "tier/short-term"]
@@ -17,7 +17,7 @@ confidence: 0.5
 valid_from: "2026-07-24T13:24:43Z"
 review_after: ""
 source_version: 1
-content_hash: "b1e14a241abab385ecce8d8d9209cb8918bf6df86376bf54298057a77ef4e95a"
+content_hash: "29761c8c2fef672ee572bfba4212ee1a87a8e6cae7b59db0d0875e0c2cb22cc3"
 supersedes: []
 contradicts: []
 depends_on: []
@@ -31,7 +31,7 @@ consumed_by: []
 related: []
 deleted: false
 deleted_at: ""
-memory_tier: "short_term"
+lifecycle: "short_term"
 ---
 
 > [!info] Scope

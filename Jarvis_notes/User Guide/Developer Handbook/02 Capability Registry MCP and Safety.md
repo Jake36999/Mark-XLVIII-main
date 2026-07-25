@@ -4,7 +4,7 @@ title: "Capability Registry MCP and Safety"
 type: "guide"
 status: "active"
 created: "2026-07-22"
-updated: "2026-07-23T02:52:44Z"
+updated: "2026-07-25T14:55:45Z"
 project_id: "jarvis_notes"
 source: "codex"
 tags: ["developer-handbook", "capabilities", "mcp", "tools", "safety", "tier/short-term"]
@@ -13,8 +13,8 @@ index_state: "indexed_local"
 remember_note_id: ""
 rag_index: true
 confidence: 0.96
-content_hash: "cb33204b9cdc79d3eaf5b151a12b8409f72b1e1730fa0de757c9d95c0f20e2a3"
-memory_tier: "short_term"
+content_hash: "ab9c673842f08328b0b99e8afa0cdf59eb6fbff442470a1bdc0cf5eae3e7d1ad"
+lifecycle: "short_term"
 project_key: "mark_xlviii"
 schema_version: "jarvis_developer_handbook/v1"
 ---
@@ -34,6 +34,9 @@ schema_version: "jarvis_developer_handbook/v1"
 | Function schema | Exact tool parameters and operations | Immediately before validation or dispatch |
 
 The stateless selector receives L0 cards plus live health. Source documents and user-provided evidence are not allowed to select their own capabilities.
+
+> [!note] L0 selection scoring is word-tokenized (fixed 2026-07-25)
+> `_search_cards()` used to score a card by raw substring counting on its id/summary/triggers text, not word-tokenized matching like the sibling `_search_records()`. Short query words that survive the stopword filter (e.g. "in", "on") could match as substrings inside unrelated longer words — "in" inside "installing", "on" inside "consolidation" — occasionally outranking a genuinely relevant tool. Found live while validating `graphify_query`'s own discoverability. Now tokenizes the haystack into words with the same plural-variant handling `_search_records()` already used, and `SEARCH_STOPWORDS` gained `in`/`on`/`this` as defense in depth.
 
 ## Registry Interfaces
 
@@ -151,3 +154,4 @@ To add a capability safely:
 - [[01 Runtime Architecture and Turn Lifecycle]]
 - [[03 Planning Approval and Dual Orchestration]]
 - [[04 Fan-Out Workers Review and Recovery]]
+- [[14 Graphify Knowledge Graph Integration]] — a full worked example of the registration chain (L0 card → risk policy → tool schema → dispatch)

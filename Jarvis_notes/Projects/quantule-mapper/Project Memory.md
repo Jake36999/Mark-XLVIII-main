@@ -4,7 +4,7 @@ title: "Project Memory - quantule_mapper"
 type: "memory"
 status: "active"
 created: "2026-07-22T02:57:00Z"
-updated: "2026-07-23T09:35:03Z"
+updated: "2026-07-25T14:33:57Z"
 project_id: "jarvis_notes"
 source: "F:\\Mark-XLVIII-main\\Jarvis_notes\\Projects\\quantule-mapper\\Project Brief.md"
 tags: ["project-memory", "repository", "verified", "quantule-mapper", "tier/short-term"]
@@ -32,7 +32,7 @@ related: ["project-brief-quantule-mapper"]
 deleted: false
 deleted_at: ""
 audit_status: "verified_read_only"
-memory_tier: "short_term"
+lifecycle: "short_term"
 project_root: "F:\\quantule_mapper"
 snapshot_hash: "cc195e58fb39b0751a53d5decb5ed03a5f0ba2ba0a46e685d62921ae4786b6e5"
 workflow_id: "project_repository_learning/v1"

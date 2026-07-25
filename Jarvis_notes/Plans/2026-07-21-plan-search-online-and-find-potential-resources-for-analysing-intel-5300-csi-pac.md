@@ -4,7 +4,7 @@ title: "Plan - Search online and find potential resources for analysing intel 53
 type: "plan"
 status: "blocked"
 created: "2026-07-21T23:43:40Z"
-updated: "2026-07-23T02:52:43Z"
+updated: "2026-07-25T14:33:56Z"
 project_id: "jarvis_notes"
 source: "jarvis"
 tags: ["plan", "workflow", "pending-approval", "tier/short-term"]
@@ -42,9 +42,9 @@ decision_gates: []
 execution_run_id: "plan-plan-search-online-and-find-potential-resources-for-analysing-intel-v1"
 execution_state: "blocked"
 execution_summary_path: "F:\\Mark-XLVIII-main\\Jarvis_notes\\Summaries\\2026-07-21-execution-run-plan-search-online-and-find-potential-resources-for-analysing-inte.md"
+lifecycle: "short_term"
 local_context_count: 5
 manifest_hash: "caeb4c8c520cb1b967839feba1728b063405f98524dc2745b7faa5466dc18f96"
-memory_tier: "short_term"
 original_prompt: "search online and find potential resources for analysing intel 5300 csi packets."
 plan_version: 1
 research_state: "complete"

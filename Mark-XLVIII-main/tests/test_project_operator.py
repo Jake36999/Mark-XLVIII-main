@@ -18,9 +18,24 @@ class ProjectOperatorRegistryTests(unittest.TestCase):
                 "knowledge_compiler_engine",
                 "mark_platform",
                 "network_management",
+                "archive",
             },
             set(registry["projects"].keys()),
         )
+
+    def test_archive_entry_grants_no_safe_operations_by_default(self):
+        # Workflow 2: the archive is registered only so graphify_query can
+        # resolve project_id="archive" -- it must not accidentally pick up any
+        # project_operator capability. classify_operation's own fallthrough for
+        # anything not in safe_operations is "confirm", so an empty
+        # safe_operations list means every operation requires confirmation.
+        from actions import project_operator
+
+        registry = project_operator.load_registry()
+        decision = project_operator.classify_operation(registry, project_id="archive", operation="status")
+
+        self.assertEqual("confirm", decision["action"])
+        self.assertTrue(decision["requires_confirmation"])
 
     def test_safe_status_operation_is_allowed_without_confirmation(self):
         from actions import project_operator

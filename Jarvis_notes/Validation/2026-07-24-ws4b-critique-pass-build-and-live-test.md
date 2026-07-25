@@ -4,7 +4,7 @@ title: "WS4b: Plan Critique Pass and Weighted Refine Loop — Build and Live Tes
 type: "report"
 status: "active"
 created: "2026-07-24T19:59:01Z"
-updated: "2026-07-24T20:04:24Z"
+updated: "2026-07-25T14:33:58Z"
 project_id: "jarvis_notes"
 source: "claude"
 tags: ["validation", "live-test", "ws4b", "canvas-planning", "tier-short-term", "tier/short-term"]
@@ -31,7 +31,7 @@ consumed_by: []
 related: []
 deleted: false
 deleted_at: ""
-memory_tier: "short_term"
+lifecycle: "short_term"
 sync_error: ""
 ---
 

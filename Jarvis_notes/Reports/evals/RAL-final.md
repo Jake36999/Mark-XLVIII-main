@@ -4,7 +4,7 @@ title: "RAL Final - JARVIS Capability, Workflow, and Model Evaluation"
 type: "evaluation-summary"
 status: "complete"
 created: "2026-07-21T16:18:00+01:00"
-updated: "2026-07-23T02:52:43Z"
+updated: "2026-07-25T14:33:57Z"
 project_id: "mark_platform"
 source: "controlled-local-evaluation"
 tags: ["tier/short-term"]
@@ -14,7 +14,7 @@ rag_index: false
 sensitivity: "internal"
 content_hash: "f24b5dde8b62bc823bd73ef89432d68ab756cdd6b0c23028dfd5adbf2e6184f7"
 attack_fixture_persisted: false
-memory_tier: "short_term"
+lifecycle: "short_term"
 rounds: 4
 ---
 

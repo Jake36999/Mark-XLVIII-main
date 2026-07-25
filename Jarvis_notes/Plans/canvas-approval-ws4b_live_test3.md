@@ -4,7 +4,7 @@ title: "Canvas Plan Approval — Write a small read-only script that reports how
 type: "plan"
 status: "pending_review"
 created: "2026-07-24T19:57:22Z"
-updated: "2026-07-24T20:04:24Z"
+updated: "2026-07-25T14:33:56Z"
 project_id: "jarvis_notes"
 source: "canvas_plan"
 tags: ["canvas-plan", "approval", "ws4b-live-test3", "tier/short-term"]
@@ -37,8 +37,8 @@ approval_state: "pending_review"
 approved_at: ""
 bundle_path: "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\canvas_approvals\\ws4b_live_test3\\v1"
 canvas_path: "Canvases/JARVIS/write_a_small_read_only_script_that_repo_1a793b.canvas"
+lifecycle: "short_term"
 manifest_hash: "84ff3c9c0e6d1922eed512933ffc74c649cc6621917480a169203cc96e9666df"
-memory_tier: "short_term"
 plan_fingerprint_hash: "1406d493e533b981d8512a7119296b504c850ee69302805752391160967e8982"
 plan_version: 1
 run_id: ""

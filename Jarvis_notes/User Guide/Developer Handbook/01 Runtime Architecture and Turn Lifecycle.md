@@ -4,7 +4,7 @@ title: "Runtime Architecture and Turn Lifecycle"
 type: "guide"
 status: "active"
 created: "2026-07-22"
-updated: "2026-07-23T02:52:44Z"
+updated: "2026-07-25T14:33:58Z"
 project_id: "jarvis_notes"
 source: "codex"
 tags: ["developer-handbook", "runtime", "router", "turn-lifecycle", "tier/short-term"]
@@ -14,7 +14,7 @@ remember_note_id: ""
 rag_index: true
 confidence: 0.97
 content_hash: "94eccbc437f1ee496c269c57b9675f5ba7f01c50c39503bc5e9e9f97980e581a"
-memory_tier: "short_term"
+lifecycle: "short_term"
 project_key: "mark_xlviii"
 schema_version: "jarvis_developer_handbook/v1"
 ---

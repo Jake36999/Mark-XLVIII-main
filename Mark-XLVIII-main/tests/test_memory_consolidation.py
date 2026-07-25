@@ -238,7 +238,7 @@ class ApplyTests(unittest.TestCase):
             new_path = Path(result["path"])
             self.assertIn("Archive", new_path.parts)
             meta, _, _ = jm.read_note(new_path)
-            self.assertEqual(meta["memory_tier"], "archive")
+            self.assertEqual(meta["lifecycle"], "archive")
 
     def test_archive_never_deletes(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -264,7 +264,7 @@ class ApplyTests(unittest.TestCase):
             # Source archived, and the long-term note records supersession.
             self.assertIn("Archive", Path(result["path"]).parts)
             lt_meta, lt_body, _ = jm.read_note(long_path)
-            self.assertEqual(lt_meta["memory_tier"], "long_term")
+            self.assertEqual(lt_meta["lifecycle"], "long_term")
 
     def test_merge_folds_into_survivor_and_archives_source(self):
         with tempfile.TemporaryDirectory() as tmp:

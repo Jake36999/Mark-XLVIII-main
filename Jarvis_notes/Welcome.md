@@ -1,9 +1,9 @@
 ---
-updated: "2026-07-23T02:52:43Z"
+updated: "2026-07-25T14:33:56Z"
 tags: ["tier/short-term"]
 index_state: "indexed_local"
 content_hash: "7988c531a01d6e3c49dad06612fa9add8e947ab9c3baacba9b9c121e7d8d67fb"
-memory_tier: "short_term"
+lifecycle: "short_term"
 ---
 
 This is your new *vault*.

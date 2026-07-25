@@ -288,7 +288,7 @@ class JarvisMemoryTests(unittest.TestCase):
             path = self._report(cfg)
 
             dest = Path(tmp) / "Archive" / "Reports"
-            result = jm.move_note(path, dest, cfg=cfg, memory_tier="archive")
+            result = jm.move_note(path, dest, cfg=cfg, lifecycle="archive")
 
             self.assertTrue(result["ok"])
             new_path = Path(result["path"])
@@ -296,7 +296,7 @@ class JarvisMemoryTests(unittest.TestCase):
             self.assertTrue(new_path.exists())
             self.assertEqual(new_path.parent, dest)
             meta, _, _ = jm.read_note(new_path)
-            self.assertEqual(meta["memory_tier"], "archive")
+            self.assertEqual(meta["lifecycle"], "archive")
 
     def test_move_rewrites_path_qualified_inbound_links(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -312,7 +312,7 @@ class JarvisMemoryTests(unittest.TestCase):
                 cfg=cfg,
             )
 
-            jm.move_note(target, Path(tmp) / "Long Term" / "Reports", cfg=cfg, memory_tier="long_term")
+            jm.move_note(target, Path(tmp) / "Long Term" / "Reports", cfg=cfg, lifecycle="long_term")
 
             _, body, _ = jm.read_note(referrer)
             self.assertIn(f"[[Long Term/Reports/{rel}|the target]]", body)
@@ -326,7 +326,7 @@ class JarvisMemoryTests(unittest.TestCase):
             referrer = self._report(cfg, title="Referrer Two", content={"Summary": "x"})
             jm.update_section(referrer, "## Summary", f"See [[{rel}]] please.", cfg=cfg)
 
-            jm.move_note(target, Path(tmp) / "Archive" / "Reports", cfg=cfg, memory_tier="archive")
+            jm.move_note(target, Path(tmp) / "Archive" / "Reports", cfg=cfg, lifecycle="archive")
 
             _, body, _ = jm.read_note(referrer)
             self.assertIn(f"[[{rel}]]", body)  # basename link still resolves, unchanged
@@ -339,7 +339,7 @@ class JarvisMemoryTests(unittest.TestCase):
             dest.mkdir(parents=True)
             (dest / first.name).write_text("---\nid: x\ntitle: X\n---\n\nbody\n", encoding="utf-8")
 
-            result = jm.move_note(first, dest, cfg=cfg, memory_tier="archive")
+            result = jm.move_note(first, dest, cfg=cfg, lifecycle="archive")
 
             self.assertFalse(result["ok"])
             self.assertIn("collision", result["error"].lower())
@@ -357,7 +357,7 @@ class JarvisMemoryTests(unittest.TestCase):
             jm.update_section(referrer, "## Summary", f"[[Reports/{rel}|t]]", cfg=cfg)
             vault_activity.baseline_vault(root)
 
-            result = jm.move_note(target, root / "Archive" / "Reports", cfg=cfg, memory_tier="archive")
+            result = jm.move_note(target, root / "Archive" / "Reports", cfg=cfg, lifecycle="archive")
             events = vault_activity.process_event_batch(
                 root,
                 [
@@ -379,7 +379,7 @@ class JarvisMemoryTests(unittest.TestCase):
             cfg["memory_tiers_enabled"] = True
             path = self._report(cfg)
             meta, _, _ = jm.read_note(path)
-            self.assertEqual(meta["memory_tier"], "short_term")
+            self.assertEqual(meta["lifecycle"], "short_term")
             self.assertIn("tier/short-term", meta.get("tags", []))
 
     def test_tier_field_absent_when_disabled(self):
@@ -387,7 +387,7 @@ class JarvisMemoryTests(unittest.TestCase):
             cfg = self.cfg(Path(tmp))  # tiers disabled by default
             path = self._report(cfg)
             meta, _, _ = jm.read_note(path)
-            self.assertNotIn("memory_tier", meta)
+            self.assertNotIn("lifecycle", meta)
             self.assertNotIn("tier/short-term", meta.get("tags", []))
 
     def test_tier_root_maps_each_tier(self):
@@ -408,7 +408,7 @@ class JarvisMemoryTests(unittest.TestCase):
             self.assertEqual(jm.note_tier({}, root / "Archive" / "Reports" / "x.md", cfg), "archive")
             # An explicit field wins over the folder.
             self.assertEqual(
-                jm.note_tier({"memory_tier": "archive"}, root / "Reports" / "x.md", cfg), "archive"
+                jm.note_tier({"lifecycle": "archive"}, root / "Reports" / "x.md", cfg), "archive"
             )
 
     # ---- Task B2: tier-aware retrieval weighting ---------------------------
@@ -422,7 +422,7 @@ class JarvisMemoryTests(unittest.TestCase):
                                  content={"Summary": "wifi sensing doppler csi baseline result"})
             arch = self._report(cfg, title="Sensing Findings Archived",
                                  content={"Summary": "wifi sensing doppler csi baseline result"})
-            jm.move_note(arch, Path(tmp) / "Archive" / "Reports", cfg=cfg, memory_tier="archive")
+            jm.move_note(arch, Path(tmp) / "Archive" / "Reports", cfg=cfg, lifecycle="archive")
             jm.reindex_local(cfg)
 
             res = jm.query_local("wifi sensing doppler csi baseline", cfg=cfg, limit=10)
@@ -440,7 +440,7 @@ class JarvisMemoryTests(unittest.TestCase):
             cfg["memory_tiers_enabled"] = True
             self._report(cfg, title="Only Short", content={"Summary": "unique marker alpha"})
             arch = self._report(cfg, title="Only Archived", content={"Summary": "unique marker alpha"})
-            jm.move_note(arch, Path(tmp) / "Archive" / "Reports", cfg=cfg, memory_tier="archive")
+            jm.move_note(arch, Path(tmp) / "Archive" / "Reports", cfg=cfg, lifecycle="archive")
             jm.reindex_local(cfg)
 
             res = jm.query_local("unique marker alpha", cfg=cfg, limit=10, tier="short_term")
@@ -1385,7 +1385,7 @@ class MemoryTierMigrationTests(unittest.TestCase):
             short = Path(jm.create_note(note_type="report", title="Working", sections={"Summary": "s"},
                                         cfg=cfg, content_mode="sections")["path"])
             # Strip the tier a fresh note would have, to simulate a legacy note.
-            jm.update_note_frontmatter(short, {"memory_tier": ""})
+            jm.update_note_frontmatter(short, {"lifecycle": ""})
             # A note physically under Archive should backfill as archive.
             arch_dir = root / "Archive" / "Reports"
             arch_dir.mkdir(parents=True)
@@ -1397,8 +1397,8 @@ class MemoryTierMigrationTests(unittest.TestCase):
 
             meta_short, _, _ = jm.read_note(short)
             meta_arch, _, _ = jm.read_note(arch)
-            self.assertEqual(meta_short["memory_tier"], "short_term")
-            self.assertEqual(meta_arch["memory_tier"], "archive")
+            self.assertEqual(meta_short["lifecycle"], "short_term")
+            self.assertEqual(meta_arch["lifecycle"], "archive")
 
             # Re-running changes nothing.
             second = mod.backfill(root, cfg, apply=True)
@@ -1425,6 +1425,114 @@ class MemoryTierMigrationTests(unittest.TestCase):
             self.assertEqual(mod.seed_mocs(root, cfg, apply=True), [])
 
 
+class LifecycleFieldMigrationTests(unittest.TestCase):
+    """Phase 0 (2026-07-25): memory_tier -> lifecycle rename, scripts/migrate-lifecycle-field.py."""
+
+    def _cfg(self, root):
+        return jm.resolve_config(
+            {"jarvis_notes_root": str(root), "remember_enabled": False,
+             "rag_embedding_provider": "disabled", "memory_tiers_enabled": True}
+        )
+
+    def _load_module(self):
+        import importlib.util
+        spec = importlib.util.spec_from_file_location(
+            "migrate_lifecycle_field",
+            str(Path(__file__).resolve().parent.parent / "scripts" / "migrate-lifecycle-field.py"),
+        )
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        return mod
+
+    def test_dry_run_reports_but_never_writes(self):
+        mod = self._load_module()
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            cfg = self._cfg(root)
+            path = Path(jm.create_note(note_type="report", title="Legacy", sections={"Summary": "s"},
+                                        cfg=cfg, content_mode="sections")["path"])
+            # Simulate a pre-rename note on disk: has memory_tier, not lifecycle.
+            metadata, body = jm.parse_frontmatter(path.read_text(encoding="utf-8"))
+            del metadata["lifecycle"]
+            metadata["memory_tier"] = "short_term"
+            path.write_text(f"{jm.render_frontmatter(metadata)}\n\n{body.rstrip()}\n", encoding="utf-8")
+            raw = path.read_bytes()
+
+            result = mod.migrate(root, apply=False)
+
+            self.assertEqual(len(result["renamed"]), 1)
+            self.assertEqual(path.read_bytes(), raw)  # untouched on disk
+
+    def test_apply_renames_the_field_and_preserves_the_value(self):
+        mod = self._load_module()
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            cfg = self._cfg(root)
+            path = Path(jm.create_note(note_type="report", title="Legacy Note", sections={"Summary": "s"},
+                                        cfg=cfg, content_mode="sections")["path"])
+            jm.update_note_frontmatter(path, {"lifecycle": "archive"})
+            # Simulate the pre-migration shape directly: memory_tier present, no lifecycle key.
+            metadata, body = jm.parse_frontmatter(path.read_text(encoding="utf-8"))
+            del metadata["lifecycle"]
+            metadata["memory_tier"] = "archive"
+            path.write_text(f"{jm.render_frontmatter(metadata)}\n\n{body.rstrip()}\n", encoding="utf-8")
+
+            result = mod.migrate(root, apply=True)
+
+            self.assertEqual(len(result["renamed"]), 1)
+            meta_after, _, _ = jm.read_note(path)
+            self.assertEqual(meta_after["lifecycle"], "archive")
+            self.assertNotIn("memory_tier", meta_after)
+
+    def test_a_note_already_migrated_is_left_alone(self):
+        mod = self._load_module()
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            cfg = self._cfg(root)
+            path = Path(jm.create_note(note_type="report", title="Already Migrated", sections={"Summary": "s"},
+                                        cfg=cfg, content_mode="sections")["path"])
+            # A fresh note already has "lifecycle" (create_note writes it directly).
+            result = mod.migrate(root, apply=True)
+            self.assertEqual(result["renamed"], [])
+            self.assertEqual(result["already"], 1)
+
+    def test_a_note_with_neither_field_is_untouched(self):
+        mod = self._load_module()
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            cfg = self._cfg(root)
+            path = root / "Reports" / "bare.md"
+            path.parent.mkdir(parents=True)
+            path.write_text("---\nid: x\ntitle: Bare\n---\n\n# Bare\n\nbody\n", encoding="utf-8")
+
+            result = mod.migrate(root, apply=True)
+
+            self.assertEqual(result["renamed"], [])
+            self.assertEqual(result["unset"], 1)
+            meta, _, _ = jm.read_note(path)
+            self.assertNotIn("lifecycle", meta)
+            self.assertNotIn("memory_tier", meta)
+
+    def test_apply_is_idempotent(self):
+        mod = self._load_module()
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            cfg = self._cfg(root)
+            path = Path(jm.create_note(note_type="report", title="Idempotent", sections={"Summary": "s"},
+                                        cfg=cfg, content_mode="sections")["path"])
+            metadata, body = jm.parse_frontmatter(path.read_text(encoding="utf-8"))
+            del metadata["lifecycle"]
+            metadata["memory_tier"] = "short_term"
+            path.write_text(f"{jm.render_frontmatter(metadata)}\n\n{body.rstrip()}\n", encoding="utf-8")
+
+            first = mod.migrate(root, apply=True)
+            second = mod.migrate(root, apply=True)
+
+            self.assertEqual(len(first["renamed"]), 1)
+            self.assertEqual(second["renamed"], [])
+            self.assertEqual(second["already"], 1)
+
+
 class FrontmatterParsingTests(unittest.TestCase):
     def test_crlf_frontmatter_parses(self):
         # A note authored with Windows CRLF must parse, or update_note_frontmatter
@@ -1441,11 +1549,11 @@ class FrontmatterParsingTests(unittest.TestCase):
             path.write_bytes(
                 b'---\r\nid: "x"\r\ntitle: "T"\r\nsnapshot_hash: "keep"\r\n---\r\n\r\n# Body\r\n'
             )
-            jm.update_note_frontmatter(path, {"memory_tier": "short_term"})
+            jm.update_note_frontmatter(path, {"lifecycle": "short_term"})
             text = path.read_text(encoding="utf-8")
             self.assertEqual(text.count("\n---\n"), 1)  # exactly one frontmatter block
             meta, _, _ = jm.read_note(path)
-            self.assertEqual(meta["memory_tier"], "short_term")
+            self.assertEqual(meta["lifecycle"], "short_term")
             self.assertEqual(meta["snapshot_hash"], "keep")  # original field preserved
 
 
@@ -1475,7 +1583,7 @@ class UnquotedYamlListTests(unittest.TestCase):
                 "---\nid: x\ntitle: T\ntags: [developer-handbook, vault]\n---\n\n# B\n",
                 encoding="utf-8",
             )
-            jm.update_note_frontmatter(path, {"memory_tier": "short_term"})
+            jm.update_note_frontmatter(path, {"lifecycle": "short_term"})
             meta, _, _ = jm.read_note(path)
             self.assertEqual(meta["tags"], ["developer-handbook", "vault"])
 

@@ -4,7 +4,7 @@ title: "Runtime Delegation Fix and Re-verification"
 type: "report"
 status: "active"
 created: "2026-07-24T18:50:50Z"
-updated: "2026-07-24T19:03:06Z"
+updated: "2026-07-25T14:33:58Z"
 project_id: "jarvis_notes"
 source: "claude"
 tags: ["validation", "live-test", "lmstudio-performance", "before-after", "tier/short-term"]
@@ -31,7 +31,7 @@ consumed_by: []
 related: []
 deleted: false
 deleted_at: ""
-memory_tier: "short_term"
+lifecycle: "short_term"
 ---
 
 > [!info] Scope

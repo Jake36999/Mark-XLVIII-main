@@ -4,7 +4,7 @@ title: "Session Assessment - Repo Learning and Canvas Planning Engine"
 type: "report"
 status: "complete"
 created: "2026-07-24T02:43:27Z"
-updated: "2026-07-24T02:43:39Z"
+updated: "2026-07-25T14:33:57Z"
 project_id: "jarvis_notes"
 source: "claude"
 tags: ["assessment", "canvas-plan", "repo-slicer", "planning", "tier/short-term"]
@@ -31,7 +31,7 @@ consumed_by: []
 related: []
 deleted: false
 deleted_at: ""
-memory_tier: "short_term"
+lifecycle: "short_term"
 ---
 
 > [!info] Scope

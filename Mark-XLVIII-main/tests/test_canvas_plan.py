@@ -260,6 +260,42 @@ class NoteRoleAndBranchCompileTests(unittest.TestCase):
         # both "n" (hashtag) and "b" (alias) resolve to role "note" -- neither compiles
         self.assertEqual(len(workflow["steps"]), 1)
 
+    def test_workflow_role_compiles_identically_to_plan(self):
+        # 2026-07-25 terminology workflow: "workflow" is the preferred spelling
+        # for the canvas anchor, aliased onto the exact same "plan" role/step.
+        payload = {
+            "nodes": [
+                _node("root", "role: workflow\nShip the thing.", role="workflow"),
+                _node("a", "role: research\nInvestigate.", role="research"),
+            ],
+            "edges": [_edge("e1", "root", "a")],
+        }
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="workflowalias", name="WorkflowAlias")
+        anchor_steps = [s for s in workflow["steps"] if s["step_type"] == "gate" and s["target"] == "plan_milestone"]
+        self.assertEqual(len(anchor_steps), 1)
+
+    def test_mode_directive_on_the_anchor_node_reaches_workflow_variables(self):
+        payload = {
+            "nodes": [
+                _node("root", "role: workflow\nmode: development\nShip the thing.", role="workflow"),
+                _node("a", "role: research\nInvestigate.", role="research"),
+            ],
+            "edges": [_edge("e1", "root", "a")],
+        }
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="modetest", name="ModeTest")
+        self.assertEqual(workflow["variables"]["mode"], "development")
+
+    def test_missing_mode_directive_leaves_variables_unchanged(self):
+        payload = {
+            "nodes": [
+                _node("root", "role: workflow\nShip the thing.", role="workflow"),
+                _node("a", "role: research\nInvestigate.", role="research"),
+            ],
+            "edges": [_edge("e1", "root", "a")],
+        }
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="nomode", name="NoMode")
+        self.assertNotIn("mode", workflow["variables"])
+
 
 class DecomposeValidationBranchTests(unittest.TestCase):
     """WS4c: minimal, format-only validation of the optional `branch` field
@@ -361,6 +397,18 @@ class NodeDirectiveParsingTests(unittest.TestCase):
         directives, _ = canvas_plan._parse_node_directives("type: implementation\ntest: tests/test_foo.py\nDo it.")
         self.assertEqual(directives["role"], "implementation")
         self.assertEqual(directives["scope"], "tests/test_foo.py")
+
+    def test_task_is_an_alias_of_branch(self):
+        # 2026-07-25 terminology workflow: "task" is the preferred spelling for
+        # a WS4c macro-pillar tag, but resolves to the same "branch" key so
+        # compile_canvas's existing branch-aware layout needs no changes.
+        directives, _ = canvas_plan._parse_node_directives("role: research\ntask: A\nInvestigate.")
+        self.assertEqual(directives["branch"], "A")
+        self.assertNotIn("task", directives)
+
+    def test_mode_directive_is_parsed(self):
+        directives, _ = canvas_plan._parse_node_directives("role: workflow\nmode: development\nBuild it.")
+        self.assertEqual(directives["mode"], "development")
 
     def test_stops_at_the_first_non_directive_line(self):
         text = "role: research\nThis is prose, project: not a directive here.\nMore prose."
@@ -1822,6 +1870,49 @@ class DecomposeGoalToCanvasTests(unittest.TestCase):
 
             edge_pairs = {(edge["fromNode"], edge["toNode"]) for edge in document["edges"]}
             self.assertEqual(edge_pairs, {("root", "look_around"), ("look_around", "make_change"), ("make_change", "check_it")})
+
+    def test_user_workflow_mode_is_written_onto_the_plan_node_and_returned(self):
+        # A minimal payload for the compile step specifically -- _good_payload()'s
+        # implementation node references an unregistered "demo_project", which
+        # compile_canvas validates and would fail on for a reason unrelated to
+        # what this test actually checks (the mode directive's own plumbing).
+        minimal_payload = {
+            "nodes": [
+                {"id": "root", "role": "plan", "prose": "Ship the thing.", "depends_on": []},
+                {"id": "look_around", "role": "research", "prose": "Find it.", "depends_on": ["root"]},
+            ],
+            "rationale": "Minimal.",
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            cfg = _cfg(root)
+            with mock.patch("core.model_router.call_text", return_value=json.dumps(minimal_payload)):
+                result = canvas_plan.decompose_goal_to_canvas(
+                    "Fix the login bug", cfg=cfg, user_workflow_mode="development"
+                )
+
+            self.assertTrue(result["ok"], result)
+            self.assertEqual(result["mode"], "development")
+
+            document = canvas.load_canvas(Path(result["canvas_path"]))
+            by_id = {node["id"]: node for node in document["nodes"]}
+            self.assertIn("mode: development", by_id["root"]["text"])
+            # only the plan/anchor node gets it, not every node
+            self.assertNotIn("mode:", by_id["look_around"]["text"])
+
+            workflow = canvas_plan.compile_canvas(document, workflow_id="modewired", name="ModeWired")
+            self.assertEqual(workflow["variables"]["mode"], "development")
+
+    def test_omitted_user_workflow_mode_leaves_the_plan_node_unchanged(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            cfg = _cfg(Path(tmp))
+            with mock.patch("core.model_router.call_text", return_value=json.dumps(self._good_payload())):
+                result = canvas_plan.decompose_goal_to_canvas("Fix the login bug", cfg=cfg)
+
+            self.assertEqual(result["mode"], "")
+            document = canvas.load_canvas(Path(result["canvas_path"]))
+            by_id = {node["id"]: node for node in document["nodes"]}
+            self.assertNotIn("mode:", by_id["root"]["text"])
 
     def test_project_hint_is_forwarded_into_the_prompt(self):
         with tempfile.TemporaryDirectory() as tmp:

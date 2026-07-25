@@ -4,7 +4,7 @@ title: "Command Palette"
 type: "guide"
 status: "draft"
 created: "2026-07-21"
-updated: "2026-07-23T02:52:44Z"
+updated: "2026-07-25T14:33:57Z"
 project_id: "jarvis_notes"
 source: "codex"
 tags: ["user-guide", "commands", "prompt-patterns", "tier/short-term"]
@@ -12,7 +12,7 @@ sync_state: "local_only"
 index_state: "indexed_local"
 remember_note_id: ""
 content_hash: "535edc85ebe9a71ce0c316fbb3846be716328724f6da2bcc79ad642d10da7cf3"
-memory_tier: "short_term"
+lifecycle: "short_term"
 ---
 
 # Command Palette

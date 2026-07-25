@@ -4,7 +4,7 @@ title: "Obsidian Memory, RAG, Tasks, and Canvas"
 type: "guide"
 status: "active"
 created: "2026-07-22"
-updated: "2026-07-23T03:00:54Z"
+updated: "2026-07-25T14:57:40Z"
 project_id: "jarvis_notes"
 source: "codex"
 tags: ["developer-handbook", "obsidian", "memory", "rag", "tasks", "canvas", "tier/short-term"]
@@ -13,8 +13,8 @@ index_state: "indexed_local"
 remember_note_id: ""
 rag_index: true
 confidence: 0.97
-content_hash: "ee75be6b10f87cada4017568913fb6c735b9e881314e619113eca0ccd64b2e30"
-memory_tier: "short_term"
+content_hash: "f0d9a7cfd9054fc3ae6faf585e764e23a9b20b9593e652f68158c51c0f0bdbf3"
+lifecycle: "short_term"
 project_key: "mark_xlviii"
 schema_version: "jarvis_developer_handbook/v1"
 ---
@@ -33,8 +33,21 @@ schema_version: "jarvis_developer_handbook/v1"
 | `.jarvis/memory.sqlite` | Derived retrieval index | Parsed Markdown, FTS rows, vectors, relations, tasks, tombstones |
 | Conversation/session state | Temporary turn context | Current request, recent tool results, active run IDs |
 | Canvas | Derived visual state | Bounded plan/task nodes and selected neighborhoods |
+| `workflows/<slug>/` | Per-workflow compartmentalized folder (2026-07-25) | Every JARVIS "workflow" (per the terminology in [[13 Canvas Planning Engine and Reasoning-Backed Decomposition]]) gets its own subfolder here, alongside `Projects/<id>/` |
 
 Secrets, API keys, ambient speech, raw model traces, and unreviewed guesses do not belong in durable memory.
+
+## Memory Lifecycle vs. Structural Tiers — two different axes, same word "tier"
+
+> [!warning] Don't conflate these
+> "Tier" means two unrelated things in this system. Keep them apart.
+
+**Lifecycle** (`lifecycle` frontmatter field, `short_term` | `long_term` | `archive`) — how long a note has been useful, tracked per-note, read by `note_tier()` and weighted in retrieval by `_tier_score_multiplier()` when `memory_tiers_enabled` is on. This field was named `memory_tier` until 2026-07-25, when it was renamed to stop colliding with the structural axis below — see the frontmatter example.
+
+**Structural tier** (Tier 0-3, a design framing, not yet a coded axis) — *where* a category of information sits: 0 immediate context (`.jarvis/`, system prompts, dot-prefixed folders), 1 general documentation (overviews, trackers, indexes — most of `Jarvis_notes/` directly), 2 project/workflow-specific (compartmentalized cartridges — `Projects/<id>/` and now `workflows/<slug>/`), 3 archive (user-led, graphify-indexed, permission-gated recall — see below). Full detail and current-vs-target-state honesty check: [[Jarvis_notes/workflows/memory-tiering-and-graphify-index/Plan|Workflow 2]].
+
+> [!important] Archive promotion is not yet permission-gated in code
+> Tier 3/archive notes are down-weighted in retrieval scoring, but nothing today *prevents* an agent from reading an archived note and recording its content into active memory. The tier model's own rule ("never record from archive without explicit user permission") is a standing instruction, not an enforced write-layer gate — a real, open gap, not a solved one.
 
 ## Markdown Note Service
 
@@ -77,7 +90,10 @@ supersedes: []
 contradicts: []
 related: []
 sensitivity: internal
+lifecycle: short_term
 ```
+
+`lifecycle` (`short_term` | `long_term` | `archive`, renamed from `memory_tier` 2026-07-25) is stamped by `create_note` only when `memory_tiers_enabled` is on; disabled, the field is simply absent and behaviour is byte-identical. See "Memory Lifecycle vs. Structural Tiers" above.
 
 Typed relationships are stored now so future DAG tooling can derive graphs without rewriting the vault.
 
@@ -144,6 +160,9 @@ The returned record includes note ID, title, path, type, tags, citation, confide
 
 `lookup_local` traverses text, type, layer, file, dependency, consumer, and related-note relationships to a bounded depth. `graph_local` emits typed note, tag, link, task, and project nodes and edges.
 
+> [!tip] RAG vs. `graphify_query` — when to use which
+> RAG answers "what do I know about X" (semantic/associative, or "what did we decide and why"). `graphify_query` (see [[14 Graphify Knowledge Graph Integration]]) answers "where does X live" and "what calls/depends on X" — structural questions RAG measurably loses on. A live profiling pass found RAG can also mis-rank closely-named historical notes (e.g. confusing two similarly-titled reports), so don't over-trust a single top-1 RAG result for a narrow factual question either. Full measured comparison: [[2026-07-25-rag-vs-knowledge-graph-profiling]].
+
 ## Project Memory Pattern
 
 Repository learning writes two complementary records:
@@ -197,3 +216,5 @@ Non-overlapping changes can merge automatically. Overlapping changes create a vi
 - [[05 Research Reports and Repository Learning]]
 - [[07 Models Credentials Speech and Resource Lifecycle]]
 - [[08 Storage Configuration and Operations]]
+- [[14 Graphify Knowledge Graph Integration]]
+- [[Jarvis_notes/workflows/memory-tiering-and-graphify-index/Plan|Workflow 2: Memory Tiering and Graphify Location Index]]

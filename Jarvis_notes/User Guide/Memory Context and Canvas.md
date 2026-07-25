@@ -4,7 +4,7 @@ title: "Memory Context and Canvas"
 type: "guide"
 status: "active"
 created: "2026-07-21"
-updated: "2026-07-23T03:00:54Z"
+updated: "2026-07-25T14:33:57Z"
 project_id: "jarvis_notes"
 source: "codex"
 tags: ["user-guide", "rag", "context", "canvas", "obsidian", "lmstudio", "tier/short-term"]
@@ -23,7 +23,7 @@ contradicts: []
 related: ["[[Tools Skills and Capabilities]]", "[[Planning Workflows]]", "[[Command Palette]]"]
 deleted: false
 deleted_at: ""
-memory_tier: "short_term"
+lifecycle: "short_term"
 ---
 
 # Memory Context and Canvas

@@ -4,7 +4,7 @@ title: "WS4d: Deterministic Context Inheritance and Deliverables — Build and L
 type: "report"
 status: "active"
 created: "2026-07-25T01:06:27Z"
-updated: "2026-07-25T05:30:35Z"
+updated: "2026-07-25T14:33:58Z"
 project_id: "jarvis_notes"
 source: "claude"
 tags: ["validation", "live-test", "ws4d", "canvas-planning", "tier-short-term", "tier/short-term"]
@@ -31,7 +31,7 @@ consumed_by: []
 related: []
 deleted: false
 deleted_at: ""
-memory_tier: "short_term"
+lifecycle: "short_term"
 sync_error: ""
 ---
 

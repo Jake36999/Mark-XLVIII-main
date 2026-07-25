@@ -4,7 +4,7 @@ title: "Process Trace and Operational UI"
 type: "guide"
 status: "active"
 created: "2026-07-22"
-updated: "2026-07-23T09:44:38Z"
+updated: "2026-07-25T14:33:58Z"
 project_id: "jarvis_notes"
 source: "codex"
 tags: ["developer-handbook", "ui", "telemetry", "process-trace", "privacy", "tier/short-term"]
@@ -14,7 +14,7 @@ remember_note_id: ""
 rag_index: true
 confidence: 0.98
 content_hash: "c8b6b791c60ba07a160114072d00abb5514f04eb466c0e6b789e889290a4f6a7"
-memory_tier: "short_term"
+lifecycle: "short_term"
 schema_version: "jarvis_developer_handbook/v1"
 ---
 

@@ -4,7 +4,7 @@ title: "Plan - Create a"
 type: "plan"
 status: "pending_review"
 created: "2026-07-21T10:54:53Z"
-updated: "2026-07-23T03:00:54Z"
+updated: "2026-07-25T14:33:56Z"
 project_id: "jarvis_notes"
 source: "jarvis"
 tags: ["plan", "workflow", "pending-approval", "tier/short-term"]
@@ -14,8 +14,8 @@ remember_note_id: ""
 content_hash: "f063b466227a46777ace3a4e3c207a350dfbe46f821f390955a3f34c331b681d"
 approval_state: "pending_review"
 execution_state: "not_started"
+lifecycle: "short_term"
 local_context_count: 5
-memory_tier: "short_term"
 original_prompt: "create a"
 research_state: "complete"
 web_source_count: 5

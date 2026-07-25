@@ -4,7 +4,7 @@ title: "Planning Workflows"
 type: "guide"
 status: "draft"
 created: "2026-07-21"
-updated: "2026-07-23T03:00:54Z"
+updated: "2026-07-25T14:33:57Z"
 project_id: "jarvis_notes"
 source: "codex"
 tags: ["user-guide", "planning", "workflows", "subagents", "tier/short-term"]
@@ -12,7 +12,7 @@ sync_state: "local_only"
 index_state: "indexed_local"
 remember_note_id: ""
 content_hash: "565df03680e4d46ab9e59964096f7183c1dfc3104c22f505e6745f60c8da174b"
-memory_tier: "short_term"
+lifecycle: "short_term"
 ---
 
 # Planning Workflows

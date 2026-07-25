@@ -51,6 +51,7 @@ from actions.file_processor import file_processor
 from actions.flight_finder     import flight_finder
 from actions.open_app          import open_app
 from actions.weather_report    import weather_action
+from actions.graphify_query    import graphify_query
 from actions.send_message      import send_message
 from actions.reminder          import reminder
 from actions.computer_settings import computer_settings
@@ -368,6 +369,29 @@ TOOL_DECLARATIONS = [
         }
     },
     {
+        "name": "graphify_query",
+        "description": (
+            "Queries a pre-built knowledge graph of a codebase for structural questions -- "
+            "prefer this over reading or grepping multiple files when the question is about "
+            "how parts of a codebase relate to each other (calls, imports, inheritance, references). "
+            "Modes: 'query' (default, free-form question, BFS traversal), "
+            "'explain' (plain-language summary of one symbol and its neighbors), "
+            "'path' (shortest relationship path between two symbols -- needs target_b). "
+            "Read-only against an already-built graph; returns a clear message if no graph exists yet."
+        ),
+        "parameters": {
+            "type": "OBJECT",
+            "properties": {
+                "question": {"type": "STRING", "description": "The question, symbol name, or path source node"},
+                "mode": {"type": "STRING", "description": "query | explain | path"},
+                "target_b": {"type": "STRING", "description": "Second symbol name, required for mode='path'"},
+                "project_id": {"type": "STRING", "description": "Registered project id to query (default: this project)"},
+                "budget": {"type": "INTEGER", "description": "Optional output token budget for mode='query'"},
+            },
+            "required": ["question"]
+        }
+    },
+    {
         "name": "system_status",
         "description": (
             "Returns real-time system metrics: CPU usage, RAM, GPU load, CPU temperature, "
@@ -657,7 +681,7 @@ TOOL_DECLARATIONS = [
                 "heading": {"type": "STRING", "description": "Section heading to edit for update_section, e.g. '## Findings'"},
                 "mode": {"type": "STRING", "description": "update_section edit mode: replace | append | prepend"},
                 "dest_dir": {"type": "STRING", "description": "Destination folder for move_note (vault-relative or absolute)"},
-                "memory_tier": {"type": "STRING", "description": "short_term | long_term | archive for move_note"},
+                "lifecycle": {"type": "STRING", "description": "short_term | long_term | archive for move_note ('memory_tier'/'tier' also accepted)"},
                 "query": {"type": "STRING", "description": "Question or topic to search in RAG memory"},
                 "topic": {"type": "STRING", "description": "Learning topic for learn_topic/learn_about workflows"},
                 "sections": {
@@ -1384,7 +1408,8 @@ def _router_tool_names_for_text(text: str) -> list[str] | None:
         (("save memory", "save this to memory", "save this as memory", "short-term memory", "short term memory", "json memory", "prompt cache", "remember that"), ["save_memory", "jarvis_memory"]),
         (("remember", "memory", "memories", "note", "notes", "vault", "obsidian", "markdown", ".md", "json memory", "short-term memory", "short term memory", "prompt cache", "rag", "context pack", "orient yourself", "note dependencies", "note consumers", "related notes", "lookup by layer", "lookup by file", "report", "research report", "deep research", "learn about", "learn topic", "learned topic", "todo", "to-do", "to do list", "task list", "checklist", "progress tracker", "search your memory", "what do you know", "memory graph", "tasks in memory", "dag candidate", "write this to your vault", "save this to your vault"), ["jarvis_memory"]),
         (("large folder", "analyze folder", "analyse folder", "summarize folder", "summarise folder", "scan folder"), ["file_controller", "project_operator", "jarvis_memory"]),
-        (("project", "repository", "repo", "codebase", "read the files", "read this directory", "learn this project", "quantule", "knowledge compiler", "network management", "mark platform", "aletheia", "scout", "code map", "handoff", "openclaw", "clawteam", "delegate", "continuity worker"), ["project_operator"]),
+        (("call graph", "who calls", "what calls", "what uses", "who uses", "depend on", "depends on", "knowledge graph", "code graph", "graphify", "shortest path between", "relationship between", "connects to", "caller of", "callers of"), ["graphify_query"]),
+        (("project", "repository", "repo", "codebase", "read the files", "read this directory", "learn this project", "quantule", "knowledge compiler", "network management", "mark platform", "aletheia", "scout", "code map", "handoff", "openclaw", "clawteam", "delegate", "continuity worker"), ["project_operator", "graphify_query"]),
         (("search", "web", "latest", "news", "price", "compare", "current", "research"), ["web_search"]),
         (("weather", "forecast"), ["weather_report"]),
         (("open ", "launch ", "start app", "run app"), ["open_app"]),
@@ -2754,6 +2779,10 @@ class JarvisLive:
                     lambda: file_processor(parameters=args, player=self.ui, speak=self.speak)
                 )
                 result = r or "Done."
+
+            elif name == "graphify_query":
+                r = await loop.run_in_executor(None, lambda: graphify_query(parameters=args, player=self.ui))
+                result = r or "No results."
 
             elif name == "computer_control":
                 r = await loop.run_in_executor(None, lambda: computer_control(parameters=args, player=self.ui))

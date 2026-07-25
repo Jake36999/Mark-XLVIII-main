@@ -4,7 +4,7 @@ title: "User Guide Index"
 type: "guide"
 status: "draft"
 created: "2026-07-21"
-updated: "2026-07-23T02:52:44Z"
+updated: "2026-07-25T14:33:57Z"
 project_id: "jarvis_notes"
 source: "codex"
 tags: ["user-guide", "index", "tier/short-term"]
@@ -12,7 +12,7 @@ sync_state: "local_only"
 index_state: "indexed_local"
 remember_note_id: ""
 content_hash: "bc02580cc770ce74d2b5519126fa6d2a53abd0d3bb759824fa82110839dffc7a"
-memory_tier: "short_term"
+lifecycle: "short_term"
 ---
 
 # User Guide Index

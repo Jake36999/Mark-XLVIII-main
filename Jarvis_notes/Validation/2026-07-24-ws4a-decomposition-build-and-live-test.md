@@ -4,7 +4,7 @@ title: "WS4a: Goal-to-Canvas Decomposition — Build and Live Test"
 type: "report"
 status: "active"
 created: "2026-07-24T19:36:56Z"
-updated: "2026-07-24T19:42:09Z"
+updated: "2026-07-25T14:33:58Z"
 project_id: "jarvis_notes"
 source: "claude"
 tags: ["validation", "live-test", "ws4a", "canvas-planning", "tier-short-term", "tier/short-term"]
@@ -31,7 +31,7 @@ consumed_by: []
 related: []
 deleted: false
 deleted_at: ""
-memory_tier: "short_term"
+lifecycle: "short_term"
 sync_error: ""
 ---
 

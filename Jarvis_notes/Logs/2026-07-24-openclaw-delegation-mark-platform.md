@@ -4,7 +4,7 @@ title: "OpenClaw Delegation - Mark Platform"
 type: "log"
 status: "draft"
 created: "2026-07-24T13:44:03Z"
-updated: "2026-07-24T13:44:25Z"
+updated: "2026-07-25T14:33:56Z"
 project_id: "jarvis_notes"
 source: "project_operator"
 tags: ["openclaw", "handoff", "project", "mark-platform", "tier/short-term"]
@@ -31,7 +31,7 @@ consumed_by: []
 related: []
 deleted: false
 deleted_at: ""
-memory_tier: "short_term"
+lifecycle: "short_term"
 ---
 
 # OpenClaw Delegation - Mark Platform

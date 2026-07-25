@@ -4,7 +4,7 @@ title: "Vault Change Awareness"
 type: "guide"
 status: "active"
 created: "2026-07-22"
-updated: "2026-07-23T09:44:38Z"
+updated: "2026-07-25T14:33:58Z"
 project_id: "jarvis_notes"
 source: "codex"
 tags: ["developer-handbook", "vault", "watcher", "indexing", "context", "tier/short-term"]
@@ -14,7 +14,7 @@ remember_note_id: ""
 rag_index: true
 confidence: 0.98
 content_hash: "8bf35de6e0c3dcdba30c0e7cc7790465c89ae7341ab8fc0020d71753b9b83d04"
-memory_tier: "short_term"
+lifecycle: "short_term"
 schema_version: "jarvis_developer_handbook/v1"
 ---
 

@@ -4,7 +4,7 @@ title: "Research, Reports, and Repository Learning"
 type: "guide"
 status: "active"
 created: "2026-07-22"
-updated: "2026-07-23T03:00:54Z"
+updated: "2026-07-25T14:56:32Z"
 project_id: "jarvis_notes"
 source: "codex"
 tags: ["developer-handbook", "research", "reports", "repository-learning", "documents", "tier/short-term"]
@@ -13,8 +13,8 @@ index_state: "indexed_local"
 remember_note_id: ""
 rag_index: true
 confidence: 0.96
-content_hash: "6835d4bd7e2de8b79b98afa8439fc4e606bc12c352254bfc10a9689be017f52c"
-memory_tier: "short_term"
+content_hash: "7051af0894f7c8df937b38c32e09dd88b4b272fda4e665dcaa3d6903a624fae0"
+lifecycle: "short_term"
 project_key: "mark_xlviii"
 schema_version: "jarvis_developer_handbook/v1"
 ---
@@ -117,9 +117,16 @@ Default safeguards cap the inventory at 5,000 files.
 
 Files are scored by category and spread across top-level folders. README files, manifests, entry points, configuration, workflows, tests, and important source files receive priority. Defaults read up to 36 files, 800,000 total bytes, and 120,000 bytes per file; configurable hard caps prevent an accidental whole-repository prompt.
 
+Explicit deny-list before any scoring happens: `.env`/`api_keys.json`/`credentials.json`/`id_rsa`/`known_hosts`-style names, `.key`/`.pem`/`.pfx`/`.p12`/`.kdbx`/`.sqlite`/`.db` suffixes, and secret/credential/api-key-shaped filenames are excluded from the inventory outright, independent of `.gitignore` state — see [[14 Graphify Knowledge Graph Integration]] for how this compares to the external tool's own (weaker, extension-allowlist-based) protection.
+
+> [!success] Graphify-informed centrality (2026-07-25)
+> When a pre-built graphify knowledge graph exists for the project (`graphify-out/graph.json`), file scores also fold in real cross-file relationship degree — `calls`/`inherits`/`references` edges, not just the import-only dependency graph this pipeline already reconstructs from scratch every run. Strictly additive: a project with no graph gets byte-identical selection to before this existed. See [[14 Graphify Knowledge Graph Integration]] for the full mechanism and a real production bug this surfaced and fixed.
+
 ### Mapping and synthesis
 
 Selected files are segmented into bounded source batches. Coverage rotates across files before returning to later segments of a single large file. Each block carries a canonical `[file:path]` citation and is wrapped as untrusted source text.
+
+A Python file's own content is presented as structured, deduplicated code slices (`core/repo_slicer.py`) rather than raw text — one slice per function/method/class, with real signatures, call graphs, docstrings, and complexity, ranked so the most informative units survive a truncated character budget. When a graphify graph exists, that ranking also weighs real cross-file usage first (`_graphify_symbol_degree`): a function with genuine callers elsewhere in the codebase outranks a merely-complex, unused one. Omitting the graphify signal reproduces the original complexity-only ranking exactly.
 
 The synthesis must contain:
 
@@ -176,3 +183,4 @@ Every repository file, web page, and document chunk is marked as untrusted evide
 - [[03 Planning Approval and Dual Orchestration]]
 - [[04 Fan-Out Workers Review and Recovery]]
 - [[06 Obsidian Memory RAG Tasks and Canvas]]
+- [[14 Graphify Knowledge Graph Integration]]

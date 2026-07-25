@@ -4,7 +4,7 @@ title: "Planning, Approval, and Dual Orchestration"
 type: "guide"
 status: "active"
 created: "2026-07-22"
-updated: "2026-07-23T02:52:44Z"
+updated: "2026-07-25T14:33:58Z"
 project_id: "jarvis_notes"
 source: "codex"
 tags: ["developer-handbook", "planning", "approval", "yaml", "orchestration", "tier/short-term"]
@@ -14,7 +14,7 @@ remember_note_id: ""
 rag_index: true
 confidence: 0.97
 content_hash: "31575d21e912f0b0843a48a2b5cd5e0bfb06ec9efefa8d24d34f0cff339c9bb8"
-memory_tier: "short_term"
+lifecycle: "short_term"
 project_key: "mark_xlviii"
 schema_version: "jarvis_developer_handbook/v1"
 ---

@@ -4,7 +4,7 @@ title: "Live Validation - Vault and Canvas Roundtrip"
 type: "progress_tracker"
 status: "active"
 created: "2026-07-21T20:55:14Z"
-updated: "2026-07-23T03:00:54Z"
+updated: "2026-07-25T14:33:58Z"
 project_id: "jarvis_notes"
 source: "codex-live-validation"
 tags: ["validation", "rag", "canvas", "tasks", "tier/short-term"]
@@ -31,7 +31,7 @@ consumed_by: []
 related: []
 deleted: false
 deleted_at: ""
-memory_tier: "short_term"
+lifecycle: "short_term"
 workflow_id: "live-validation"
 ---
 

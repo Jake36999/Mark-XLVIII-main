@@ -1,9 +1,9 @@
 ---
-updated: "2026-07-23T02:52:43Z"
+updated: "2026-07-25T14:33:56Z"
 tags: ["tier/short-term"]
 index_state: "indexed_local"
 content_hash: "13b6e272920c1d8dc7d66f4732fa062f69cb70b1a33c1ed0da91d9dcbdb66db3"
-memory_tier: "short_term"
+lifecycle: "short_term"
 ---
 
 # Review repositories

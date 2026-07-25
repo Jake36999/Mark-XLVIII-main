@@ -435,6 +435,49 @@ class CapabilityRegistryTests(unittest.TestCase):
         self.assertEqual(manifest["manifest"]["id"], "web_search")
         self.assertIn("properties", schema["schema"])
 
+    def test_search_cards_uses_word_boundaries_not_substring_matching(self):
+        from actions.capability_registry import _search_cards
+
+        registry = {
+            "cards": [
+                {
+                    "id": "unrelated_tool",
+                    "kind": "tool",
+                    "summary": "Handles installing, downloading, and scheduling updates for running games.",
+                    "triggers": [],
+                    "risk_tier": "T1",
+                    "available": True,
+                },
+                {
+                    "id": "graph_tool",
+                    "kind": "tool",
+                    "summary": "Answers what calls or depends on a symbol.",
+                    "triggers": ["calls", "depends"],
+                    "risk_tier": "T1",
+                    "available": True,
+                },
+            ]
+        }
+
+        # "run" is a real word, not a stopword. Substring counting used to match
+        # it once inside "running"; word-tokenized matching must not.
+        results = _search_cards(registry, "run", limit=8)
+        ids = [r["id"] for r in results]
+        self.assertNotIn("unrelated_tool", ids)
+
+        # a query actually about calls/dependencies must rank the relevant card,
+        # not a card that only happens to contain lots of "-ing" words.
+        results = _search_cards(registry, "what calls or depends on this symbol", limit=8)
+        self.assertEqual(results[0]["id"], "graph_tool")
+        self.assertNotIn("unrelated_tool", [r["id"] for r in results])
+
+    def test_search_stopwords_exclude_in_on_this(self):
+        from actions.capability_registry import SEARCH_STOPWORDS
+
+        self.assertIn("in", SEARCH_STOPWORDS)
+        self.assertIn("on", SEARCH_STOPWORDS)
+        self.assertIn("this", SEARCH_STOPWORDS)
+
 
 if __name__ == "__main__":
     unittest.main()

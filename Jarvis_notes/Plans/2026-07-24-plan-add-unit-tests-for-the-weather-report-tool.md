@@ -4,7 +4,7 @@ title: "Plan - Add unit tests for the weather_report tool"
 type: "plan"
 status: "pending_review"
 created: "2026-07-24T18:45:27Z"
-updated: "2026-07-24T18:45:31Z"
+updated: "2026-07-25T14:33:56Z"
 project_id: "jarvis_notes"
 source: "jarvis"
 tags: ["plan", "workflow", "pending-approval", "tier/short-term"]
@@ -37,9 +37,9 @@ approval_state: "pending_review"
 approved_action_ids: ["p01", "p02", "p03"]
 decision_gates: []
 execution_state: "not_started"
+lifecycle: "short_term"
 local_context_count: 5
 manifest_hash: "9a11e7bd02386414c86c0129338beda21de071493d924b9ed86d1cbc4c4cd3e8"
-memory_tier: "short_term"
 original_prompt: "add unit tests for the weather_report tool."
 plan_version: 1
 research_state: "complete"

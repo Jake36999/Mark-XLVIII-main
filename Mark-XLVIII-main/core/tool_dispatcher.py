@@ -26,6 +26,7 @@ class DispatchContext:
 
 READ_ONLY_TOOLS = {
     "capability_registry",
+    "graphify_query",
     "model_registry",
     "system_status",
     "weather_report",
@@ -87,7 +88,7 @@ HEADLESS_TOOLS = {
     "capability_registry", "dual_orchestrator", "model_lifecycle", "model_registry",
     "file_processor", "file_controller", "browser_control", "reminder", "weather_report",
     "system_status", "open_app", "desktop_control", "computer_settings", "computer_control",
-    "send_message", "youtube_video", "code_helper", "dev_agent",
+    "send_message", "youtube_video", "code_helper", "dev_agent", "graphify_query",
 }
 
 
@@ -295,6 +296,10 @@ def _handler(tool_name: str) -> Callable[[dict[str, Any]], Any] | None:
         from actions.dev_agent import dev_agent
 
         return lambda args: dev_agent(parameters=args)
+    if tool_name == "graphify_query":
+        from actions.graphify_query import graphify_query
+
+        return lambda args: graphify_query(parameters=args)
     return None
 
 

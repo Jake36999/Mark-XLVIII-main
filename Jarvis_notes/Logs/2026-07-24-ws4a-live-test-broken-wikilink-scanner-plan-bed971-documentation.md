@@ -4,7 +4,7 @@ title: "WS4a Live Test: Broken Wikilink Scanner — plan_bed971 — documentatio
 type: "log"
 status: "draft"
 created: "2026-07-24T19:34:13Z"
-updated: "2026-07-24T19:42:09Z"
+updated: "2026-07-25T14:33:56Z"
 project_id: "jarvis_notes"
 source: "canvas_plan"
 tags: ["canvas-plan", "node-doc", "ws4a-live-test", "tier/short-term"]
@@ -31,7 +31,7 @@ consumed_by: []
 related: []
 deleted: false
 deleted_at: ""
-memory_tier: "short_term"
+lifecycle: "short_term"
 ---
 
 # WS4a Live Test: Broken Wikilink Scanner — plan — `plan_bed971`

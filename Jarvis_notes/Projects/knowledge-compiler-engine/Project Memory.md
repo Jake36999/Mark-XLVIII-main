@@ -4,7 +4,7 @@ title: "Project Memory - Knowledge Compiler Engine"
 type: "memory"
 status: "active"
 created: "2026-07-22T11:42:34Z"
-updated: "2026-07-23T09:35:03Z"
+updated: "2026-07-25T14:33:57Z"
 project_id: "jarvis_notes"
 source: "F:\\Mark-XLVIII-main\\Jarvis_notes\\Projects\\knowledge-compiler-engine\\Project Brief.md"
 tags: ["project-memory", "repository", "verified", "knowledge-compiler-engine", "tier/short-term"]
@@ -32,7 +32,7 @@ related: ["project-brief-knowledge-compiler-engine"]
 deleted: false
 deleted_at: ""
 audit_status: "verified_read_only"
-memory_tier: "short_term"
+lifecycle: "short_term"
 project_key: "knowledge_compiler_engine"
 project_root: "F:\\knowledge_compiler_engine (DAG Engine)"
 quality_state: "audited"

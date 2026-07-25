@@ -4,7 +4,7 @@ title: "RAL Round 4 - Concurrency, Recovery, and Combined Regression"
 type: "evaluation-report"
 status: "complete"
 created: "2026-07-21T16:10:00+01:00"
-updated: "2026-07-23T02:52:44Z"
+updated: "2026-07-25T14:33:57Z"
 project_id: "mark_platform"
 source: "controlled-local-evaluation"
 tags: ["tier/short-term"]
@@ -14,7 +14,7 @@ rag_index: false
 sensitivity: "internal"
 content_hash: "f49f4e83a514a22f717fc49720ad4f86199e3e5a2a4773d7adc63e284b0140ff"
 attack_fixture_persisted: false
-memory_tier: "short_term"
+lifecycle: "short_term"
 round: 4
 ---
 

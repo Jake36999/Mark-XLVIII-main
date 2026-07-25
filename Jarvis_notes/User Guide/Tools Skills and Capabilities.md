@@ -4,15 +4,15 @@ title: "Tools Skills and Capabilities"
 type: "guide"
 status: "draft"
 created: "2026-07-21"
-updated: "2026-07-23T02:52:44Z"
+updated: "2026-07-25T14:58:33Z"
 project_id: "jarvis_notes"
 source: "codex"
 tags: ["user-guide", "tools", "capabilities", "workflows", "tier/short-term"]
 sync_state: "local_only"
 index_state: "indexed_local"
 remember_note_id: ""
-content_hash: "e5430a4b8d450ca65810d0b7ac5c6373ab4c61a805c283c77a6a7409d5058bbd"
-memory_tier: "short_term"
+content_hash: "c36f2ae051ee9783ed43d9898f4f3cec6d68778bec95781e402a45081a4259f8"
+lifecycle: "short_term"
 ---
 
 # Tools Skills and Capabilities
@@ -32,6 +32,7 @@ memory_tier: "short_term"
 | `capability_registry` | Tool help, workflow help, planning metadata | Manifest or workflow plan | Low |
 | `web_search` | Current web/news/research/prices | Search results with sources | Low |
 | `jarvis_memory` | Vault notes, reports, local RAG, graph/tasks | Markdown notes and cited memory results | Low |
+| `graphify_query` | What calls/uses/depends on a symbol; relationship paths between two symbols | Structural answer from a pre-built code knowledge graph | Low |
 | `jarvis_canvas` | Rolling plan boards, task dashboards, node neighborhoods | Native `.canvas` files | Low to medium |
 | `plan_workflow` | Long-form plans, revisions, approvals, summaries, blockers | Reviewable plan and execution notes | Low to medium |
 | `save_memory` | Short durable facts | JSON prompt cache plus vault mirror | Low |
@@ -70,6 +71,16 @@ Important operations: `create_note`, `create_todo_template`, `create_report_from
 
 > [!tip] Context control
 > Use `context_pack` for bounded project orientation. Use `lookup_local` for explicit `deps`, `consumers`, `related`, `type`, `layer`, `files`, or text lookup. Set `max_notes`, `max_chars`, and `depth` rather than loading whole folders into a prompt.
+
+### `graphify_query`
+
+> [!info] Use when
+> The question is about how parts of a codebase relate — "what calls X", "what does X depend on", "what connects A to B" — rather than what you know or decided about something.
+
+Wraps a pre-built local knowledge graph (`graphify`). Modes: `query` (free-form BFS traversal, default), `explain` (a symbol and its real neighbors), `path` (shortest relationship path between two named symbols — needs `target_b`). Read-only; never runs extraction itself. If no graph has been built yet for the target, it says so plainly rather than failing confusingly.
+
+> [!tip] vs. `jarvis_memory`
+> `jarvis_memory` answers "what do I know / what did we decide." `graphify_query` answers "where does this live / what touches this." Measured live, not assumed — see [[Developer Handbook/14 Graphify Knowledge Graph Integration|Note 14]].
 
 ### `jarvis_canvas`
 
@@ -169,6 +180,7 @@ Local speech capability. STT can use Vosk. TTS can use Windows, EdgeTTS, Kokoro,
 | Local files | `file_controller` or `file_processor` |
 | Bounded project orientation | `jarvis_memory.context_pack` |
 | Note dependencies/consumers | `jarvis_memory.lookup_local` |
+| What calls/depends on a code symbol | `graphify_query` |
 | Plan and task visualization | `jarvis_canvas` |
 | Project status/handoffs | `project_operator` |
 | Model load/cleanup | `model_lifecycle` |

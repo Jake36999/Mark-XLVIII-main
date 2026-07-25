@@ -1,9 +1,9 @@
 ---
-updated: "2026-07-24T12:07:19Z"
+updated: "2026-07-25T14:33:56Z"
 tags: ["tier/short-term"]
 index_state: "indexed_local"
 content_hash: "a645a92538ecb904422c312c4bf87976330017a3bf87ead559431178d49809d5"
-memory_tier: "short_term"
+lifecycle: "short_term"
 ---
 
 [Phasip/obsidian-canvas-llm-extender.git](https://github.com/Phasip/obsidian-canvas-llm-extender.git)

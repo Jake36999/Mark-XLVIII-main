@@ -242,6 +242,216 @@ class ProjectLearningTests(unittest.TestCase):
         self.assertEqual(in_degree.get("src/pipeline/core_engine.py"), 3)
         self.assertNotIn("src/pipeline/leaf.py", in_degree)
 
+    def _graphify_graph(self) -> dict:
+        """A minimal but realistic graphify graph.json shape: one file-level
+        node per module plus a couple of symbol nodes, `contains` edges from
+        each file to its own symbols, and cross-file `calls`/`imports` edges
+        -- the exact shape `_apply_graphify_centrality` reads."""
+        return {
+            "nodes": [
+                {"id": "hub", "source_file": "src/hub.py"},
+                {"id": "hub_run", "source_file": "src/hub.py"},
+                {"id": "leaf_a", "source_file": "src/leaf_a.py"},
+                {"id": "leaf_a_go", "source_file": "src/leaf_a.py"},
+                {"id": "leaf_b", "source_file": "src/leaf_b.py"},
+                {"id": "leaf_b_go", "source_file": "src/leaf_b.py"},
+                {"id": "untouched", "source_file": "src/untouched.py"},
+            ],
+            "links": [
+                {"relation": "contains", "source": "hub", "target": "hub_run"},
+                {"relation": "contains", "source": "leaf_a", "target": "leaf_a_go"},
+                {"relation": "contains", "source": "leaf_b", "target": "leaf_b_go"},
+                {"relation": "calls", "source": "leaf_a_go", "target": "hub_run"},
+                {"relation": "calls", "source": "leaf_b_go", "target": "hub_run"},
+                {"relation": "imports", "source": "leaf_a", "target": "hub"},
+            ],
+        }
+
+    def test_graphify_centrality_boosts_a_real_cross_file_hub(self):
+        from actions.project_learning import _apply_graphify_centrality
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            graph_dir = root / "graphify-out"
+            graph_dir.mkdir()
+            (graph_dir / "graph.json").write_text(json.dumps(self._graphify_graph()), encoding="utf-8")
+
+            records = [
+                {"path": "src/hub.py", "score": 40},
+                {"path": "src/leaf_a.py", "score": 40},
+                {"path": "src/untouched.py", "score": 40},
+            ]
+            _apply_graphify_centrality(records, root)
+
+        by_path = {r["path"]: r for r in records}
+        # hub.py is targeted by 3 cross-file edges (2 calls + 1 import); its
+        # own "contains" edge to hub_run must NOT count toward this.
+        self.assertEqual(by_path["src/hub.py"]["graphify_centrality"], 3)
+        self.assertGreater(by_path["src/hub.py"]["score"], 40)
+        # a file with no cross-file edges pointing at it is untouched
+        self.assertNotIn("graphify_centrality", by_path["src/untouched.py"])
+        self.assertEqual(by_path["src/untouched.py"]["score"], 40)
+
+    def test_graphify_symbol_degree_ranks_a_real_cross_file_callee(self):
+        from actions.project_learning import _graphify_symbol_degree
+
+        graph = {
+            "nodes": [
+                {"id": "hub_file", "label": "hub.py", "source_file": "src/hub.py"},
+                {"id": "hub_run", "label": "hub_run()", "source_file": "src/hub.py"},
+                {"id": "hub_init", "label": ".__init__()", "source_file": "src/hub.py"},
+                {"id": "leaf_file", "label": "leaf_a.py", "source_file": "src/leaf_a.py"},
+                {"id": "leaf_go", "label": "leaf_a_go()", "source_file": "src/leaf_a.py"},
+            ],
+            "links": [
+                {"relation": "contains", "source": "hub_file", "target": "hub_run"},
+                {"relation": "contains", "source": "leaf_file", "target": "leaf_go"},
+                {"relation": "calls", "source": "leaf_go", "target": "hub_run"},
+                {"relation": "calls", "source": "leaf_go", "target": "hub_run"},
+                {"relation": "calls", "source": "leaf_go", "target": "hub_init"},
+            ],
+        }
+
+        degree = _graphify_symbol_degree(graph)
+
+        self.assertEqual(degree[("src/hub.py", "hub_run")], 2)
+        # a method label ".__init__()" strips to a bare name, not left dot-prefixed
+        self.assertEqual(degree[("src/hub.py", "__init__")], 1)
+        self.assertNotIn(("src/hub.py", ".__init__"), degree)
+        # a symbol nothing calls into doesn't appear at all
+        self.assertNotIn(("src/leaf_a.py", "leaf_a_go"), degree)
+        # the file-level node itself (label == basename) is never mistaken for a symbol
+        self.assertNotIn(("src/hub.py", "hub.py"), degree)
+
+    def test_graphify_symbol_degree_for_root_is_a_strict_no_op_without_a_graph(self):
+        from actions.project_learning import _graphify_symbol_degree_for_root
+
+        with tempfile.TemporaryDirectory() as tmp:
+            degree = _graphify_symbol_degree_for_root(Path(tmp))
+
+        self.assertEqual(degree, {})
+
+    def test_render_slices_receives_a_real_symbol_degree_map_end_to_end(self):
+        """Confirms the wiring from a real graphify graph on disk all the way to
+        render_slices' ranking -- not just the pure function in isolation."""
+        from actions.project_learning import _graphify_symbol_degree_for_root, _python_slice_view
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            graph_dir = root / "graphify-out"
+            graph_dir.mkdir()
+            graph = {
+                "nodes": [
+                    {"id": "mod_file", "label": "mod.py", "source_file": "mod.py"},
+                    {"id": "mod_used", "label": "used()", "source_file": "mod.py"},
+                    {"id": "other_file", "label": "other.py", "source_file": "other.py"},
+                    {"id": "other_caller", "label": "caller()", "source_file": "other.py"},
+                ],
+                "links": [
+                    {"relation": "contains", "source": "mod_file", "target": "mod_used"},
+                    {"relation": "calls", "source": "other_caller", "target": "mod_used"},
+                ],
+            }
+            (graph_dir / "graph.json").write_text(json.dumps(graph), encoding="utf-8")
+
+            source = (
+                "def used(x):\n    return x\n\n"
+                "def unused(y, z):\n"
+                "    if y:\n        return z\n"
+                "    return y\n"
+            )
+            symbol_degree = _graphify_symbol_degree_for_root(root)
+            rendered = _python_slice_view(source, "mod.py", max_chars=4000, symbol_degree=symbol_degree)
+
+        # unused() has higher AST complexity (an if-branch) than used(), so it
+        # would win a complexity-only ranking; the real cross-file caller signal
+        # must still put used() first end-to-end, not just in the pure function.
+        self.assertLess(rendered.index("def used"), rendered.index("def unused"))
+
+    def test_graphify_centrality_tolerates_an_inventory_root_above_the_extraction_root(self):
+        """Real production bug found via live validation: project_operator.py
+        calls learn_repository with a project's *registered* root, which can
+        sit one directory above wherever `graphify extract` was actually run
+        from (e.g. a wrapper checkout dir containing the real package one
+        level down). The graph's own source_file paths are relative to its
+        extraction root, so an inventory record's path carries an extra
+        leading segment the graph never had -- an exact-match lookup silently
+        boosted nothing, even with a perfectly valid graph on disk."""
+        from actions.project_learning import _apply_graphify_centrality
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            graph_dir = root / "graphify-out"
+            graph_dir.mkdir()
+            (graph_dir / "graph.json").write_text(json.dumps(self._graphify_graph()), encoding="utf-8")
+
+            # paths carry an extra "outer_wrapper/" segment the graph doesn't have
+            records = [
+                {"path": "outer_wrapper/src/hub.py", "score": 40},
+                {"path": "outer_wrapper/src/untouched.py", "score": 40},
+            ]
+            _apply_graphify_centrality(records, root)
+
+        by_path = {r["path"]: r for r in records}
+        self.assertEqual(by_path["outer_wrapper/src/hub.py"]["graphify_centrality"], 3)
+        self.assertGreater(by_path["outer_wrapper/src/hub.py"]["score"], 40)
+        self.assertNotIn("graphify_centrality", by_path["outer_wrapper/src/untouched.py"])
+
+    def test_graphify_centrality_is_a_strict_no_op_without_a_graph(self):
+        from actions.project_learning import _apply_graphify_centrality
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)  # no graphify-out/ created at all
+            records = [{"path": "src/hub.py", "score": 40}]
+            _apply_graphify_centrality(records, root)
+
+        self.assertEqual(records, [{"path": "src/hub.py", "score": 40}])
+
+    def test_graphify_centrality_degrades_gracefully_on_a_corrupt_graph(self):
+        from actions.project_learning import _apply_graphify_centrality
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            graph_dir = root / "graphify-out"
+            graph_dir.mkdir()
+            (graph_dir / "graph.json").write_text("{not valid json", encoding="utf-8")
+
+            records = [{"path": "src/hub.py", "score": 40}]
+            _apply_graphify_centrality(records, root)
+
+        # no crash, and no partial/garbage mutation
+        self.assertEqual(records, [{"path": "src/hub.py", "score": 40}])
+
+    def test_select_reading_set_engages_graphify_centrality_end_to_end(self):
+        from actions.project_learning import inventory_repository, select_reading_set
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "workspace"
+            src = root / "src"
+            src.mkdir(parents=True)
+            (root / "graphify-out").mkdir()
+            (root / "graphify-out" / "graph.json").write_text(json.dumps(self._graphify_graph()), encoding="utf-8")
+            (src / "hub.py").write_text("def run():\n    return 1\n", encoding="utf-8")
+            (src / "leaf_a.py").write_text("def go():\n    return 1\n", encoding="utf-8")
+            (src / "leaf_b.py").write_text("def go():\n    return 1\n", encoding="utf-8")
+            (src / "untouched.py").write_text("def idle():\n    return 1\n", encoding="utf-8")
+
+            inventory = inventory_repository(root)
+            with_graph = {
+                item["path"]: item.get("graphify_centrality")
+                for item in select_reading_set(inventory, max_files=10)
+            }
+            # point at a nonexistent graph -- must fall back with zero effect
+            without_graph = {
+                item["path"]: item.get("graphify_centrality")
+                for item in select_reading_set(
+                    inventory_repository(root), max_files=10, graphify_graph_path=root / "no-such-graph.json"
+                )
+            }
+
+        self.assertEqual(with_graph.get("src/hub.py"), 3)
+        self.assertIsNone(without_graph.get("src/hub.py"))
+
     def test_code_mass_lifts_a_definition_dense_leaf_over_a_trivial_source_file(self):
         # A big module with many top-level defs but zero importers (a pipeline
         # leaf like semantic_slicer) must still outrank a one-liner source file.

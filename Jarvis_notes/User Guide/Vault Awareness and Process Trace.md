@@ -4,7 +4,7 @@ title: "Vault Awareness and Process Trace"
 type: "guide"
 status: "active"
 created: "2026-07-22"
-updated: "2026-07-23T09:44:38Z"
+updated: "2026-07-25T14:33:58Z"
 project_id: "jarvis_notes"
 source: "codex"
 tags: ["user-guide", "vault", "process-trace", "obsidian", "tier/short-term"]
@@ -14,7 +14,7 @@ remember_note_id: ""
 rag_index: true
 confidence: 0.98
 content_hash: "c94178e278a52f5dad6f5b2dafdce2f9005a6ed0fe148dc9bb287f7a10f45240"
-memory_tier: "short_term"
+lifecycle: "short_term"
 schema_version: "jarvis_user_guide/v1"
 ---
 

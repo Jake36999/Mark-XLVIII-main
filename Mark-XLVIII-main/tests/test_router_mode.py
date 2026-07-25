@@ -113,6 +113,26 @@ class RouterToolCallingTests(unittest.TestCase):
 
         self.assertIn("jarvis_memory", names)
 
+    def test_router_tool_schema_routes_relationship_questions_to_graphify_query(self):
+        import main
+
+        for prompt in (
+            "what calls select_reading_set",
+            "what does ToolDispatcher depend on",
+            "show me the codebase knowledge graph",
+            "what is the shortest path between ToolDispatcher and capability_registry",
+        ):
+            names = [tool["function"]["name"] for tool in main._router_tool_schema(prompt)]
+            self.assertIn("graphify_query", names, msg=f"prompt={prompt!r} names={names}")
+
+    def test_router_tool_schema_offers_graphify_query_alongside_project_operator(self):
+        import main
+
+        names = [tool["function"]["name"] for tool in main._router_tool_schema("explain the codebase structure")]
+
+        self.assertIn("project_operator", names)
+        self.assertIn("graphify_query", names)
+
     def test_router_tool_schema_routes_vault_markdown_and_json_memory(self):
         import main
 

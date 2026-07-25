@@ -4,7 +4,7 @@ title: "Live Validation Read Only Gate"
 type: "skill"
 status: "deprecated"
 created: "2026-07-21T21:34:43Z"
-updated: "2026-07-23T03:00:54Z"
+updated: "2026-07-25T14:33:57Z"
 project_id: "jarvis_notes"
 source: "daemon"
 tags: ["skill", "candidate", "approval-required", "tier/short-term"]
@@ -37,8 +37,8 @@ approved_playbook_hash: "b09dd4f6b1b438387cdb7d739b15a1c1313548e337aa2a6ca20a44f
 enabled_at: "2026-07-21T21:34:46Z"
 installed_playbook_hash: "b09dd4f6b1b438387cdb7d739b15a1c1313548e337aa2a6ca20a44fb466bf655"
 installed_playbook_path: "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\skills\\enabled\\skill-live-validation-read-only-gate\\v1\\workflow.yaml"
+lifecycle: "short_term"
 manifest_hash: "9a38da5a7a8e45677f0052081ad95b1e8be27dc2472f60af8032ca10568ddc9a"
-memory_tier: "short_term"
 playbook_hash: "b09dd4f6b1b438387cdb7d739b15a1c1313548e337aa2a6ca20a44fb466bf655"
 playbook_path: "F:\\Mark-XLVIII-main\\Jarvis_notes\\Skills\\.packages\\skill-live-validation-read-only-gate\\v1\\workflow.yaml"
 playbook_step_count: 1

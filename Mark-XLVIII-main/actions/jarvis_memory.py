@@ -302,7 +302,7 @@ def note_tier(metadata: dict[str, Any], path: str | Path, cfg: dict[str, Any]) -
     Path derivation makes tier weighting work on existing notes before any
     backfill, because tier and folder are the design invariant.
     """
-    explicit = str((metadata or {}).get("memory_tier") or "").strip().lower()
+    explicit = str((metadata or {}).get("lifecycle") or "").strip().lower()
     if explicit in MEMORY_TIERS:
         return explicit
     try:
@@ -764,8 +764,8 @@ def create_note(
     if cfg.get("memory_tiers_enabled"):
         from actions.obsidian_render import tier_tags
 
-        tier = str((metadata_extra or {}).get("memory_tier") or "short_term").strip().lower()
-        metadata["memory_tier"] = tier
+        tier = str((metadata_extra or {}).get("lifecycle") or "short_term").strip().lower()
+        metadata["lifecycle"] = tier
         existing_tags = list(metadata.get("tags") or [])
         for tag in tier_tags(tier):
             if tag not in existing_tags:
@@ -989,7 +989,7 @@ def move_note(
     dest_dir: str | Path,
     *,
     cfg: dict[str, Any] | None = None,
-    memory_tier: str = "",
+    lifecycle: str = "",
 ) -> dict[str, Any]:
     """Move a note to another folder without breaking inbound links.
 
@@ -1020,8 +1020,8 @@ def move_note(
 
     # Update the tier field in place first, then move the file, so the on-disk
     # note is self-consistent at every step.
-    if memory_tier:
-        update_note_frontmatter(path, {"memory_tier": str(memory_tier).strip().lower()})
+    if lifecycle:
+        update_note_frontmatter(path, {"lifecycle": str(lifecycle).strip().lower()})
 
     dest_dir.mkdir(parents=True, exist_ok=True)
     text = path.read_bytes()
@@ -2094,7 +2094,7 @@ def _row_to_result(row: sqlite3.Row, score: float, method: str, query: str = "")
         "instruction_authority": "none",
         "project_id": row["project_id"] or "",
         "project_key": str(metadata.get("project_key") or ""),
-        "memory_tier": str(metadata.get("memory_tier") or ""),
+        "lifecycle": str(metadata.get("lifecycle") or ""),
         "layer": str(metadata.get("layer") or ""),
         "files": metadata.get("files") or metadata.get("key_files") or [],
         "relations": json.loads(row["relations"] or "{}") if "relations" in row.keys() else {},
@@ -2257,9 +2257,9 @@ def query_local(
         fused_items: list[dict[str, Any]] = []
         for item in fused.values():
             item_tier = note_tier(
-                {"memory_tier": item.get("memory_tier")}, item.get("path", ""), cfg
+                {"lifecycle": item.get("lifecycle")}, item.get("path", ""), cfg
             )
-            item["memory_tier"] = item_tier
+            item["lifecycle"] = item_tier
             if tier_filter and item_tier != tier_filter:
                 continue
             if tiers_enabled:
@@ -4359,7 +4359,7 @@ def jarvis_memory(
                 Path(str(params.get("path") or "")),
                 str(params.get("dest_dir") or params.get("destination") or ""),
                 cfg=cfg,
-                memory_tier=str(params.get("memory_tier") or params.get("tier") or ""),
+                lifecycle=str(params.get("lifecycle") or params.get("memory_tier") or params.get("tier") or ""),
             )
         elif operation in {"learn_topic", "learn_about"}:
             search_payload = params.get("search_payload")

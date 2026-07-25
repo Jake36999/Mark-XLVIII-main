@@ -4,7 +4,7 @@ title: "JARVIS Remaining Features Live Validation Report"
 type: "report"
 status: "complete"
 created: "2026-07-22T00:09:02+01:00"
-updated: "2026-07-23T03:00:54Z"
+updated: "2026-07-25T14:33:58Z"
 project_id: "jarvis_notes"
 source: "codex-live-validation"
 tags: ["jarvis", "mark-xl-viii", "live-validation", "release-readiness", "openclaw", "rag", "mcp", "tier/short-term"]
@@ -19,7 +19,7 @@ review_after: "2026-08-05"
 source_version: 1
 content_hash: "61feedad472d94f78df1f3b4e9a53f95cb6fdf59dd0679dcb2143e7c2b435ce3"
 related: ["[[2026-07-21-jarvis-implementation-progress-report]]", "[[2026-07-21-live-validation-ai-and-uk-politics-news-2026-07-21]]", "[[2026-07-21-openclaw-delegation-jarvis-openclaw-live-validation]]"]
-memory_tier: "short_term"
+lifecycle: "short_term"
 workflow_id: "jarvis-finalization-live-validation"
 ---
 

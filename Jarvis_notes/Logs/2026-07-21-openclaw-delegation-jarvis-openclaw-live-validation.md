@@ -4,7 +4,7 @@ title: "OpenClaw Delegation - JARVIS OpenClaw Live Validation"
 type: "log"
 status: "draft"
 created: "2026-07-21T22:30:41Z"
-updated: "2026-07-23T03:00:54Z"
+updated: "2026-07-25T14:33:56Z"
 project_id: "jarvis_notes"
 source: "project_operator"
 tags: ["openclaw", "handoff", "project", "live-validation", "tier/short-term"]
@@ -31,7 +31,7 @@ consumed_by: []
 related: []
 deleted: false
 deleted_at: ""
-memory_tier: "short_term"
+lifecycle: "short_term"
 ---
 
 # OpenClaw Delegation - JARVIS OpenClaw Live Validation

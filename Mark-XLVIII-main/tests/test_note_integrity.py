@@ -17,7 +17,7 @@ class InspectNoteTests(unittest.TestCase):
     def test_detects_doubled_frontmatter(self):
         # A minimal block, then the original frontmatter pushed into the body.
         note = (
-            '---\nupdated: "z"\nmemory_tier: "short_term"\n---\n\n'
+            '---\nupdated: "z"\nlifecycle: "short_term"\n---\n\n'
             '---\nid: "x"\ntitle: "T"\n---\n\n# Body\n'
         )
         findings = ni.inspect_note(note)

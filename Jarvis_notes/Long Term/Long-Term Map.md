@@ -4,7 +4,7 @@ title: "Long-Term Map"
 type: "map_of_content"
 status: "draft"
 created: "2026-07-23T02:52:44Z"
-updated: "2026-07-23T02:54:53Z"
+updated: "2026-07-25T14:33:56Z"
 project_id: "jarvis_notes"
 source: "user"
 tags: ["tier/long-term"]
@@ -31,7 +31,7 @@ consumed_by: []
 related: []
 deleted: false
 deleted_at: ""
-memory_tier: "long_term"
+lifecycle: "long_term"
 ---
 
 # Long-Term Map

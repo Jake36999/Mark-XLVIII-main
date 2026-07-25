@@ -40,6 +40,7 @@ SKIP_DIRS = {
     "env",
     "runtime_logs",
     "runtime_validation",
+    "graphify-out",
 }
 
 TEXT_SUFFIXES = {
@@ -403,12 +404,172 @@ def _apply_centrality(records: list[dict[str, Any]]) -> None:
                 record["import_centrality"] = degree
 
 
+# graphify (2026-07-25): an optional, strictly additive richer centrality
+# signal from a pre-built external knowledge graph (github.com/Graphify-Labs/
+# graphify), when one exists for the project being learned. `_apply_centrality`
+# above reconstructs a same-process, per-run, import-only dependency graph
+# from scratch every single call; a graphify graph is built once, persisted,
+# and carries real `calls`/`inherits`/`references` edges too, not just
+# `imports` -- a strictly richer version of the exact signal this file
+# already computes. `contains` edges (a file "containing" its own functions)
+# are deliberately excluded: that's just file size, already covered by
+# `_apply_centrality`'s own code-mass term, and would swamp the genuine
+# cross-file signal this is meant to add.
+_GRAPHIFY_MAX_BOOST = 150
+_GRAPHIFY_PER_EDGE = 3
+_GRAPHIFY_SKIP_RELATIONS = frozenset({"contains"})
+_GRAPHIFY_DEFAULT_RELATIVE_PATH = Path("graphify-out") / "graph.json"
+
+
+def _read_graphify_graph(graph_path: Path) -> dict[str, Any] | None:
+    """Best-effort read of a graphify knowledge graph. Returns `None` (never
+    raises) on any missing file, unreadable file, invalid JSON, or a shape
+    that doesn't look like a graphify graph -- this must never become a hard
+    dependency for repository learning."""
+    try:
+        text = graph_path.read_text(encoding="utf-8")
+    except OSError:
+        return None
+    try:
+        data = json.loads(text)
+    except json.JSONDecodeError:
+        return None
+    if not isinstance(data, dict) or not isinstance(data.get("nodes"), list) or not isinstance(data.get("links"), list):
+        return None
+    return data
+
+
+def _graphify_cross_file_degree(graph: dict[str, Any]) -> dict[str, int]:
+    """Cross-file relationship count per source file, keyed by the same
+    relative-posix-path convention as an inventory record's `path`."""
+    id_to_file: dict[str, str] = {}
+    for node in graph.get("nodes", []):
+        if not isinstance(node, dict):
+            continue
+        node_id, source_file = node.get("id"), node.get("source_file")
+        if node_id and source_file:
+            id_to_file[str(node_id)] = str(source_file)
+
+    degree: dict[str, int] = {}
+    for link in graph.get("links", []):
+        if not isinstance(link, dict) or link.get("relation") in _GRAPHIFY_SKIP_RELATIONS:
+            continue
+        src_file = id_to_file.get(str(link.get("source")))
+        dst_file = id_to_file.get(str(link.get("target")))
+        if src_file and dst_file and src_file != dst_file:
+            degree[dst_file] = degree.get(dst_file, 0) + 1
+    return degree
+
+
+def _graphify_lookup_degree(degree_by_file: dict[str, int], rel: str) -> int | None:
+    """Look up cross-file degree for `rel`, tolerating an inventory root that
+    sits one or more directories above wherever `graphify extract` was
+    actually run from -- the graph's own `source_file` paths are relative to
+    its extraction root, not necessarily the root passed to
+    `select_reading_set`. Only ever matches an exact path suffix (never
+    fuzzy/substring), bounded to a few segments so a genuine miss stays a
+    miss.
+    """
+    candidate = rel
+    for _ in range(4):
+        degree = degree_by_file.get(candidate)
+        if degree:
+            return degree
+        if "/" not in candidate:
+            return None
+        candidate = candidate.split("/", 1)[1]
+    return None
+
+
+def _graphify_symbol_degree(graph: dict[str, Any]) -> dict[tuple[str, str], int]:
+    """Cross-file relationship count per (source_file, bare_symbol_name) --
+    the same edge-counting rule as `_graphify_cross_file_degree` (`contains`
+    edges excluded), just keyed one level deeper than file granularity, so
+    `repo_slicer.render_slices` can rank *which* slice within an already-
+    selected file matters most. graphify labels a symbol node as e.g.
+    `"_search_cards()"` or `".call()"` for a method -- strip the parens/dot to
+    match repo_slicer's own bare `name` field. A collision between two
+    same-named symbols in one file (e.g. two classes' own `__init__`) shares
+    one degree value between them -- a graceful coarsening, not a crash risk.
+    """
+    id_to_symbol: dict[str, tuple[str, str]] = {}
+    for node in graph.get("nodes", []):
+        if not isinstance(node, dict):
+            continue
+        node_id, source_file, label = node.get("id"), node.get("source_file"), node.get("label")
+        if not (node_id and source_file and label):
+            continue
+        name = str(label).strip()
+        if name.endswith("()"):
+            name = name[:-2]
+        name = name.lstrip(".")
+        if not name or name == str(source_file).rsplit("/", 1)[-1]:
+            continue  # the file's own module-level node, not a symbol
+        id_to_symbol[str(node_id)] = (str(source_file), name)
+
+    degree: dict[tuple[str, str], int] = {}
+    for link in graph.get("links", []):
+        if not isinstance(link, dict) or link.get("relation") in _GRAPHIFY_SKIP_RELATIONS:
+            continue
+        target_symbol = id_to_symbol.get(str(link.get("target")))
+        if not target_symbol:
+            continue
+        src_symbol = id_to_symbol.get(str(link.get("source")))
+        src_file = src_symbol[0] if src_symbol else None
+        if src_file and src_file != target_symbol[0]:
+            degree[target_symbol] = degree.get(target_symbol, 0) + 1
+    return degree
+
+
+def _graphify_symbol_degree_for_root(root: Path, *, graph_path: Path | None = None) -> dict[tuple[str, str], int]:
+    """Best-effort `_graphify_symbol_degree`, read from `<root>/graphify-out/graph.json`
+    (or an explicit override). Returns `{}` -- never raises -- exactly like
+    `_apply_graphify_centrality`'s own fallback, so a project with no graph
+    gets byte-identical `render_slices` behaviour to before this existed.
+    """
+    graph = _read_graphify_graph(graph_path or (root / _GRAPHIFY_DEFAULT_RELATIVE_PATH))
+    if graph is None:
+        return {}
+    return _graphify_symbol_degree(graph)
+
+
+def _apply_graphify_centrality(
+    records: list[dict[str, Any]],
+    root: Path,
+    *,
+    graph_path: Path | None = None,
+) -> None:
+    """Fold graphify cross-file relationship degree into each record's score,
+    in place. Complements `_apply_centrality` rather than replacing it --
+    both run; this one silently no-ops (leaving every score untouched) when
+    no graph exists at `graph_path` (default `<root>/graphify-out/graph.json`),
+    so behavior is byte-identical to before this existed for any project
+    without a pre-built graph.
+    """
+    graph = _read_graphify_graph(graph_path or (root / _GRAPHIFY_DEFAULT_RELATIVE_PATH))
+    if graph is None:
+        return
+    degree_by_file = _graphify_cross_file_degree(graph)
+    if not degree_by_file:
+        return
+    for record in records:
+        rel = str(record.get("path") or "").replace("\\", "/")
+        degree = _graphify_lookup_degree(degree_by_file, rel)
+        if not degree:
+            continue
+        boost = min(_GRAPHIFY_MAX_BOOST, degree * _GRAPHIFY_PER_EDGE)
+        if boost:
+            record["score"] = int(record.get("score") or 0) + boost
+            record["graphify_centrality"] = degree
+
+
 def select_reading_set(
     inventory: dict[str, Any],
     *,
     max_files: int = 36,
     max_total_bytes: int = 800_000,
     max_file_bytes: int = 120_000,
+    graphify_graph_path: str | Path | None = None,
 ) -> list[dict[str, Any]]:
     selected: list[dict[str, Any]] = []
     total = 0
@@ -417,6 +578,13 @@ def select_reading_set(
     # Reorder within each category by structural centrality before quota selection,
     # so a hub module outranks peripheral peers and survives the source quota.
     _apply_centrality(inventory.get("files", []))
+    root_value = inventory.get("root")
+    if root_value:
+        _apply_graphify_centrality(
+            inventory.get("files", []),
+            Path(str(root_value)),
+            graph_path=Path(graphify_graph_path) if graphify_graph_path else None,
+        )
     for record in inventory.get("files", []):
         if not record.get("text_candidate"):
             continue
@@ -528,7 +696,13 @@ def _python_outline(text: str) -> str:
     return "\n".join(lines)
 
 
-def _python_slice_view(text: str, path: str, *, max_chars: int) -> str:
+def _python_slice_view(
+    text: str,
+    path: str,
+    *,
+    max_chars: int,
+    symbol_degree: dict[tuple[str, str], int] | None = None,
+) -> str:
     """Structured, code-bearing view of a Python source for the mapper.
 
     Replaces the signatures-only `_python_outline` on the reading path: the model
@@ -542,6 +716,10 @@ def _python_slice_view(text: str, path: str, *, max_chars: int) -> str:
     so slices render with `cite=False`; emitting `[file:` here would only be
     rewritten by `_defuse_source_text`. On a parse failure or a body-less module
     it falls back to `_python_outline`, so no file is ever dropped.
+
+    `symbol_degree` (optional): forwarded to `render_slices` so a symbol with
+    real cross-file callers -- per a pre-built graphify graph -- outranks a
+    merely-complex one within this file's own slice budget.
     """
     from core import repo_slicer
 
@@ -555,11 +733,16 @@ def _python_slice_view(text: str, path: str, *, max_chars: int) -> str:
     if module["imports"]:
         header = "imports: " + ", ".join(module["imports"][:24]) + "\n\n"
     budget = max(400, int(max_chars) - len(header))
-    body = repo_slicer.render_slices(slices, max_chars=budget, cite=False)
+    body = repo_slicer.render_slices(slices, max_chars=budget, cite=False, symbol_degree=symbol_degree)
     return (header + body) if body.strip() else _python_outline(text)
 
 
-def _read_selected(selected: list[dict[str, Any]], *, max_chars_per_file: int = 24_000) -> list[dict[str, Any]]:
+def _read_selected(
+    selected: list[dict[str, Any]],
+    *,
+    max_chars_per_file: int = 24_000,
+    symbol_degree: dict[tuple[str, str], int] | None = None,
+) -> list[dict[str, Any]]:
     sources: list[dict[str, Any]] = []
     for record in selected:
         try:
@@ -568,7 +751,7 @@ def _read_selected(selected: list[dict[str, Any]], *, max_chars_per_file: int = 
             sources.append({"path": record["path"], "error": str(exc), "text": ""})
             continue
         if Path(str(record["path"])).suffix.lower() == ".py":
-            sampled = _python_slice_view(text, record["path"], max_chars=max_chars_per_file)
+            sampled = _python_slice_view(text, record["path"], max_chars=max_chars_per_file, symbol_degree=symbol_degree)
         else:
             sampled = text
         sources.append(
@@ -1036,7 +1219,12 @@ def learn_repository(
         max_total_bytes=max(50_000, min(int(params.get("max_read_bytes") or 800_000), 2_000_000)),
         max_file_bytes=max(10_000, min(int(params.get("max_file_bytes") or 120_000), 500_000)),
     )
-    sources = _read_selected(selected, max_chars_per_file=int(params.get("max_chars_per_file") or 24_000))
+    symbol_degree = _graphify_symbol_degree_for_root(source)
+    sources = _read_selected(
+        selected,
+        max_chars_per_file=int(params.get("max_chars_per_file") or 24_000),
+        symbol_degree=symbol_degree,
+    )
     git_context = _git_context(source)
     ground_truth = _inventory_ground_truth(inventory)
     diagnostics: list[str] = []

@@ -4,7 +4,7 @@ title: "Prompt Injection Hardening — Four Rounds"
 type: "report"
 status: "complete"
 created: "2026-07-22"
-updated: "2026-07-23T02:52:43Z"
+updated: "2026-07-25T14:33:57Z"
 project_id: "mark_xlviii"
 source: "claude"
 tags: ["security", "prompt-injection", "hardening", "evaluation", "tier/short-term"]
@@ -16,7 +16,7 @@ sensitivity: "private"
 confidence: 0.95
 content_hash: "3df1bc06f83219f1c64bf075e24ed8675a9f8f87c62ce3cb97f8b7db55ba5fe9"
 attack_fixture_persisted: false
-memory_tier: "short_term"
+lifecycle: "short_term"
 rounds: 4
 schema_version: "jarvis_hardening_report/v1"
 ---

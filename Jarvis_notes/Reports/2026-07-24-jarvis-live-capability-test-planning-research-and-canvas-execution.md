@@ -4,7 +4,7 @@ title: "JARVIS Live Capability Test - Planning, Research, and Canvas Execution"
 type: "report"
 status: "complete"
 created: "2026-07-24T01:59:14Z"
-updated: "2026-07-24T01:59:20Z"
+updated: "2026-07-25T14:33:57Z"
 project_id: "jarvis_notes"
 source: "claude"
 tags: ["capability-test", "live-deployment", "planning", "research", "canvas-plan", "repo-slicer", "tier/short-term"]
@@ -31,7 +31,7 @@ consumed_by: []
 related: []
 deleted: false
 deleted_at: ""
-memory_tier: "short_term"
+lifecycle: "short_term"
 ---
 
 > [!info] Scope

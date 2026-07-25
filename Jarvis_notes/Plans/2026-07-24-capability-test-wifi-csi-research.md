@@ -4,7 +4,7 @@ title: "Capability Test - WiFi CSI Research"
 type: "plan"
 status: "pending_review"
 created: "2026-07-24T01:43:26Z"
-updated: "2026-07-24T01:59:41Z"
+updated: "2026-07-25T14:33:56Z"
 project_id: "jarvis_notes"
 source: "jarvis"
 tags: ["plan", "workflow", "pending-approval", "tier-short-term", "capability-test"]
@@ -37,9 +37,9 @@ approval_state: "pending_review"
 approved_action_ids: ["p01", "p02", "p03"]
 decision_gates: []
 execution_state: "not_started"
+lifecycle: "short_term"
 local_context_count: 5
 manifest_hash: "aeabd520e806fb98131ab068fbd7bd1736058be5268907c85ba2a833f5dd067e"
-memory_tier: "short_term"
 original_prompt: "Research WiFi CSI-based presence and room-occupancy detection approaches for a local always-on assistant, and write a report with cited sources on the best current options."
 plan_version: 1
 research_state: "complete"
