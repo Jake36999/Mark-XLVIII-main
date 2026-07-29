@@ -34,6 +34,10 @@ DEFAULT_LMSTUDIO_URL = "http://localhost:1234/v1"
 DEFAULT_GEMINI_MODEL = "gemini-2.5-flash"
 DEFAULT_ANTHROPIC_MODEL = "claude-sonnet-5"
 DEFAULT_ANTHROPIC_URL = "https://api.anthropic.com/v1"
+# Cap on how many local models one call may walk before giving up. This host
+# holds one task model at a time, so each extra candidate is a cold multi-GB
+# load; a long tail produces timeout cascades rather than resilience.
+DEFAULT_MAX_FALLBACK_CANDIDATES = 3
 OPENAI_KEY_CHECK_TTL_SECONDS = 600
 _OPENAI_KEY_CHECK_CACHE: dict[tuple[str, str], tuple[bool, float]] = {}
 _PROVENANCE = threading.local()
@@ -227,6 +231,77 @@ def _route_from_context(prompt: str, role: str, system: str | None = None) -> st
     return "quick" if len(stripped) < 160 else "main"
 
 
+_WARM_MODEL_CACHE: tuple[float, frozenset[str]] = (0.0, frozenset())
+_WARM_MODEL_CACHE_TTL_SECONDS = 10.0
+_WARM_MODEL_LOCK = threading.Lock()
+
+
+def _warm_models(cfg: dict) -> frozenset[str]:
+    """Model keys that are loaded right now, so picking them costs no load.
+
+    Cached briefly because this sits on the hot path. Fail-open by design: a
+    probe failure returns an empty set, which simply means "no warmth
+    information" and leaves candidate order exactly as it was. A stale entry
+    can at worst route to a model that has since been evicted -- that path
+    already works, it just pays the load it would have paid anyway. Never let
+    this gate correctness.
+    """
+    global _WARM_MODEL_CACHE
+    now = time.monotonic()
+    cached_at, cached = _WARM_MODEL_CACHE
+    if cached_at and (now - cached_at) < _WARM_MODEL_CACHE_TTL_SECONDS:
+        return cached
+    warm: set[str] = set()
+    try:
+        from actions.model_lifecycle import list_models
+
+        payload = list_models(cfg, timeout=2)
+        for item in payload.get("loaded") or []:
+            key = str(item.get("model_key") or item.get("identifier") or "").strip()
+            if key:
+                warm.add(key)
+    except Exception:
+        warm = set()
+    result = frozenset(warm)
+    with _WARM_MODEL_LOCK:
+        _WARM_MODEL_CACHE = (now, result)
+    return result
+
+
+def _order_by_warmth(candidates: list[str], cfg: dict) -> list[str]:
+    """Stable partition: already-loaded models first, everything else after.
+
+    A partition, never a re-rank -- relative order inside each group is
+    preserved, and it only ever runs over candidates that already survived
+    route selection. That matters: re-ranking globally could promote a warm
+    general model over the only model that can actually serve the route (the
+    vision route has exactly one member).
+    """
+    if not candidates or not cfg.get("warm_model_preference_enabled"):
+        return candidates
+    baseline = {str(item).strip() for item in (cfg.get("baseline_models") or []) if str(item).strip()}
+    warm = _warm_models(cfg) | baseline
+    if not warm:
+        return candidates
+    preferred = [item for item in candidates if item in warm]
+    rest = [item for item in candidates if item not in warm]
+    return preferred + rest
+
+
+def _candidate_limit(cfg: dict) -> int:
+    """How many local models one call may walk. 0 means unlimited (an explicit
+    opt-out of capping); anything missing or malformed falls back to the
+    default rather than accidentally disabling the cap."""
+    raw = cfg.get("model_fallback_max_candidates")
+    if raw is None:
+        return DEFAULT_MAX_FALLBACK_CANDIDATES
+    try:
+        parsed = int(raw)
+    except (TypeError, ValueError):
+        return DEFAULT_MAX_FALLBACK_CANDIDATES
+    return parsed if parsed >= 0 else DEFAULT_MAX_FALLBACK_CANDIDATES
+
+
 def _lmstudio_routes(config: dict) -> dict[str, list[str]]:
     routes = {key: list(value) for key, value in DEFAULT_LMSTUDIO_ROUTES.items()}
     configured = config.get("model_routes") or config.get("lmstudio_model_routes") or {}
@@ -263,7 +338,34 @@ def select_lmstudio_models(
     if normalized_role == "planner":
         candidates += routes.get("main", [])
     candidates += routes.get("quick", [])
-    return _drop_cooling_down(_dedupe([candidate for candidate in candidates if candidate]), cfg)
+    # Warm-first, then drop cooling models -- in that order, so a model that is
+    # loaded but currently cooling down after failures is still correctly dropped
+    # rather than promoted by its warmth.
+    ordered = _drop_cooling_down(
+        _order_by_warmth(_dedupe([candidate for candidate in candidates if candidate]), cfg),
+        cfg,
+    )
+    # Cap the chain. Every extra candidate on a cold local host is a multi-GB
+    # GGUF load that can exceed the request timeout, so a long tail doesn't buy
+    # resilience -- it buys a timeout cascade. Live testing measured a 1109s
+    # turn where ~90% was walking dead candidates. Keep enough for a real
+    # fallback, not enough to melt the turn.
+    limit = _candidate_limit(cfg)
+    if not limit or len(ordered) <= limit:
+        return ordered
+    capped = ordered[:limit]
+    # The model this role was explicitly configured with must stay reachable.
+    # On a non-"main" route the planner's own model is never prepended, so it
+    # only appears deep in the chain via the "main" route list -- a blind
+    # truncation would silently make a user's configured planner_model
+    # unreachable. Give it the last-resort slot instead of dropping it.
+    configured = _split_models(cfg.get(f"{normalized_role}_models")) or [
+        str(cfg.get(f"{normalized_role}_model") or "")
+    ]
+    preferred = next((item for item in configured if item and item in ordered), "")
+    if preferred and preferred not in capped:
+        capped[-1] = preferred
+    return capped
 
 
 def _drop_cooling_down(candidates: list[str], config: dict) -> list[str]:
@@ -518,6 +620,23 @@ def _tool_json_prompt(prompt: str, tools: list[dict]) -> str:
     )
 
 
+def _broker_has_no_linked_session(broker) -> bool:
+    """True only when we can cheaply *prove* nothing is linked this session.
+
+    Cloud providers here are supplementary: keys are entered per session in the
+    UI and never stored. On a purely local session the answer is always
+    "unlinked", but asking `status()` costs an IPC round trip that also spawns
+    the broker subprocess -- paid on every planner turn, just to be told no.
+    Brokers without this capability (e.g. injected test doubles) return False so
+    the normal `status()` path still runs unchanged.
+    """
+    try:
+        checker = getattr(broker, "has_linked_session", None)
+        return callable(checker) and not checker()
+    except Exception:
+        return False
+
+
 def _openai_key_is_valid(
     settings: ProviderSettings,
     *,
@@ -527,6 +646,8 @@ def _openai_key_is_valid(
 ) -> bool:
     try:
         broker = credential_broker or get_session_broker()
+        if _broker_has_no_linked_session(broker):
+            return False
         status = broker.status("openai")
         return status.get("state") in {"linked", "degraded"}
     except Exception:
@@ -615,6 +736,8 @@ def _anthropic_key_is_valid(
 ) -> bool:
     try:
         broker = credential_broker or get_session_broker()
+        if _broker_has_no_linked_session(broker):
+            return False
         status = broker.status("anthropic")
         return status.get("state") in {"linked", "degraded"}
     except Exception:
@@ -1437,13 +1560,17 @@ def _call_lmstudio_tools_with_fallback(
             time.sleep(0.4)
     native_error = "LM Studio local tool route failed. Tried: " + " | ".join(errors)
     try:
+        # Only retry the *first* candidate as prompted JSON. This pass exists
+        # for models without native tool-calling, not as a second chance for
+        # models that just timed out -- re-walking the whole chain doubled an
+        # already-expensive failure into 2x cold loads for no new information.
         return _call_lmstudio_json_tools_with_fallback(
             prompt,
             settings,
             system=system,
             timeout=timeout,
             post=post,
-            candidates=candidates,
+            candidates=candidates[:1],
             tools=tools,
             config=config,
         )

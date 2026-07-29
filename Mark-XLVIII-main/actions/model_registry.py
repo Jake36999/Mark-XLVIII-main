@@ -166,6 +166,52 @@ def _profile_for(model_id: str) -> dict[str, Any]:
     }
 
 
+# A model's advertised context window is not what it gets on this host. LM
+# Studio loads each model with an explicit `context_length` (see
+# `lmstudio_model_load_profiles` in config/runtime.json) chosen to fit VRAM --
+# qwen/qwen3-4b-2507 advertises 32768 but is actually loaded at 4096, an 8x
+# overestimate. Sizing a prompt from the advertised number is what produced the
+# live `n_keep: 4223 >= n_ctx: 4096` failure, and worse, that failure looked
+# like "the small model can't cope", pushing the fallback chain into 8-14B
+# models. Always budget against the *effective* window.
+_CHARS_PER_TOKEN = 3.2
+_CONTEXT_SAFETY_TOKENS = 512
+
+
+def effective_profile(model: str, cfg: dict[str, Any] | None = None) -> dict[str, Any]:
+    """Capability profile merged with the context this host actually loads."""
+    profile = dict(_profile_for(model))
+    declared = int(profile.get("context_window") or 0)
+    effective = declared
+    try:
+        loaded = model_lifecycle.load_profile_for(model, cfg) or {}
+        configured = int(loaded.get("context_length") or 0)
+        if configured > 0:
+            effective = configured
+    except Exception:
+        pass
+    profile["declared_context_window"] = declared
+    profile["effective_context_window"] = effective or declared or 8192
+    return profile
+
+
+def char_budget_for(
+    model: str,
+    cfg: dict[str, Any] | None = None,
+    *,
+    reserve_tokens: int = 0,
+) -> int:
+    """Characters of input this model can actually take, minus room to reply.
+
+    Deliberately conservative: chunking slightly small costs an extra batch,
+    while chunking too large costs a hard context failure and a cascade into a
+    larger model.
+    """
+    window = int(effective_profile(model, cfg).get("effective_context_window") or 8192)
+    usable = window - _CONTEXT_SAFETY_TOKENS - max(0, int(reserve_tokens))
+    return max(1_000, int(usable * _CHARS_PER_TOKEN))
+
+
 def meets_floor(profile: dict[str, Any], role: str) -> tuple[bool, list[str]]:
     floor = QUALITY_FLOORS.get(role, QUALITY_FLOORS["worker"])
     reasons: list[str] = []

@@ -256,6 +256,19 @@ class SessionCredentialBroker:
     def link_openai(self, key: str, *, base_url: str, model: str) -> dict[str, Any]:
         return self.link("openai", key, base_url=base_url, model=model)
 
+    def has_linked_session(self) -> bool:
+        """True only when a broker subprocess is actually live.
+
+        `link()` is the only way a key enters the broker, and it starts the
+        subprocess, so a False here is an exact "nothing has been linked this
+        session" rather than a guess. Callers use it to skip the `status()`
+        IPC round trip on a purely local session -- without it, asking "is
+        OpenAI linked?" would *spawn* a credential-broker process just to be
+        told no, on every planner turn.
+        """
+        with self._lock:
+            return self._process is not None and self._process.is_alive()
+
     def status(self, provider: str = "openai") -> dict[str, Any]:
         return self._send({"operation": "status", "provider": provider})
 

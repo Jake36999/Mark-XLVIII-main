@@ -969,6 +969,41 @@ def persistent_generation_snapshot(cfg: dict[str, Any] | None = None) -> dict[st
     return {"ok": True, "leases": leases, "lease_db_path": cfg["lease_db_path"]}
 
 
+def recently_used_models(cfg: dict[str, Any] | None = None, *, within_seconds: float | None = None) -> set[str]:
+    """Models whose generation lease finished within `within_seconds`.
+
+    `active_snapshot()` only knows about work happening *right now*, which is
+    why idle cleanup could not tell "unused" from "used two seconds ago" -- by
+    the time a reply is spoken the lease is already released, so a just-used
+    specialist looked exactly like a cold one and got evicted before every
+    single spoken reply. The lease table already records `completed_at`, so
+    recency is read from there rather than adding new global state.
+    """
+    cfg = _resolved_config(cfg)
+    ttl = float(cfg.get("task_model_ttl_seconds") or 0) if within_seconds is None else float(within_seconds)
+    if ttl <= 0:
+        return set()
+    cutoff = time.time() - ttl
+    try:
+        with closing(_lease_connect(cfg)) as connection:
+            rows = connection.execute(
+                "SELECT DISTINCT model, instance_id FROM model_generation_leases "
+                "WHERE completed_at IS NOT NULL AND completed_at >= ?",
+                (cutoff,),
+            ).fetchall()
+    except Exception:
+        # Fail open: no recency information means cleanup behaves exactly as
+        # it did before. Never let this block a genuine eviction.
+        return set()
+    recent: set[str] = set()
+    for row in rows:
+        for value in (row["model"], row["instance_id"]):
+            text = str(value or "").strip()
+            if text:
+                recent.add(text)
+    return recent
+
+
 def _ewma(previous: Any, sample: Any) -> float | None:
     if sample is None:
         return None if previous is None else float(previous)
@@ -1444,6 +1479,15 @@ def unload_non_baseline(
     failed: list[dict[str, Any]] = []
     kept: list[dict[str, Any]] = []
 
+    # `task_model_ttl_seconds` was configured but never actually enforced, so a
+    # specialist used seconds ago was indistinguishable from an idle one and got
+    # evicted before every spoken reply -- then cold-loaded again on the next
+    # turn. Honour the TTL here. VRAM safety is unchanged: max_task_models_loaded
+    # still evicts at the next load, and the idle sweep still fires once the TTL
+    # elapses. This delays eviction; it does not remove it. `force=True` (an
+    # explicit "unload models" request) bypasses it entirely.
+    recent = set() if force else recently_used_models(cfg)
+
     for item in listed["loaded"]:
         if item.get("baseline"):
             kept.append(item)
@@ -1451,6 +1495,9 @@ def unload_non_baseline(
         instance_id = item.get("instance_id")
         if not instance_id:
             failed.append({"item": item, "error": "missing instance_id"})
+            continue
+        if recent and {str(instance_id), str(item.get("model_key") or "")} & recent:
+            kept.append(item)
             continue
         try:
             response = post(

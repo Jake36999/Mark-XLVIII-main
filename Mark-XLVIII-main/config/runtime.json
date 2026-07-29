@@ -94,6 +94,8 @@
   "task_model_ttl_seconds": 300,
   "idle_cleanup_seconds": 300,
   "max_task_models_loaded": 1,
+  "warm_model_preference_enabled": true,
+  "model_fallback_max_candidates": 3,
   "model_generation_wait_seconds": 900,
   "model_generation_lease_seconds": 2400,
   "model_first_token_timeout_seconds": 180,
