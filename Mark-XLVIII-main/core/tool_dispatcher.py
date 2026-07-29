@@ -34,6 +34,9 @@ READ_ONLY_TOOLS = {
 }
 
 READ_ONLY_OPERATIONS: dict[str, set[str]] = {
+    # `export` deliberately excluded -- it writes a file, so it keeps hitting
+    # the confirmation gate like any other write.
+    "process_trace": {"recent", "list", "turn", ""},
     "memory_consolidation": {"detect", "candidates", "what_is_stale"},
     "dual_orchestrator": {"health", "validate", "compile", "preview_legacy", "status"},
     "jarvis_canvas": {
@@ -89,6 +92,7 @@ HEADLESS_TOOLS = {
     "file_processor", "file_controller", "browser_control", "reminder", "weather_report",
     "system_status", "open_app", "desktop_control", "computer_settings", "computer_control",
     "send_message", "youtube_video", "code_helper", "dev_agent", "graphify_query",
+    "process_trace",
 }
 
 
@@ -307,6 +311,10 @@ def _handler(tool_name: str) -> Callable[[dict[str, Any]], Any] | None:
         from actions.graphify_query import graphify_query
 
         return lambda args: graphify_query(parameters=args)
+    if tool_name == "process_trace":
+        from actions.process_trace import process_trace
+
+        return lambda args: process_trace(parameters=args)
     return None
 
 

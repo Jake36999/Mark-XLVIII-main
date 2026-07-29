@@ -138,12 +138,21 @@ class ProcessEventHub:
         with self._lock:
             self._subscribers.pop(str(subscription_id), None)
 
-    def snapshot(self, *, categories: Iterable[str] = (), limit: int = 250) -> list[dict[str, Any]]:
+    def snapshot(
+        self,
+        *,
+        categories: Iterable[str] = (),
+        limit: int = 250,
+        turn_id: str | int = "",
+    ) -> list[dict[str, Any]]:
         selected = {str(value).casefold() for value in categories if value}
+        wanted_turn = str(turn_id).strip()
         with self._lock:
             events = [event for event, _ in self._events]
         if selected:
             events = [event for event in events if event.category.casefold() in selected]
+        if wanted_turn:
+            events = [event for event in events if str(event.turn_id) == wanted_turn]
         return [event.to_dict() for event in events[-max(1, min(int(limit), self.max_events)) :]]
 
     def clear(self) -> None:
@@ -193,3 +202,82 @@ PROCESS_EVENTS = ProcessEventHub()
 
 def emit_process_event(**kwargs: Any) -> ProcessEvent:
     return PROCESS_EVENTS.emit(**kwargs)
+
+
+# A turn moves through three phases, and the hand-off between them is
+# deliberately one-way:
+#
+#   1 PROCESSING    working out what the user is asking for
+#   2 OPERATING     running tools to get it
+#   3 COMMUNICATING answering the user
+#
+# The point is that phase 3 answers the *user's question*; it does not narrate
+# phase 2. Operational detail already has two dedicated homes (the log pane and
+# the process-trace panel) and reaches the user on request via the
+# `process_trace` tool -- it does not need to bleed into spoken prose.
+PHASE_PROCESSING = 1
+PHASE_OPERATING = 2
+PHASE_COMMUNICATING = 3
+
+PHASE_NAMES = {
+    PHASE_PROCESSING: "processing_request",
+    PHASE_OPERATING: "completing_operation",
+    PHASE_COMMUNICATING: "communicating_to_user",
+}
+
+
+class TurnPhaseError(RuntimeError):
+    pass
+
+
+class TurnContext:
+    """Per-turn scope carrying the phase and the receipts phase 3 may cite.
+
+    Deliberately a local in the turn handler rather than state on JarvisLive:
+    turns are stateless with respect to each other and this does not change
+    that. It is scope, not memory.
+
+    Only `phase` is validated. `category`/`state` stay free-form strings
+    everywhere else -- the trace UI builds its filters from observed
+    categories, so closing that vocabulary would buy nothing and cost widget
+    changes. Validate the thing that has an invariant; leave the log alone.
+    """
+
+    __slots__ = ("turn_id", "source", "phase", "user_text", "tool_receipts")
+
+    def __init__(self, turn_id: str | int = "", source: str = "text", user_text: str = ""):
+        self.turn_id = turn_id or ""
+        self.source = source
+        self.user_text = user_text
+        self.phase = PHASE_PROCESSING
+        self.tool_receipts: list[dict[str, Any]] = []
+
+    def advance(
+        self,
+        phase: int,
+        *,
+        summary: str,
+        category: str,
+        source: str = "jarvis",
+        state: str = "running",
+        detail: Any = None,
+        **extra: Any,
+    ) -> ProcessEvent:
+        if phase < self.phase:
+            raise TurnPhaseError(
+                f"turn {self.turn_id!r} cannot move back from "
+                f"{PHASE_NAMES.get(self.phase, self.phase)} to {PHASE_NAMES.get(phase, phase)}"
+            )
+        self.phase = phase
+        payload = dict(detail or {})
+        payload["phase"] = phase
+        payload["phase_name"] = PHASE_NAMES.get(phase, str(phase))
+        return emit_process_event(
+            category=category,
+            source=source,
+            summary=summary,
+            state=state,
+            turn_id=self.turn_id,
+            detail=payload,
+            **extra,
+        )

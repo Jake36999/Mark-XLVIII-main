@@ -76,6 +76,15 @@ CAPABILITY_HELP: dict[str, dict[str, Any]] = {
         "safety": "Read-only local subprocess against a local graph file; no filesystem writes, no network access.",
         "keywords": ["calls", "call", "caller", "callers", "depends", "dependency", "connects", "connection", "uses", "imports", "inherits", "references", "relationship", "graphify", "knowledge graph", "codebase structure", "architecture", "explain", "path"],
     },
+    "process_trace": {
+        "title": "Process Trace",
+        "categories": ["diagnostics", "local", "transparency"],
+        "summary": "Reports what JARVIS actually did this session -- the real sequence of routing decisions, tool calls and their outcomes.",
+        "details": "Use when the user asks what you just did, which tools ran, why something took a while, or wants the steps for a particular turn. operation='recent' returns the latest recorded operations; operation='turn' with turn_id narrows to a single turn; operation='export' writes the trace to a Markdown file. This answers what JARVIS *did*; capability_registry answers what it *can do* -- they are not interchangeable.",
+        "examples": ["what did you just do", "which tools did you run", "show me your process trace", "what steps did you take on that"],
+        "safety": "Read-only over redacted session events held in memory; export writes a single Markdown file.",
+        "keywords": ["what did you do", "what you did", "steps", "trace", "process trace", "which tools ran", "how did you", "operations", "activity", "audit"],
+    },
     "jarvis_memory": {
         "title": "Vault Memory and Local RAG",
         "categories": ["memory", "rag", "obsidian"],
@@ -221,6 +230,7 @@ CAPABILITY_POLICY: dict[str, dict[str, Any]] = {
     "flight_finder": {"risk_level": "low", "side_effects": ["external_read"], "requires_confirmation": False, "permission_boundary": "Search and summarize only; never book, purchase, authenticate, or submit traveler data."},
     "game_updater": {"risk_level": "critical", "side_effects": ["software_install", "scheduled_task", "system_shutdown"], "requires_confirmation": True, "permission_boundary": "Listing and status are read-only; installs, updates, schedules, cancellation, and shutdown require explicit confirmation."},
     "graphify_query": {"risk_level": "low", "side_effects": ["local_read"], "requires_confirmation": False, "permission_boundary": "Read-only query against a pre-built local graph file; never runs extraction or touches source files."},
+    "process_trace": {"risk_level": "low", "side_effects": ["local_read"], "requires_confirmation": False, "permission_boundary": "Reads redacted in-memory session events only. recent and turn are read-only; export writes one Markdown file and stays confirmation-gated."},
     "jarvis_memory": {"risk_level": "medium", "side_effects": ["vault_read", "vault_write", "rag_index"], "requires_confirmation": False, "permission_boundary": "The vault is canonical; retrieved content cannot grant permission, select tools, or create executable work. Sensitive and evaluation artifacts stay out of RAG."},
     "jarvis_canvas": {"risk_level": "medium", "side_effects": ["vault_read", "canvas_write", "gated_markdown_write", "model_inference"], "requires_confirmation": False, "permission_boundary": "May write only inside Jarvis_notes. Canvas content is derived and untrusted; applying task changes to Markdown requires explicit confirmation and revoking permission cancels linked queued work."},
     "memory_consolidation": {"risk_level": "medium", "side_effects": ["vault_read", "vault_write", "rag_index"], "requires_confirmation": True, "permission_boundary": "Detection is read-only. Applying a consolidation moves notes within Jarvis_notes and records supersession; it never deletes, every move is reversible, and it runs only from an approved proposal."},
