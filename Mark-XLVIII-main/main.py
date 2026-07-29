@@ -1563,9 +1563,43 @@ def _rule_token_matches(token: str, lowered: str) -> bool:
         return token in lowered
     pattern = _RULE_TOKEN_CACHE.get(token)
     if pattern is None:
-        pattern = re.compile(rf"(?<![a-z0-9]){re.escape(token)}(?![a-z0-9])")
+        # A trailing plural is still the same word: "which projects" must match
+        # the "project" rule. Only the *leading* boundary does collision work
+        # (it is what keeps "ram" out of program/diagram and "repo" out of
+        # weather_report), so relaxing the trailing side for a simple plural
+        # costs nothing and restores matches an earlier strict-boundary pass
+        # had silently dropped.
+        pattern = re.compile(rf"(?<![a-z0-9]){re.escape(token)}(?:e?s)?(?![a-z0-9])")
         _RULE_TOKEN_CACHE[token] = pattern
     return bool(pattern.search(lowered))
+
+
+# "What calls X" is a question about code structure, and graphify_query exists
+# to answer exactly it. Live assessment found such a question reaching
+# project_operator instead -- because the question mentioned a filename
+# (`project_learning.py`) that tripped the "project" keyword, and the model then
+# invented a project id from it and got policy-blocked. Detecting the question
+# shape and answering it with the one tool built for it removes the choice.
+_STRUCTURAL_CODE_QUESTION = re.compile(
+    r"\b(?:what|which|who|where)\b[^?.]{0,40}?\b"
+    r"(?:calls?|called\s+by|callers?|uses?|users?|invokes?|references?|imports?|inherits?|"
+    r"depends?\s+on|depend\s+on|consumers?)\b",
+    re.IGNORECASE,
+)
+_STRUCTURAL_CODE_SUBJECT = re.compile(r"[A-Za-z_][A-Za-z0-9_]*(?:_[A-Za-z0-9_]+|\.py\b|\(\))")
+
+
+def _is_structural_code_question(text: str) -> bool:
+    """A "what calls/uses/depends on <symbol>" question about real code.
+
+    Requires both the question shape and a code-shaped subject (a snake_case
+    identifier, a .py file, or a call form), so ordinary English like "who uses
+    this feature" does not get pulled in.
+    """
+    candidate = (text or "").strip()
+    if not candidate or not _STRUCTURAL_CODE_QUESTION.search(candidate):
+        return False
+    return bool(_STRUCTURAL_CODE_SUBJECT.search(candidate))
 
 
 def _router_tool_names_for_text(text: str, has_upload: bool = False) -> list[str] | None:
@@ -1582,6 +1616,8 @@ def _router_tool_names_for_text(text: str, has_upload: bool = False) -> list[str
         return ["capability_registry", "web_search", "jarvis_memory"]
     if _is_learn_project_prompt(text):
         return ["project_operator"]
+    if _is_structural_code_question(text):
+        return ["graphify_query"]
     if _is_learn_topic_prompt(text):
         return ["capability_registry", "web_search", "jarvis_memory"]
     if _is_todo_template_prompt(text):

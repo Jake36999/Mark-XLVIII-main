@@ -97,11 +97,24 @@ def classify_operation(
     projects = registry.get("projects", {})
     project = projects.get(project_id)
     if not project:
+        known = sorted(projects.keys())
+        # A plain sentence alongside the structured policy. Live assessment saw
+        # a model invent a project_id from a filename, get blocked, and relay
+        # only "that project is unknown" -- a dead end, even though the real
+        # ids were sitting in the payload. Say what to do next in prose the
+        # reply can actually use. Registered projects are code repositories;
+        # questions about a symbol or file belong to graphify_query.
         return {
             "action": "block",
             "requires_confirmation": False,
             "reason": f"Unknown project_id '{project_id}'.",
-            "known_projects": sorted(projects.keys()),
+            "known_projects": known,
+            "hint": (
+                f"'{project_id}' is not a registered project. Registered ids are: "
+                f"{', '.join(known) if known else 'none'}. If this was a file or symbol name "
+                "rather than a project, use graphify_query for questions about what calls, "
+                "uses, or depends on it."
+            ),
         }
 
     normalized_operation = (operation or "status").strip().lower()

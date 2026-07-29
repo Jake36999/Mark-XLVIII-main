@@ -48,6 +48,71 @@ class RouterKeywordCollisionTests(unittest.TestCase):
     def test_multiword_phrases_still_match_as_substrings(self):
         self.assertTrue(main._rule_token_matches("deep research", "run a deep research pass"))
 
+    def test_simple_plurals_still_match_their_singular_keyword(self):
+        """The first strict-boundary pass silently dropped plurals -- "which
+        projects" stopped matching the "project" rule. Only the leading boundary
+        does the collision work, so the trailing side can allow a plural."""
+        for token, text in [
+            ("project", "which projects do you know about"),
+            ("file", "list the files"),
+            ("tool", "what tools are available"),
+            ("note", "show my notes"),
+            ("box", "check the boxes"),
+        ]:
+            with self.subTest(token=token):
+                self.assertTrue(main._rule_token_matches(token, text))
+
+    def test_plural_tolerance_does_not_reopen_the_collisions(self):
+        for token, text in [
+            ("ram", "the programs are running"),
+            ("ram", "show me the diagram"),
+            ("repo", "check the weather_report"),
+            ("read", "what have you already done"),
+            ("move", "remove that file"),
+        ]:
+            with self.subTest(token=token, text=text):
+                self.assertFalse(main._rule_token_matches(token, text))
+
+
+class StructuralCodeQuestionTests(unittest.TestCase):
+    """Live assessment: "what functions call _apply_graphify_centrality in
+    project_learning.py" reached project_operator, because the filename tripped
+    the "project" keyword. The model then invented a project_id from it and was
+    policy-blocked, so a question graphify_query exists to answer went
+    unanswered."""
+
+    def test_structural_questions_go_to_the_graph_tool_alone(self):
+        for text in [
+            "What functions call _apply_graphify_centrality in project_learning.py?",
+            "what calls select_reading_set",
+            "who uses ToolDispatcher()",
+            "what depends on repo_slicer.py",
+            "which functions reference _direct_answer",
+        ]:
+            with self.subTest(text=text):
+                self.assertEqual(main._router_tool_names_for_text(text), ["graphify_query"])
+
+    def test_ordinary_english_is_not_pulled_in(self):
+        for text in [
+            "walk me through the tradeoffs of blending degree centrality into scoring",
+            "what tools do you have",
+            "what did you just do",
+            "can you extract the methods from this pdf",
+        ]:
+            with self.subTest(text=text):
+                self.assertFalse(main._is_structural_code_question(text))
+
+    def test_unknown_project_id_gets_actionable_guidance(self):
+        import json
+
+        from actions.project_operator import project_operator
+
+        payload = json.loads(project_operator(parameters={"project_id": "project_learning", "operation": "status"}))
+        hint = payload["policy"]["hint"]
+        self.assertIn("not a registered project", hint)
+        self.assertIn("mark_platform", hint)
+        self.assertIn("graphify_query", hint)
+
     def test_dot_prefixed_extensions_still_match(self):
         self.assertTrue(main._rule_token_matches(".json", "open data.json"))
 
