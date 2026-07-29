@@ -129,6 +129,31 @@ class DirectAnswerTests(unittest.TestCase):
         results, receipts = self._results(result="x" * 5_000)
         self.assertIsNone(main._direct_answer(results, receipts))
 
+    def test_negative_results_fall_through(self):
+        """Caught by live assessment: a reasoning question was misrouted to
+        graphify_query, which returned "No node matching '...' found." with a
+        clean receipt -- and that dead end was handed to the user as the entire
+        answer. A tool can succeed technically and still find nothing."""
+        for payload in (
+            "No node matching 'degree centrality' found.",
+            "No results for that query in the local index.",
+            "No operations have been recorded in this session.",
+            "Could not find anything matching that symbol.",
+        ):
+            with self.subTest(payload=payload):
+                results, receipts = self._results(tool="graphify_query", result=payload)
+                self.assertIsNone(main._direct_answer(results, receipts))
+
+    def test_trivially_short_output_falls_through(self):
+        for payload in ("OK", "Done.", "n/a"):
+            with self.subTest(payload=payload):
+                results, receipts = self._results(result=payload)
+                self.assertIsNone(main._direct_answer(results, receipts))
+
+    def test_a_terse_but_real_answer_still_goes_direct(self):
+        results, receipts = self._results(result="Sunny in Glasgow, 18C.")
+        self.assertEqual(main._direct_answer(results, receipts), "Sunny in Glasgow, 18C.")
+
     def test_the_second_model_call_is_actually_skipped(self):
         jarvis = _jarvis()
         routed = ToolModelResponse(text="", tool_calls=[ToolCall(id="c1", name="weather_report", arguments={})])

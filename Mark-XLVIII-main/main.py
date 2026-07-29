@@ -164,6 +164,28 @@ _DIRECT_ANSWER_TOOLS = frozenset({
     "process_trace",
 })
 _DIRECT_ANSWER_MAX_CHARS = 1_200
+# Only rejects near-empty output ("OK", "Done."). Kept low deliberately: a
+# genuinely terse answer like "Sunny in Glasgow, 18C." is a real answer, and
+# the semantic negatives are handled by the markers below rather than by
+# length.
+_DIRECT_ANSWER_MIN_CHARS = 16
+# A tool can succeed technically while finding nothing. Live assessment caught
+# this: a reasoning question was misrouted to graphify_query, which returned
+# "No node matching '...' found." -- a clean receipt with a null result -- and
+# the direct path handed that dead end straight to the user as the whole
+# answer. A negative result is exactly the case where the model should still
+# get a turn, so it can answer properly or say what it would need instead.
+_EMPTY_RESULT_MARKERS = (
+    "no node matching",
+    "no results",
+    "no result",
+    "not found",
+    "nothing found",
+    "no matches",
+    "no graph",
+    "could not find",
+    "no operations have been recorded",
+)
 
 
 def _direct_answer(tool_results: list[dict], receipts: list[dict]) -> str | None:
@@ -186,6 +208,14 @@ def _direct_answer(tool_results: list[dict], receipts: list[dict]) -> str | None
         return None
     # Structured payloads and code are for the summariser, not for reading out.
     if text[:1] in {"{", "["} or "```" in text:
+        return None
+    # A near-empty or explicitly negative result is not an answer. Note this
+    # inspects content only to decide whether to ADD a model step -- never to
+    # decide how content is presented, which is why the whitelist itself stays
+    # keyed on tool name. Guessing wrong here costs one extra generation; the
+    # other direction costs the user a dead end.
+    lowered = text.lower()
+    if len(text) < _DIRECT_ANSWER_MIN_CHARS or any(marker in lowered for marker in _EMPTY_RESULT_MARKERS):
         return None
     return text
 
