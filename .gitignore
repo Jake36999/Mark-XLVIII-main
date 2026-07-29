@@ -50,6 +50,17 @@ env/
 ENV/
 
 # -----------------------------
+# Obsidian community plugins
+# -----------------------------
+# Vendored third-party plugin code, and -- more importantly -- their data.json
+# files hold live secrets. obsidian-local-rest-api stores its bearer API key
+# plus the self-signed certificate AND its private key there in plaintext.
+# `.obsidian/` itself is tracked for shared vault settings, so without this rule
+# a broad `git add` would commit those. Plugins are installed per machine
+# through the Obsidian UI; they are not repo content.
+Jarvis_notes/.obsidian/plugins/
+
+# -----------------------------
 # Nested independent git repos (not submodules)
 # -----------------------------
 # These are separate projects that happen to live under this tree, each with

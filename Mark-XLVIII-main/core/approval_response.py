@@ -27,23 +27,59 @@ _LABELS = ("Approve", "Correct", "Deny")
 _DECISION_BY_LABEL = {"approve": "approve", "correct": "correct", "deny": "deny"}
 _CHECKBOX_RE = re.compile(r"^-\s+\[([ xX])\]\s+\*\*(Approve|Correct|Deny)\*\*", re.IGNORECASE)
 
+# One-click alternative to editing a checkbox by hand, for vaults with the
+# Buttons community plugin installed. A button cannot tick an existing checkbox
+# -- in Buttons 0.9.x `replace` means the button replacing *itself*, and text
+# actions only prepend/append/insert -- so a click appends this line instead and
+# the parser treats it as equivalent evidence.
+#
+# The line is deliberately plain enough for a human to type by hand, so nothing
+# here depends on the plugin being present. Vaults without Buttons see the
+# buttons render as inert code blocks and keep using the checkboxes.
+_DECISION_LINE_RE = re.compile(r"^Decision:\s+(Approve|Correct|Deny)\s*$", re.IGNORECASE)
+
+
+def _decision_buttons() -> list[str]:
+    """Buttons plugin blocks that append a decision line when clicked.
+
+    `type append text` writes `action` immediately after the button block, which
+    keeps the recorded line inside this section where the parser looks for it.
+    """
+    blocks: list[str] = []
+    for label in _LABELS:
+        blocks += [
+            "```button",
+            f"name {label}",
+            "type append text",
+            f"action Decision: {label}",
+            "```",
+            "",
+        ]
+    return blocks
+
 
 def render_approval_template() -> str:
     """The fixed Markdown block a caller appends to a note awaiting a decision.
 
-    Exactly one checkbox should end up checked; the matching callout below it is
-    where the free-text correction or denial reason belongs.
+    Exactly one decision should end up recorded -- either by ticking one
+    checkbox or by clicking one button. The matching callout below is where the
+    free-text correction or denial reason belongs.
     """
     return "\n".join(
         [
             f"## {APPROVAL_SECTION}",
             "",
-            "Mark exactly one box below, then save this note.",
+            "Click one button below, or tick exactly one box by hand, then save this note.",
             "",
+            *_decision_buttons(),
             "- [ ] **Approve** — execute the plan exactly as compiled.",
             "- [ ] **Correct** — the plan needs changes before it can run.",
             "- [ ] **Deny** — do not execute this plan.",
             "",
+            # Wording held stable deliberately. Callers and tests substitute
+            # correction/denial text by matching these lines verbatim, so a
+            # cosmetic edit here silently turns those replacements into no-ops
+            # and the placeholder text survives into a real decision.
             "> [!note] Correction details (only read if **Correct** is checked)",
             "> Describe what should change.",
             "",
@@ -103,15 +139,29 @@ def parse_approval_response(body: str) -> dict[str, Any]:
         for match in (_CHECKBOX_RE.match(line.strip()) for line in section.splitlines())
         if match and match.group(1).lower() == "x"
     ]
-    if not checked:
+    # Button clicks append `Decision: <label>` lines. Repeating the same choice
+    # is harmless (a double-click is still one decision), so only the distinct
+    # set matters.
+    clicked = [
+        match.group(1)
+        for match in (_DECISION_LINE_RE.match(line.strip()) for line in section.splitlines())
+        if match
+    ]
+
+    distinct = {label.capitalize() for label in checked} | {label.capitalize() for label in clicked}
+    if not distinct:
         decision = "pending"
-    elif len(checked) > 1:
+    elif len(distinct) > 1:
+        # Covers a ticked box disagreeing with a clicked button just as much as
+        # two ticked boxes. Both are non-decisions; the caller must refuse
+        # rather than pick one.
         decision = "ambiguous"
     else:
-        decision = _DECISION_BY_LABEL[checked[0].lower()]
+        decision = _DECISION_BY_LABEL[next(iter(distinct)).lower()]
     return {
         "decision": decision,
         "checked_options": sorted(checked),
+        "clicked_options": sorted({label.capitalize() for label in clicked}),
         "correction": _extract_callout(section, "Correction details"),
         "denial_reason": _extract_callout(section, "Reason for denial"),
     }

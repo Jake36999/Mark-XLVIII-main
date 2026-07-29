@@ -81,5 +81,81 @@ class ParseApprovalResponseTests(unittest.TestCase):
         self.assertEqual(result["denial_reason"], "Explain why this plan should not run.")
 
 
+class ButtonDecisionTests(unittest.TestCase):
+    """The Buttons community plugin cannot tick an existing checkbox -- in
+    0.9.x `replace` means the button replacing itself, and text actions only
+    prepend/append. So a click appends `Decision: <label>` and the parser
+    treats that as equivalent evidence to a ticked box.
+
+    The plugin is optional: the line is plain enough to type by hand, and a
+    vault without Buttons keeps using the checkboxes unchanged.
+    """
+
+    def _clicked(self, *labels: str, section: str | None = None) -> str:
+        """Append the lines a click writes, *inside* the approval section.
+
+        Appending after `_body_with` would land the line beyond the trailing
+        `##` header and outside the parsed section -- which is correct
+        behaviour, just not what these cases are exercising.
+        """
+        recorded = "".join(f"\nDecision: {label}\n" for label in labels)
+        return _body_with((section or ar.render_approval_template()) + recorded)
+
+    def test_template_ships_a_button_per_option(self):
+        template = ar.render_approval_template()
+        self.assertEqual(template.count("```button"), 3)
+        for label in ("Approve", "Correct", "Deny"):
+            self.assertIn(f"action Decision: {label}", template)
+
+    def test_the_buttons_own_action_lines_are_not_read_as_a_decision(self):
+        """`action Decision: Approve` sits inside every rendered button block.
+        A fresh, untouched template must still be pending -- the parser's
+        anchored pattern is what prevents the template approving itself."""
+        self.assertEqual(
+            ar.parse_approval_response(_body_with(ar.render_approval_template()))["decision"],
+            "pending",
+        )
+
+    def test_a_click_records_a_decision(self):
+        for label, expected in [("Approve", "approve"), ("Correct", "correct"), ("Deny", "deny")]:
+            with self.subTest(label=label):
+                result = ar.parse_approval_response(self._clicked(label))
+                self.assertEqual(result["decision"], expected)
+                self.assertEqual(result["clicked_options"], [label])
+
+    def test_double_clicking_the_same_button_is_still_one_decision(self):
+        body = self._clicked("Approve", "Approve")
+        self.assertEqual(ar.parse_approval_response(body)["decision"], "approve")
+
+    def test_two_different_buttons_are_ambiguous(self):
+        body = self._clicked("Approve", "Deny")
+        self.assertEqual(ar.parse_approval_response(body)["decision"], "ambiguous")
+
+    def test_a_decision_recorded_outside_the_section_is_ignored(self):
+        """Scoping matters: only lines inside the Approval Decision section
+        count, so stray text elsewhere in a plan note cannot approve it."""
+        body = _body_with(ar.render_approval_template()) + "\nDecision: Approve\n"
+        self.assertEqual(ar.parse_approval_response(body)["decision"], "pending")
+
+    def test_a_click_agreeing_with_a_ticked_box_is_honoured(self):
+        section = ar.render_approval_template().replace("- [ ] **Approve**", "- [x] **Approve**")
+        self.assertEqual(
+            ar.parse_approval_response(self._clicked("Approve", section=section))["decision"], "approve"
+        )
+
+    def test_a_click_contradicting_a_ticked_box_fails_closed(self):
+        section = ar.render_approval_template().replace("- [ ] **Approve**", "- [x] **Approve**")
+        self.assertEqual(
+            ar.parse_approval_response(self._clicked("Deny", section=section))["decision"], "ambiguous"
+        )
+
+    def test_a_hand_typed_line_works_without_the_plugin(self):
+        self.assertEqual(ar.parse_approval_response(self._clicked("approve"))["decision"], "approve")
+
+    def test_prose_mentioning_a_decision_is_not_a_decision(self):
+        body = _body_with(ar.render_approval_template() + "\nI think Decision approve is right, maybe.\n")
+        self.assertEqual(ar.parse_approval_response(body)["decision"], "pending")
+
+
 if __name__ == "__main__":
     unittest.main()
