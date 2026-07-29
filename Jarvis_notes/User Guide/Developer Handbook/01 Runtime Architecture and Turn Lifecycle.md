@@ -4,7 +4,7 @@ title: "Runtime Architecture and Turn Lifecycle"
 type: "guide"
 status: "active"
 created: "2026-07-22"
-updated: "2026-07-25T14:33:58Z"
+updated: "2026-07-29T21:53:32Z"
 project_id: "jarvis_notes"
 source: "codex"
 tags: ["developer-handbook", "runtime", "router", "turn-lifecycle", "tier/short-term"]
@@ -13,7 +13,7 @@ index_state: "indexed_local"
 remember_note_id: ""
 rag_index: true
 confidence: 0.97
-content_hash: "94eccbc437f1ee496c269c57b9675f5ba7f01c50c39503bc5e9e9f97980e581a"
+content_hash: "1522c6aab87fcde6a8bf45aca985322fb26510e648d8332567762e8539bec032"
 lifecycle: "short_term"
 project_key: "mark_xlviii"
 schema_version: "jarvis_developer_handbook/v1"
@@ -60,8 +60,12 @@ sequenceDiagram
         R->>D: policy-checked calls
         D->>T: dispatch registered handler
         T-->>R: structured result
-        R->>M: summarize tool evidence
-        M-->>R: English response
+        alt tool output already answers the user
+            R->>R: reply directly, no second model call
+        else needs synthesis
+            R->>M: summarize tool evidence
+            M-->>R: English response
+        end
     end
     R->>R: reject stale turn if superseded
     R->>UI: display response
@@ -70,6 +74,41 @@ sequenceDiagram
     R->>W: dispatch approved pending plan
     UI->>UI: resume listening after cooldown
 ```
+
+## Turn Phases (2026-07-29)
+
+A turn moves through three phases, and the hand-off between them is deliberately one-way:
+
+| Phase | Name | What happens |
+| --- | --- | --- |
+| 1 | `processing_request` | Working out what the user is asking for |
+| 2 | `completing_operation` | Running tools to get it |
+| 3 | `communicating_to_user` | Answering the user |
+
+`core/process_events.TurnContext` carries the phase. It is created as a **local** in `_handle_router_text_command` and passed down — never stored on `JarvisLive` — so turns remain stateless with respect to each other. This is scope, not memory. `TurnContext.advance()` records the phase on the emitted event and refuses a non-monotonic transition.
+
+> [!important] Only the phase is validated
+> `category` and `state` stay free-form strings everywhere else. The process-trace panel builds its filter list from *observed* categories, so closing that vocabulary would buy nothing and force widget changes. Validate the thing that has an invariant; leave the log alone.
+
+### The one-way barrier
+
+Phase 3 answers the user's question; it does not narrate phase 2. Before this existed, `_build_tool_summary_prompt` carried roughly thirteen lines about tool mechanics, gates, and receipts against a single line about answering — so the model wrote about JARVIS's execution rather than about what was asked. The prompt now leads with answering and ends by saying explicitly not to describe which tools ran unless the user asked.
+
+Two things are deliberately *kept* on that path:
+
+- `evidence_block`'s nonce fence and untrusted-data framing. These are prompt-injection controls, not verbosity.
+- One line naming the tools that actually ran. That is trusted grounding stated **outside** the fence, so the model never has to infer what executed from attacker-influenceable evidence. It was briefly removed as "mechanics" during development and three tests correctly caught it — the barrier governs what reaches the *user*, not what facts the model receives.
+
+### Direct answers (skipping the phase-3 model call)
+
+When a single tool whose output is already user-facing prose succeeds cleanly, the reply is that output — no second model call. On a host holding one task model at a time this often removes an evict-and-load cycle too.
+
+All guards must hold: exactly one tool ran; its receipt is clean; the tool is in the `_DIRECT_ANSWER_TOOLS` whitelist (`weather_report`, `system_status`, `capability_registry`, `graphify_query`, `process_trace`); the result is short, plain, non-JSON text; and no confirmation gate fired.
+
+> [!warning] Whitelisted by tool name, never by inspecting the result
+> Letting content decide how it is presented is precisely how tool output would steer its own handling. One exception exists and is narrow: a near-empty or explicitly negative result (`No node matching ... found`) falls through to the model. That check reads content only to decide whether to *add* a model step. Live assessment caught the original of this — a misrouted question returned a tool's "not found" as the entire user-facing answer.
+
+The unverified-completion notice runs on every path producing model prose, but **not** on the direct-answer path, where the text is the tool's own output and a genuine test-runner result would trip a false positive.
 
 ## Hard Workflow Routing
 
@@ -85,8 +124,15 @@ Before asking a model to choose a tool, `main.py` recognizes high-value request 
 | `learn about <topic>` | Performs sourced topic learning and RAG persistence |
 | blank to-do template | Creates the canonical Markdown template directly |
 | current news plus report | Searches first, validates citations, then creates the report |
+| capability question | Answers from the manifest with **zero model calls** |
+| structural code question | Returns `graphify_query` alone |
 
 This layer prevents a small local model from replacing a multi-step operation with a plausible paragraph.
+
+The last two were added 2026-07-29 after live testing:
+
+- **Capability questions** (`what tools do you have`) are answerable from a deterministic manifest that imports no model router at all, yet used to cost two model calls — planner tool-selection plus worker summarisation. `_handle_capability_overview_workflow` now answers directly. The detector deliberately refuses to fire when the prompt names an external artifact (pdf, file, document, paper), because a question *about a document* that reached the capability manifest is exactly how "extract the methods from this pdf" came back describing JARVIS's own backend.
+- **Structural code questions** (`what calls X`, `what depends on Y`) require both an asking form and a code-shaped subject — a snake_case identifier, a `.py` file, or a call form. Requiring both halves keeps ordinary English such as "who uses this feature the most" out of it. Without this, a filename like `project_learning.py` tripped the `project` keyword, `project_operator` was offered alongside `graphify_query`, and the model chose the wrong one and invented a project id from the filename.
 
 ## General Tool Routing
 
@@ -96,8 +142,39 @@ For requests outside the hard routes:
 2. Only schemas relevant to the prompt are supplied to `call_with_tools`.
 3. A planner model may return prose or structured tool calls.
 4. At most five returned calls are executed for the turn.
-5. Tool results are truncated to a bounded summary payload and sent to a worker model for the final conversational answer.
+5. Tool results are truncated to a bounded summary payload and sent to a worker model for the final conversational answer — unless the direct-answer conditions above are met.
 6. Project-learning answers may use only returned takeaways and cited report content. A degraded inventory cannot be converted into an invented architecture summary.
+
+### Keyword matching and its collision class
+
+Routing keywords are matched by `_rule_token_matches`. Multi-word phrases (`deep research`) match as substrings — they are specific enough. **Bare single words match on a leading word boundary**, because plain substring matching produced a recurring family of bugs:
+
+| Keyword | Wrongly matched inside | Effect |
+| --- | --- | --- |
+| `repo` | `weather_report` | A weather request routed to project tooling |
+| `ram` | `program`, `diagram`, `framework` | Unrelated prompts routed to system status |
+| `read` | `already`, `thread` | Unrelated prompts routed to file tooling |
+
+A simple trailing plural is still allowed (`projects` matches `project`). Only the *leading* boundary does the collision work, and an earlier strict-both-sides version silently stopped `projects`, `files`, and `tools` from matching anything for two releases before it was noticed.
+
+> [!important] The model is never handed an empty tool list
+> When no rule matches, the router falls back to a small read-only default set rather than `tools=[]`. With no tools the model cannot act at all, so it answers from the system prompt — and that is what produced a confident, entirely wrong answer about an uploaded PDF.
+
+## Uploaded Files Across Turns (2026-07-29)
+
+The UI drop zone announces an upload as a one-off synthetic turn carrying the path (`[FILE_UPLOADED] path=... | name=...`). Because router turns are stateless — `call_with_tools` takes a single string with no history — the *next* turn, the one that actually asks something about the file, had no idea a file existed. The path lived only on a Qt widget and was backfilled deep inside `_execute_tool`, far too late to help.
+
+Three changes make the feature work end to end:
+
+1. `_record_upload_announcement` remembers the active upload for the session. `_upload_context_note` then tells the model a file is in scope on subsequent turns — **path and name only, never contents**, so it cannot become an injection surface.
+2. `_with_upload_path` resolves a missing `file_path` for file tools **before** `classify_effect` runs. Previously the confirmation gate classified first, so a prompt asked the user to approve an action on `file_path=''` — a file the message could not even name.
+3. The routing table gained the document vocabulary it was missing (`method`, `methods`, `extract`, `section`, `paper`, `attached`), and an active upload biases a bare "summarise this" toward `file_processor`.
+
+> [!warning] Classification must match behaviour
+> `file_processor` was classified read-only while silently writing sibling files: analysis saved whenever a result exceeded ~600 characters, and extraction *always* wrote a `<name>_text.txt` next to the user's source. Saving is now opt-in (`save=true`); extraction returns bounded text instead. An omitted `action` is also treated as its real default (summarize) rather than falling to the generic write branch, which used to demand confirmation just to read a file the user had handed over.
+
+> [!danger] Instruction loss was a fabrication vector
+> In `_process_text_doc`, an unrecognised action set `instruction = action` *after* reassigning `action` to `"custom"`, against a `prompt_map` already built from the original (usually empty) instruction. The model therefore received raw file content with **no instruction at all** and free-associated. This is the most likely cause of the fabricated document summary recorded in the 2026-07-25 validation pass.
 
 ## Turn IDs and Stale Reply Suppression
 

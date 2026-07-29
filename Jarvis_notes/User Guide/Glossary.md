@@ -4,14 +4,14 @@ title: "Glossary"
 type: "guide"
 status: "draft"
 created: "2026-07-21"
-updated: "2026-07-25T14:59:49Z"
+updated: "2026-07-29T21:53:32Z"
 project_id: "jarvis_notes"
 source: "codex"
 tags: ["user-guide", "glossary", "tier/short-term"]
 sync_state: "local_only"
 index_state: "indexed_local"
 remember_note_id: ""
-content_hash: "a7f20512b8a9bacd59bbb8cc7d1812ecc4d729cce8de2aa3447dd85e81879a6e"
+content_hash: "3d31672c2f48ef278813a836a60f15565f9278db42fe79c843cec6cbe04efb99"
 lifecycle: "short_term"
 ---
 
@@ -82,6 +82,10 @@ Generated vault notes should include frontmatter fields such as:
 | Blocker Note | Vault note explaining why execution cannot continue without user input |
 | Execution Summary | Vault note recording completed work, evidence, artifacts, and follow-ups |
 | Knowledge Graph | A pre-built local map of a codebase's structure (via `graphify_query`) — answers "what calls/depends on X," not "what do you know about X" |
+| Turn Phase | Which stage of a turn JARVIS is in: *processing your request*, *completing an operation*, or *communicating to you*. The hand-off is one-way, so replies answer the question rather than narrating the machinery |
+| Process Trace | The record of what actually ran — reachable by asking, via `process_trace`. Distinct from the capability manifest, which lists what *could* run |
+| Direct Answer | A turn where a tool's own output is already the answer, so no second model is asked to paraphrase it. Faster, and on this hardware it often avoids swapping models |
+| Warm Model | A model already loaded in LM Studio. Picking a warm model over a cold one avoids a multi-gigabyte load, which is the single biggest cost on a local-only host |
 
 > [!example] Workflow example
 > `current_news_report` resolves the date, searches cited news, creates a Markdown report, and reindexes the vault.

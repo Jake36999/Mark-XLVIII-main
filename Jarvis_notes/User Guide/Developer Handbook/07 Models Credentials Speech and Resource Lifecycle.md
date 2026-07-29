@@ -4,7 +4,7 @@ title: "Models, Credentials, Speech, and Resource Lifecycle"
 type: "guide"
 status: "active"
 created: "2026-07-22"
-updated: "2026-07-25T14:33:58Z"
+updated: "2026-07-29T21:53:32Z"
 project_id: "jarvis_notes"
 source: "codex"
 tags: ["developer-handbook", "models", "lmstudio", "credentials", "speech", "tier/short-term"]
@@ -13,7 +13,7 @@ index_state: "indexed_local"
 remember_note_id: ""
 rag_index: true
 confidence: 0.97
-content_hash: "ea7902aa06e2102c272308369ab59e9a84d7c85f53516182450383b40113c224"
+content_hash: "b184e174676d40036dc3550869114a4211d7e6ab550b020532b02694fb023295"
 lifecycle: "short_term"
 project_key: "mark_xlviii"
 schema_version: "jarvis_developer_handbook/v1"
@@ -51,6 +51,38 @@ Trusted system directives can pin a route. Otherwise the router classifies the r
 - bounded delegated tasks: `worker`.
 
 Source evidence cannot pin its own route; only the trusted system channel may use an internal route directive.
+
+> [!danger] Keyword routing is fragile in both directions — pin the route where it matters
+> The classifier reads the *prompt*. The tool-summary prompt necessarily concatenates tool output, so an unpinned summary call let attacker-influenceable content select its own model class. It also self-poisoned: the prompt's own anti-fabrication boilerplate contained the literal phrase "cited report content", and `cited report` is a `research` keyword — so **every tool summary in the system** classified as research and chained into `qwen2.5-14b-deepresearch → marco-deepresearch-8b → deepseek-r1-8b`, with streaming and a 1800-second ceiling.
+>
+> Removing the offending words was not sufficient: the remaining text contained "plan", which scores as `main` — also a heavy chain. The durable fix is the pin. `_handle_router_text_command` now sends the summary call with `[jarvis-route:worker]` on the trusted system channel, which short-circuits keyword matching entirely. Measured: the summary chain went from seven candidates including three 8–14B models down to three small ones.
+
+## Local-First Model Economics (2026-07-29)
+
+This host serves every model from one LM Studio instance holding a single task model at a time, so each extra candidate in a chain is a cold multi-gigabyte load. Optimising for the *system* rather than for the largest runnable model is a correctness concern, not a micro-optimisation: live testing measured a 1109-second turn in which roughly 90% of the wall-clock was walking dead candidates.
+
+| Control | Behavior |
+| --- | --- |
+| `model_fallback_max_candidates` | Caps a chain (default 3). `0` disables the cap; missing or malformed falls back to the default. The role's explicitly configured model is preserved even when the cap would truncate it away — it takes the last-resort slot rather than vanishing. |
+| `warm_model_preference_enabled` | Stable partition of already-loaded models ahead of cold ones, from `model_lifecycle.list_models()["loaded"]` behind a ~10 s TTL cache. A **partition, never a re-rank**, applied only to candidates that already survived route selection — otherwise a warm general model could outrank the only model that can serve the route. Runs *before* the cooldown filter, so a warm-but-cooling model is still dropped. Fails open: a probe failure leaves order untouched. |
+| `task_model_ttl_seconds` | Now actually enforced (it was configured but never read). |
+
+### Duplicate work removed
+
+When native tool-calling failed on every candidate, the JSON-tools compatibility pass re-walked **the same full chain again** — doubling an already-expensive failure into a second round of cold loads for no new information. It now retries only the first candidate, which is what that pass is for.
+
+### Cloud providers are supplementary
+
+Keys are entered per session in the UI and never stored, so on a purely local session the answer to "is OpenAI linked?" is always no — but asking it cost an IPC round trip that *spawned the broker subprocess*, on every planner turn, just to be told no. `SessionCredentialBroker.has_linked_session()` answers that without IPC: `link()` is the only way a key enters and it starts the process, so a `False` is exact rather than a guess. Brokers lacking the method (test doubles) fall through to the normal `status()` path unchanged.
+
+### Context budgets come from the loaded profile, not the advertised one
+
+A model's advertised context window is not what it gets here. `MODEL_PROFILES` declares 32768 for `qwen/qwen3-4b-2507`; `lmstudio_model_load_profiles` actually loads it at **4096** — an eightfold overestimate, and the reason overflow was invisible. Sizing a prompt from the advertised number produced the live `n_keep: 4223 >= n_ctx: 4096` failure, and worse, that failure looked like "the small model cannot cope" and pushed the chain into larger models.
+
+`model_registry.effective_profile()` merges the capability profile with the real configured `context_length`; `char_budget_for()` converts that into a usable character budget — about 11,500 characters for the 4096-token worker, falling under 9,000 once room is reserved for the reply itself. The tool-summary evidence block was a flat **24,000** characters against that, so overflow was structural rather than occasional. It is now derived from the model that will actually run the work.
+
+> [!tip] The local-first principle, stated once
+> Decompose work to fit the profile of the model it will be delegated to. `core/repo_slicer` and `project_learning._source_batches` already do this for repository learning; `char_budget_for()` is the general form.
 
 ## Quality Floors
 
@@ -93,6 +125,13 @@ Baseline models are kept warm:
 - `orpeus_text_to_speech`.
 
 Task models receive a 300-second TTL. Only one non-baseline task model is allowed to remain loaded. An idle cleanup loop runs every 300 seconds and never unloads a protected active request or baseline model.
+
+> [!warning] The TTL was configured but not enforced, and TTS thrashed against it
+> `core/tts.py` releases idle task models before **every spoken reply**, and its only guard was `active_snapshot()["active_count"]` — which is already zero by then, because the generation lease was released when the reply was composed. "Idle" and "used two seconds ago" were indistinguishable, so a specialist was evicted at the end of one turn and cold-loaded again on the next.
+>
+> `model_lifecycle.recently_used_models()` reads `completed_at` from the existing generation-lease table, and `unload_non_baseline` now skips a non-baseline model used within the TTL unless `force=True`. VRAM safety is unchanged: `max_task_models_loaded` still evicts at the next load and the idle sweep still fires once the TTL elapses. This *delays* eviction; it does not remove it. An explicit user "unload models" passes `force=True` and is unaffected. Fails open — an unreadable lease table means no recency information and cleanup behaves exactly as before.
+>
+> Measured after the fix: across eleven live turns, **zero evictions**, and only one model was ever loaded.
 
 ## Generation Leases
 

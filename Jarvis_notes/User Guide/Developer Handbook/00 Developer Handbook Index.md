@@ -4,7 +4,7 @@ title: "JARVIS Developer Handbook"
 type: "guide"
 status: "active"
 created: "2026-07-22"
-updated: "2026-07-25T14:55:11Z"
+updated: "2026-07-29T21:53:32Z"
 project_id: "jarvis_notes"
 source: "codex"
 tags: ["developer-handbook", "jarvis", "architecture", "index", "tier/short-term"]
@@ -13,7 +13,7 @@ index_state: "indexed_local"
 remember_note_id: ""
 rag_index: true
 confidence: 0.97
-content_hash: "bf726e7ddfa3505d18d8e716edf128313f67f33be0d929911973a2e4f83291ac"
+content_hash: "03653d1ccd0a539952de8a92ea6f24fea9467f23c1bedcf284bb6b37e7e88e40"
 lifecycle: "short_term"
 project_key: "mark_xlviii"
 schema_version: "jarvis_developer_handbook/v1"
@@ -85,7 +85,7 @@ flowchart LR
 | Path | Role |
 | --- | --- |
 | `Mark-XLVIII-main/main.py` | Application lifecycle, router mode, turn handling, hard workflows, speech transitions |
-| `Mark-XLVIII-main/core/model_router.py` | Provider and model selection, tool-call generation, local fallback, model provenance |
+| `Mark-XLVIII-main/core/model_router.py` | Provider and model selection, capped/warm-first candidate chains, tool-call generation, local fallback, model provenance |
 | `Mark-XLVIII-main/core/tool_dispatcher.py` | Tool schema loading, effect classification, policy checks, handler dispatch |
 | `Mark-XLVIII-main/actions/capability_registry.py` | L0 cards, L1 manifests, workflow metadata, MCP-style discovery |
 | `Mark-XLVIII-main/actions/plan_workflow.py` | Plan creation, revision, approval, bundle creation, dispatch, summary, blockers |
@@ -94,15 +94,16 @@ flowchart LR
 | `Mark-XLVIII-main/actions/jarvis_memory.py` | Markdown services, reports, local RAG, graph, tasks, learning, reconciliation |
 | `Mark-XLVIII-main/actions/project_learning.py` | Read-only repository inventory, evidence selection, cited synthesis, project memory, graphify-informed centrality |
 | `Mark-XLVIII-main/actions/graphify_query.py` | On-demand knowledge-graph query/explain/path tool, subprocess-wrapped |
+| `Mark-XLVIII-main/actions/process_trace.py` | Read-only report of what actually ran this session; the escape hatch for the one-way phase barrier |
 | `Mark-XLVIII-main/core/repo_slicer.py` | AST code slicing into ranked, deduplicated function/class units, graphify-degree-aware |
 | `Mark-XLVIII-main/actions/document_workflow.py` | Resumable extraction and chunk/map/reduce analysis |
-| `Mark-XLVIII-main/actions/model_lifecycle.py` | LM Studio model inventory, loading, TTL, generation leases, cleanup |
+| `Mark-XLVIII-main/actions/model_lifecycle.py` | LM Studio model inventory, loading, enforced task-model TTL, generation leases, cleanup |
 | `Mark-XLVIII-main/core/tts.py` and `core/stt.py` | Local speech engines and turn-safe playback/capture |
 | `Mark-XLVIII-main/core/vault_activity.py` | Persistent vault revisions, write receipts, bounded diffs, and turn acknowledgements |
 | `Mark-XLVIII-main/core/canvas_document.py` | Canvas parsing, validation, revisions, and unknown-field preservation |
 | `Mark-XLVIII-main/core/canvas_layout.py` | Deterministic rectangle-aware Canvas layout profiles |
 | `Mark-XLVIII-main/core/canvas_index.py` | Derived Canvas nodes, edges, references, and cross-view relationships |
-| `Mark-XLVIII-main/core/process_events.py` | Redacted session event hub for operational trace |
+| `Mark-XLVIII-main/core/process_events.py` | Redacted session event hub for operational trace, plus `TurnContext` phase enforcement |
 | `Mark-XLVIII-main/core/operations_state.py` | Worker-thread health and workflow telemetry provider |
 
 ## Related User Documentation

@@ -4,14 +4,14 @@ title: "Tools Skills and Capabilities"
 type: "guide"
 status: "draft"
 created: "2026-07-21"
-updated: "2026-07-25T14:58:33Z"
+updated: "2026-07-29T21:53:32Z"
 project_id: "jarvis_notes"
 source: "codex"
 tags: ["user-guide", "tools", "capabilities", "workflows", "tier/short-term"]
 sync_state: "local_only"
 index_state: "indexed_local"
 remember_note_id: ""
-content_hash: "c36f2ae051ee9783ed43d9898f4f3cec6d68778bec95781e402a45081a4259f8"
+content_hash: "4ad6ac3790fd7e71e968a1e39f5de7b0d3e92033d7de463c2fe9a44727c5343f"
 lifecycle: "short_term"
 ---
 
@@ -33,6 +33,7 @@ lifecycle: "short_term"
 | `web_search` | Current web/news/research/prices | Search results with sources | Low |
 | `jarvis_memory` | Vault notes, reports, local RAG, graph/tasks | Markdown notes and cited memory results | Low |
 | `graphify_query` | What calls/uses/depends on a symbol; relationship paths between two symbols | Structural answer from a pre-built code knowledge graph | Low |
+| `process_trace` | What JARVIS just did — which tools ran, in what order, with what outcome | Phase-labelled list of real operations | Low |
 | `jarvis_canvas` | Rolling plan boards, task dashboards, node neighborhoods | Native `.canvas` files | Low to medium |
 | `plan_workflow` | Long-form plans, revisions, approvals, summaries, blockers | Reviewable plan and execution notes | Low to medium |
 | `save_memory` | Short durable facts | JSON prompt cache plus vault mirror | Low |
@@ -81,6 +82,16 @@ Wraps a pre-built local knowledge graph (`graphify`). Modes: `query` (free-form 
 
 > [!tip] vs. `jarvis_memory`
 > `jarvis_memory` answers "what do I know / what did we decide." `graphify_query` answers "where does this live / what touches this." Measured live, not assumed — see [[Developer Handbook/14 Graphify Knowledge Graph Integration|Note 14]].
+
+### `process_trace`
+
+> [!info] Use when
+> You want to know what JARVIS actually *did* — which tools ran, in what order, and how each turned out.
+
+Operations: `recent` (default), `turn` (needs a `turn_id`), `export` (writes the trace to a Markdown file; confirmation-gated because it writes).
+
+> [!tip] vs. `capability_registry`
+> `capability_registry` tells you what JARVIS **can** do. `process_trace` tells you what it **did**. Asking "what did you just do" used to reach the capability manifest and come back describing the tool inventory — these are now separate tools with separate routing.
 
 ### `jarvis_canvas`
 
@@ -181,6 +192,8 @@ Local speech capability. STT can use Vosk. TTS can use Windows, EdgeTTS, Kokoro,
 | Bounded project orientation | `jarvis_memory.context_pack` |
 | Note dependencies/consumers | `jarvis_memory.lookup_local` |
 | What calls/depends on a code symbol | `graphify_query` |
+| What JARVIS just did | `process_trace` |
+| Anything about an uploaded file | `file_processor` |
 | Plan and task visualization | `jarvis_canvas` |
 | Project status/handoffs | `project_operator` |
 | Model load/cleanup | `model_lifecycle` |

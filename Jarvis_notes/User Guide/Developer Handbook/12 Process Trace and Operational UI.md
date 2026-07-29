@@ -4,7 +4,7 @@ title: "Process Trace and Operational UI"
 type: "guide"
 status: "active"
 created: "2026-07-22"
-updated: "2026-07-25T14:33:58Z"
+updated: "2026-07-29T21:53:32Z"
 project_id: "jarvis_notes"
 source: "codex"
 tags: ["developer-handbook", "ui", "telemetry", "process-trace", "privacy", "tier/short-term"]
@@ -13,7 +13,7 @@ index_state: "indexed_local"
 remember_note_id: ""
 rag_index: true
 confidence: 0.98
-content_hash: "c8b6b791c60ba07a160114072d00abb5514f04eb466c0e6b789e889290a4f6a7"
+content_hash: "25b74fd4e353cc3875f9b6b9dba34425c69e54efc087ac9759ede202b0a94428"
 lifecycle: "short_term"
 schema_version: "jarvis_developer_handbook/v1"
 ---
@@ -40,6 +40,27 @@ schema_version: "jarvis_developer_handbook/v1"
 | `evidence_refs` | Paths or IDs, never raw evidence bodies |
 
 The global event hub is thread-safe and capped at 250 events or 1 MiB. Subscribers receive immutable `ProcessEvent` records through queued Qt signals.
+
+`snapshot()` accepts a `turn_id` filter so a single turn's operations can be isolated.
+
+Turn-phase boundaries additionally carry `detail.phase` and `detail.phase_name` (`processing_request`, `completing_operation`, `communicating_to_user`) via `TurnContext.advance()` — see [[01 Runtime Architecture and Turn Lifecycle]].
+
+## The `process_trace` Tool (2026-07-29)
+
+The trace was previously reachable only through the GUI (Ctrl+Shift+O, Ctrl+K, or an export dialog), so a user who *asked* "what did you just do" got no useful answer — the question fell through to `capability_registry`, which reports what JARVIS **can** do. That is the same manifest that answered a question about an uploaded PDF with JARVIS's own orchestration methods.
+
+`actions/process_trace.py` exposes the existing hub read-only:
+
+| Operation | Behavior | Gate |
+| --- | --- | --- |
+| `recent` (default) | Latest recorded operations, phase-labelled | read, no approval |
+| `turn` | Same, scoped to one `turn_id` | read, no approval |
+| `export` | Writes the trace to a Markdown file | **write, confirmation-gated** |
+
+It returns prose rather than JSON deliberately: the result *is* the answer, so the turn can take the direct-answer path and skip the summarising model entirely rather than paying a generation to paraphrase a list back into a list.
+
+> [!info] This is the escape hatch for the one-way phase barrier
+> Replies stop narrating background operations, so there has to be somewhere the detail is available on request. `process_trace` answers what JARVIS **did**; `capability_registry` answers what it **can do**. They are not interchangeable, and the standing prompt now says so explicitly.
 
 ## Redaction Boundary
 
