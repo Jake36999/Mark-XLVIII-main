@@ -151,8 +151,15 @@ def classify_effect(tool_name: str, arguments: dict[str, Any]) -> dict[str, Any]
     if tool_name == "jarvis_memory" and operation == "run_task_review":
         effect = "write" if bool(arguments.get("scheduled")) else "read"
         return {"effect": effect, "requires_approval": effect == "write", "operation": operation}
-    if tool_name == "file_processor" and operation in {"summarize", "analyze", "analyze_large", "analyze_folder"}:
-        default_save = operation in {"summarize", "analyze_large", "analyze_folder"}
+    if tool_name == "file_processor" and operation in {"", "summarize", "analyze", "analyze_large", "analyze_folder"}:
+        # An omitted action is not "unknown, therefore dangerous" -- file_processor
+        # defaults it to summarize. Classifying it via the generic write branch
+        # made a plain "summarize this upload" demand confirmation, which read as
+        # the upload feature being broken.
+        # summarize/analyze only persist an artifact when explicitly asked
+        # (file_processor's incidental "the result was long, so save it" writes
+        # are opt-in); the chunked folder/large-file paths always write.
+        default_save = operation in {"analyze_large", "analyze_folder"}
         saves_artifact = bool(arguments.get("save_to_vault", arguments.get("save", default_save)))
         effect = "write" if saves_artifact else "read"
         return {"effect": effect, "requires_approval": effect == "write", "operation": operation}

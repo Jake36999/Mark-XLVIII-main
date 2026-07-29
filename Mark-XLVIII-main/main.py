@@ -1436,7 +1436,32 @@ def _extract_plan_revision(text: str) -> str:
     return cleaned or "Revision requested."
 
 
-def _router_tool_names_for_text(text: str) -> list[str] | None:
+# A small, safe default so the model always has *something* to reach for.
+# Read-only and cheap: discovery, memory lookup, file reading, web search.
+_DEFAULT_ROUTER_TOOLS = ("capability_registry", "jarvis_memory", "file_processor", "web_search")
+
+_RULE_TOKEN_CACHE: dict[str, re.Pattern[str]] = {}
+
+
+def _rule_token_matches(token: str, lowered: str) -> bool:
+    """Match a routing keyword without the substring collisions.
+
+    Multi-word phrases ("deep research") are specific enough to match as
+    substrings. Bare single words are not: plain `in` matching made "ram" hit
+    *program*/*diagram*/*framework*, "read" hit *already*/*thread*, and -- the
+    original of this bug family -- "repo" hit *weather_report*. Single words
+    are matched on word boundaries instead.
+    """
+    if " " in token or token.startswith("."):
+        return token in lowered
+    pattern = _RULE_TOKEN_CACHE.get(token)
+    if pattern is None:
+        pattern = re.compile(rf"(?<![a-z0-9]){re.escape(token)}(?![a-z0-9])")
+        _RULE_TOKEN_CACHE[token] = pattern
+    return bool(pattern.search(lowered))
+
+
+def _router_tool_names_for_text(text: str, has_upload: bool = False) -> list[str] | None:
     lowered = (text or "").lower()
     if _is_cancel_planning_prompt(text):
         return ["plan_workflow"]
@@ -1461,7 +1486,12 @@ def _router_tool_names_for_text(text: str) -> list[str] | None:
         (("lm studio", "lmstudio", "loaded model", "loaded models", "model lifecycle", "cleanup model", "cleanup models", "unload model", "unload models", "task model", "baseline model", "idle cleanup", "model load profile", "context cap"), ["model_lifecycle"]),
         (("canvas", "canva note", "canvas node", "task dashboard", "plan board", "rolling plan", "visual task board", "extend node"), ["jarvis_canvas"]),
         (("create plan", "make a plan", "draft a plan", "long-form plan", "long form plan", "planning pass", "plan document", "revise plan", "update plan", "approve plan", "start plan", "attempt plan", "execute plan", "run plan", "execution summary", "blocker note", "workflow blocker"), ["plan_workflow"]),
-        (("what can you do", "what are your tools", "what tools", "available tools", "tool help", "capability", "capabilities", "workflow", "workflows", "manifest", "tool manifest", "mcp", "can you ", "are you able", "do you have", "speech to text", "text to speech", "tts", "stt", "microphone"), ["capability_registry"]),
+        # "can you " deliberately absent: it is a politeness marker, not a
+        # capability signal. It used to route any polite request here -- and
+        # this tool's manifest literally lists the backend orchestration
+        # methods ("tools/list", "tools/call", ...), so "can you extract the
+        # methods from this pdf" was answered with JARVIS's own internals.
+        (("what can you do", "what are your tools", "what tools", "available tools", "tool help", "capability", "capabilities", "workflow", "workflows", "manifest", "tool manifest", "mcp", "are you able", "speech to text", "text to speech", "tts", "stt", "microphone"), ["capability_registry"]),
         (("system", "status", "cpu", "memory usage", "ram", "gpu", "temperature", "uptime", "performance"), ["system_status"]),
         (("save memory", "save this to memory", "save this as memory", "short-term memory", "short term memory", "json memory", "prompt cache", "remember that"), ["save_memory", "jarvis_memory"]),
         (("remember", "memory", "memories", "note", "notes", "vault", "obsidian", "markdown", ".md", "json memory", "short-term memory", "short term memory", "prompt cache", "rag", "context pack", "orient yourself", "note dependencies", "note consumers", "related notes", "lookup by layer", "lookup by file", "report", "research report", "deep research", "learn about", "learn topic", "learned topic", "todo", "to-do", "to do list", "task list", "checklist", "progress tracker", "search your memory", "what do you know", "memory graph", "tasks in memory", "dag candidate", "write this to your vault", "save this to your vault"), ["jarvis_memory"]),
@@ -1481,12 +1511,20 @@ def _router_tool_names_for_text(text: str) -> list[str] | None:
         (("remind", "reminder"), ["reminder"]),
         (("game", "steam", "epic"), ["game_updater"]),
         (("flight", "flights", "airport"), ["flight_finder"]),
-        (("upload", "uploaded", "document", "pdf", "csv", "excel", "json file", ".json", "xml", "pptx", "powerpoint", "audio", "archive", "large document", "summarize file", "summarise file", "summarize document", "summarise document", "analyze file", "analyse file", "analyze document", "analyse document", "process file"), ["file_processor"]),
+        # "method(s)", "extract", "section", "paper", "attached" added after the
+        # reported failure: "extract the methods from this pdf" matched only via
+        # "pdf", and phrasings without a format word ("what are the methods in
+        # this paper") matched nothing at all.
+        (("upload", "uploaded", "attached", "attachment", "document", "pdf", "csv", "excel", "json file", ".json", "xml", "pptx", "powerpoint", "audio", "archive", "large document", "paper", "method", "methods", "extract", "section", "summarize", "summarise", "analyze", "analyse", "process file"), ["file_processor"]),
     ]
     selected: list[str] = []
     for tokens, names in rules:
-        if any(token in lowered for token in tokens):
+        if any(_rule_token_matches(token, lowered) for token in tokens):
             selected.extend(names)
+    # An active upload means a bare "summarise this" is about the file, not
+    # about the vault or the assistant itself.
+    if has_upload and "file_processor" not in selected:
+        selected.insert(0, "file_processor")
     if not selected:
         capability = select_capability(
             text,
@@ -1496,13 +1534,19 @@ def _router_tool_names_for_text(text: str) -> list[str] | None:
         )
         selected_card = capability.get("selected") or {}
         selected_id = str(selected_card.get("id") or "")
-        return [selected_id] if selected_id and selected_id in {item["name"] for item in TOOL_DECLARATIONS} else []
+        if selected_id and selected_id in {item["name"] for item in TOOL_DECLARATIONS}:
+            return [selected_id]
+        # Never hand the model an empty tool list. With tools=[] it cannot act
+        # at all, so it answers from the system prompt -- which is mostly a
+        # description of JARVIS's own tooling. That is precisely how a question
+        # about an uploaded PDF came back describing the backend.
+        return list(_DEFAULT_ROUTER_TOOLS)
     seen = set()
     return [name for name in selected if not (name in seen or seen.add(name))]
 
 
-def _router_tool_schema(text: str | None = None) -> list[dict]:
-    names = _router_tool_names_for_text(text or "")
+def _router_tool_schema(text: str | None = None, *, has_upload: bool = False) -> list[dict]:
+    names = _router_tool_names_for_text(text or "", has_upload=has_upload)
     declarations = TOOL_DECLARATIONS
     if names is not None:
         by_name = {declaration["name"]: declaration for declaration in TOOL_DECLARATIONS}
@@ -1643,6 +1687,7 @@ class JarvisLive:
         self._active_plan_run_id = ""
         self._planning_mode_active = False
         self._pending_tool_confirmation: dict[str, Any] | None = None
+        self._active_upload: dict[str, Any] | None = None
 
     def _make_remote_key(self):
         """Called from Qt main thread when user presses Remote Control."""
@@ -2224,6 +2269,81 @@ class JarvisLive:
             + (f" Diagnostics: {'; '.join(str(item) for item in diagnostics[:2])}" if diagnostics else "")
         )
 
+    # The UI announces an upload as a one-off synthetic turn carrying the path,
+    # but router turns are stateless (`call_with_tools` takes a single string
+    # with no history), so by the next turn -- the one that actually says
+    # "extract the methods" -- nothing knew a file existed. The path lived only
+    # on a Qt widget and was backfilled far too late, inside _execute_tool.
+    # Remembering it for the session is what makes the upload feature work at
+    # all across a normal two-turn interaction.
+    _UPLOAD_ANNOUNCEMENT_PREFIX = "[FILE_UPLOADED]"
+
+    def _record_upload_announcement(self, text: str) -> None:
+        if not text.startswith(self._UPLOAD_ANNOUNCEMENT_PREFIX):
+            return
+        fields: dict[str, str] = {}
+        for chunk in text[len(self._UPLOAD_ANNOUNCEMENT_PREFIX):].split("|"):
+            key, sep, value = chunk.partition("=")
+            if sep:
+                fields[key.strip().lower()] = value.strip()
+        path = fields.get("path") or ""
+        if not path:
+            return
+        self._active_upload = {
+            "path": path,
+            "name": fields.get("name") or Path(path).name,
+            "type": fields.get("type") or Path(path).suffix.lstrip("."),
+            "recorded_at": time.time(),
+        }
+
+    def _active_upload_path(self) -> str:
+        """Best known path for the file the user most recently supplied."""
+        record = getattr(self, "_active_upload", None)
+        if isinstance(record, dict) and isinstance(record.get("path"), str) and record["path"].strip():
+            return record["path"]
+        try:
+            current = self.ui.current_file
+        except Exception:
+            return ""
+        # Must be an actual path string. The UI surface is duck-typed (and
+        # stubbed in tests), so anything non-str here would otherwise be
+        # stringified straight into a tool argument.
+        return current if isinstance(current, str) and current.strip() else ""
+
+    def _upload_context_note(self) -> str:
+        """A short, trusted note telling the model a file is in scope.
+
+        Only the user-chosen path/name go in here -- never file contents --
+        so this cannot become an injection surface.
+        """
+        record = getattr(self, "_active_upload", None)
+        path = self._active_upload_path()
+        if not path:
+            return ""
+        name = (record or {}).get("name") or Path(path).name
+        return (
+            f"[session context] The user has supplied a file for you to work with: "
+            f"name={name}, path={path}. When they refer to \"this file\", \"the document\", "
+            f"\"the pdf\", or ask to read/extract/summarise something without naming a source, "
+            f"they mean this file -- use file_processor on that path rather than answering "
+            f"from your own knowledge or your own capability manifest."
+        )
+
+    def _with_upload_path(self, tool_name: str, arguments: dict[str, Any]) -> dict[str, Any]:
+        """Fill in the active upload's path for file tools that were given none.
+
+        Runs before the confirmation gate classifies the call, so the user is
+        asked to approve a named file rather than an empty path.
+        """
+        if tool_name not in {"file_processor", "file_controller"}:
+            return dict(arguments)
+        resolved = dict(arguments)
+        if not str(resolved.get("file_path") or "").strip():
+            path = self._active_upload_path()
+            if path:
+                resolved["file_path"] = path
+        return resolved
+
     def _handle_capability_overview_workflow(self, text: str) -> str | None:
         """Answer "what can you do" from the manifest, with zero model calls.
 
@@ -2378,6 +2498,7 @@ class JarvisLive:
                 self.ui.write_log(f"SYS: Skipped stale {source} turn.")
                 return
             self.ui.set_state("THINKING")
+            self._record_upload_announcement(text)
             emit_process_event(
                 category="router",
                 source="jarvis",
@@ -2436,11 +2557,14 @@ class JarvisLive:
                                 self.ui.write_log(
                                     f"VAULT: Change awareness degraded - {str(activity_error)[:140]}"
                                 )
+                        upload_note = self._upload_context_note()
+                        if upload_note and not text.startswith(self._UPLOAD_ANNOUNCEMENT_PREFIX):
+                            model_text = f"{model_text}\n\n{upload_note}"
                         routed = call_with_tools(
                             model_text,
                             role="planner",
                             system=self._router_tool_system_prompt(),
-                            tools=_router_tool_schema(text),
+                            tools=_router_tool_schema(text, has_upload=bool(self._active_upload_path())),
                             timeout=120,
                         )
                     else:
@@ -2459,18 +2583,24 @@ class JarvisLive:
                                 self.ui.write_log("TOOL: dev_agent (redirected to canvas plan review)")
                                 reply = self._redirect_dev_agent_to_canvas(text, turn_id)
                                 break
-                            classification = classify_effect(call.name, call.arguments or {})
+                            # Resolve the file path BEFORE classifying. The
+                            # backfill used to live deep inside _execute_tool,
+                            # so a confirmation prompt for a file action asked
+                            # the user to approve `file_path=''` -- an action on
+                            # a file the message could not even name.
+                            call_arguments = self._with_upload_path(call.name, call.arguments or {})
+                            classification = classify_effect(call.name, call_arguments)
                             if classification.get("requires_approval"):
                                 self._pending_tool_confirmation = {
                                     "tool_name": call.name,
-                                    "arguments": dict(call.arguments or {}),
+                                    "arguments": dict(call_arguments),
                                     "call_id": call.id,
                                     "created_turn_id": turn_id,
                                     "created_at": time.monotonic(),
                                     "expires_at": time.monotonic() + 120.0,
                                 }
                                 self.ui.write_log(f"TOOL: {call.name} (awaiting confirmation)")
-                                reply = describe_pending_action(call.name, call.arguments or {}, classification)
+                                reply = describe_pending_action(call.name, call_arguments, classification)
                                 break
                             self.ui.write_log(f"TOOL: {call.name}")
                             emit_process_event(
@@ -2479,10 +2609,10 @@ class JarvisLive:
                                 summary=f"Calling {call.name}.",
                                 state="running",
                                 turn_id=turn_id or "",
-                                detail={"arguments": call.arguments},
+                                detail={"arguments": call_arguments},
                             )
-                            result = self._execute_router_tool_call(call.id, call.name, call.arguments)
-                            receipt = _tool_receipt(call.name, call.arguments, result)
+                            result = self._execute_router_tool_call(call.id, call.name, call_arguments)
+                            receipt = _tool_receipt(call.name, call_arguments, result)
                             tool_receipts.append(receipt)
                             emit_process_event(
                                 category="tool",
@@ -2495,7 +2625,7 @@ class JarvisLive:
                             tool_results.append(
                                 {
                                     "tool": call.name,
-                                    "arguments": call.arguments,
+                                    "arguments": call_arguments,
                                     "result": str(result)[:4000],
                                 }
                             )

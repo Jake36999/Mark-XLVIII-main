@@ -278,8 +278,14 @@ class RouterToolCallingTests(unittest.TestCase):
         reminder_tools = [tool["function"]["name"] for tool in main._router_tool_schema("set a reminder")]
         web_tools = [tool["function"]["name"] for tool in main._router_tool_schema("search the web")]
 
-        self.assertIn("capability_registry", news_tools)
-        self.assertIn("web_search", news_tools)
+        # "can you check the news" used to also offer capability_registry,
+        # because the routing table matched the bare politeness marker
+        # "can you ". That collision is what sent "can you extract the methods
+        # from this pdf" to the capability manifest -- whose contents are
+        # literally JARVIS's own backend orchestration methods. The marker is
+        # gone, so a clear action prompt now yields just its action tool, which
+        # is what the other two assertions here already expected.
+        self.assertEqual(news_tools, ["web_search"])
         self.assertEqual(reminder_tools, ["reminder"])
         self.assertEqual(web_tools, ["web_search"])
 

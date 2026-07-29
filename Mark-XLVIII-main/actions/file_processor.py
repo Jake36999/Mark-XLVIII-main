@@ -92,6 +92,24 @@ def _output_path(src: Path, suffix: str, new_ext: str = None) -> Path:
     name = f"{src.stem}_{suffix}{ext}"
     return src.parent / name
 
+
+_EXTRACT_RETURN_LIMIT = 12_000
+
+
+def _bounded_extract(text: str) -> str:
+    """Return extracted text to the caller instead of writing a sibling file.
+
+    Extraction used to always drop a `<name>_text.txt` next to the user's
+    source -- a filesystem write the caller never asked for, and one that made
+    the tool's "read-only" classification untrue. Saving is now opt-in via
+    `save=True`; by default the text comes back, bounded so it cannot blow the
+    summarising model's context.
+    """
+    text = text or ""
+    if len(text) <= _EXTRACT_RETURN_LIMIT:
+        return text
+    return text[:_EXTRACT_RETURN_LIMIT] + f"\n\n[truncated -- {len(text)} characters total; pass save=true to write the full text to a file]"
+
 def _process_image(path: Path, action: str, params: dict, speak=None) -> str:
     try:
         from PIL import Image
@@ -114,7 +132,7 @@ def _process_image(path: Path, action: str, params: dict, speak=None) -> str:
                     + (f"OCR text:\n{extracted}" if extracted else "No OCR text was detected. Local visual description requires a healthy vision route.")
                 )
 
-            if len(result) > 500 and params.get("save", True):
+            if len(result) > 500 and params.get("save", False):
                 out = _output_path(path, "result", ".txt")
                 out.write_text(result, encoding="utf-8")
                 return f"{result[:300]}...\n\nFull result saved to: {out}"
@@ -207,9 +225,11 @@ def _process_pdf(path: Path, action: str, params: dict, speak=None) -> str:
             return "Could not extract text from PDF (may be scanned/image-based)."
 
         if action == "extract_text":
-            out = _output_path(path, "text", ".txt")
-            out.write_text(text, encoding="utf-8")
-            return f"Text extracted ({len(text)} chars). Saved: {out.name}"
+            if params.get("save", False):
+                out = _output_path(path, "text", ".txt")
+                out.write_text(text, encoding="utf-8")
+                return f"Text extracted ({len(text)} chars). Saved: {out.name}"
+            return _bounded_extract(text)
 
         prompt_map = {
             "summarize":      f"Summarize this PDF document concisely:\n\n{text}",
@@ -221,7 +241,7 @@ def _process_pdf(path: Path, action: str, params: dict, speak=None) -> str:
             model    = _analysis_client()
             response = model.generate_content(prompt_map.get(action, f"Analyze:\n\n{text}"))
             result   = response.text.strip()
-            if len(result) > 600 and params.get("save", True):
+            if len(result) > 600 and params.get("save", False):
                 out = _output_path(path, action, ".txt")
                 out.write_text(result, encoding="utf-8")
                 return f"{result[:400]}...\n\nFull result saved: {out.name}"
@@ -285,11 +305,11 @@ def _process_text_doc(path: Path, file_type: str, action: str,
         return f"Word count: {words} words, {chars} characters, {lines} lines."
 
     if action == "extract_text":
-        if file_type != "txt":
+        if file_type != "txt" and params.get("save", False):
             out = _output_path(path, "extracted", ".txt")
             out.write_text(content, encoding="utf-8")
             return f"Text extracted. Saved: {out.name}"
-        return content[:2000]
+        return _bounded_extract(content)
 
     instruction = params.get("instruction", "")
     prompt_map  = {
@@ -303,15 +323,26 @@ def _process_text_doc(path: Path, file_type: str, action: str,
     }
 
     if action not in prompt_map:
-
-        action  = "custom"
-        instruction = action
+        # Previously this set `instruction = action` *after* reassigning action
+        # to "custom", and prompt_map had already been built from the original
+        # (usually empty) instruction -- so the model received the raw file
+        # content with no instruction whatsoever and free-associated. That is a
+        # direct fabrication vector: it is how a document summary came back
+        # describing something the file never contained.
+        requested = action or "summarize"
+        instruction = str(params.get("instruction") or "").strip() or (
+            f"The caller asked to '{requested}' this document. Do exactly that if it is a "
+            f"reasonable document operation. If it is not, summarize the document and state "
+            f"plainly that '{requested}' is not a supported operation -- do not invent content."
+        )
+        action = "custom"
+        prompt_map["custom"] = f"{instruction}\n\n{content[:40000]}"
 
     try:
         model    = _analysis_client()
         response = model.generate_content(prompt_map[action])
         result   = response.text.strip()
-        if len(result) > 600 and params.get("save", True):
+        if len(result) > 600 and params.get("save", False):
             out = _output_path(path, action, ".txt")
             out.write_text(result, encoding="utf-8")
             return f"{result[:400]}...\n\nFull result saved: {out.name}"
@@ -799,9 +830,11 @@ def _process_pptx(path: Path, action: str, params: dict, speak=None) -> str:
     if action in ("summarize", "extract_text", "analyze"):
         text = _read_pptx_text()
         if action == "extract_text":
-            out = _output_path(path, "text", ".txt")
-            out.write_text(text, encoding="utf-8")
-            return f"Text extracted. Saved: {out.name}"
+            if params.get("save", False):
+                out = _output_path(path, "text", ".txt")
+                out.write_text(text, encoding="utf-8")
+                return f"Text extracted. Saved: {out.name}"
+            return _bounded_extract(text)
         try:
             model    = _analysis_client()
             prompt   = f"{'Summarize' if action == 'summarize' else 'Analyze'} this presentation:\n{text[:30000]}"
