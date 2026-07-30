@@ -36,7 +36,14 @@ def workflow(step_type="python_hook", target="test_hook", *, retry_safe=True):
     }
 
 
-class DualOrchestratorTests(unittest.TestCase):
+class RuntimeHarness(unittest.TestCase):
+    """Bundle/registry scaffolding shared with tests/test_dual_orchestrator_guards.py.
+
+    Extracted rather than duplicated: a second copy would drift, and these
+    helpers encode the exact on-disk shape (`workflow.yaml`, `work-items.json`,
+    a signed `approval.json`) that the runtime's guards check.
+    """
+
     def hook_registry(self, handler):
         registry = do.PythonHookRegistry()
         registry.register(
@@ -77,6 +84,8 @@ class DualOrchestratorTests(unittest.TestCase):
             approval_projection_hash="projection-hash",
         )
 
+
+class DualOrchestratorTests(RuntimeHarness):
     def test_schema_rejects_unknown_fields_and_dependency_cycles(self):
         raw = workflow()
         raw["unexpected"] = True

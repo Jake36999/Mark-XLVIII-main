@@ -119,6 +119,26 @@ Deletion and desktop control are in that set. This asymmetry should be closed de
 
 The artefact that gets human review is six times better tested than the executor that does not.
 
+> [!success] Addressed on 2026-07-30 — `tests/test_dual_orchestrator_guards.py`
+> 35 new tests, density now **one per 33 lines**. Aimed at the paths that stop a run executing something the human did not approve, or executing it twice — none of which had any coverage:
+>
+> | Area | What is now pinned |
+> | --- | --- |
+> | Envelope integrity | Every signed field; a forged, empty, or missing signature; an envelope signed by another vault; adding an action that was never approved |
+> | On-disk drift | Editing `workflow.yaml` or `work-items.json` after approval halts the run before any work |
+> | Crash recovery | A live lease means another worker owns it; an expired lease on retry-safe work is reclaimed; **non-retry-safe work is never silently retried**; an item missing from the manifest pauses the run |
+> | Cancellation | Pending work never starts, items are marked, the reason is recorded |
+> | Compensation | Runs on reject/escalate with real side effects; receives the original inputs and defects; a failing undo is recorded, not swallowed; does *not* run for `side_effects: none` or an accepted step |
+> | Bindings | A missing source resolves to `None` rather than a stray value |
+> | Resource classes | Model and OpenClaw slots; slot acquisition aborts on cancel |
+>
+> Verified by mutation: 21 checks, each removing a guard and requiring the naming test to fail. All caught.
+
+> [!note] Two corrections the work produced
+> The compensation tests were wrong on first write — I assumed a dispatch exception triggers compensation. It does not: compensation is gated on a **review verdict** of `REJECT_REPLAN`/`ESCALATE` *and* declared `side_effects` other than `none`. A step that merely raised has not necessarily changed anything. The tests now encode that gate rather than the assumption.
+>
+> Separately, `with sqlite3.connect(...)` commits but does **not** close. The open handle made temp-directory cleanup fail on Windows with a misleading `NotADirectoryError` on the `.sqlite` file. Test helpers now use `contextlib.closing`.
+
 ### 3.3 Dead scaffolding no tool can detect
 
 Roughly **20 live references to `self.session`** remain in `main.py`, all permanently unreachable because `_gemini_live_enabled()` ends in `return bool(wants_gemini and False)`.
@@ -150,9 +170,9 @@ No amount of plumbing improves this. It bounds what the product can be, and road
 1. ~~**Delete the Gemini scaffolding.**~~ **Done** (`dc0dd4e`) — 758 lines. Removal surfaced two costs beyond the vision loss: every dashboard command polled 8 seconds for a session that could never appear, and every tool call depended on `google-genai` because `_execute_tool` returned a vendor type while the import set `types = None` on failure.
 2. ~~**Establish that return values describe completed effects.**~~ **Done** (`da93ab8`) — `core/effect_outcome.py` plus 25 mutation-verified regression tests.
 3. ~~**Contract tests for the seven untested high-risk tools.**~~ **Done** — 28 tests, ten mutations verified. See section 3.1.
-4. **Raise `dual_orchestrator` test density** toward the planning layer's. Now the largest remaining gap: 1,762 lines and 19 tests for the component that executes approved work against real state.
+4. ~~**Raise `dual_orchestrator` test density.**~~ **Done** — 19 tests to 54, one per 93 lines to one per 33, 21 mutations verified. See section 3.2.
 
-New work these three surfaced, not yet done:
+New work this cycle surfaced, not yet done:
 
 5. **Audit the Gemini *generative* surface.** Eight action modules (`code_helper`, `computer_control`, `computer_settings`, `desktop`, `file_processor`, `flight_finder`, `web_search`, `youtube_video`) each define their own `_get_api_key()` and construct a `genai.Client`. That is separate from Live and was deliberately not touched. Whether any of those paths are reachable is unknown — and "looks wired, is not" is exactly the defect this cycle kept finding.
 6. **Rewire or retire `SystemMonitor` and `ProactiveEngine`.** Both were started only as Live background tasks and have been inert since. Each produces a prompt string, so wiring either to router mode is small.
