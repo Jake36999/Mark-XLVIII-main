@@ -41,29 +41,26 @@ def _safe_print(message: str) -> None:
         print(text.encode(encoding, errors="replace").decode(encoding, errors="replace"))
 
 
-def _get_api_key() -> str:
-    raise RuntimeError("Gemini search is not linked for this session; using local public search backends.")
-
-
 def _gemini_search(query: str) -> str:
-    from google import genai
+    """The last-resort backend, which no longer exists.
 
-    client = genai.Client(api_key=_get_api_key())
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=query,
-        config={"tools": [{"google_search": {}}]},
+    This called Gemini with google_search grounding when DuckDuckGo and the HTML
+    scraper had both returned nothing. Because the credential accessor raised
+    unconditionally, the user's error message for "nothing was found" became
+    "Search failed: Gemini search is not linked for this session" -- a
+    credential problem reported for a situation that had nothing to do with
+    credentials, and one the user could not act on.
+
+    Raising with the real reason keeps the same control flow (the caller already
+    turns this into `ok: False`) while saying the true thing. Note it must NOT
+    be replaced by a local model: inventing search results from model weights is
+    the fabrication this system spent the cycle removing, and there would be no
+    citation to check it against.
+    """
+    raise RuntimeError(
+        f"No results found for {query!r}. The local search backends returned nothing, "
+        "and there is no cloud search backend configured."
     )
-
-    text = ""
-    for part in response.candidates[0].content.parts:
-        if hasattr(part, "text") and part.text:
-            text += part.text
-
-    text = text.strip()
-    if not text:
-        raise ValueError("Gemini returned an empty response.")
-    return text
 
 
 def _ddg_client():

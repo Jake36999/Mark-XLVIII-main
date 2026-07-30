@@ -174,12 +174,49 @@ No amount of plumbing improves this. It bounds what the product can be, and road
 
 New work this cycle surfaced, not yet done:
 
-5. **Audit the Gemini *generative* surface.** Eight action modules (`code_helper`, `computer_control`, `computer_settings`, `desktop`, `file_processor`, `flight_finder`, `web_search`, `youtube_video`) each define their own `_get_api_key()` and construct a `genai.Client`. That is separate from Live and was deliberately not touched. Whether any of those paths are reachable is unknown — and "looks wired, is not" is exactly the defect this cycle kept finding.
+5. ~~**Audit the Gemini *generative* surface.**~~ **Done** — full findings in section 6 below.
 6. **Rewire or retire `SystemMonitor` and `ProactiveEngine`.** Both were started only as Live background tasks and have been inert since. Each produces a prompt string, so wiring either to router mode is small.
 
 ## 5. Caveat on the numbers
 
 "Never imported by a test" is a **coverage proxy, not line coverage**. A module can be imported and barely exercised. The 18% figure (8,314 of 46,878 first-party lines, 30 of 79 modules) is a *floor* on the gap, not a measurement of it. A real coverage run would be a cheap and worthwhile follow-up.
+
+## 6. The Gemini generative surface, audited (2026-07-30)
+
+Nine `genai.Client` construction sites across eight action modules, each with its own `_get_api_key()`. Every accessor **raises** rather than returning an empty string, which is the right shape -- it fails loudly. And every site was reachable from a live caller except one.
+
+> [!success] Nothing fabricated
+> This is the meaningful difference from Gemini Live. Every path either degraded to a working local fallback or reported failure. None invented an answer. The problem was that five capabilities were dead while reporting their own death as a raw Python exception string -- useless to a user, and invisible as a capability gap.
+
+| Site | Was | Now |
+| --- | --- | --- |
+| `code_helper._screen_debug_action` | **`NameError`** -- `_get_api_key` was never defined or imported in that module | Local vision pipeline |
+| `youtube_video._summarize_with_gemini` | Transcript fetched, then discarded with a credential error | `call_text`, transcript fenced |
+| `computer_settings._detect_action` | Client built *outside* the try, so the error escaped `computer_settings()` and its own fallback never ran | `call_text`, output restricted to known actions |
+| `file_processor._gemini_client` | **Zero callers** | Deleted |
+| `web_search._gemini_search` | Reported "Gemini search is not linked" when the real situation was "nothing found" | Reports no results found |
+| `desktop._ask_gemini_for_desktop_action` | Dead | **Deliberately stays disabled** |
+| `computer_control._screen_find` | Dead | **Deliberately stays disabled** |
+| `flight_finder` (2 sites) | Degrades to regex date parsing either side | Left alone, knowingly |
+
+### Two that were not restored, and why
+
+> [!danger] `desktop_control` action=`task` executes model-generated Python
+> Its output goes to `_execute_generated_code`, which calls `exec(compile(...))`. The sandbox restricts builtins but still exposes `Path`, `shutil.copy2` and `shutil.copytree` -- so this is a model-driven arbitrary-file-write path with **no confirmation gate**, unlike every other high-risk tool.
+>
+> Porting it to a local model would have granted a 4B model the ability to execute code against the filesystem: adding a capability under cover of a repair, using the weakest model available. It now fails with a reason the user can act on, and re-enabling it needs a design decision -- at minimum an approval step showing the generated code before it runs.
+
+`computer_control._screen_find` returned coordinates that fed straight into a click. Every other capability restored here returns text a human can sanity-check; two numbers cannot be checked, so a confident wrong answer is indistinguishable from a right one. The local models are also weaker at precise grounding than at description, which would make that failure *more* likely while keeping it invisible. It returns `None`, which the caller already reports as `NOT_FOUND`.
+
+### One thing removed on the way
+
+`_screen_debug_action` used to extract a code block from the model's reply and **overwrite the user's source file with it** -- an unreviewed model edit to real files, from a tool the registry classifies high-risk. The rewrite returns the suggestion and lets the user apply it.
+
+### A mistake worth recording
+
+The first version of `tests/test_gemini_surface_audit.py` passed `Path(__file__)` as the fake screenshot. `_screen_debug_action` unlinks the screenshot after reading it -- by design, it is disposing of a capture -- so **the test deleted its own source file**, which was untracked and therefore unrecoverable from git. Rewritten with a temp-file fixture and a warning at the top of the file.
+
+The general lesson is cheap: never hand a real path to a function whose contract includes deleting its input, even in a test.
 
 ## Related Notes
 

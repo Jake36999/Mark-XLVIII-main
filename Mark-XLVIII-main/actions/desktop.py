@@ -24,8 +24,10 @@ def _get_base_dir() -> Path:
     return Path(__file__).resolve().parent.parent
 
 def _get_api_key() -> str:
+    # See _ask_gemini_for_desktop_action: this path stays disabled on purpose.
     raise RuntimeError("Gemini cloud credentials are session-only and unavailable to this legacy action.")
-    
+
+
 def _get_desktop() -> Path:
     if _OS == "Linux":
         xdg = os.environ.get("XDG_DESKTOP_DIR", "")
@@ -100,54 +102,31 @@ def _execute_generated_code(code: str, player=None) -> str:
 
 
 def _ask_gemini_for_desktop_action(task: str) -> str:
+    """Ask a model to write Python for a desktop task. DISABLED.
 
-    from google import genai as _genai
-    _client = _genai.Client(api_key=_get_api_key())
+    Its output goes straight to `_execute_generated_code`, which calls
+    `exec(compile(...))`. The sandbox restricts builtins but still exposes
+    `Path`, `shutil.copy2` and `shutil.copytree` -- so this is a
+    model-driven arbitrary-file-write path.
 
-    desktop = str(_get_desktop())
+    It has been dead since Gemini credentials stopped resolving, and it is
+    deliberately **not** being ported to a local model. Doing so would newly
+    grant a 4B local model the ability to execute generated code against the
+    user's filesystem, with no confirmation gate of the kind every other
+    high-risk tool has -- which would be adding a capability under cover of a
+    repair, and the weakest available model at that.
 
-    os_specific = ""
-    if _OS == "Windows":
-        os_specific = "- ctypes (Windows API calls, read-only)\n- winreg (registry READ only)"
-    elif _OS == "Darwin":
-        os_specific = "- subprocess is NOT available; use pyautogui or Path only"
-    else:
-        os_specific = "- subprocess is NOT available; use pyautogui or Path only"
+    Re-enabling this needs a design decision from the owner, not a rewire:
+    at minimum an explicit approval step showing the generated code before it
+    runs. Until then it fails with a reason the user can act on.
+    """
+    raise RuntimeError(
+        "Desktop task automation is disabled. It executes model-generated Python "
+        "against your filesystem, and there is no approval step for that yet. "
+        "Use the specific desktop actions (organize, clean, list, stats, wallpaper) instead."
+    )
 
-    prompt = f"""You are a desktop automation assistant.
-Current OS: {_OS}
-Desktop path: {desktop}
 
-Generate safe Python code to accomplish the task below.
-Allowed modules ONLY:
-- pyautogui (mouse, keyboard — if needed)
-- pathlib.Path (file/folder inspection only, no deletion)
-- shutil.copy2, shutil.copytree, shutil.disk_usage (NO move, NO rmtree)
-- os_path (os.path equivalent, read-only)
-- time.sleep
-{os_specific}
-
-Hard rules:
-- NO file deletion (no unlink, no rmtree, no remove)
-- NO subprocess calls
-- NO exec() or eval() inside the code
-- NO import statements (modules are pre-injected)
-- NO file write operations except explicitly requested
-- If task cannot be done safely with these tools, output exactly: UNSAFE
-
-Output ONLY the Python code. No explanation, no markdown, no backticks.
-
-Task: {task}"""
-
-    try:
-        response = _client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
-        code = response.text.strip()
-        if code.startswith("```"):
-            lines = code.split("\n")
-            code  = "\n".join(lines[1:-1]).strip()
-        return code
-    except Exception as e:
-        return f"ERROR: {e}"
 
 def set_wallpaper(image_path: str) -> str:
     path = Path(image_path).expanduser().resolve()

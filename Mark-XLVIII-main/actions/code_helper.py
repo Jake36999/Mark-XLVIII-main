@@ -417,88 +417,66 @@ Optimized code:"""
 
 
 def _screen_debug_action(description, file_path, player, speak=None) -> str:
+    """Capture the screen and explain what is wrong on it, using local models.
+
+    This used to call `genai.Client(api_key=_get_api_key())` -- but
+    `_get_api_key` is not defined or imported anywhere in this module, so the
+    call raised `NameError`, and the broad handler turned that into
+    "Screen analysis failed: name '_get_api_key' is not defined". The
+    capability had been dead for the whole local-first era and reported its own
+    death as a Python error string.
+
+    It now runs through actions/vision_pipeline -- the same local path
+    `screen_process` uses: read the screen, then let a text model reason about
+    what it says. The screen transcript is untrusted (it is whatever happened to
+    be displayed), so the pipeline fences it before any model reasons over it.
+    """
+    from actions.vision_pipeline import describe_image
 
     if player:
         player.write_log("[Code] Taking screenshot for analysis...")
-
-    print("[Code] 📸 Capturing screen for debug...")
-
+    print("[Code] Capturing screen for debug...")
 
     screenshot_path = _take_screenshot()
     if not screenshot_path:
         return "Could not take screenshot, sir. Please make sure PyAutoGUI is installed."
 
-
     file_content = ""
     if file_path:
         file_content, err = _read_file(file_path)
         if err:
-            print(f"[Code] ⚠️ Could not read file: {err}")
+            print(f"[Code] Could not read file: {err}")
 
-    try:
-        from google import genai
-        from google.genai import types
-
-        client = genai.Client(api_key=_get_api_key())
-
-        image_bytes  = screenshot_path.read_bytes()
-        image_base64 = _image_to_base64(screenshot_path)
-
-        user_question = description or "What error or problem do you see on the screen? How can it be fixed?"
-
-        context = ""
-        if file_content:
-            context = f"\n\nAdditionally, here is the related file content:\n```\n{file_content[:4000]}\n```"
-
-        analysis_prompt = f"""You are an expert programmer and debugger analyzing a screenshot.
-
-User's question: {user_question}{context}
-
-Please:
-1. Identify any errors, exceptions, or problems visible on the screen
-2. Explain what is causing the problem in simple terms
-3. Provide a concrete fix or solution
-4. If there's code visible, show the corrected version
-
-Be specific and actionable. If you see an error message, quote it exactly."""
-
-        contents = [
-            types.Part.from_bytes(data=image_bytes, mime_type="image/png"),
-            analysis_prompt,
-        ]
-
-        response = client.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=contents,
+    question = description or "What error or problem is visible on the screen, and how do I fix it?"
+    if file_content:
+        # Bounded deliberately: the model answering this runs at 4096-8192 tokens.
+        question += (
+            "\n\nThe user also supplied this related file. Unlike the screen "
+            "contents, this is trusted input:\n" + file_content[:4000]
         )
 
-        analysis = response.text.strip()
-        print(f"[Code] ✅ Screen analysis complete")
-
+    try:
+        outcome = describe_image(
+            screenshot_path.read_bytes(), "image/png", question, angle="screen"
+        )
+    except Exception as exc:
+        return f"Screen analysis failed: {exc}"
+    finally:
         try:
             screenshot_path.unlink()
         except Exception:
             pass
 
-        if file_path and file_content:
+    if not outcome.get("ok"):
+        error = outcome.get("error") or "no local vision model produced an answer"
+        return f"I captured the screen, but no local vision model could read it: {error}"
 
-            code_match = re.search(r"```[a-zA-Z]*\n(.*?)```", analysis, re.DOTALL)
-            if code_match:
-                fixed_code = code_match.group(1).strip()
-                save_path  = Path(file_path)
-                _save_file(save_path, fixed_code)
-                analysis += f"\n\n✅ Fixed code has been saved to: {file_path}"
-                print(f"[Code] ✅ Fixed code saved: {file_path}")
-
-        return analysis
-
-    except Exception as e:
-
-        try:
-            screenshot_path.unlink()
-        except Exception:
-            pass
-        return f"Screen analysis failed: {e}"
+    # Deliberately no automatic file write. The Gemini version extracted a code
+    # block from the reply and overwrote the user's file with it -- an unreviewed
+    # model edit to real source with no confirmation step, from a tool the
+    # registry classifies high-risk. Returning the suggestion and letting the
+    # user apply it is the honest boundary.
+    return str(outcome.get("answer") or "").strip()
 
 
 def code_helper(

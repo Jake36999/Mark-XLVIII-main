@@ -39,19 +39,9 @@ def _analysis_client():
     return get_model_wrapper(role="worker", system=ANALYSIS_SYSTEM_PROMPT)
 
 
-def _get_api_key() -> str:
-    raise RuntimeError("Gemini cloud credentials are session-only; use the model router for file analysis.")
-
-
-def _gemini_client():
-    from google import genai
-    _c = genai.Client(api_key=_get_api_key())
-
-    class _W:
-        def generate_content(self, contents):
-            return _c.models.generate_content(model="gemini-2.5-flash", contents=contents)
-
-    return _W()
+# `_get_api_key()` and `_gemini_client()` were removed on 2026-07-30. The client
+# had zero callers -- file analysis already goes through the model router -- so
+# it was scaffolding that made a dead cloud path look like a live option.
 
 
 def _detect_type(path: Path) -> str:

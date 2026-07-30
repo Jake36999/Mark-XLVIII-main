@@ -19,6 +19,15 @@ class FakeModel:
 
 
 class FileProcessorModelRoutingTests(unittest.TestCase):
+    def test_there_is_no_gemini_path_left_to_take(self):
+        """These tests used to patch `_get_api_key` to explode if it was ever
+        read. It and `_gemini_client()` were deleted on 2026-07-30 -- the client
+        had zero callers -- so the property is now structural rather than
+        enforced by a mock that could quietly stop matching."""
+        self.assertFalse(hasattr(fp, "_get_api_key"))
+        self.assertFalse(hasattr(fp, "_gemini_client"))
+        self.assertNotIn("genai", Path(fp.__file__).read_text(encoding="utf-8"))
+
     def test_text_summary_uses_model_router_without_gemini_key(self):
         model = FakeModel("local text summary")
 
@@ -26,8 +35,7 @@ class FileProcessorModelRoutingTests(unittest.TestCase):
             path = Path(tmp) / "notes.md"
             path.write_text("# Notes\n\nJARVIS uses local models for file analysis.", encoding="utf-8")
 
-            with mock.patch("actions.file_processor.get_model_wrapper", return_value=model) as get_wrapper, \
-                 mock.patch("actions.file_processor._get_api_key", side_effect=AssertionError("Gemini key should not be read")):
+            with mock.patch("actions.file_processor.get_model_wrapper", return_value=model) as get_wrapper:
                 result = fp.file_processor({"file_path": str(path), "action": "summarize", "save": False})
 
         self.assertEqual(result, "local text summary")
@@ -41,8 +49,7 @@ class FileProcessorModelRoutingTests(unittest.TestCase):
             path = Path(tmp) / "memory.json"
             path.write_text('{"project": "mark", "memory": "vault-first"}', encoding="utf-8")
 
-            with mock.patch("actions.file_processor.get_model_wrapper", return_value=model) as get_wrapper, \
-                 mock.patch("actions.file_processor._get_api_key", side_effect=AssertionError("Gemini key should not be read")):
+            with mock.patch("actions.file_processor.get_model_wrapper", return_value=model) as get_wrapper:
                 result = fp.file_processor({"file_path": str(path), "action": "analyze", "save": False})
 
         self.assertEqual(result, "local json analysis")
@@ -56,8 +63,7 @@ class FileProcessorModelRoutingTests(unittest.TestCase):
             path = Path(tmp) / "example.py"
             path.write_text("print('hello')\n", encoding="utf-8")
 
-            with mock.patch("actions.file_processor.get_model_wrapper", return_value=model) as get_wrapper, \
-                 mock.patch("actions.file_processor._get_api_key", side_effect=AssertionError("Gemini key should not be read")):
+            with mock.patch("actions.file_processor.get_model_wrapper", return_value=model) as get_wrapper:
                 result = fp.file_processor({"file_path": str(path), "action": "review", "save": False})
 
         self.assertEqual(result, "local code review")
