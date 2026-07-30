@@ -1826,7 +1826,42 @@ class CanvasExecutionReceiptTests(unittest.TestCase):
         self.assertIsNone(completion_call.kwargs["detail"])
 
 
-class DecomposeGoalToCanvasTests(unittest.TestCase):
+class _DecomposeRegistryIsolated(unittest.TestCase):
+    """Decomposition tests run against a fixed registry, not the user's real one.
+
+    Since 2026-07-30 `decompose_goal_to_canvas` compiles what it produced before
+    reporting success, and `compile_canvas` checks project targets against the
+    registry. Without this these tests read whatever projects happen to be
+    registered on the developer's machine -- so `demo_project` resolved on
+    nobody's, and the same suite would pass or fail depending on the host.
+    """
+
+    TEST_REGISTRY = {
+        "projects": {
+            "demo_project": {
+                "display_name": "Demo Project",
+                "root": "/tmp/demo",
+                "safe_operations": ["delegate_openclaw", "status", "scout"],
+            },
+            # Some fixtures pass `project_hint="mark_platform"` explicitly.
+            "mark_platform": {
+                "display_name": "Mark Platform",
+                "root": "/tmp/mark",
+                "safe_operations": ["delegate_openclaw", "status", "scout"],
+            },
+        }
+    }
+
+    def setUp(self):
+        super().setUp()
+        import actions.project_operator as project_operator
+
+        patcher = mock.patch.object(project_operator, "load_registry", return_value=self.TEST_REGISTRY)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+
+class DecomposeGoalToCanvasTests(_DecomposeRegistryIsolated):
     """WS4a: turning a plain goal into a real, drawn canvas."""
 
     def _good_payload(self) -> dict:
@@ -1842,7 +1877,7 @@ class DecomposeGoalToCanvasTests(unittest.TestCase):
                 },
                 {
                     "id": "make_change",
-                    "role": "implementation",
+                    "role": "implementation", "directives": {"project": "demo_project"},
                     "directives": {"project": "demo_project", "file": "auth.py"},
                     "prose": "Apply the fix.",
                     "depends_on": ["look_around"],
@@ -2062,7 +2097,7 @@ class DecomposeGoalToCanvasTests(unittest.TestCase):
             "nodes": [
                 {"id": "root", "role": "plan", "prose": "Anchor.", "depends_on": []},
                 {"id": "a", "role": "research", "prose": "Step A.", "depends_on": ["root", "b"]},
-                {"id": "b", "role": "implementation", "prose": "Step B.", "depends_on": ["a"]},
+                {"id": "b", "role": "implementation", "directives": {"project": "demo_project"}, "prose": "Step B.", "depends_on": ["a"]},
             ],
         }
         with tempfile.TemporaryDirectory() as tmp:
@@ -2090,7 +2125,7 @@ class DecomposeGoalToCanvasTests(unittest.TestCase):
             "nodes": [
                 {"id": "root", "role": "plan", "prose": "Anchor.", "depends_on": []},
                 {"id": "a", "role": "research", "prose": "Step A.", "depends_on": ["root", "b"]},
-                {"id": "b", "role": "implementation", "prose": "Step B.", "depends_on": ["a"]},
+                {"id": "b", "role": "implementation", "directives": {"project": "demo_project"}, "prose": "Step B.", "depends_on": ["a"]},
             ],
         }
         with tempfile.TemporaryDirectory() as tmp:
@@ -2113,7 +2148,7 @@ class DecomposeGoalToCanvasTests(unittest.TestCase):
             "nodes": [
                 {"id": "root", "role": "plan", "prose": "Anchor.", "depends_on": []},
                 {"id": "Step 1!", "role": "research", "prose": "First.", "depends_on": ["root"]},
-                {"id": "Step 1?", "role": "implementation", "prose": "Second.", "depends_on": ["Step 1!"]},
+                {"id": "Step 1?", "role": "implementation", "directives": {"project": "demo_project"}, "prose": "Second.", "depends_on": ["Step 1!"]},
             ],
         }
         with tempfile.TemporaryDirectory() as tmp:
@@ -2143,7 +2178,7 @@ class DecomposeGoalToCanvasTests(unittest.TestCase):
             self.assertTrue(Path(result["canvas_path"]).name, "custom_name.canvas")
 
 
-class DecomposeBranchAndNoteTests(unittest.TestCase):
+class DecomposeBranchAndNoteTests(_DecomposeRegistryIsolated):
     """WS4c: a multi-branch decomposition round-trips through
     decompose_goal_to_canvas -- branch mirrored to a top-level key, note
     nodes excluded only at compile time (still present in the canvas)."""
@@ -2223,7 +2258,7 @@ class DecomposeBranchAndNoteTests(unittest.TestCase):
             self.assertNotEqual(a_x, b_x)
 
 
-class DecomposeDeliverablesTests(unittest.TestCase):
+class DecomposeDeliverablesTests(_DecomposeRegistryIsolated):
     """WS4d: deliverables round-trip through decompose_goal_to_canvas into
     real acceptance_criteria, and are surfaced to the critique pass."""
 
@@ -2233,7 +2268,7 @@ class DecomposeDeliverablesTests(unittest.TestCase):
                 {"id": "root", "role": "plan", "prose": "Ship the report script.", "depends_on": []},
                 {
                     "id": "build_script",
-                    "role": "implementation",
+                    "role": "implementation", "directives": {"project": "demo_project"},
                     "prose": "Write the report-generating script.",
                     "depends_on": ["root"],
                     "deliverables": ["A script exists at scripts/report.py.", "Running it prints a summary table."],
@@ -2308,7 +2343,7 @@ class DecomposeDeliverablesTests(unittest.TestCase):
                 {"id": "root", "role": "plan", "prose": "Ship it.", "depends_on": []},
                 {
                     "id": "build",
-                    "role": "implementation",
+                    "role": "implementation", "directives": {"project": "demo_project"},
                     "prose": "Build it.",
                     "depends_on": ["root"],
                     "deliverables": "config loaded into memory as Python dict.",

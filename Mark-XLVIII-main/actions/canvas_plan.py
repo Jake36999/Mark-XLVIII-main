@@ -706,6 +706,41 @@ def _validate_decomposition(payload: dict[str, Any]) -> list[str]:
     return problems
 
 
+def _infer_project_hint(goal: str) -> str:
+    """Which registered project a goal is about, when that is unambiguous.
+
+    `project_hint` was a caller-supplied parameter with **no callers**, so the
+    pin below it never fired on any live path. The result: every decomposition
+    containing an implementation node produced a canvas that `compile_canvas`
+    then refused, because the node had no project target. Inferring here means
+    every caller benefits rather than each having to remember.
+
+    Deliberately returns "" when two projects match. Guessing which repository a
+    plan will write to is exactly the decision `compile_canvas` refuses to make
+    on the user's behalf, and it should refuse here too.
+    """
+    try:
+        from actions.project_operator import load_registry
+
+        projects = (load_registry().get("projects") or {})
+    except Exception:
+        return ""
+
+    lowered = f" {goal.lower()} "
+    matched = set()
+    for project_id, meta in projects.items():
+        candidates = {
+            str(project_id).lower(),
+            str(project_id).replace("_", " ").lower(),
+            str(meta.get("display_name") or "").lower(),
+        }
+        for candidate in candidates:
+            if candidate and candidate in lowered:
+                matched.add(project_id)
+                break
+    return next(iter(matched)) if len(matched) == 1 else ""
+
+
 def decompose_goal_to_canvas(
     goal: str,
     *,
@@ -750,6 +785,12 @@ def decompose_goal_to_canvas(
     goal = str(goal or "").strip()
     if not goal:
         return {"ok": False, "error": "A goal is required."}
+
+    # Default the hint rather than requiring every caller to supply it. Nothing
+    # ever did, so the pin below never fired and every decomposition with an
+    # implementation node produced a canvas compile_canvas would refuse.
+    if not project_hint.strip():
+        project_hint = _infer_project_hint(goal)
 
     base_prompt = f"Goal: {goal}"
     if project_hint:
@@ -879,6 +920,25 @@ def decompose_goal_to_canvas(
     # the given prefix, so a sentinel no real id matches would pin everything
     # and silently leave every node at its (0, 0) placeholder.
     laid_out, _metrics = layout_document(payload_canvas, profile="dependency", managed_prefix="")
+
+    # Compile before writing. The docstring above promises that nothing is
+    # written and `ok` is False on a structurally invalid decomposition -- and a
+    # canvas `compile_canvas` refuses is structurally invalid, whatever else is
+    # right about it.
+    #
+    # Without this, decompose reported ok:True for a canvas that `propose` would
+    # then reject, so the caller got a canvas path, no approval note, and no
+    # obvious connection between the two. Found by running the loop end to end
+    # on 2026-07-30: every goal containing an implementation step failed here.
+    try:
+        compile_canvas(dict(laid_out), workflow_id="decomposition_precheck", name="Decomposition Precheck")
+    except CanvasCompileError as exc:
+        return {
+            "ok": False,
+            "error": f"The decomposition does not compile into a runnable plan: {exc}",
+            "goal": goal,
+            "attempts": attempt,
+        }
 
     resolved = canvas_actions.resolve_config(cfg)
     slug_base = re.sub(r"[^a-z0-9]+", "_", goal[:40].lower()).strip("_") or "goal"
