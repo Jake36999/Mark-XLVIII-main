@@ -74,7 +74,7 @@ from actions.model_lifecycle   import (
 from actions.web_search        import web_search as web_search_action
 from actions.computer_control  import computer_control
 from actions.game_updater      import game_updater
-from actions.system_monitor    import get_system_status
+from actions.system_monitor    import SystemMonitor, get_system_status
 from core.runtime_config import load_runtime_config, migrate_legacy_config
 from core.evidence import evidence_block
 from core.process_events import (
@@ -1815,13 +1815,12 @@ class JarvisLive:
         self.ui.on_interrupt      = self.interrupt
         self.ui.on_mute_changed   = self._on_mute_changed
         self._dashboard     = None
-        # NOTE: SystemMonitor (threshold alerts) and ProactiveEngine (idle
-        # check-ins) are NOT instantiated here any more. Their only callers were
-        # Gemini Live background tasks, so both features have been inert for the
-        # whole local-first era. The engines themselves are untouched in
-        # actions/system_monitor.py and actions/proactive.py -- each produces a
-        # prompt string, so rewiring either to router mode is a small job. Left
-        # unwired rather than kept as a dead attribute, so the gap is visible.
+        self._sys_monitor   = SystemMonitor()   # persistent cooldown state
+        # ProactiveEngine (unprompted idle check-ins) was retired on 2026-07-30
+        # rather than rewired. It handed the time plus stored memory to a model
+        # and let it decide whether to speak; on a host holding one task model at
+        # a time that evicts whatever is warm to start a conversation nobody
+        # asked for. Recoverable from git history if it is ever wanted.
         self._last_user_speech = time.monotonic()  # updated on every user utterance
         self._local_tts        = None
         self._local_tts_lock   = threading.Lock()
@@ -3660,8 +3659,41 @@ class JarvisLive:
         if self._dashboard:
             await self._dashboard.broadcast({"type": "status", "state": "active"})
         asyncio.create_task(self._listen_router_stt())
+        asyncio.create_task(self._run_system_monitor())
         while True:
             await asyncio.sleep(3600)
+
+    async def _run_system_monitor(self) -> None:
+        """Speak a warning when CPU, RAM, temperature or GPU crosses a threshold.
+
+        Inert since Gemini Live was switched off -- it was only ever started as a
+        Live background task, and it handed the alert to the model to phrase.
+
+        No model call now. `SystemMonitor.check()` returns a finished sentence,
+        and paraphrasing "memory is at 95%" would cost a model load, add latency
+        and give the number a chance to come back wrong. On a host that holds one
+        task model at a time it would also evict whatever is warm.
+
+        Stays quiet while JARVIS is speaking or busy: an alert is never urgent
+        enough to talk over an answer the user actually asked for.
+        `SystemMonitor` holds a 300-second per-metric cooldown of its own, so a
+        sustained condition warns once rather than every fifteen seconds.
+        """
+        while True:
+            await asyncio.sleep(15)
+            try:
+                if self.ui.muted or self._assistant_busy_for_filler():
+                    continue
+                with self._speaking_lock:
+                    if self._is_speaking:
+                        continue
+                alert = await asyncio.to_thread(self._sys_monitor.check)
+                if alert:
+                    self.ui.write_log(f"SYS: {alert}")
+                    self.speak(alert)
+            except Exception as exc:
+                # A monitor must never be able to take the assistant down.
+                print(f"[Monitor] check failed: {exc}")
 
     # ── main loop ───────────────────────────────────────────────────────────
 

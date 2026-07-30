@@ -175,7 +175,11 @@ No amount of plumbing improves this. It bounds what the product can be, and road
 New work this cycle surfaced, not yet done:
 
 5. ~~**Audit the Gemini *generative* surface.**~~ **Done** — full findings in section 6 below.
-6. **Rewire or retire `SystemMonitor` and `ProactiveEngine`.** Both were started only as Live background tasks and have been inert since. Each produces a prompt string, so wiring either to router mode is small.
+6. ~~**Rewire or retire `SystemMonitor` and `ProactiveEngine`.**~~ **Done** — decided separately rather than as one change.
+
+   **`SystemMonitor` rewired, with no model call.** `check()` used to return a *prompt* (`[SYSTEM_ALERT] RAM is at 95%. Warn the user in their language...`) because a model was going to phrase it. It now returns the sentence the user hears, and `_run_system_monitor` speaks it directly. Paraphrasing "memory is at 95%" through a model would cost a load, add latency, give the number a chance to come back wrong, and evict whatever is warm — for a fact the machine already had. The loop stays quiet while muted, speaking, or busy, and a failing check can never take the assistant down.
+
+   **`ProactiveEngine` retired.** It handed the time plus stored memory to a model after 15 minutes of silence and let it decide whether to speak unprompted. On a host holding one task model at a time that evicts the warm model to start a conversation nobody asked for — directly against the model-economics work this cycle was built on. `actions/proactive.py` is deleted and recoverable from git history. Owner decision, taken explicitly rather than assumed.
 
 ## 5. Caveat on the numbers
 

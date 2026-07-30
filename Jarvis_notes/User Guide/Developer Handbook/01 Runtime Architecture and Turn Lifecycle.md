@@ -39,8 +39,12 @@ schema_version: "jarvis_developer_handbook/v1"
 >
 > `test_no_gemini_live_session_path_remains` now fails the suite if `self.session`, `genai.Client`, `live.connect`, or `send_client_content` reappears in `main.py`.
 
-> [!warning] Two features were removed with it and are not wired to router mode
-> `SystemMonitor` threshold alerts and `ProactiveEngine` idle check-ins were started only as Gemini Live background tasks, so both have been inert since Live was switched off. The engines themselves are untouched in `actions/system_monitor.py` and `actions/proactive.py`; each produces a prompt string, so rewiring either to router mode is small. They are left **unwired rather than kept as dead attributes**, so the gap stays visible.
+> [!success] The two features that went inert with Live were resolved on 2026-07-30
+> Both were started only as Gemini Live background tasks. They were decided separately rather than as one change.
+>
+> **`SystemMonitor` is wired to router mode, and makes no model call.** `check()` returned a prompt (`[SYSTEM_ALERT] ... Warn the user in their language`) because a model was going to phrase it; it now returns the sentence the user hears, and `_run_system_monitor` speaks it directly. Paraphrasing a number the machine already has would cost a model load, add latency, risk the number coming back wrong, and evict whatever is warm. It stays quiet while muted, speaking, or busy — an alert is never urgent enough to talk over an answer the user asked for — and `SystemMonitor` keeps a 300-second per-metric cooldown so a sustained condition warns once.
+>
+> **`ProactiveEngine` was retired, not rewired.** It handed the time plus stored memory to a model after 15 minutes of silence and let it decide whether to speak unprompted; on a one-task-model host that evicts the warm model to start a conversation nobody asked for. `actions/proactive.py` is deleted and recoverable from git history.
 
 ## One Conversational Turn
 

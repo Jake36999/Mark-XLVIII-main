@@ -152,11 +152,27 @@ class SystemMonitor:
         self._last_alert[key] = time.monotonic()
 
     def check(self) -> str | None:
+        """One spoken sentence when a threshold is breached, else None.
+
+        This used to return a *prompt* -- "[SYSTEM_ALERT] RAM is at 95%. Warn
+        the user in their language and suggest freeing memory." -- because the
+        only consumer fed it to Gemini and let the model phrase the warning.
+
+        There is no model in this path any more, and there should not be. The
+        alert is already a complete fact; handing "RAM is at 95%" to a language
+        model to be rephrased costs a model load, adds latency, and introduces a
+        chance of the number coming back wrong. On a host that holds one task
+        model at a time it would also evict whatever is warm in order to say
+        something the machine already knew.
+
+        So `check()` now returns text meant for the user, and the caller speaks
+        it directly.
+        """
         try:
-            cpu  = psutil.cpu_percent(interval=None)
-            ram  = psutil.virtual_memory().percent
+            cpu = psutil.cpu_percent(interval=None)
+            ram = psutil.virtual_memory().percent
             temp = _get_cpu_temp()
-            gpu  = _get_gpu_usage()
+            gpu = _get_gpu_usage()
         except Exception:
             return None
 
@@ -166,9 +182,8 @@ class SystemMonitor:
             self._cpu_streak += 1
             if self._cpu_streak >= _CPU_STREAK and self._can_alert("cpu"):
                 alerts.append(
-                    f"[SYSTEM_ALERT] CPU usage has been critically high ({cpu:.0f}%) "
-                    "for several seconds. Warn the user in their language and suggest "
-                    "closing heavy applications."
+                    f"CPU usage has been at {cpu:.0f}% for a while, sir. "
+                    "You may want to close something heavy."
                 )
                 self._record("cpu")
                 self._cpu_streak = 0
@@ -177,24 +192,19 @@ class SystemMonitor:
 
         if ram >= self.thresholds["ram"] and self._can_alert("ram"):
             alerts.append(
-                f"[SYSTEM_ALERT] RAM is at {ram:.0f}% — nearly exhausted. "
-                "Warn the user in their language and suggest freeing memory."
+                f"Memory is at {ram:.0f}%, sir. It is close to exhausted."
             )
             self._record("ram")
 
         if temp > 0 and temp >= self.thresholds["temp"] and self._can_alert("temp"):
             alerts.append(
-                f"[SYSTEM_ALERT] CPU temperature is {temp:.0f}°C — above the safe limit. "
-                "Warn the user in their language and advise reducing system load "
-                "or checking cooling."
+                f"CPU temperature is {temp:.0f} degrees, sir, above the safe limit. "
+                "Worth easing off the load or checking cooling."
             )
             self._record("temp")
 
         if gpu >= 0 and gpu >= self.thresholds["gpu"] and self._can_alert("gpu"):
-            alerts.append(
-                f"[SYSTEM_ALERT] GPU load is at {gpu:.0f}%. "
-                "Briefly inform the user in their language."
-            )
+            alerts.append(f"GPU load is at {gpu:.0f}%, sir.")
             self._record("gpu")
 
         return " ".join(alerts) if alerts else None
