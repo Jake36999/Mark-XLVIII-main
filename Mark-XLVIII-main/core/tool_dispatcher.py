@@ -22,6 +22,16 @@ class DispatchContext:
     run_id: str = ""
     action_id: str = ""
     user_confirmed: bool = False
+    # Cooperative cancellation. `Future.cancel()` cannot stop a call that has
+    # already started, so a client asking to cancel a running model call, file
+    # walk, or OpenClaw delegation was told "cancelled" while the work carried
+    # on. Long-running tools should poll `cancelled` at checkpoints and stop.
+    # None means "cancellation is not offered on this path".
+    cancel_event: threading.Event | None = None
+
+    @property
+    def cancelled(self) -> bool:
+        return bool(self.cancel_event is not None and self.cancel_event.is_set())
 
 
 READ_ONLY_TOOLS = {

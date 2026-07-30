@@ -37,6 +37,7 @@ class TaskRecord:
     result: dict[str, Any] | None = None
     error: str = ""
     lock: threading.RLock = field(default_factory=threading.RLock)
+    cancel_event: threading.Event = field(default_factory=threading.Event)
 
 
 class MCPTaskStore:
@@ -45,10 +46,12 @@ class MCPTaskStore:
         self._tasks: dict[str, TaskRecord] = {}
         self._lock = threading.RLock()
 
-    def submit(self, function, *args, **kwargs) -> TaskRecord:
+    def submit(self, function, *args, cancel_event: threading.Event | None = None, **kwargs) -> TaskRecord:
         task_id = uuid.uuid4().hex
         future = self._executor.submit(function, *args, **kwargs)
         record = TaskRecord(task_id=task_id, future=future)
+        if cancel_event is not None:
+            record.cancel_event = cancel_event
         with self._lock:
             self._tasks[task_id] = record
 
@@ -71,15 +74,42 @@ class MCPTaskStore:
         with self._lock:
             return self._tasks.get(task_id)
 
-    def cancel(self, task_id: str) -> bool:
+    def cancel(self, task_id: str) -> dict[str, Any]:
+        """Ask a task to stop, and report honestly whether it did.
+
+        `Future.cancel()` only succeeds while a task is still queued. Once the
+        call is running it returns False and nothing stops -- so reporting a bare
+        boolean let a client believe a model call, file walk, or OpenClaw
+        delegation had been cancelled while it kept going.
+
+        Three distinct outcomes now:
+          unknown              -- no such task
+          cancelled            -- it never started; it will not run
+          cancellation_requested -- already running; the cooperative flag is
+                                    set and it stops at its next checkpoint,
+                                    which some tools do not have yet
+        """
         record = self.get(task_id)
         if record is None:
-            return False
-        cancelled = record.future.cancel()
-        if cancelled:
-            with record.lock:
+            return {"taskId": task_id, "cancelled": False, "status": "unknown"}
+
+        record.cancel_event.set()
+        stopped = record.future.cancel()
+        with record.lock:
+            if stopped:
                 record.status = "cancelled"
-        return cancelled
+                status = "cancelled"
+            elif record.status in {"completed", "failed", "cancelled"}:
+                status = record.status
+            else:
+                record.status = "cancellation_requested"
+                status = "cancellation_requested"
+        return {
+            "taskId": task_id,
+            "cancelled": stopped,
+            "status": status,
+            "cooperative": not stopped and status == "cancellation_requested",
+        }
 
 
 class JarvisMCPServer:
@@ -113,14 +143,26 @@ class JarvisMCPServer:
             arguments = params.get("arguments") if isinstance(params.get("arguments"), dict) else {}
             meta = params.get("_meta") if isinstance(params.get("_meta"), dict) else {}
             jarvis_meta = meta.get("jarvis") if isinstance(meta.get("jarvis"), dict) else {}
+            if bool(meta.get("task")):
+                # Backgrounded work gets a cancellation token so `tasks/cancel`
+                # can ask a running call to stop rather than only reporting that
+                # it could not be un-queued.
+                cancel_event = threading.Event()
+                context = DispatchContext(
+                    source="mcp",
+                    run_id=str(jarvis_meta.get("run_id") or ""),
+                    action_id=str(jarvis_meta.get("action_id") or ""),
+                    cancel_event=cancel_event,
+                )
+                record = self.tasks.submit(
+                    self.dispatcher.call, name, arguments, context=context, cancel_event=cancel_event
+                )
+                return {"task": {"taskId": record.task_id, "status": record.status, "pollInterval": 500}}
             context = DispatchContext(
                 source="mcp",
                 run_id=str(jarvis_meta.get("run_id") or ""),
                 action_id=str(jarvis_meta.get("action_id") or ""),
             )
-            if bool(meta.get("task")):
-                record = self.tasks.submit(self.dispatcher.call, name, arguments, context=context)
-                return {"task": {"taskId": record.task_id, "status": record.status, "pollInterval": 500}}
             return _tool_result(self.dispatcher.call(name, arguments, context=context))
         if method == "tasks/get":
             record = self.tasks.get(str(params.get("taskId") or ""))
@@ -137,8 +179,7 @@ class JarvisMCPServer:
                 return _tool_result({"ok": False, "error": {"code": "task_failed", "message": record.error}})
             return {"task": {"taskId": record.task_id, "status": record.status, "pollInterval": 500}}
         if method == "tasks/cancel":
-            task_id = str(params.get("taskId") or "")
-            return {"taskId": task_id, "cancelled": self.tasks.cancel(task_id)}
+            return self.tasks.cancel(str(params.get("taskId") or ""))
         if method.startswith(("cards/", "manifests/", "schemas/", "workflows/", "capabilities/")):
             return self._capability_method(method, params)
         raise KeyError(f"Unsupported method: {method}")

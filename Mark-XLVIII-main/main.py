@@ -153,6 +153,34 @@ def _tool_summary_evidence_limit(user_text: str) -> int:
         return fallback
 
 
+_AUTHORIZATION_UNKNOWN = object()
+
+# Why a tool call is allowed to run, and what each basis permits.
+#
+# `None` means "no tool restriction" -- those bases authorize one specific call
+# that was individually checked, so the tool identity is already accounted for.
+# A frozenset restricts the basis to named tools, which is what stops a future
+# deterministic shortcut from quietly reaching something high-risk.
+_TOOL_AUTHORIZATION_BASES: dict[str, frozenset[str] | None] = {
+    # classify_effect ran on this exact call and did not require approval.
+    "effect_classified": None,
+    # The user answered a confirmation prompt for this exact call, and it
+    # re-runs with the arguments they were shown.
+    "user_confirmed": None,
+    # A literal phrase the user typed matched a hard route, so the action is
+    # the user's own explicit request rather than free model choice. Restricted
+    # to the tools those handlers actually need.
+    "deterministic_workflow": frozenset(
+        {
+            "plan_workflow",
+            "capability_registry",
+            "jarvis_memory",
+            "web_search",
+            "project_operator",
+        }
+    ),
+}
+
 # Tools whose return value is already prose written for the user. Whitelisted
 # by TOOL NAME, never by inspecting the result -- letting content decide how it
 # gets presented is exactly how tool output would steer its own handling.
@@ -2132,6 +2160,7 @@ class JarvisLive:
                 "agent_count": 1,
                 "max_packets": 8,
             },
+            authorized_by="deterministic_workflow",
         )
         try:
             payload = json.loads(result)
@@ -2176,6 +2205,7 @@ class JarvisLive:
                 "path": "latest",
                 "revision": revision,
             },
+            authorized_by="deterministic_workflow",
         )
         try:
             payload = json.loads(result)
@@ -2218,7 +2248,7 @@ class JarvisLive:
             turn_id=turn_id or "",
             detail={"arguments": arguments},
         )
-        result = self._execute_router_tool_call(pending["call_id"], tool_name, arguments)
+        result = self._execute_router_tool_call(pending["call_id"], tool_name, arguments, authorized_by="user_confirmed")
         receipt = _tool_receipt(tool_name, arguments, result)
         emit_process_event(
             category="tool",
@@ -2278,6 +2308,7 @@ class JarvisLive:
                 "local_context_limit": 5,
                 "max_web_results": 5,
             },
+            authorized_by="deterministic_workflow",
         )
         try:
             payload = json.loads(result)
@@ -2309,6 +2340,7 @@ class JarvisLive:
             "learn_topic_plan",
             "capability_registry",
             {"operation": "plan", "query": text, "limit": 3},
+            authorized_by="deterministic_workflow",
         )
 
         search_args = {
@@ -2319,7 +2351,7 @@ class JarvisLive:
             "output_format": "json",
         }
         self.ui.write_log("TOOL: web_search")
-        search_result = self._execute_router_tool_call("learn_topic_search", "web_search", search_args)
+        search_result = self._execute_router_tool_call("learn_topic_search", "web_search", search_args, authorized_by="deterministic_workflow")
         try:
             search_payload = json.loads(search_result)
         except Exception:
@@ -2348,7 +2380,7 @@ class JarvisLive:
             "tags": ["learning", "rag"],
         }
         self.ui.write_log("TOOL: jarvis_memory")
-        learn_result = self._execute_router_tool_call("learn_topic_memory", "jarvis_memory", learn_args)
+        learn_result = self._execute_router_tool_call("learn_topic_memory", "jarvis_memory", learn_args, authorized_by="deterministic_workflow")
         try:
             learn_payload = json.loads(learn_result)
         except Exception:
@@ -2387,7 +2419,7 @@ class JarvisLive:
             "max_batches": 4,
         }
         self.ui.write_log("TOOL: project_operator (read-only project learning)")
-        result = self._execute_router_tool_call("learn_project", "project_operator", args)
+        result = self._execute_router_tool_call("learn_project", "project_operator", args, authorized_by="deterministic_workflow")
         try:
             payload = json.loads(result)
         except Exception:
@@ -2503,7 +2535,7 @@ class JarvisLive:
         if not _is_capability_overview_prompt(text):
             return None
         self.ui.write_log("TOOL: capability_registry")
-        raw = self._execute_router_tool_call("capability_overview", "capability_registry", {"operation": "list"})
+        raw = self._execute_router_tool_call("capability_overview", "capability_registry", {"operation": "list"}, authorized_by="deterministic_workflow")
         try:
             payload = json.loads(raw)
         except Exception:
@@ -2544,6 +2576,7 @@ class JarvisLive:
                 "tags": ["template", "todo", "tasks", "obsidian"],
                 "reindex": True,
             },
+            authorized_by="deterministic_workflow",
         )
         try:
             payload = json.loads(result)
@@ -2574,6 +2607,7 @@ class JarvisLive:
             "workflow_plan",
             "capability_registry",
             {"operation": "plan", "query": text, "limit": 3},
+            authorized_by="deterministic_workflow",
         )
 
         search_args = {
@@ -2586,7 +2620,7 @@ class JarvisLive:
             "output_format": "json",
         }
         self.ui.write_log("TOOL: web_search")
-        search_result = self._execute_router_tool_call("current_news_search", "web_search", search_args)
+        search_result = self._execute_router_tool_call("current_news_search", "web_search", search_args, authorized_by="deterministic_workflow")
         try:
             search_payload = json.loads(search_result)
         except Exception:
@@ -2616,7 +2650,7 @@ class JarvisLive:
             "tags": tags,
         }
         self.ui.write_log("TOOL: jarvis_memory")
-        report_result = self._execute_router_tool_call("current_news_report", "jarvis_memory", report_args)
+        report_result = self._execute_router_tool_call("current_news_report", "jarvis_memory", report_args, authorized_by="deterministic_workflow")
         try:
             report_payload = json.loads(report_result)
         except Exception:
@@ -2759,7 +2793,7 @@ class JarvisLive:
                                 turn_id=turn_id or "",
                                 detail={"arguments": call_arguments},
                             )
-                            result = self._execute_router_tool_call(call.id, call.name, call_arguments)
+                            result = self._execute_router_tool_call(call.id, call.name, call_arguments, authorized_by="effect_classified")
                             receipt = _tool_receipt(call.name, call_arguments, result)
                             tool_receipts.append(receipt)
                             emit_process_event(
@@ -2868,17 +2902,68 @@ class JarvisLive:
             finally:
                 self._schedule_listening_check(0.1)
 
-    def _execute_router_tool_call(self, call_id: str, name: str, args: dict) -> str:
-        # Every caller of this helper has already been authorized by
-        # construction: the gated routed.tool_calls loop only reaches it for
-        # calls classify_effect already cleared, _handle_pending_tool_confirmation
-        # only reaches it after a real user confirmation, and the ~11
-        # deterministic workflow bootstraps (_handle_start_plan_workflow,
-        # _handle_todo_template_workflow, etc.) call it for a specific action
-        # a matched literal phrase already authorized, not free model choice.
-        # pre_approved=True here reflects that; the fail-closed check in
-        # _execute_tool exists for callers that DON'T go through this helper
-        # (currently only the dormant Gemini Live _receive_audio path).
+    def _execute_router_tool_call(
+        self,
+        call_id: str,
+        name: str,
+        args: dict,
+        *,
+        authorized_by: str,
+    ) -> str:
+        """Run a tool whose authorization has already been established.
+
+        `authorized_by` must name *which* basis applies -- see
+        `_TOOL_AUTHORIZATION_BASES`. This used to be an unconditional
+        `pre_approved=True` on the helper itself, which was true of every caller
+        at the time but made the authorization implicit: a future call site added
+        here would silently inherit a bypass of the strongest guard. That is the
+        same shape as the defect that started this work, where a confirmation
+        gate protected one execution path and not another.
+
+        Naming the basis also gives the process trace a record of *why* each
+        effectful call was permitted, and lets a per-basis allowlist stop a new
+        deterministic shortcut from reaching a high-risk tool.
+        """
+        allowed_tools = _TOOL_AUTHORIZATION_BASES.get(authorized_by, _AUTHORIZATION_UNKNOWN)
+        if allowed_tools is _AUTHORIZATION_UNKNOWN:
+            emit_process_event(
+                category="approval",
+                source=name,
+                summary=f"Refused {name}: unknown authorization basis {authorized_by!r}.",
+                state="blocked",
+                severity="error",
+            )
+            return json.dumps(
+                {"ok": False, "error": f"Unknown tool authorization basis {authorized_by!r}."}
+            )
+        if allowed_tools is not None and name not in allowed_tools:
+            # Teeth for the allowlist: a deterministic shortcut is authorized by
+            # a matched literal phrase, which justifies the specific tools those
+            # handlers use -- not an arbitrary one added later.
+            emit_process_event(
+                category="approval",
+                source=name,
+                summary=f"Refused {name}: not permitted under {authorized_by}.",
+                state="blocked",
+                severity="error",
+                detail={"authorized_by": authorized_by, "permitted": sorted(allowed_tools)},
+            )
+            return json.dumps(
+                {
+                    "ok": False,
+                    "error": (
+                        f"{name} is not permitted under '{authorized_by}' authorization. "
+                        f"Route it through the confirmation gate instead."
+                    ),
+                }
+            )
+        emit_process_event(
+            category="approval",
+            source=name,
+            summary=f"{name} authorized via {authorized_by}.",
+            state="user_approved" if authorized_by == "user_confirmed" else "authorized",
+            detail={"authorized_by": authorized_by},
+        )
         fc = _RouterFunctionCall(call_id, name, args)
         response = asyncio.run(self._execute_tool(fc, pre_approved=True))
         payload = getattr(response, "response", {}) or {}

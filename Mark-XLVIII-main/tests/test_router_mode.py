@@ -347,6 +347,9 @@ class RouterToolCallingTests(unittest.TestCase):
             "call_1",
             "project_operator",
             {"operation": "list"},
+            # A model-selected call is authorized by classify_effect having
+            # cleared it, and must say so -- see _TOOL_AUTHORIZATION_BASES.
+            authorized_by="effect_classified",
         )
         jarvis.ui.write_log.assert_any_call("TOOL: project_operator")
         jarvis.ui.write_log.assert_any_call("JARVIS: I found the registered projects.")
@@ -398,7 +401,7 @@ class RouterToolCallingTests(unittest.TestCase):
         jarvis.ui = mock.Mock()
         calls = []
 
-        def fake_execute(call_id, name, args):
+        def fake_execute(call_id, name, args, *, authorized_by=""):
             calls.append((name, args))
             if name == "capability_registry":
                 return json.dumps({"ok": True, "workflow_id": "current_news_report"})
@@ -455,7 +458,7 @@ class RouterToolCallingTests(unittest.TestCase):
         jarvis.ui = mock.Mock()
         calls = []
 
-        def fake_execute(call_id, name, args):
+        def fake_execute(call_id, name, args, *, authorized_by=""):
             calls.append((name, args))
             if name == "capability_registry":
                 return json.dumps({"ok": True, "workflow_id": "learn_topic_memory"})

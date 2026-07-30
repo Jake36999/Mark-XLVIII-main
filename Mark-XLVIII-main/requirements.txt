@@ -39,3 +39,4 @@ pycaw; sys_platform == "win32"
 win10toast; sys_platform == "win32"
 pywinauto; sys_platform == "win32"
 qrcode[pil]
+pytest-xdist

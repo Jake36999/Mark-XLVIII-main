@@ -140,7 +140,10 @@ class DeterministicBootstrapUnaffectedTests(unittest.TestCase):
         jarvis = _new_jarvis()
         with mock.patch("main.jarvis_memory", return_value='{"ok": true}') as fake_jarvis_memory:
             result = jarvis._execute_router_tool_call(
-                "c1", "jarvis_memory", {"operation": "create_todo_template"}
+                "c1",
+                "jarvis_memory",
+                {"operation": "create_todo_template"},
+                authorized_by="deterministic_workflow",
             )
         fake_jarvis_memory.assert_called_once()
         self.assertIn("ok", result)
@@ -148,7 +151,9 @@ class DeterministicBootstrapUnaffectedTests(unittest.TestCase):
     def test_plan_workflow_start_plan_executes_directly(self):
         jarvis = _new_jarvis()
         with mock.patch("main.plan_workflow", return_value='{"ok": true}') as fake_plan_workflow:
-            result = jarvis._execute_router_tool_call("c1", "plan_workflow", {"operation": "start_plan"})
+            result = jarvis._execute_router_tool_call(
+                "c1", "plan_workflow", {"operation": "start_plan"}, authorized_by="deterministic_workflow"
+            )
         fake_plan_workflow.assert_called_once()
         self.assertIn("ok", result)
 
