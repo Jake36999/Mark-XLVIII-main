@@ -4,7 +4,7 @@ title: "Models, Credentials, Speech, and Resource Lifecycle"
 type: "guide"
 status: "active"
 created: "2026-07-22"
-updated: "2026-07-29T21:53:32Z"
+updated: "2026-07-30T01:49:08Z"
 project_id: "jarvis_notes"
 source: "codex"
 tags: ["developer-handbook", "models", "lmstudio", "credentials", "speech", "tier/short-term"]
@@ -13,7 +13,7 @@ index_state: "indexed_local"
 remember_note_id: ""
 rag_index: true
 confidence: 0.97
-content_hash: "b184e174676d40036dc3550869114a4211d7e6ab550b020532b02694fb023295"
+content_hash: "9fdc3242050b62103b9c2b44dbbc2fa944b34cf9ab14ffac5afc88653d1ba91a"
 lifecycle: "short_term"
 project_key: "mark_xlviii"
 schema_version: "jarvis_developer_handbook/v1"
@@ -119,12 +119,17 @@ Current endpoints:
 - OpenAI-compatible inference: `http://localhost:1234/v1`.
 - Native model management: `http://localhost:1234/api/v1`.
 
-Baseline models are kept warm:
+Exactly one baseline model is kept warm: **`qwen/qwen3-4b-2507`**. `config/runtime.json`'s `baseline_models` is authoritative, and the lifecycle resolver now agrees with it.
 
-- `qwen/qwen3-4b-2507`;
-- `orpeus_text_to_speech`.
+> [!danger] This note previously listed `orpeus_text_to_speech` as a second baseline. That was wrong (corrected 2026-07-30)
+> The documentation matched a **bug**, not the intended policy. `model_lifecycle._resolved_config()` was appending `tts_model` and, for the Orpheus engine, `orpeus_text_to_speech` into the effective baseline list — silently overriding `baseline_models` and contradicting a decision recorded on 2026-07-24 and pinned by `tests/test_speech_runtime.py::test_runtime_config_gates_filler_on_user_idle`: three always-resident models held RAM at roughly 70% stationary, so speech should load on demand and idle out like any other task model.
+>
+> The promotion also made that TTL unreachable for speech, since baseline models are never unloaded — so the intended behaviour could not happen even in principle. The promotion is gone; `worker_model` is still tolerated if omitted from the list, because the always-warm worker is baseline by definition.
 
 Task models receive a 300-second TTL. Only one non-baseline task model is allowed to remain loaded. An idle cleanup loop runs every 300 seconds and never unloads a protected active request or baseline model.
+
+> [!important] `unload_non_baseline(keep=...)` protects the caller's own next call
+> With speech no longer baseline, the TTS path had a new hazard: it cleans up immediately *before* speaking, so it could unload the very voice it was about to load again. `core/tts.py` now names the configured voice in `keep`, which is honoured even under `force=True` — forcing a cleanup should not sabotage the caller's own next call. This is a narrower guarantee than permanent residency, which is the point.
 
 > [!warning] The TTL was configured but not enforced, and TTS thrashed against it
 > `core/tts.py` releases idle task models before **every spoken reply**, and its only guard was `active_snapshot()["active_count"]` — which is already zero by then, because the generation lease was released when the reply was composed. "Idle" and "used two seconds ago" were indistinguishable, so a specialist was evicted at the end of one turn and cold-loaded again on the next.

@@ -9,6 +9,7 @@ import time
 import uuid
 from contextlib import closing
 from pathlib import Path
+from collections.abc import Iterable
 from typing import Any, Callable
 
 import requests
@@ -206,12 +207,22 @@ def resolve_config(overrides: dict[str, Any] | None = None) -> dict[str, Any]:
         raw.update({key: value for key, value in overrides.items() if value is not None})
 
     baseline = _split_models(raw.get("baseline_models")) or list(DEFAULT_BASELINE_MODELS)
-    for key in ("worker_model", "tts_model"):
-        value = str(raw.get(key) or "").strip()
-        if value:
-            baseline.append(value)
-    if str(raw.get("tts_engine") or "").strip().lower() == "orpheus":
-        baseline.append("orpeus_text_to_speech")
+    # The always-warm worker is baseline by definition; configs list it too, so
+    # this is normally a no-op that just tolerates it being omitted.
+    worker_model = str(raw.get("worker_model") or "").strip()
+    if worker_model:
+        baseline.append(worker_model)
+    # Speech models are deliberately NOT promoted here. This used to append
+    # `tts_model` and, for the Orpheus engine, `orpeus_text_to_speech` -- which
+    # silently overrode `baseline_models` in runtime.json and contradicted a
+    # recorded decision (2026-07-24, pinned by
+    # tests/test_speech_runtime.py::test_runtime_config_gates_filler_on_user_idle):
+    # three always-resident models held RAM at roughly 70% stationary, so speech
+    # should load on demand and idle out through the normal task-model TTL.
+    # Promoting it also made that TTL unreachable, since baseline models are
+    # never unloaded. The TTS path protects the voice it is about to use through
+    # `unload_non_baseline(keep=...)` instead, which is a narrower guarantee than
+    # permanent residency.
 
     return {
         "native_url": _derive_native_url(raw),
@@ -1460,7 +1471,16 @@ def unload_non_baseline(
     post: Callable = requests.post,
     timeout: int = 15,
     force: bool = False,
+    keep: Iterable[str] | None = None,
 ) -> dict[str, Any]:
+    """Release non-baseline models.
+
+    `keep` names models the caller is about to use and must not lose. The TTS
+    path needs it: it runs this immediately before speaking, so without an
+    explicit exclusion it could unload the very voice it is about to load again.
+    `keep` is honoured even under `force=True` -- forcing a cleanup should not
+    mean sabotaging the caller's own next call.
+    """
     cfg = _resolved_config(cfg)
     active = active_snapshot(cfg)
     if active["active_count"] and not force:
@@ -1487,6 +1507,7 @@ def unload_non_baseline(
     # elapses. This delays eviction; it does not remove it. `force=True` (an
     # explicit "unload models" request) bypasses it entirely.
     recent = set() if force else recently_used_models(cfg)
+    protected = {_normalize_model_id(item) for item in (keep or []) if str(item).strip()}
 
     for item in listed["loaded"]:
         if item.get("baseline"):
@@ -1495,6 +1516,10 @@ def unload_non_baseline(
         instance_id = item.get("instance_id")
         if not instance_id:
             failed.append({"item": item, "error": "missing instance_id"})
+            continue
+        identifiers = {str(instance_id), str(item.get("model_key") or ""), str(item.get("display_name") or "")}
+        if protected and {_normalize_model_id(value) for value in identifiers if value} & protected:
+            kept.append(item)
             continue
         if recent and {str(instance_id), str(item.get("model_key") or "")} & recent:
             kept.append(item)

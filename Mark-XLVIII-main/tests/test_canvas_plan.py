@@ -9,7 +9,29 @@ from actions import jarvis_canvas as canvas
 from actions.dual_orchestrator import DIALECT, validate_workflow
 
 
-def _node(node_id: str, text: str, *, role: str = "", x: int = 0, y: int = 0) -> dict:
+_DEFAULT_TEST_PROJECT = "mark_platform"
+
+
+def _node(
+    node_id: str,
+    text: str,
+    *,
+    role: str = "",
+    x: int = 0,
+    y: int = 0,
+    project: str | None = _DEFAULT_TEST_PROJECT,
+) -> dict:
+    """Build a canvas node for tests.
+
+    Implementation nodes get a registered project target by default. Since
+    2026-07-30 `compile_canvas` blocks an implementation node with no target --
+    previously such a node compiled and then silently delegated nothing --
+    so fixtures that predate the blocker would otherwise all fail on a
+    condition they were never written to exercise. Pass `project=None` to
+    assert the blocker itself.
+    """
+    if role == "implementation" and project and "project:" not in text:
+        text = f"project: {project}\n{text}"
     node = {"id": node_id, "type": "text", "text": text, "x": x, "y": y, "width": 400, "height": 180}
     if role:
         node["jarvisRole"] = role
@@ -482,13 +504,20 @@ class CompileCanvasDirectiveWiringTests(unittest.TestCase):
         workflow = canvas_plan.compile_canvas(payload, workflow_id="intent_test")
         self.assertEqual(workflow["steps"][0]["inputs"]["intent"], "Write a hello world script.")
 
-    def test_implementation_without_project_directive_gets_no_project_id(self):
-        """Confirms the live-tested gap: no directive, no canvas-level default
-        -- inputs.project_id is simply absent, matching today's safe no-op
-        rather than guessing a target."""
-        payload = {"nodes": [_node("i", "role: implementation\nDo it.", role="implementation")], "edges": []}
-        workflow = canvas_plan.compile_canvas(payload, workflow_id="no_project")
-        self.assertNotIn("project_id", workflow["steps"][0]["inputs"])
+    def test_implementation_without_project_directive_is_blocked(self):
+        """This test previously asserted the opposite -- that `project_id` was
+        simply absent, described as a "safe no-op". It was not safe: the step
+        still dispatched, project_operator read the missing id as
+        `operation=list`, and the node reported ok:true having delegated
+        nothing. An approved plan could therefore look complete while doing no
+        work. Compiling now fails instead, before any approval exists."""
+        payload = {
+            "nodes": [_node("i", "role: implementation\nDo it.", role="implementation", project=None)],
+            "edges": [],
+        }
+        with self.assertRaises(canvas_plan.CanvasCompileError) as caught:
+            canvas_plan.compile_canvas(payload, workflow_id="no_project")
+        self.assertIn("no project target", str(caught.exception))
 
     def test_canvas_level_project_from_plan_root_is_inherited(self):
         payload = {
@@ -2232,8 +2261,13 @@ class DecomposeDeliverablesTests(unittest.TestCase):
     def test_deliverables_compile_into_real_acceptance_criteria(self):
         with tempfile.TemporaryDirectory() as tmp:
             cfg = _cfg(Path(tmp))
+            # project_hint is now load-bearing: decompose pins it onto the plan
+            # anchor so implementation nodes inherit a target, which
+            # compile_canvas requires since 2026-07-30.
             with mock.patch("core.model_router.call_text", return_value=json.dumps(self._payload_with_deliverables())):
-                result = canvas_plan.decompose_goal_to_canvas("Ship the report script", cfg=cfg)
+                result = canvas_plan.decompose_goal_to_canvas(
+                    "Ship the report script", cfg=cfg, project_hint="mark_platform"
+                )
 
             document = canvas.load_canvas(Path(result["canvas_path"]))
             workflow = canvas_plan.compile_canvas(document, workflow_id="deliverables_test")
@@ -2565,3 +2599,72 @@ class CritiqueAndProposePlanTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ImplementationProjectTargetTests(unittest.TestCase):
+    """An implementation node with no project target used to compile happily and
+    then do nothing: project_operator treats a missing project_id as
+    `operation=list` and returns the registered project list with ok:true, so an
+    approved plan reported success having delegated no work at all.
+
+    Blocking rather than defaulting is deliberate -- picking a project
+    automatically would silently authorise OpenClaw against a live repo the
+    moment a human approves. Failing at compile time surfaces the gap before any
+    approval exists.
+    """
+
+    def _payload(self, impl_text: str, plan_text: str = "role: plan\n\nShip the thing."):
+        return {
+            "nodes": [
+                _node("plan1", plan_text, role="plan"),
+                _node("impl1", impl_text, role="implementation", project=None),
+            ],
+            "edges": [_edge("e1", "plan1", "impl1")],
+        }
+
+    def test_node_level_project_compiles(self):
+        payload = self._payload("role: implementation\nproject: mark_platform\n\nDo the work.")
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="t")
+        blob = json.dumps(workflow)
+        self.assertIn("mark_platform", blob)
+
+    def test_canvas_level_project_is_inherited(self):
+        payload = self._payload(
+            "role: implementation\n\nDo the work.",
+            plan_text="role: plan\nproject: mark_platform\n\nShip the thing.",
+        )
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="t")
+        self.assertIn("mark_platform", json.dumps(workflow))
+
+    def test_no_project_anywhere_is_a_compile_blocker(self):
+        payload = self._payload("role: implementation\n\nDo the work.")
+        with self.assertRaises(canvas_plan.CanvasCompileError) as caught:
+            canvas_plan.compile_canvas(payload, workflow_id="t")
+        message = str(caught.exception)
+        self.assertIn("no project target", message)
+        self.assertIn("impl1", message)
+
+    def test_the_blocker_names_the_real_registered_projects(self):
+        """Acceptance criterion: the user must be able to resolve this in
+        Obsidian, which means the error has to say what to put in the
+        directive."""
+        payload = self._payload("role: implementation\n\nDo the work.")
+        with self.assertRaises(canvas_plan.CanvasCompileError) as caught:
+            canvas_plan.compile_canvas(payload, workflow_id="t")
+        self.assertIn("mark_platform", str(caught.exception))
+
+    def test_unregistered_project_still_blocks(self):
+        payload = self._payload("role: implementation\nproject: not_a_real_project\n\nDo the work.")
+        with self.assertRaises(canvas_plan.CanvasCompileError) as caught:
+            canvas_plan.compile_canvas(payload, workflow_id="t")
+        self.assertIn("not registered", str(caught.exception))
+
+    def test_non_implementation_roles_need_no_project(self):
+        payload = {
+            "nodes": [
+                _node("plan1", "role: plan\n\nShip it.", role="plan"),
+                _node("v1", "role: verification\n\nRun the tests.", role="verification"),
+            ],
+            "edges": [_edge("e1", "plan1", "v1")],
+        }
+        canvas_plan.compile_canvas(payload, workflow_id="t")

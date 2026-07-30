@@ -210,11 +210,16 @@ class OpenAICompatibleTtsTests(unittest.TestCase):
         ), mock.patch("core.tts._play_audio_bytes"):
             engine.speak("hello")
 
-        unload.assert_called_once_with(
-            engine.lifecycle_config,
-            timeout=10,
-            force=False,
-        )
+        # The voice is no longer a baseline model -- it loads on demand and idles
+        # out through the task-model TTL, per the 2026-07-24 RAM decision. So this
+        # cleanup, which runs immediately *before* speaking, must name the voice
+        # in `keep` or it can unload the very model it is about to use.
+        unload.assert_called_once()
+        args, kwargs = unload.call_args
+        self.assertEqual(args[0], engine.lifecycle_config)
+        self.assertEqual(kwargs["timeout"], 10)
+        self.assertFalse(kwargs["force"])
+        self.assertIn(engine.model, kwargs["keep"])
 
     def test_openai_compatible_engine_never_synthesizes_two_chunks_at_once(self):
         from core import tts

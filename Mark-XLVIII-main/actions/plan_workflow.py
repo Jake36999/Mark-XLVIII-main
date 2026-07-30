@@ -117,6 +117,77 @@ def _web_research(prompt: str, *, max_results: int, enabled: bool) -> dict[str, 
         return {"ok": False, "results": [], "message": f"Web research failed: {exc}"}
 
 
+def _research_state(
+    web_payload: dict[str, Any],
+    local_results: list[dict[str, Any]],
+    *,
+    internet: bool,
+) -> dict[str, Any]:
+    """Describe what evidence a plan was actually built from.
+
+    `research_state` used to be the literal string "complete" on every plan,
+    regardless of whether the web search returned anything, errored, or was
+    never attempted. A reader -- human or a downstream workflow deciding whether
+    the evidence is strong enough to act on -- had no way to tell a
+    well-sourced plan from an offline one. `web_source_count` was already being
+    recorded next to it, so the truth was available and simply unused.
+
+    | state       | meaning                                                     |
+    | ----------- | ----------------------------------------------------------- |
+    | complete    | web search ran and returned at least one usable source      |
+    | partial     | web ran but returned nothing usable, while local notes did  |
+    | local_only  | internet was disabled; local vault evidence was used        |
+    | offline     | internet was disabled and no local evidence was found       |
+    | failed      | the web backend errored, or produced nothing and no local   |
+    |             | evidence exists either                                      |
+    """
+    sources = list(web_payload.get("results") or [])
+    message = str(web_payload.get("message") or "").strip()
+    backend = str(web_payload.get("backend") or web_payload.get("provider") or "").strip()
+    searched = bool(web_payload.get("ok"))
+
+    if not internet:
+        state = "local_only" if local_results else "offline"
+    elif not searched:
+        state = "failed"
+    elif sources:
+        state = "complete"
+    elif local_results:
+        state = "partial"
+    else:
+        state = "failed"
+
+    return {
+        "research_state": state,
+        "web_source_count": len(sources),
+        "local_context_count": len(local_results),
+        # Only carry the message when it explains a shortfall; a successful
+        # search's chatter is not an error.
+        "web_error": "" if state in {"complete", "local_only"} else message,
+        "retrieval_backend": backend,
+    }
+
+
+_DEGRADED_RESEARCH_STATES = frozenset({"partial", "offline", "failed"})
+
+
+def _research_state_notice(evidence: dict[str, Any]) -> str:
+    """A visible line for the plan body when the evidence is not what a reader
+    would assume from a plan that merely exists."""
+    state = str(evidence.get("research_state") or "")
+    if state not in _DEGRADED_RESEARCH_STATES:
+        return ""
+    detail = str(evidence.get("web_error") or "").strip()
+    reason = f" Reason: {detail}" if detail else ""
+    return (
+        f"> [!warning] Degraded research evidence — `{state}`\n"
+        f"> This plan was built from {evidence.get('web_source_count', 0)} web source(s) and "
+        f"{evidence.get('local_context_count', 0)} local note(s)."
+        f"{reason}\n"
+        "> Treat its conclusions as provisional and re-run research before relying on them."
+    )
+
+
 def _local_context_text(results: list[dict[str, Any]]) -> str:
     if not results:
         return "- No relevant local vault notes were found."
@@ -1255,7 +1326,15 @@ def create_plan(
         return {"ok": False, "error": "A plan prompt is required."}
     local_results = _local_research(prompt, cfg, local_context_limit)
     web_payload = _web_research(prompt, max_results=max_web_results, enabled=internet)
+    evidence = _research_state(web_payload, local_results, internet=internet)
     sections = build_plan_sections(prompt, local_results=local_results, web_payload=web_payload, user_context=user_context)
+    notice = _research_state_notice(evidence)
+    if notice:
+        # Front of the note, not buried: a reader deciding whether to approve
+        # should see degraded evidence before the plan's own confident prose.
+        first_key = next(iter(sections), "")
+        if first_key:
+            sections[first_key] = f"{notice}\n\n{sections[first_key]}"
     note_title = title.strip() or f"Plan - {_title_from_prompt(prompt)}"
     note_id = f"plan-{_slug(note_title)}"
     result = create_note(
@@ -1276,9 +1355,7 @@ def create_plan(
             "agent_permission": "propose",
             "approval_state": "pending_review",
             "original_prompt": prompt,
-            "research_state": "complete",
-            "local_context_count": len(local_results),
-            "web_source_count": len(web_payload.get("results") or []),
+            **evidence,
             "execution_state": "not_started",
         },
         reindex=True,

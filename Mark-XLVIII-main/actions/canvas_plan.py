@@ -112,18 +112,21 @@ _ROLE_SPECS: dict[str, dict[str, Any]] = {
         # operation (the `openclaw` resource class); a plain command step would land
         # in the wrong class and bypass the sandbox the plan's security note requires.
         #
-        # CONFIRMED LIVE (2026-07-24, see the canvas-implementation-node live test in
-        # Jarvis_notes): this step never actually reaches delegate_openclaw. Nothing
-        # here (or in compile_canvas below) sets `project_id`, and project_operator()
-        # treats a missing project_id as `operation=list` and returns the registered
-        # project list -- a harmless but silent no-op that reports ok:true. The node's
-        # authored instruction is never forwarded as `intent`/`task` either, so even a
-        # correctly-targeted call would arrive with an empty task. A real fix needs a
-        # deliberate design decision (e.g. a `project:` canvas directive mirroring
-        # `role:`/`type:`) rather than a default project_id here -- defaulting this to
-        # e.g. this codebase's own project id would silently authorise OpenClaw to
-        # write to the live repo the moment a human approves the plan, which is a much
-        # bigger blast-radius change than the current no-op and needs its own sign-off.
+        # History (2026-07-24 -> 2026-07-30). This step used to be a silent no-op:
+        # nothing set `project_id`, and project_operator treats a missing one as
+        # `operation=list`, returning the registered project list with ok:true --
+        # so an approved implementation node reported success having delegated
+        # nothing. The authored instruction was not forwarded either.
+        #
+        # Both halves are now closed. `intent` carries the node's prose (WS4d),
+        # `project_id` comes from the node's `project:` directive or the canvas
+        # plan node's, and compile_canvas *blocks* when neither exists.
+        #
+        # Blocking, not defaulting: the earlier decision against defaulting still
+        # holds -- picking a project automatically would silently authorise
+        # OpenClaw against a live repo the moment a human approves. Failing at
+        # compile time surfaces the gap in the preview and plan note, before any
+        # approval exists.
         "orchestrator": "deterministic",
         "step_type": "tool",
         "target": "project_operator",
@@ -391,11 +394,11 @@ def compile_canvas(
             if canvas_project_id and canvas_mode:
                 break
 
+    # Load the registry whenever any implementation node exists, not only when
+    # one already names a project -- the missing-project blocker below needs the
+    # real list of ids to tell the user what to put in the directive.
     registered_project_ids: set[str] | None = None
-    if canvas_project_id or any(
-        _resolve_role(node) == "implementation" and _node_directives(node).get("project")
-        for node in nodes
-    ):
+    if canvas_project_id or any(_resolve_role(node) == "implementation" for node in nodes):
         from actions.project_operator import load_registry
 
         registered_project_ids = set(load_registry().get("projects") or {})
@@ -454,13 +457,29 @@ def compile_canvas(
                 inputs["args"] = scope
         if role == "implementation":
             project_id = directives.get("project") or canvas_project_id
-            if project_id:
-                if registered_project_ids is not None and project_id not in registered_project_ids:
-                    raise CanvasCompileError(
-                        f"Node '{nid}' declares project '{project_id}', which is not registered. "
-                        f"Known projects: {', '.join(sorted(registered_project_ids)) or '(none registered)'}."
-                    )
-                inputs["project_id"] = project_id
+            if not project_id:
+                # Blocking, rather than defaulting. project_operator treats a
+                # missing project_id as `operation=list` and returns the
+                # registered project list with ok:true -- so an approved
+                # implementation node used to report success having delegated
+                # nothing at all. Defaulting to a project was rejected earlier
+                # for good reason: it would silently authorise OpenClaw to write
+                # to a live repo the moment a human approves the plan. Failing
+                # at compile time is the safe direction -- it surfaces in the
+                # preview and the plan note, before any approval exists.
+                known = ", ".join(sorted(registered_project_ids)) if registered_project_ids else ""
+                raise CanvasCompileError(
+                    f"Implementation node '{nid}' has no project target. Add a `project:` directive to "
+                    f"the node, or to the canvas's plan node to set it for the whole canvas. "
+                    f"Without one this step would delegate nothing and still report success."
+                    + (f" Registered projects: {known}." if known else "")
+                )
+            if registered_project_ids is not None and project_id not in registered_project_ids:
+                raise CanvasCompileError(
+                    f"Node '{nid}' declares project '{project_id}', which is not registered. "
+                    f"Known projects: {', '.join(sorted(registered_project_ids)) or '(none registered)'}."
+                )
+            inputs["project_id"] = project_id
             # The dual-purpose prose (D1) is the agent's actual task -- forward it
             # so delegate_openclaw never dispatches with an empty intent. WS4d:
             # a deterministic context preamble rides along on the same field.
@@ -553,7 +572,7 @@ _DECOMPOSE_SYSTEM_PROMPT = (
     '{"nodes": [{"id": "short_snake_case_id", '
     '"role": "plan|research|implementation|verification|review|reference|note", '
     '"directives": {"scope": "optional test path(s), verification only", '
-    '"project": "optional registered project id, implementation only", '
+    '"project": "registered project id -- REQUIRED on implementation nodes unless the plan node sets it", '
     '"file": "optional file path, reference/implementation only", '
     '"recommended_model": "optional semantic or developer hint", '
     '"branch": "optional macro-component tag, e.g. \\"A\\" -- see below"}, '
@@ -798,8 +817,16 @@ def decompose_goal_to_canvas(
             value = str(directives.get(key) or "").strip()
             if value:
                 lines.append(f"{label}: {value}")
-        if role == "plan" and user_workflow_mode.strip():
-            lines.append(f"mode: {user_workflow_mode.strip()}")
+        if role == "plan":
+            if user_workflow_mode.strip():
+                lines.append(f"mode: {user_workflow_mode.strip()}")
+            # Pin the project hint onto the anchor deterministically rather than
+            # hoping the model emitted `project:` on each implementation node.
+            # compile_canvas now blocks an implementation node with no target,
+            # so leaving this to model discretion would make decomposition fail
+            # to compile whenever it declined to repeat the hint.
+            if project_hint.strip() and not str(directives.get("project") or "").strip():
+                lines.append(f"project: {project_hint.strip()}")
         prose = str(node.get("prose") or "").strip() or f"{role} step for: {goal[:200]}"
         text = "\n".join(lines) + "\n\n" + prose
         deliverables_raw = node.get("deliverables")

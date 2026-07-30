@@ -1,9 +1,12 @@
 ---
-updated: "2026-07-25T14:33:56Z"
+type: "log"
+status: "historical"
+updated: "2026-07-30T01:35:41Z"
 tags: ["tier/short-term"]
-index_state: "indexed_local"
+index_state: "excluded_local"
+rag_index: false
 content_hash: "13b6e272920c1d8dc7d66f4732fa062f69cb70b1a33c1ed0da91d9dcbdb66db3"
-lifecycle: "short_term"
+lifecycle: "archive"
 ---
 
 # Review repositories

@@ -551,3 +551,72 @@ class BundleGuardTests(unittest.TestCase):
 
         self.assertFalse(result["ok"])
         self.assertIn("run bundle is missing", result["error"].lower())
+
+
+class ResearchStateTruthfulnessTests(unittest.TestCase):
+    """`research_state` was the literal string "complete" on every plan, whether
+    the web search succeeded, returned nothing, errored, or was never attempted.
+    A reader -- or a downstream workflow deciding whether the evidence justifies
+    acting -- could not tell a well-sourced plan from an offline one. The counts
+    needed to answer honestly were already being recorded beside it."""
+
+    def test_web_sources_present_is_complete(self):
+        evidence = pw._research_state(
+            {"ok": True, "results": [{"url": "a"}, {"url": "b"}], "backend": "ddg"},
+            [{"title": "note"}],
+            internet=True,
+        )
+        self.assertEqual(evidence["research_state"], "complete")
+        self.assertEqual(evidence["web_source_count"], 2)
+        self.assertEqual(evidence["retrieval_backend"], "ddg")
+        self.assertEqual(evidence["web_error"], "")
+
+    def test_zero_web_sources_is_not_complete(self):
+        evidence = pw._research_state(
+            {"ok": True, "results": [], "message": "no usable sources"},
+            [{"title": "note"}],
+            internet=True,
+        )
+        self.assertEqual(evidence["research_state"], "partial")
+
+    def test_zero_web_and_zero_local_is_failed(self):
+        evidence = pw._research_state({"ok": True, "results": []}, [], internet=True)
+        self.assertEqual(evidence["research_state"], "failed")
+
+    def test_web_exception_is_failed_and_keeps_the_reason(self):
+        evidence = pw._research_state(
+            {"ok": False, "results": [], "message": "Web research failed: boom"},
+            [{"title": "note"}],
+            internet=True,
+        )
+        self.assertEqual(evidence["research_state"], "failed")
+        self.assertIn("boom", evidence["web_error"])
+
+    def test_internet_disabled_is_distinguished_from_failure(self):
+        with_local = pw._research_state({"ok": False, "results": []}, [{"t": 1}], internet=False)
+        without_local = pw._research_state({"ok": False, "results": []}, [], internet=False)
+        self.assertEqual(with_local["research_state"], "local_only")
+        self.assertEqual(without_local["research_state"], "offline")
+
+    def test_degraded_states_get_a_visible_notice(self):
+        for state in ("partial", "offline", "failed"):
+            with self.subTest(state=state):
+                notice = pw._research_state_notice(
+                    {"research_state": state, "web_source_count": 0, "local_context_count": 1}
+                )
+                self.assertIn("Degraded research evidence", notice)
+
+    def test_healthy_states_get_no_notice(self):
+        for state in ("complete", "local_only"):
+            with self.subTest(state=state):
+                self.assertEqual(pw._research_state_notice({"research_state": state}), "")
+
+    def test_a_real_plan_records_the_honest_state(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            cfg = PlanWorkflowTests().cfg(Path(tmp))
+            with mock.patch.object(pw, "structured_web_search", side_effect=RuntimeError("network unreachable")):
+                result = pw.create_plan("probe honesty", cfg=cfg, internet=True)
+            metadata, body, _ = jm.read_note(Path(result["path"]))
+        self.assertEqual(metadata["research_state"], "failed")
+        self.assertIn("network unreachable", metadata["web_error"])
+        self.assertIn("Degraded research evidence", body)

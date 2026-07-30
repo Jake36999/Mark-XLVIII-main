@@ -299,3 +299,77 @@ class CapabilityOverviewFastPathTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class BaselinePolicyTests(unittest.TestCase):
+    """`_resolved_config` appended `tts_model` and, for the Orpheus engine,
+    `orpeus_text_to_speech` into the effective baseline -- silently overriding
+    `baseline_models` in runtime.json and contradicting the recorded 2026-07-24
+    decision (three always-resident models held RAM at ~70%). It also made the
+    task-model TTL unreachable for speech, since baselines are never unloaded."""
+
+    def test_effective_baseline_matches_configuration(self):
+        import json
+
+        from actions import model_lifecycle
+
+        configured = json.loads(Path("config/runtime.json").read_text(encoding="utf-8"))["baseline_models"]
+        effective = model_lifecycle._resolved_config(None)["baseline_models"]
+        self.assertEqual(sorted(effective), sorted(configured))
+
+    def test_speech_model_is_not_a_baseline(self):
+        from actions import model_lifecycle
+
+        self.assertFalse(model_lifecycle.is_baseline_model("orpeus_text_to_speech"))
+
+    def test_an_omitted_worker_model_is_still_treated_as_baseline(self):
+        from actions import model_lifecycle
+
+        with mock.patch.object(
+            model_lifecycle,
+            "_load_file_config",
+            return_value={"baseline_models": [], "worker_model": "qwen/qwen3-4b-2507"},
+        ):
+            effective = model_lifecycle._resolved_config(None)["baseline_models"]
+        self.assertIn("qwen/qwen3-4b-2507", effective)
+
+
+class UnloadKeepGuardTests(unittest.TestCase):
+    """With speech no longer baseline, the TTS path -- which cleans up
+    immediately *before* speaking -- could unload the very voice it is about to
+    use. `keep` names models the caller still needs."""
+
+    LISTED = {
+        "ok": True,
+        "policy": {},
+        "loaded": [
+            {"instance_id": "orpeus_text_to_speech", "model_key": "orpeus_text_to_speech",
+             "display_name": "orpeus_text_to_speech", "baseline": False},
+            {"instance_id": "mistralai/mistral-7b-instruct-v0.3",
+             "model_key": "mistralai/mistral-7b-instruct-v0.3", "display_name": "m", "baseline": False},
+        ],
+    }
+
+    def _run(self, keep, force=False):
+        from actions import model_lifecycle
+
+        post = mock.Mock()
+        post.return_value = mock.Mock(raise_for_status=mock.Mock())
+        with mock.patch.object(model_lifecycle, "active_snapshot", return_value={"active_count": 0}), \
+             mock.patch.object(model_lifecycle, "list_models", return_value=self.LISTED), \
+             mock.patch.object(model_lifecycle, "recently_used_models", return_value=set()):
+            result = model_lifecycle.unload_non_baseline(timeout=5, post=post, force=force, keep=keep)
+        return {item["model_key"] for item in result["unloaded"]}
+
+    def test_without_keep_the_voice_is_evictable(self):
+        self.assertIn("orpeus_text_to_speech", self._run(None))
+
+    def test_keep_protects_the_voice(self):
+        self.assertNotIn("orpeus_text_to_speech", self._run({"orpeus_text_to_speech"}))
+
+    def test_keep_still_releases_unrelated_specialists(self):
+        self.assertIn("mistralai/mistral-7b-instruct-v0.3", self._run({"orpeus_text_to_speech"}))
+
+    def test_keep_survives_force(self):
+        """Forcing a cleanup should not sabotage the caller's own next call."""
+        self.assertNotIn("orpeus_text_to_speech", self._run({"orpeus_text_to_speech"}, force=True))

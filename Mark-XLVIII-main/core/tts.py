@@ -866,10 +866,22 @@ class OpenAICompatibleTTSEngine:
 
                     # Speech is latency-sensitive. Release a specialist that is
                     # merely warm, while lifecycle leases protect active work.
+                    #
+                    # `keep` is load-bearing: the speech model is no longer a
+                    # baseline (it loads on demand and idles out through the
+                    # task-model TTL, per the 2026-07-24 RAM decision), so
+                    # without naming it here this cleanup could unload the very
+                    # voice it is about to speak with and force an immediate
+                    # reload.
+                    voice_models = {
+                        str(self.lifecycle_config.get("tts_lmstudio_model") or "").strip(),
+                        str(getattr(self, "model", "") or "").strip(),
+                    }
                     model_lifecycle.unload_non_baseline(
                         self.lifecycle_config,
                         timeout=10,
                         force=False,
+                        keep={item for item in voice_models if item},
                     )
                 except Exception as exc:
                     print(f"[TTS] Idle task-model cleanup skipped: {exc}")

@@ -4,7 +4,7 @@ title: "Canvas Planning Engine and Reasoning-Backed Decomposition"
 type: "guide"
 status: "active"
 created: "2026-07-25"
-updated: "2026-07-25T14:33:58Z"
+updated: "2026-07-30T01:49:08Z"
 project_id: "jarvis_notes"
 source: "claude"
 tags: ["developer-handbook", "canvas-plan", "planning", "mode-2", "tier/short-term"]
@@ -13,7 +13,7 @@ index_state: "indexed_local"
 remember_note_id: ""
 rag_index: true
 confidence: 0.9
-content_hash: "0faab7cf971c623a2db1b16d3928af40aabd8ce5908eeac3ab9c39352d72b82b"
+content_hash: "7b425cff113f41dd77ef573171328acebe1fbdcebab28bd2b45b57ebc001bae0"
 lifecycle: "short_term"
 project_key: "mark_xlviii"
 schema_version: "jarvis_developer_handbook/v1"
@@ -62,11 +62,18 @@ Build the thing. This line and below is the agent's actual instruction.
 | --- | --- | --- |
 | `role:` / `type:` | all | step type via `_ROLE_SPECS` (below) |
 | `scope:` / `test:` | verification | `inputs.args` |
-| `project:` | implementation | `inputs.project_id` (a `plan`-role node's own `project:` sets the canvas-wide default; a node-level value overrides it) |
+| `project:` | implementation (**required**) | `inputs.project_id` (a `plan`-role node's own `project:` sets the canvas-wide default; a node-level value overrides it) |
 | `file:` | reference / implementation | `inputs.file` |
 | `recommended model:` | any | `inputs.recommended_model` — a visible, editable hint (D2), inert on dispatch |
 | `branch:` / `task:` | any (WS4c) | fan-out column grouping — see below |
 | `mode:` | the `plan`/`workflow`-anchor node only | `workflow["variables"]["mode"]` — purely descriptive `research`/`development` routing metadata, never validated or enforced |
+
+> [!danger] An implementation node with no project target is a compile-time blocker (2026-07-30)
+> This used to compile happily and then do nothing. Nothing set `project_id`, and `project_operator` reads a missing one as `operation=list` — returning the registered project list with `ok: true`. So an **approved** implementation node reported success having delegated no work at all. The node's prose was not forwarded either; that half (`intent`) was fixed by WS4d.
+>
+> `compile_canvas` now refuses, naming the node and listing the registered project ids so the gap is fixable in Obsidian. It blocks rather than defaulting: choosing a project automatically would silently authorise OpenClaw against a live repository the moment a human approves, which is a far larger blast radius than a loud failure. Failing at compile time means it surfaces in the preview and plan note *before* any approval exists.
+>
+> `decompose_goal_to_canvas` pins its `project_hint` onto the plan anchor for this reason — leaving the directive to model discretion would make generated plans fail to compile whenever the model declined to repeat it. The decomposition schema now states `project` is required on implementation nodes.
 
 > [!important] D2 — targeting is a visible recommendation, not a silent default
 > `recommended model:` is rendered on the node and in the T4 approval preview. Left unedited, it counts as accepted; edited, the plan fingerprint changes and re-triggers approval. Nothing about targeting is a silent default a human never sees.
