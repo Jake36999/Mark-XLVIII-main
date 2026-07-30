@@ -137,6 +137,40 @@ MARK reuses Aletheia patterns and can call its loopback JSON-RPC bridge through 
 
 OpenClaw is similarly optional and is invoked through a registered project operation for bounded coding continuity. It is not an always-on worker pool.
 
+## Effect Honesty (2026-07-30)
+
+> [!danger] The most expensive recurring defect in this codebase
+> Seven defects in the 2026-07 cycle shared no subsystem and one mistake: **a success signal returned when work was *dispatched*, not when it was *done*.**
+
+| Site | What it claimed | What was true |
+| --- | --- | --- |
+| Vision injection | "the actual image arrives in the next message" | It never arrived; the reply came from no visual input |
+| `screen_process()` | `True` | Bytes queued to a dead session |
+| MCP `cancel()` | `True` | The task was still running |
+| `research_state` | `"complete"` on every plan | The search may have failed or never run |
+| Lifecycle resolver | The configured baseline | It had silently appended to it |
+| Canvas implementation node | Compiled successfully | Silent no-op — no project target |
+
+On a hosted stack the gap between dispatch and completion is milliseconds and invisible. Here a model load takes ninety seconds, a vault write crosses a filesystem watcher, and a delegated task runs in another process. **The gap is where the truth lives**, and going local-first widened it without anything being adjusted to match.
+
+### The rule
+
+**A return value describes what the caller may rely on having happened.**
+
+If a function returns before its effect is observable, its state is `REQUESTED` — not `COMPLETED`, and not a bare `True`. `REQUESTED` is not a failure; it is the honest name for "asked for, outcome not yet known", and it is the state this codebase kept failing to express.
+
+Two corollaries, both violated in practice:
+
+- **A bare `True`/`False` cannot express `REQUESTED`**, which makes it the wrong return type for anything asynchronous, delegated, or queued. Prefer a named state.
+- **Reporting a configured value is not reporting an effective one.** A function that transforms its input must report what it produced. This is why `scripts/config_audit.py` exists.
+
+`core/effect_outcome.py` holds the vocabulary — `COMPLETED`, `PARTIAL`, `REQUESTED`, `SKIPPED`, `FAILED`, `UNKNOWN` — with `ASSERTS_COMPLETION` naming the only state a caller may treat as done. `outcome()` derives `ok` from `state` so the two cannot drift apart, which is precisely how every original defect presented.
+
+Sites keep their own domain words where those read better (`cancellation_requested` at an MCP boundary). `SITE_VOCABULARIES` maps each onto a canonical state, so the equivalence is checkable and a new word added without thought fails loudly instead of passing silently.
+
+> [!success] These tests were verified to have teeth
+> `tests/test_effect_honesty.py` restores each original bug by mutation and requires the naming test to fail. All confirmed: hardcoded `"complete"`, bare-boolean cancel, `screen_process` returning `True` on dispatch, the resolver appending to the baseline, vision claiming an answer it never received, and — with both guards disabled — the Canvas silent no-op. A regression test that passes against the bug it names is decoration, so this check is worth repeating when the file grows.
+
 ## Extending the Registry
 
 To add a capability safely:
@@ -148,6 +182,7 @@ To add a capability safely:
 5. Add a workflow record only if the capability participates in a repeatable sequence.
 6. Add health checks and a quality floor.
 7. Test selection, schema retrieval, policy rejection, and successful dispatch.
+8. **Return a state, not a boolean** — see Effect Honesty above. If the handler dispatches work it does not wait for, say `REQUESTED`. Add a test that forces the effect to fail and asserts the return value does not claim success.
 
 ## Related Notes
 
