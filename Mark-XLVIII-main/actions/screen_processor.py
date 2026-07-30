@@ -73,6 +73,23 @@ _IMG_MAX_W = 1280
 _IMG_MAX_H = 720
 _JPEG_Q    = 82
 
+# A screenshot bound for OCR is a different problem from a webcam frame bound
+# for scene description, and it used to be treated as the same one. These
+# numbers were sized for a Gemini Live *stream*, where continuous frames crossed
+# the network and bandwidth set the budget. A single capture handed to a model
+# on localhost has no such budget, and the cost of getting it wrong is total:
+# downscaling a 1920x1080 desktop to 1280x720 with BILINEAR and JPEG 82 leaves
+# UI text a few pixels tall. Measured live, the OCR model answered "the image is
+# too blurry to recognize any text content" and then hallucinated fragments.
+#
+# 2560x1440 lets an ordinary 1080p or 1440p display through untouched; anything
+# larger is resampled with LANCZOS, which preserves small text far better than
+# BILINEAR. The camera path keeps the smaller size -- describing a room does not
+# need the detail, and the webcam does not produce it.
+_OCR_MAX_W  = 2560
+_OCR_MAX_H  = 1440
+_OCR_JPEG_Q = 92
+
 _SYSTEM_PROMPT = (
     "You are JARVIS, Tony Stark's AI assistant. "
     "You are given an image from either the user's screen or their webcam. "
@@ -85,15 +102,22 @@ _SYSTEM_PROMPT = (
 )
 
 
-def _compress(img_bytes: bytes, source_format: str = "PNG") -> tuple[bytes, str]:
+def _compress(
+    img_bytes: bytes,
+    source_format: str = "PNG",
+    *,
+    max_size: tuple[int, int] | None = None,
+    quality: int | None = None,
+    resample=None,
+) -> tuple[bytes, str]:
     if not _PIL:
         return img_bytes, f"image/{source_format.lower()}"
 
     try:
         img = PIL.Image.open(io.BytesIO(img_bytes)).convert("RGB")
-        img.thumbnail((_IMG_MAX_W, _IMG_MAX_H), PIL.Image.BILINEAR)
+        img.thumbnail(max_size or (_IMG_MAX_W, _IMG_MAX_H), resample or PIL.Image.BILINEAR)
         buf = io.BytesIO()
-        img.save(buf, format="JPEG", quality=_JPEG_Q, optimize=False)
+        img.save(buf, format="JPEG", quality=quality or _JPEG_Q, optimize=False)
         return buf.getvalue(), "image/jpeg"
     except Exception as e:
         print(f"[Vision] ⚠️  Image compress failed: {e}")
@@ -110,7 +134,13 @@ def _capture_screen() -> tuple[bytes, str]:
         shot     = sct.grab(target)
         png      = mss.tools.to_png(shot.rgb, shot.size)
 
-    return _compress(png, "PNG")
+    return _compress(
+        png,
+        "PNG",
+        max_size=(_OCR_MAX_W, _OCR_MAX_H),
+        quality=_OCR_JPEG_Q,
+        resample=PIL.Image.LANCZOS if _PIL else None,
+    )
 
 
 def _cv2_backend() -> int:
@@ -390,23 +420,26 @@ def screen_process(
     response=None,
     player=None,
     session_memory=None,
-) -> bool:
+) -> str:
+    """Capture the screen or camera and answer a question about it, locally.
 
+    Returns the answer, or "" on failure -- so the old `if screen_process(...)`
+    truthiness check still reads correctly.
+
+    This used to hand the capture to a Gemini Live session and return True the
+    moment the bytes were queued, which reported success for work that had not
+    happened yet and, once Live was switched off, for work that never happened
+    at all. It now waits for a real answer from a local model.
+    """
     params    = parameters or {}
     user_text = (params.get("text") or params.get("user_text") or "").strip()
     angle     = params.get("angle", "screen").lower().strip()
 
     if not user_text:
         print("[Vision] ⚠️  No question provided — aborting")
-        return False
+        return ""
 
     print(f"[Vision] ▶ angle={angle!r}  question='{user_text[:80]}'")
-
-    try:
-        _ensure_session(player=player)
-    except Exception as e:
-        print(f"[Vision] ❌ Could not start session: {e}")
-        return False
 
     try:
         if angle == "camera":
@@ -427,10 +460,21 @@ def screen_process(
             print(f"[Vision] 🖥️  Screen: {len(image_bytes):,} bytes")
     except Exception as e:
         print(f"[Vision] ❌ Capture error: {e}")
-        return False
+        return ""
 
-    _session.analyze(image_bytes, mime_type, user_text)
-    return True
+    from actions.vision_pipeline import describe_image
+
+    outcome = describe_image(image_bytes, mime_type, user_text, angle=angle)
+    if angle == "camera" and player and hasattr(player, "stop_camera_stream"):
+        try:
+            player.stop_camera_stream()
+        except Exception as _e:
+            print(f"[Vision] ⚠️  Could not close camera: {_e}")
+    if not outcome.get("ok"):
+        print(f"[Vision] ❌ {outcome.get('error') or 'no answer'}")
+        return ""
+    print(f"[Vision] ✅ {outcome.get('path') or 'local'}")
+    return str(outcome.get("answer") or "")
 
 
 def warmup_session(player=None) -> None:
@@ -445,12 +489,7 @@ if __name__ == "__main__":
     mode = input("angle — screen / camera (default: screen): ").strip().lower() or "screen"
     q    = input("Question (Enter = default): ").strip() or "What do you see? Be brief."
 
-    t0 = time.perf_counter()
-    warmup_session()
-    print(f"Session ready in {time.perf_counter()-t0:.2f}s\n")
-
     t1 = time.perf_counter()
-    ok = screen_process({"angle": mode, "text": q})
-    print(f"Queued in {time.perf_counter()-t1:.3f}s — waiting for audio...")
-    time.sleep(10)
-    print("Done." if ok else "Failed.")
+    answer = screen_process({"angle": mode, "text": q})
+    print(f"\nAnswered in {time.perf_counter()-t1:.1f}s\n")
+    print(answer or "Failed — no local vision model produced an answer.")

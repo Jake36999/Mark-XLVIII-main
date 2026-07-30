@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 import json
 import os
 import re
@@ -8,7 +9,7 @@ import threading
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Callable, Mapping
+from typing import Any, Callable, Mapping, Sequence
 
 import requests
 
@@ -43,12 +44,11 @@ DEFAULT_MAX_FALLBACK_CANDIDATES = 3
 # worker model -- a text-only model does not merely answer an image question
 # less well, it cannot see the image.
 #
-# Latent rather than live as of 2026-07-30: no image currently reaches an
-# LM Studio model at all. Both image paths (main.py's `_pending_vision`
-# injection and actions/screen_processor's send loop) hand bytes to a Gemini
-# Live session, and `_gemini_live_enabled()` returns False unconditionally. The
-# ordering matters the moment image input is wired to a local model, which is
-# the obvious next step now that Live is off.
+# Live as of 2026-07-30: `call_vision` sends images to LM Studio, and
+# actions/vision_pipeline routes a screen capture through the OCR model and a
+# camera capture through the scene model. Before that, no image reached a local
+# model at all -- both paths handed bytes to a Gemini Live session that
+# `_gemini_live_enabled()` had already switched off.
 CAPABILITY_ROUTES = frozenset({"vision"})
 OPENAI_KEY_CHECK_TTL_SECONDS = 600
 _OPENAI_KEY_CHECK_CACHE: dict[tuple[str, str], tuple[bool, float]] = {}
@@ -1030,6 +1030,27 @@ def _is_system_role_error(response: Any) -> bool:
     return bool(_SYSTEM_ROLE_ERROR_PATTERN.search(str(getattr(response, "text", "") or "")))
 
 
+def _image_content_parts(images: Sequence[Mapping[str, Any]] | None) -> list[dict]:
+    """OpenAI-style image parts, as LM Studio's chat endpoint expects them.
+
+    Accepts either raw `bytes` or an already-base64 string, because the two
+    capture paths differ: a screenshot arrives as bytes from mss, while a
+    replayed or stored capture is usually already encoded.
+    """
+    parts: list[dict] = []
+    for image in images or ():
+        raw = image.get("bytes", image.get("data"))
+        if isinstance(raw, (bytes, bytearray, memoryview)):
+            encoded = base64.b64encode(bytes(raw)).decode("ascii")
+        else:
+            encoded = str(raw or "").strip()
+        if not encoded:
+            continue
+        mime = str(image.get("mime_type") or "image/png").strip() or "image/png"
+        parts.append({"type": "image_url", "image_url": {"url": f"data:{mime};base64,{encoded}"}})
+    return parts
+
+
 def _build_messages(
     prompt: str,
     system: str | None,
@@ -1037,13 +1058,21 @@ def _build_messages(
     *,
     model: str = "",
     force_merge: bool = False,
+    images: Sequence[Mapping[str, Any]] | None = None,
 ) -> list[dict]:
     messages: list[dict] = []
     if system and not force_merge and system_role_supported(model, config):
         messages.append({"role": "system", "content": system.strip()})
     elif system:
         prompt = f"{system.strip()}\n\nUser request:\n{prompt}"
-    messages.append({"role": "user", "content": prompt})
+    # A plain string stays a plain string. Sending the content-part form
+    # unconditionally would change every text call's wire format for no gain,
+    # and some local runtimes only accept the string shape.
+    parts = _image_content_parts(images)
+    if parts:
+        messages.append({"role": "user", "content": [{"type": "text", "text": prompt}, *parts]})
+    else:
+        messages.append({"role": "user", "content": prompt})
     return messages
 
 
@@ -1091,10 +1120,14 @@ def _call_lmstudio_chat(
     post: Callable,
     max_tokens: int = 1200,
     config: dict | None = None,
+    images: Sequence[Mapping[str, Any]] | None = None,
 ) -> str:
-    route = _route_from_context(prompt, settings.role, system)
+    # An image in the payload is a capability fact, not a guess from keywords:
+    # only a vision model can serve this call, so the route is fixed here rather
+    # than inferred from the prompt's wording.
+    route = "vision" if images else _route_from_context(prompt, settings.role, system)
     lifecycle_cfg = model_lifecycle_service.resolve_config(config)
-    messages = _build_messages(prompt, system, config, model=settings.model)
+    messages = _build_messages(prompt, system, config, model=settings.model, images=images)
 
     headers = {"Content-Type": "application/json"}
     if settings.api_key:
@@ -1492,6 +1525,7 @@ def _call_lmstudio_chat_with_fallback(
     candidates: list[str],
     config: dict | None = None,
     max_tokens: int | None = None,
+    images: Sequence[Mapping[str, Any]] | None = None,
 ) -> str:
     errors: list[str] = []
     for index, candidate in enumerate(candidates):
@@ -1514,6 +1548,7 @@ def _call_lmstudio_chat_with_fallback(
                 post=post,
                 max_tokens=max(1, int(candidate_max_tokens)),
                 config=config,
+                images=images,
             )
             if index:
                 previous = last_model_provenance()
@@ -1865,6 +1900,74 @@ def call_text(
         candidates=candidates or [settings.model],
         config=cfg,
         max_tokens=max_tokens,
+    )
+
+
+def vision_candidates(config: dict | None = None, *, model: str = "") -> list[str]:
+    """Local models that can actually accept an image, most preferred first.
+
+    Deliberately not `select_lmstudio_models`: that infers the route from the
+    prompt's wording, and a vision call's prompt is an instruction about an
+    image ("transcribe this", "what is shown") which need not contain any of the
+    vision keywords. Here the image itself is the evidence, so the route is
+    known rather than guessed. It also skips the worker prepend and the warmth
+    partition for the reason CAPABILITY_ROUTES exists.
+    """
+    cfg = load_config() if config is None else config
+    # An explicit model means "prefer this one", not "only this one". The OCR
+    # model is requested by name, and if it is missing the route's general
+    # vision models are a worse but working answer -- they read text too, just
+    # less reliably. Failing the whole capture instead would be the wrong trade.
+    listed = ([model] if model else []) + list(_lmstudio_routes(cfg).get("vision", []))
+    candidates = _dedupe([item for item in listed if item])
+    # A cooling-down vision model still beats a warm text-only one, so an empty
+    # result after filtering falls back to the full list rather than to nothing.
+    return _drop_cooling_down(candidates, cfg) or candidates
+
+
+def call_vision(
+    prompt: str,
+    *,
+    images: Sequence[Mapping[str, Any]],
+    model: str = "",
+    system: str | None = None,
+    timeout: int = 240,
+    max_tokens: int | None = 900,
+    config: dict | None = None,
+    post: Callable = requests.post,
+) -> str:
+    """Send an image plus an instruction to a local vision model.
+
+    Local-only on purpose. The cloud providers `call_text` can reach are keyed
+    per session and hold no key at rest, so a screen capture must never be able
+    to leave the machine as a side effect of a routing decision -- a screenshot
+    is the single most sensitive payload this system handles.
+    """
+    if not images:
+        raise ValueError("call_vision requires at least one image")
+    cfg = load_config() if config is None else config
+    candidates = vision_candidates(cfg, model=model)
+    if not candidates:
+        raise RuntimeError(
+            "No vision-capable local model is configured; lmstudio_routes['vision'] is empty."
+        )
+    settings = ProviderSettings(
+        role="vision",
+        provider="lmstudio",
+        model=candidates[0],
+        base_url=_clean_base_url(cfg.get("lmstudio_url") or cfg.get("llm_url"), DEFAULT_LMSTUDIO_URL),
+        api_key=None,
+    )
+    return _call_lmstudio_chat_with_fallback(
+        prompt,
+        settings,
+        system=system,
+        timeout=timeout,
+        post=post,
+        candidates=candidates,
+        config=cfg,
+        max_tokens=max_tokens,
+        images=images,
     )
 
 

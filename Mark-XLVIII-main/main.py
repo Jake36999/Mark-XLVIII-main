@@ -190,6 +190,11 @@ _DIRECT_ANSWER_TOOLS = frozenset({
     "capability_registry",
     "graphify_query",
     "process_trace",
+    # The local vision pipeline already ends in a text model answering the
+    # user's question about the capture. Summarising that is a third model call
+    # on a host that holds one task model at a time, and it can only lose
+    # detail -- the summariser never saw the image.
+    "screen_process",
 })
 _DIRECT_ANSWER_MAX_CHARS = 1_200
 # Only rejects near-empty output ("OK", "Done."). Kept low deliberately: a
@@ -3214,6 +3219,46 @@ class JarvisLive:
             ),
         )
 
+    async def _describe_capture_locally(
+        self, image_bytes: bytes, mime_type: str, question: str, angle: str
+    ) -> str:
+        """Answer a capture with local models and hand the answer back as the tool result.
+
+        The Gemini Live path defers the image to a following turn and releases
+        `_vision_busy` when that injection fires. Nothing fires here, so this
+        owns the whole lifecycle: run the pipeline, close the camera, clear the
+        flags -- otherwise a single failed capture would leave vision latched
+        busy for the rest of the session.
+        """
+        from actions.vision_pipeline import describe_image
+
+        loop = asyncio.get_running_loop()
+        try:
+            outcome = await loop.run_in_executor(
+                None,
+                lambda: describe_image(image_bytes, mime_type, question, angle=angle),
+            )
+        except Exception as exc:
+            outcome = {"ok": False, "answer": "", "error": f"{type(exc).__name__}: {exc}", "path": ""}
+        finally:
+            self._vision_busy = False
+            self._vision_cam_active = False
+            self._vision_close_pending = False
+            if angle == "camera":
+                try:
+                    self.ui.stop_camera_stream()
+                except Exception as exc:
+                    print(f"[Vision] ⚠️  Could not close camera: {exc}")
+
+        if outcome.get("ok") and str(outcome.get("answer") or "").strip():
+            print(f"[Vision] ✅ {outcome.get('path') or 'local'} answered in {len(outcome['answer']):,} chars")
+            return str(outcome["answer"]).strip()
+        error = str(outcome.get("error") or "").strip() or "no local vision model produced an answer"
+        print(f"[Vision] ❌ {error}")
+        # Say what actually failed. The old behaviour here was to describe the
+        # image anyway, from nothing.
+        return f"I captured your {angle}, but no local vision model could read it: {error}"
+
     async def _execute_tool(self, fc, pre_approved: bool = False) -> types.FunctionResponse:
         name = fc.name
         args = dict(fc.args or {})
@@ -3314,13 +3359,19 @@ class JarvisLive:
                         img_b, mime_t = await loop.run_in_executor(None, _capture_screen)
                         print(f"[Vision] 🖥️  Screen: {len(img_b):,} bytes")
                         _stall = "screen"
-                    self._pending_vision = (img_b, mime_t, user_text, angle)
-                    result = (
-                        f"[VISION_ACTIVE] {_stall.capitalize()} captured. "
-                        f"Immediately say one natural sentence in English, such as "
-                        f"'Looking at your {_stall} now, sir.' "
-                        f"Do not describe or guess content; the actual image arrives in the next message."
-                    )
+                    if getattr(self, "session", None):
+                        # Gemini Live is connected, so the image is injected as
+                        # its own turn once this tool response lands, and the
+                        # session releases _vision_busy from there.
+                        self._pending_vision = (img_b, mime_t, user_text, angle)
+                        result = (
+                            f"[VISION_ACTIVE] {_stall.capitalize()} captured. "
+                            f"Immediately say one natural sentence in English, such as "
+                            f"'Looking at your {_stall} now, sir.' "
+                            f"Do not describe or guess content; the actual image arrives in the next message."
+                        )
+                    else:
+                        result = await self._describe_capture_locally(img_b, mime_t, user_text, angle)
 
             elif name == "close_camera":
                 self.ui.stop_camera_stream()

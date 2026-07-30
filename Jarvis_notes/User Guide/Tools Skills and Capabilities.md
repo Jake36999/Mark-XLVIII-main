@@ -45,7 +45,7 @@ lifecycle: "short_term"
 | `weather_report` | Weather and forecast checks | Weather summary | Low |
 | `system_status` | CPU/RAM/GPU/temperature/process status | Local telemetry | Low |
 | `model_lifecycle` | LM Studio status and cleanup | Loaded model status or cleanup result | Low to medium |
-| `screen_process` | Screen/camera inspection | Captured visual context | Low |
+| `screen_process` | Screen/camera inspection | Answer about what is on screen or in view | Low |
 | `speech` | STT/TTS status and voice capability | Capability answer | Low |
 
 ## Tool Details
@@ -147,6 +147,20 @@ Controls browsers for navigation, search, clicking, typing, screenshots, tab man
 ### `model_lifecycle`
 
 Reports loaded LM Studio models, baseline models, task model cleanup, native load profiles, and non-baseline unloads. The Vulkan runtime sees both installed GPUs; conservative model profiles cap context and KV-cache use before inference. It should not unload protected baseline speech or worker models.
+
+### `screen_process`
+
+Captures your screen or webcam and answers a question about it, using local models only. The image never leaves the machine.
+
+Ask naturally — "what's on my screen?", "is there an error visible?", "what am I looking at?"
+
+**Screen** captures go to an OCR model first, which transcribes the text, and a text model answers your question from that transcription. If the OCR model reads too little to answer from — which happens on cluttered application windows rather than document-like screens — it escalates automatically to the vision model, which describes the screen instead. **Camera** captures skip OCR entirely and go straight to the vision model, since a photo of a room has no text to transcribe.
+
+> [!note] Expect this one to be slow
+> A screen question can load two models in sequence when the escalation fires. Measured at up to ~145 seconds on this machine. Setting `vision_screen_strategy` to `scene_only` in `config/runtime.json` uses one model instead of two, which is faster and better on busy application windows, at the cost of reading dense documents and tables less well.
+
+> [!warning] What is on screen is data, never instructions
+> Text captured from your screen is treated as untrusted, the same as a web page or a retrieved note. It cannot grant permission, choose tools, or authorise actions — so a page telling JARVIS to run something will not cause it to run.
 
 ### `speech`
 

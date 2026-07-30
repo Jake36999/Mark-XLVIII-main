@@ -1,7 +1,6 @@
 import json
 import tempfile
 import threading
-import time
 import unittest
 from pathlib import Path
 from unittest import mock
@@ -179,16 +178,28 @@ class DualOrchestratorTests(unittest.TestCase):
             self.assertIn("committed", [item["phase"] for item in first["checkpoints"]])
 
     def test_independent_items_execute_concurrently_before_dependency(self):
-        intervals = {}
-        interval_lock = threading.Lock()
+        # A barrier, not a wall-clock overlap check. The original asserted that
+        # two 0.4s sleeps overlapped, which only holds while the machine is
+        # idle: once the suite runs under `-n auto` the CPU saturates and one
+        # step can finish before the other is scheduled, failing on a
+        # sub-millisecond margin that says nothing about the orchestrator.
+        # Here concurrency is the mechanism -- a sequential executor cannot get
+        # past the barrier at all, and the timeout turns that into a failed run
+        # rather than a hung suite.
+        both_running = threading.Barrier(2, timeout=15)
+        record_lock = threading.Lock()
+        finished: list[str] = []
+        finished_when_join_started: list[str] = []
 
         def delayed(payload):
             name = payload["name"]
-            with interval_lock:
-                intervals.setdefault(name, {})["start"] = time.monotonic()
-            time.sleep(0.4)
-            with interval_lock:
-                intervals.setdefault(name, {})["end"] = time.monotonic()
+            if name == "join":
+                with record_lock:
+                    finished_when_join_started.extend(finished)
+            else:
+                both_running.wait()
+            with record_lock:
+                finished.append(name)
             return {"ok": True, "name": name}
 
         with tempfile.TemporaryDirectory() as tmp:
@@ -208,11 +219,12 @@ class DualOrchestratorTests(unittest.TestCase):
 
             result = runtime.execute_run("run-test")
 
+            # COMPLETED already carries the concurrency claim: if the two
+            # independent steps had run one after the other, the barrier would
+            # have timed out and failed the run.
             self.assertEqual(result["run"]["status"], "COMPLETED")
-            self.assertLess(intervals["left"]["start"], intervals["right"]["end"])
-            self.assertLess(intervals["right"]["start"], intervals["left"]["end"])
-            self.assertGreaterEqual(intervals["join"]["start"], intervals["left"]["end"])
-            self.assertGreaterEqual(intervals["join"]["start"], intervals["right"]["end"])
+            self.assertEqual(set(finished_when_join_started), {"left", "right"})
+            self.assertEqual(finished[-1], "join")
 
     def test_independent_reviewer_can_escalate_accepted_deterministic_result(self):
         with tempfile.TemporaryDirectory() as tmp:
