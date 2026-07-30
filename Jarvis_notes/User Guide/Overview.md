@@ -46,8 +46,8 @@ lifecycle: "short_term"
 
 ## Operating Model
 
-> [!info] Local-first by default
-> Router mode can use local speech, local models, OpenAI-compatible endpoints, tools, reminders, browser/file operations, and vault memory without Gemini Live.
+> [!info] Local-first, and Gemini Live is switched off
+> Router mode is the only live path. Local speech, local models, OpenAI-compatible endpoints, tools, reminders, browser/file operations, screen and camera understanding, and vault memory all run without Gemini Live — which is disabled in code, not merely unused.
 
 | Layer | Role |
 | --- | --- |

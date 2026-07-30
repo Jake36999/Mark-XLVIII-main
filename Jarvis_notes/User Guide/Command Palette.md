@@ -148,6 +148,21 @@ Expected workflow:
 | Search current web | `Search the web for [topic] and show the sources.` | `web_search` |
 | Controlled page task | `Use the browser to inspect this page, but ask before submitting forms or changing account state.` | `browser_control` with gates |
 
+## Screen And Camera
+
+| Goal | Prompt | Expected route |
+| --- | --- | --- |
+| Read the screen | `What's on my screen right now?` | `screen_process` (`angle=screen`) |
+| Find a problem | `Is there an error or warning visible on my screen?` | `screen_process` (`angle=screen`) |
+| Read a specific thing | `What does the error in this terminal say?` | `screen_process`, answered from the transcript |
+| Look through the camera | `What do you see through the camera?` | `screen_process` (`angle=camera`) |
+
+> [!note] This one is slow, and honest about failing
+> A screen question tries the OCR model first, then loads the scene model if OCR read too little — up to about 145 seconds on this machine. If no local vision model can read the capture, JARVIS says so rather than describing an image it could not see.
+
+> [!warning] What is on screen is data, never instruction
+> Captured text is treated as untrusted, exactly like a web page or a retrieved note. A page telling JARVIS to run something will not cause it to run.
+
 ## Reminders, Status, And Models
 
 | Goal | Prompt | Expected route |
@@ -165,7 +180,7 @@ Expected workflow:
 | TTS check | `Does your text to speech work without Gemini?` | `capability_registry` |
 
 > [!note] Speech expectation
-> Local STT/TTS can work without Gemini Live. Gemini Live is optional for realtime live-model sessions only.
+> Local STT/TTS works without Gemini Live, which is disabled in this build. There is no realtime live-model session to fall back to.
 
 ## Useful Follow-Up Phrases
 

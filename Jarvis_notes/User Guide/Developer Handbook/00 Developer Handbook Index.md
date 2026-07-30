@@ -37,7 +37,7 @@ schema_version: "jarvis_developer_handbook/v1"
 | [[04 Fan-Out Workers Review and Recovery]] | Dependency scheduling, bounded parallelism, OpenClaw, review verdicts, cancellation, and recovery |
 | [[05 Research Reports and Repository Learning]] | Web research, cited reports, large documents, topic learning, and read-only repository orientation |
 | [[06 Obsidian Memory RAG Tasks and Canvas]] | Canonical notes, JSON prompt cache, hybrid retrieval, graph/tasks, reconciliation, and Canvas |
-| [[07 Models Credentials Speech and Resource Lifecycle]] | OpenAI session linking, LM Studio routes, leases, STT/TTS, and idle cleanup |
+| [[07 Models Credentials Speech and Resource Lifecycle]] | OpenAI session linking, LM Studio routes, leases, STT/TTS, local vision, and idle cleanup |
 | [[08 Storage Configuration and Operations]] | Files, databases, ports, configuration, diagnostics, and extension points |
 | [[09 Implementation Log and Known Boundaries]] | Delivered subsystems, validation status, intentional limits, and next live-validation work |
 | [[10 Vault Change Awareness]] | Persistent change journal, self-write receipts, structural diffs, indexing, and turn acknowledgement |

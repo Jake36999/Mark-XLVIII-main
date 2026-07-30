@@ -1,6 +1,6 @@
 # MARK XLVIII
 
-MARK XLVIII is the local desktop platform and runtime shell for **JARVIS**. The current build is local-first: Gemini Live is optional, not a launch requirement.
+MARK XLVIII is the local desktop platform and runtime shell for **JARVIS**. The current build is local-first: Gemini Live is disabled in code, and every capability — including screen and camera understanding — runs against local models.
 
 ## Current Architecture
 
@@ -50,9 +50,10 @@ Keys must not be stored in `config/runtime.json`, `config/api_keys.json`, enviro
 | `actions/jarvis_canvas.py` | Semantic Canvas facade and Markdown task proposals |
 | `actions/canvas_plan.py` | Mode 2 Canvas planning: compile, approve, review-gate, and execute |
 | `actions/project_learning.py` | Repository inventory, file selection, and code-slice-based learning |
+| `actions/vision_pipeline.py` | Local screen/camera understanding: OCR transcription, scene description, and escalation between them |
 | `core/repo_slicer.py` | AST code slicing into ranked, deduplicated function/class units |
 | `core/approval_response.py` | Shared checkbox+callout approve/correct/deny schema for both planning modes |
-| `core/model_router.py` | OpenAI/local routing, fallback, provenance, and model leases |
+| `core/model_router.py` | OpenAI/local routing, fallback, provenance, model leases, and local-only image calls |
 | `core/vault_activity.py` | External vault edit journal and turn awareness |
 | `core/canvas_*.py` | Canvas validation, deterministic layout, and relationship index |
 | `core/process_events.py` | Redacted session event stream |

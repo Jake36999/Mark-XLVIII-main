@@ -22,7 +22,7 @@ schema_version: "jarvis_developer_handbook/v1"
 # Runtime Architecture and Turn Lifecycle
 
 > [!abstract] Runtime model
-> MARK XLVIII is a desktop Python application. Router mode is the normal local-first path: Gemini Live is optional, local STT/TTS remains available, and model/tool requests go through the same guarded router.
+> MARK XLVIII is a desktop Python application. Router mode is the only live path: Gemini Live is disabled in code, local STT/TTS remains available, and model/tool requests go through the same guarded router.
 
 ## Startup Sequence
 
@@ -32,8 +32,10 @@ schema_version: "jarvis_developer_handbook/v1"
 4. Router mode warms the local TTS service asynchronously, places the UI in `LISTENING`, and starts the local microphone loop.
 5. Background loops perform model cleanup and, only when explicitly enabled, scheduled task reviews.
 
-> [!note] Optional Live mode
-> Gemini Live has a separate realtime session path. It is not required for tools, local speech, plans, reports, memory, reminders, or LM Studio routing.
+> [!warning] Live mode is disabled, not optional — and code behind it is dead code
+> Gemini Live has a separate realtime session path, and `_gemini_live_enabled()` ends in `return bool(wants_gemini and False)`. The `and False` is hardcoded, so `self.session` is always `None` no matter how the runtime is configured. Nothing local needs it: tools, speech, plans, reports, memory, reminders, and LM Studio routing all run without it.
+>
+> The consequence is not cosmetic. **Any branch guarded by `if self.session:` never executes.** Screenshot understanding lived entirely inside one such branch and was therefore non-functional while appearing wired — it captured the screen, announced that the image would arrive next turn, and the image never arrived. When auditing a capability, check whether its live path is behind the session guard before assuming it works.
 
 ## One Conversational Turn
 

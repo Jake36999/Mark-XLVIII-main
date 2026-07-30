@@ -73,10 +73,23 @@ schema_version: "jarvis_developer_handbook/v1"
 - Added read-only repository inventory, representative reading, cited synthesis, snapshot caching, and compact RAG takeaways.
 - Added report-quality checks that reject unknown citations, uncited architecture, inventory contradictions, and truncated takeaways.
 
+### Vision (2026-07-30)
+
+- Added image content parts to the router; before this the payload had no field an image could occupy.
+- Added `call_vision()`, local-only by construction, and `actions/vision_pipeline.py`.
+- Replaced the dead Gemini injection branch in `main.py` with a local path that returns a real answer as the tool result.
+- Added transcript cleanup for grounding markers, placeholder regions, and decode loops; added escalation from OCR to the scene model when the transcript is too thin to answer from.
+- Corrected capture sizing from stream-appropriate (1280×720/JPEG 82/BILINEAR) to capture-appropriate (2560×1440/JPEG 92/LANCZOS).
+
 ## Current Validation
 
 > [!success] Automated suite
-> The complete MARK test suite passed on 2026-07-22: **292 passed**, with one existing Python `audioop` deprecation warning.
+> The complete MARK test suite passed on 2026-07-30: **1041 passed**, in 126s under `pytest-xdist` (`addopts = -n auto`), with the existing Python `audioop` deprecation warning. The suite was 292 tests on 2026-07-22 and 880 before the finalisation work began.
+>
+> `pytest.ini` deliberately sets **no** `testpaths`. Setting it to `tests` silently dropped six vendored tests from `jarvis-ui-components` — making the run faster must not make it smaller.
+
+> [!tip] Run the configuration audit alongside the suite
+> `python scripts/config_audit.py` reports where declared configuration and effective behaviour disagree. Green tests do not catch a value that was written in `config/runtime.json` and quietly transformed before use — two real defects this cycle were exactly that shape. Current state: no contradictions, 11 checks passed, 7 expected-transform notes.
 
 Validated behaviors include:
 
@@ -127,7 +140,13 @@ Task scanning works on demand. Recurring reviews and notifications run only afte
 
 ### Optional services remain optional
 
-Aletheia, Remember Me, OpenClaw, Gemini Live, and the dashboard are not required for Mark-native RAG and workflow execution. Their live availability should be checked before a workflow depends on them.
+Aletheia, Remember Me, OpenClaw, and the dashboard are not required for Mark-native RAG and workflow execution. Their live availability should be checked before a workflow depends on them.
+
+### Gemini Live is disabled, and anything behind it is dead code
+
+`_gemini_live_enabled()` ends in `return bool(wants_gemini and False)`, so `self.session` is always `None`. This is stronger than "optional", and the distinction has already cost real capability: **screenshot understanding was non-functional for the entire local-first era** because its only live path sat behind `if self._pending_vision and self.session:`. It captured the screen, told the user the image was arriving next turn, and then answered from no visual input at all.
+
+Fixed on 2026-07-30 (see [[07 Models Credentials Speech and Resource Lifecycle]]), but the class of defect is the lesson: a feature whose live path is behind a permanently-false guard reports success, produces plausible output, and passes review. When auditing capability, grep for `self.session` before trusting it.
 
 ### Native external tools require environment-specific validation
 

@@ -27,13 +27,15 @@ lifecycle: "short_term"
 | JARVIS | The assistant personality and tool-using agent |
 | MARK XLVIII | The local platform or shell that hosts JARVIS, the dashboard, tools, speech, memory, project operations, and model routing |
 | Router Mode | The default local assistant mode using local or OpenAI-compatible models and tools |
-| Gemini Live | Optional realtime Live backend |
+| Gemini Live | Realtime Live backend, **currently disabled in code** |
 
 > [!important] Identity distinction
 > JARVIS is the assistant. MARK XLVIII is the platform. JARVIS should not identify as MARK XLVIII.
 
-> [!note] Gemini Live
-> Gemini Live is not required for local speech, tools, reminders, memory, reports, or project operations.
+> [!warning] Gemini Live is off, not merely optional
+> `_gemini_live_enabled()` ends in `return bool(wants_gemini and False)` — the `and False` is hardcoded, so the session is never created regardless of configuration. Nothing local depends on it: speech, tools, reminders, memory, reports, and project operations all run without it.
+>
+> The word "optional" was doing real damage. Screenshot understanding routed its images to a Live session and looked implemented for as long as the docs described that session as merely optional rather than absent (see [[07 Models Credentials Speech and Resource Lifecycle]]). Treat any remaining code path that requires `self.session` as **dead until proven otherwise**.
 
 ## Memory
 
@@ -118,9 +120,16 @@ Generated vault notes should include frontmatter fields such as:
 | Task Model | Specialist model loaded only when a larger task requires it |
 | STT | Speech to text |
 | TTS | Text to speech |
+| OCR Model | `unlimited-ocr`. Transcribes text visible in an image. Strong on document-like screens, weak on cluttered application UIs |
+| Scene Model | `qwen/qwen3-vl-4b`. Describes what an image shows. The only usable path for a camera capture, and the fallback when OCR reads too little |
+| Screen Transcript | The OCR model's reading of a screen capture. **Untrusted** — whatever is displayed wrote it, so it is fenced before any model reasons over it |
+| `vision_screen_strategy` | `ocr_first` (default, two model loads, better on dense text) or `scene_only` (one model load, better on application UIs) |
 
 > [!info] Speech expectation
 > JARVIS can use local STT/TTS without Gemini Live. TTS should chunk long replies and avoid duplicate playback.
+
+> [!info] Vision expectation
+> Image understanding is entirely local: `call_vision()` deliberately bypasses the cloud providers `call_text()` can reach, because a screen capture is the most sensitive payload the system handles. Expect a screen question to be slow — up to ~145 seconds when OCR reads too little and the scene model has to be loaded as well.
 
 ## Reports
 
