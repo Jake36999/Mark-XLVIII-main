@@ -101,6 +101,18 @@ The *gates* around them are tested. `test_chat_tool_gate` mocks `main.file_contr
 
 Deletion and desktop control are in that set. This asymmetry should be closed deliberately rather than left as an accident of what was interesting to test.
 
+> [!success] Closed on 2026-07-30 — `tests/test_high_risk_tool_contracts.py`
+> 28 contract tests, asking three things per tool: does it do what it says, does it refuse what it should refuse, and when it fails does it say so.
+>
+> The guards that turned out to exist and are now pinned: `_SAFE_ROOTS` confines file operations to the home directory and resolves before comparing, so `..` cannot escape; `delete_file` refuses the seven protected user directories; deletion is **send2trash only** and refuses outright rather than falling back to a permanent unlink; `_safe_screenshot_path` silently redirects an out-of-bounds capture instead of writing where it was told.
+>
+> Verified by mutation, not assumed: each guard was removed in turn and the test naming it was required to fail. All ten caught, including a mutation that replaced trash with a real `unlink()`.
+>
+> Two tests now guard the *category* rather than individual tools — a newly registered high-risk tool with no contract test, or one that stops requiring confirmation, fails the suite.
+
+> [!danger] `shutdown_jarvis` is tested at its gate only, deliberately
+> Its handler calls `os._exit(0)`. A test that executed it would terminate the runner mid-suite, so the contract tests assert its classification, its permission boundary, and that a deterministic shortcut cannot reach it — never the effect itself. Any future work here must keep that boundary.
+
 ### 3.2 Test density is inverted against risk
 
 `actions/dual_orchestrator.py` is the engine that executes approved work against real state: **1,762 lines, 19 tests, one per 93 lines**. `actions/canvas_plan.py`, which produces *proposals a human then reviews*, has 160.
@@ -135,10 +147,15 @@ No amount of plumbing improves this. It bounds what the product can be, and road
 
 ## 4. Ranked next actions
 
-1. **Delete the Gemini scaffolding.** Not deprecate -- delete. It has already caused one silent capability loss and can cause more. Highest value per hour available in the repository.
-2. **Establish that return values describe completed effects**, with regression tests on the seven repaired sites. This attacks the cause in section 1, not its instances.
-3. **Contract tests for the seven untested high-risk tools.** Not full coverage -- "does it do what it says, and does it report failure honestly."
-4. **Raise `dual_orchestrator` test density** toward the planning layer's.
+1. ~~**Delete the Gemini scaffolding.**~~ **Done** (`dc0dd4e`) — 758 lines. Removal surfaced two costs beyond the vision loss: every dashboard command polled 8 seconds for a session that could never appear, and every tool call depended on `google-genai` because `_execute_tool` returned a vendor type while the import set `types = None` on failure.
+2. ~~**Establish that return values describe completed effects.**~~ **Done** (`da93ab8`) — `core/effect_outcome.py` plus 25 mutation-verified regression tests.
+3. ~~**Contract tests for the seven untested high-risk tools.**~~ **Done** — 28 tests, ten mutations verified. See section 3.1.
+4. **Raise `dual_orchestrator` test density** toward the planning layer's. Now the largest remaining gap: 1,762 lines and 19 tests for the component that executes approved work against real state.
+
+New work these three surfaced, not yet done:
+
+5. **Audit the Gemini *generative* surface.** Eight action modules (`code_helper`, `computer_control`, `computer_settings`, `desktop`, `file_processor`, `flight_finder`, `web_search`, `youtube_video`) each define their own `_get_api_key()` and construct a `genai.Client`. That is separate from Live and was deliberately not touched. Whether any of those paths are reachable is unknown — and "looks wired, is not" is exactly the defect this cycle kept finding.
+6. **Rewire or retire `SystemMonitor` and `ProactiveEngine`.** Both were started only as Live background tasks and have been inert since. Each produces a prompt string, so wiring either to router mode is small.
 
 ## 5. Caveat on the numbers
 
