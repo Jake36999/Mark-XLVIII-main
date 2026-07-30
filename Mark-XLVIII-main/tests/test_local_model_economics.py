@@ -373,3 +373,75 @@ class UnloadKeepGuardTests(unittest.TestCase):
     def test_keep_survives_force(self):
         """Forcing a cleanup should not sabotage the caller's own next call."""
         self.assertNotIn("orpeus_text_to_speech", self._run({"orpeus_text_to_speech"}, force=True))
+
+
+class CapabilityRoutePrecedenceTests(unittest.TestCase):
+    """A quality-tiered route (code, reasoning, main) can lead with the small
+    warm model -- escalation costs a retry. A capability route cannot: a
+    text-only model does not answer an image question less well, it cannot see
+    the image, so leading with it would invite a confident answer about
+    something the model never received.
+
+    Latent rather than live: no image currently reaches an LM Studio model at
+    all -- both image paths hand bytes to a Gemini Live session, and
+    `_gemini_live_enabled()` is unconditionally False. This ordering matters the
+    moment image input is wired to a local model.
+    """
+
+    VISION_CONFIG = dict(
+        BASE_CONFIG,
+        warm_model_preference_enabled=True,
+        model_routes=dict(
+            BASE_CONFIG["model_routes"],
+            vision=["qwen/qwen3-vl-4b"],
+        ),
+    )
+
+    def setUp(self):
+        model_router._WARM_MODEL_CACHE = (0.0, frozenset())
+        self.addCleanup(setattr, model_router, "_WARM_MODEL_CACHE", (0.0, frozenset()))
+
+    def test_vision_is_declared_a_capability_route(self):
+        self.assertIn("vision", model_router.CAPABILITY_ROUTES)
+
+    def test_the_capable_model_leads_on_a_vision_route(self):
+        chain = model_router.select_lmstudio_models(
+            "describe this screenshot image", role="worker", config=self.VISION_CONFIG
+        )
+        self.assertEqual(chain[0], "qwen/qwen3-vl-4b")
+
+    def test_warmth_cannot_promote_a_text_model_over_the_capable_one(self):
+        """The subtle half. Dropping the prepend was not sufficient on its own:
+        baseline models count as warm by definition, so the warm-first partition
+        re-promoted the generic worker straight back to the front."""
+        with mock.patch.object(
+            model_router, "_warm_models", return_value=frozenset({"qwen/qwen3-4b-2507"})
+        ):
+            chain = model_router.select_lmstudio_models(
+                "describe this screenshot image", role="worker", config=self.VISION_CONFIG
+            )
+        self.assertEqual(chain[0], "qwen/qwen3-vl-4b")
+
+    def test_quality_tiered_routes_still_lead_with_the_warm_worker(self):
+        for prompt, label in [
+            ("debug this traceback", "code"),
+            ("derive the tradeoff", "reasoning"),
+            ("hello jarvis", "quick"),
+            ("plan the architecture", "main"),
+        ]:
+            with self.subTest(route=label):
+                chain = model_router.select_lmstudio_models(
+                    prompt, role="worker", config=self.VISION_CONFIG
+                )
+                self.assertEqual(chain[0], "qwen/qwen3-4b-2507")
+
+    def test_a_text_fallback_is_still_available_behind_the_capable_model(self):
+        """Deliberately kept. Removing the fallback would make a vision request
+        hard-fail when the VL model is unavailable, and an empty candidate list
+        produces a confusing error rather than a clean one. Whether a text model
+        should ever answer a genuine image request is a separate decision for
+        whoever wires image input."""
+        chain = model_router.select_lmstudio_models(
+            "describe this screenshot image", role="worker", config=self.VISION_CONFIG
+        )
+        self.assertGreater(len(chain), 1)

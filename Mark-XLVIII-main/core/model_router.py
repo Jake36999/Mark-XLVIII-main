@@ -38,6 +38,18 @@ DEFAULT_ANTHROPIC_URL = "https://api.anthropic.com/v1"
 # holds one task model at a time, so each extra candidate is a cold multi-GB
 # load; a long tail produces timeout cascades rather than resilience.
 DEFAULT_MAX_FALLBACK_CANDIDATES = 3
+# Routes whose model list is a capability requirement rather than a quality
+# preference. On these, the route's own models must be tried before the generic
+# worker model -- a text-only model does not merely answer an image question
+# less well, it cannot see the image.
+#
+# Latent rather than live as of 2026-07-30: no image currently reaches an
+# LM Studio model at all. Both image paths (main.py's `_pending_vision`
+# injection and actions/screen_processor's send loop) hand bytes to a Gemini
+# Live session, and `_gemini_live_enabled()` returns False unconditionally. The
+# ordering matters the moment image input is wired to a local model, which is
+# the obvious next step now that Live is off.
+CAPABILITY_ROUTES = frozenset({"vision"})
 OPENAI_KEY_CHECK_TTL_SECONDS = 600
 _OPENAI_KEY_CHECK_CACHE: dict[tuple[str, str], tuple[bool, float]] = {}
 _PROVENANCE = threading.local()
@@ -268,15 +280,23 @@ def _warm_models(cfg: dict) -> frozenset[str]:
     return result
 
 
-def _order_by_warmth(candidates: list[str], cfg: dict) -> list[str]:
+def _order_by_warmth(candidates: list[str], cfg: dict, route: str = "") -> list[str]:
     """Stable partition: already-loaded models first, everything else after.
 
     A partition, never a re-rank -- relative order inside each group is
     preserved, and it only ever runs over candidates that already survived
-    route selection. That matters: re-ranking globally could promote a warm
-    general model over the only model that can actually serve the route (the
-    vision route has exactly one member).
+    route selection.
+
+    Skipped entirely on a capability route. Warmth is a cost optimisation and
+    must never override a capability requirement: on the vision route the warm
+    baseline is a text-only model, so promoting it would put a model that cannot
+    see the image ahead of the one that can. Preserving route order was not
+    enough on its own -- baseline models are treated as warm by definition, so
+    the partition re-promoted the generic worker even after it stopped being
+    prepended.
     """
+    if route in CAPABILITY_ROUTES:
+        return candidates
     if not candidates or not cfg.get("warm_model_preference_enabled"):
         return candidates
     baseline = {str(item).strip() for item in (cfg.get("baseline_models") or []) if str(item).strip()}
@@ -332,7 +352,13 @@ def select_lmstudio_models(
     candidates: list[str] = []
     if normalized_role == "planner" and route == "main":
         candidates += _split_models(cfg.get("planner_models")) or [str(cfg.get("planner_model") or "")]
-    if normalized_role == "worker":
+    # The generic worker model normally leads: on a quality-tiered route
+    # (code, reasoning, main) a small warm model is a reasonable first attempt
+    # and escalation costs only a retry. A CAPABILITY route is different in
+    # kind -- a text-only model cannot see an image at all, so leading with it
+    # is not a cheap first attempt, it is the wrong tool. Let the route's own
+    # specialised models come first there.
+    if normalized_role == "worker" and route not in CAPABILITY_ROUTES:
         candidates += _split_models(cfg.get("worker_models")) or [str(cfg.get("worker_model") or "")]
     candidates += routes.get(route, [])
     if normalized_role == "planner":
@@ -342,7 +368,7 @@ def select_lmstudio_models(
     # loaded but currently cooling down after failures is still correctly dropped
     # rather than promoted by its warmth.
     ordered = _drop_cooling_down(
-        _order_by_warmth(_dedupe([candidate for candidate in candidates if candidate]), cfg),
+        _order_by_warmth(_dedupe([candidate for candidate in candidates if candidate]), cfg, route),
         cfg,
     )
     # Cap the chain. Every extra candidate on a cold local host is a multi-GB
