@@ -27,15 +27,15 @@ lifecycle: "short_term"
 | JARVIS | The assistant personality and tool-using agent |
 | MARK XLVIII | The local platform or shell that hosts JARVIS, the dashboard, tools, speech, memory, project operations, and model routing |
 | Router Mode | The default local assistant mode using local or OpenAI-compatible models and tools |
-| Gemini Live | Realtime Live backend, **currently disabled in code** |
+| Gemini Live | **Removed** on 2026-07-30. A realtime backend that was disabled in code for the whole local-first era |
 
 > [!important] Identity distinction
 > JARVIS is the assistant. MARK XLVIII is the platform. JARVIS should not identify as MARK XLVIII.
 
-> [!warning] Gemini Live is off, not merely optional
-> `_gemini_live_enabled()` ends in `return bool(wants_gemini and False)` — the `and False` is hardcoded, so the session is never created regardless of configuration. Nothing local depends on it: speech, tools, reminders, memory, reports, and project operations all run without it.
+> [!info] Gemini Live is gone, and Router Mode is the only path
+> It was described as "optional" while being hardcoded off, and that word did real damage: screenshot understanding routed its images to a Live session and looked implemented for as long as the session was described as merely optional rather than absent.
 >
-> The word "optional" was doing real damage. Screenshot understanding routed its images to a Live session and looked implemented for as long as the docs described that session as merely optional rather than absent (see [[07 Models Credentials Speech and Resource Lifecycle]]). Treat any remaining code path that requires `self.session` as **dead until proven otherwise**.
+> Deleted rather than deprecated — 758 lines across `main.py` and `actions/screen_processor.py`. `test_no_gemini_live_session_path_remains` fails the suite if `self.session`, `genai.Client`, `live.connect`, or `send_client_content` reappears in `main.py`.
 
 ## Memory
 

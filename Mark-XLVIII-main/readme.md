@@ -1,6 +1,6 @@
 # MARK XLVIII
 
-MARK XLVIII is the local desktop platform and runtime shell for **JARVIS**. The current build is local-first: Gemini Live is disabled in code, and every capability — including screen and camera understanding — runs against local models.
+MARK XLVIII is the local desktop platform and runtime shell for **JARVIS**. The current build is local-first: Gemini Live has been removed, and every capability — including screen and camera understanding — runs against local models.
 
 ## Current Architecture
 

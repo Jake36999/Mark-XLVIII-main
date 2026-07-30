@@ -14,26 +14,48 @@ class RouterModeConfigTests(unittest.TestCase):
 
         self.assertEqual(main._assistant_mode({}), "router")
 
-    def test_gemini_live_is_disabled_unless_explicitly_enabled(self):
+    def test_no_gemini_live_session_path_remains(self):
+        """These used to assert Gemini Live was *disabled*. It is now *deleted*,
+        which is the stronger property and the one worth guarding.
+
+        The distinction was never cosmetic. While the session merely existed and
+        returned False, `if self.session:` branches read as live code, and
+        screenshot understanding sat inside one -- capturing the screen,
+        announcing the image would arrive next turn, and answering from nothing.
+        A reintroduced session attribute would make that possible again.
+        """
         import main
 
-        self.assertFalse(main._gemini_live_enabled({}))
-        self.assertFalse(main._gemini_live_enabled({"assistant_mode": "router"}))
-        self.assertFalse(
-            main._gemini_live_enabled(
-                {"assistant_mode": "gemini_live", "voice_provider": "gemini", "gemini_api_key": "key"}
-            )
-        )
+        source = Path(main.__file__).read_text(encoding="utf-8")
+        for banned in ("self.session", "genai.Client", "live.connect", "send_client_content"):
+            self.assertNotIn(banned, source, f"Gemini Live path reintroduced: {banned}")
 
-    def test_google_billing_error_is_non_retryable(self):
+    def test_the_assistant_has_exactly_one_live_path(self):
+        """`run()` starts router mode and nothing else. If a second mode is ever
+        added, it must be reachable -- not guarded by a constant."""
         import main
 
-        self.assertTrue(
-            main._is_nonretryable_gemini_error(
-                "Your prepayment credits are depleted. Please manage billing."
-            )
-        )
-        self.assertTrue(main._is_nonretryable_gemini_error("429 RESOURCE_EXHAUSTED"))
+        self.assertFalse(hasattr(main, "_gemini_live_enabled"))
+        self.assertFalse(hasattr(main, "LIVE_MODEL"))
+
+    def test_tool_dispatch_does_not_depend_on_the_google_sdk(self):
+        """`_execute_tool` returned `google.genai.types.FunctionResponse`, so the
+        live tool path imported a vendor SDK needed only by a disabled feature --
+        and the import was wrapped in `try/except` setting `types = None`. On a
+        machine without `google-genai`, every tool call would have raised
+        AttributeError."""
+        import main
+
+        self.assertFalse(hasattr(main, "genai"))
+        response = main.ToolResponse(id="c1", name="x", response={"result": "ok"})
+        self.assertEqual(response.response["result"], "ok")
+
+    def test_the_capture_path_no_longer_imports_gemini(self):
+        from actions import screen_processor
+
+        source = Path(screen_processor.__file__).read_text(encoding="utf-8")
+        self.assertNotIn("genai", source)
+        self.assertNotIn("_VisionSession", source)
 
 
 class RouterModeSetupConfigTests(unittest.TestCase):

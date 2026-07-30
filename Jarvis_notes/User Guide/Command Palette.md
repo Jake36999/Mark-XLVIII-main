@@ -180,7 +180,7 @@ Expected workflow:
 | TTS check | `Does your text to speech work without Gemini?` | `capability_registry` |
 
 > [!note] Speech expectation
-> Local STT/TTS works without Gemini Live, which is disabled in this build. There is no realtime live-model session to fall back to.
+> Speech is entirely local — Vosk for STT, and Orpheus, Kokoro, EdgeTTS or Windows SAPI for TTS. There is no cloud realtime session.
 
 ## Useful Follow-Up Phrases
 

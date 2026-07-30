@@ -81,6 +81,13 @@ schema_version: "jarvis_developer_handbook/v1"
 - Added transcript cleanup for grounding markers, placeholder regions, and decode loops; added escalation from OCR to the scene model when the transcript is too thin to answer from.
 - Corrected capture sizing from stream-appropriate (1280×720/JPEG 82/BILINEAR) to capture-appropriate (2560×1440/JPEG 92/LANCZOS).
 
+### Gemini Live removal (2026-07-30)
+
+- Deleted ten `JarvisLive` methods reachable only from a connection loop that could not run, plus the loop itself and the `_VisionSession` class in `screen_processor`.
+- Replaced `types.FunctionResponse` with a local `ToolResponse`, removing a `google-genai` dependency from the live tool path.
+- Removed the 8-second session poll from the dashboard command relay.
+- Added `test_no_gemini_live_session_path_remains` so the path cannot return unnoticed.
+
 ## Current Validation
 
 > [!success] Automated suite
@@ -142,11 +149,25 @@ Task scanning works on demand. Recurring reviews and notifications run only afte
 
 Aletheia, Remember Me, OpenClaw, and the dashboard are not required for Mark-native RAG and workflow execution. Their live availability should be checked before a workflow depends on them.
 
-### Gemini Live is disabled, and anything behind it is dead code
+### Gemini Live has been removed
 
-`_gemini_live_enabled()` ends in `return bool(wants_gemini and False)`, so `self.session` is always `None`. This is stronger than "optional", and the distinction has already cost real capability: **screenshot understanding was non-functional for the entire local-first era** because its only live path sat behind `if self._pending_vision and self.session:`. It captured the screen, told the user the image was arriving next turn, and then answered from no visual input at all.
+Deleted on 2026-07-30: **758 lines** across `main.py` and `actions/screen_processor.py`, including ten methods reachable only from a connection loop that could not run.
 
-Fixed on 2026-07-30 (see [[07 Models Credentials Speech and Resource Lifecycle]]), but the class of defect is the lesson: a feature whose live path is behind a permanently-false guard reports success, produces plausible output, and passes review. When auditing capability, grep for `self.session` before trusting it.
+It had been hardcoded off (`return bool(wants_gemini and False)`) rather than removed, and the cost of that half-measure was concrete:
+
+- **Screenshot understanding was non-functional for the entire local-first era** — its only live path sat behind `if self._pending_vision and self.session:`. It captured the screen, said the image was arriving next turn, and answered from nothing.
+- **Every dashboard command paid an 8-second delay**, polling for a session that could never appear before falling through to the path that actually answers it.
+- **Every tool call depended on `google-genai`** — `_execute_tool` returned `types.FunctionResponse`, and the import set `types = None` on failure, so a machine without that SDK would have raised `AttributeError` on any tool use. Replaced with a local `ToolResponse`.
+
+The lesson generalises: **a feature whose live path is behind a permanently-false guard reports success, produces plausible output, and passes review.** Nothing catches it — not the compiler, not the type checker, not the test suite. Prefer deletion to a disabled flag.
+
+`test_no_gemini_live_session_path_remains` fails the suite if `self.session`, `genai.Client`, `live.connect`, or `send_client_content` reappears in `main.py`.
+
+> [!warning] Two features went inert with it and are still unwired
+> `SystemMonitor` threshold alerts and `ProactiveEngine` idle check-ins were only ever started as Live background tasks. The engines are untouched in `actions/system_monitor.py` and `actions/proactive.py` and each just builds a prompt string, so rewiring to router mode is a small job. Deliberately left unwired rather than kept as dead attributes.
+
+> [!note] The Gemini *generative* API is a separate, larger surface
+> `code_helper`, `computer_control`, `computer_settings`, `desktop`, `file_processor`, `flight_finder`, `web_search`, and `youtube_video` each define their own `_get_api_key()` and construct a `genai.Client`. That is not Live and was **not** touched by this removal. Whether those paths are reachable is unaudited and worth a separate pass.
 
 ### Native external tools require environment-specific validation
 

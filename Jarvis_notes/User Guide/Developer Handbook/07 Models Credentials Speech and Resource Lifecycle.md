@@ -86,7 +86,7 @@ A model's advertised context window is not what it gets here. `MODEL_PROFILES` d
 
 ## Local Vision (2026-07-30)
 
-Until this date **no image reached any model at all**. `_build_messages` produced a plain string, so there was nowhere in the payload to put one, and both capture paths handed bytes to a Gemini Live session that `_gemini_live_enabled()` switches off unconditionally. Asking about the screen captured it, returned `[VISION_ACTIVE] ... the actual image arrives in the next message`, and the image never arrived. The reply that followed was generated from no visual input whatsoever.
+Until this date **no image reached any model at all**. `_build_messages` produced a plain string, so there was nowhere in the payload to put one, and both capture paths handed bytes to a Gemini Live session that was hardcoded off. Asking about the screen captured it, returned `[VISION_ACTIVE] ... the actual image arrives in the next message`, and the image never arrived. The reply that followed was generated from no visual input whatsoever. (That Live path has since been deleted outright — see [[09 Implementation Log and Known Boundaries]].)
 
 Three pieces now connect it:
 

@@ -1,0 +1,152 @@
+---
+id: "jarvis-20260730T173753Z-a67d11b5"
+title: "System Assessment: Where MARK XLVIII Is Strong, and Where It Is Not"
+type: "report"
+status: "active"
+created: "2026-07-30T17:37:53Z"
+updated: "2026-07-30T17:37:53Z"
+project_id: "jarvis_notes"
+source: "claude"
+tags: ["assessment", "architecture", "test-coverage", "technical-debt", "tier-long-term", "tier/long-term"]
+sync_state: "local_only"
+index_state: "indexed_local"
+remember_note_id: ""
+rag_index: true
+sensitivity: "internal"
+confidence: 0.85
+valid_from: "2026-07-30T17:37:53Z"
+review_after: ""
+source_version: 1
+content_hash: "71fe583c0ce039f9522b4f88dc95d0f29a03b62c279f517a0d1c22305dd87741"
+supersedes: []
+contradicts: []
+depends_on: []
+depended_on_by: []
+extends: []
+extended_by: []
+implements: []
+implemented_by: []
+consumes: []
+consumed_by: []
+related: []
+deleted: false
+deleted_at: ""
+lifecycle: "long_term"
+sync_error: ""
+---
+
+# System Assessment: Where MARK XLVIII Is Strong, and Where It Is Not
+
+> [!abstract] The finding in one line
+> The defects found this cycle are not seven unrelated bugs. They are one failure mode -- **the system reports success it has never verified** -- and only the instances have been fixed, not the cause.
+
+## 1. The dominant failure mode
+
+Seven separate defects this cycle, all the same shape:
+
+| Where | What it claimed | What was true |
+| --- | --- | --- |
+| Vision injection (`main.py`) | "the actual image arrives in the next message" | It never arrived. The reply was generated from no visual input. |
+| `screen_process()` (`screen_processor.py`) | Returned `True` | Bytes were queued to a dead session; nothing was processed |
+| MCP `cancel()` | Returned `True` | `Future.cancel()` fails on a running task; it kept going |
+| `research_state` | Hardcoded `"complete"` | Search may have failed entirely |
+| Orpheus baseline | Configuration honoured | `_resolved_config` silently appended two models |
+| Canvas implementation node | Plan compiled successfully | Silent no-op -- no project target |
+| `_resolved_config` | Reported the declared baseline | Promoted models the configuration never named |
+
+These share no subsystem. They share **epistemics**: each returns a success signal when work is *dispatched* rather than when it is *done*.
+
+On a cloud stack that gap is milliseconds and invisible. On a host where a model load takes ninety seconds, that gap is where the truth lives. This is the architectural consequence of going local-first that was never accounted for.
+
+> [!danger] The cause is still open
+> Every instance above was repaired individually. There is still **no convention** that a return value must describe a completed effect rather than an accepted request. Until there is, this will keep recurring, and it will keep being invisible -- none of these were caught by tests, by review, or by the type system. Two were caught by a user noticing the answer was wrong.
+
+## 2. Strengths
+
+### Adversarial posture is genuinely strong
+
+`evidence_block` nonce fencing, `_TOOL_AUTHORIZATION_BASES` with a *required* keyword so a new call site cannot silently inherit a bypass, hash-frozen approval envelopes, trusted-channel-only route pinning, and 18 dedicated injection-corpus tests.
+
+The proof is behavioural: when the vision pipeline was written, the screen transcript was fenced before any model reasoned over it -- not because it was remembered, but because the pattern was already the obvious thing to reach for. That is architecture doing its job.
+
+### The decision layer is well tested
+
+| Module | Lines | Tests | Lines per test |
+| --- | --- | --- | --- |
+| `actions/canvas_plan.py` | 2,464 | 160 | 15 |
+| `core/model_router.py` | 2,125 | 70 | 30 |
+| `actions/project_learning.py` | 1,508 | 40 | 38 |
+| `actions/jarvis_memory.py` | 4,518 | 86 | 53 |
+
+The planning, routing and approval spine is the most exercised code in the repository, and it is where a mistake propagates furthest.
+
+### The instrumentation built this cycle is the real asset
+
+`process_trace`, `scripts/config_audit.py`, provenance recording, and `char_budget_for()` all convert *invisible* failures into *visible* ones -- precisely the class this system is worst at. The configuration audit alone would have caught two of the seven defects in section 1.
+
+### Failure reporting is becoming honest
+
+MCP cancellation now returns `cancellation_requested` rather than a bare `True`. `research_state` returns `partial`, `offline`, or `failed`. Vision says "no local vision model could read it" instead of describing an image it never saw. This is a measurable behavioural shift and it should continue.
+
+## 3. Weaknesses
+
+### 3.1 Verification asymmetry -- the sharpest structural problem
+
+**7 of 12 high-risk tools have no test importing their module**: `browser_control`, `computer_control`, `computer_settings`, `desktop_control`, `file_controller`, `screen_process`, `shutdown_jarvis`.
+
+The *gates* around them are tested. `test_chat_tool_gate` mocks `main.file_controller` and proves the confirmation pause works and that frozen arguments are used on resume. So:
+
+- Well defended against a dangerous tool being called **wrongly**.
+- Undefended against a dangerous tool **behaving wrongly once approved**.
+
+Deletion and desktop control are in that set. This asymmetry should be closed deliberately rather than left as an accident of what was interesting to test.
+
+### 3.2 Test density is inverted against risk
+
+`actions/dual_orchestrator.py` is the engine that executes approved work against real state: **1,762 lines, 19 tests, one per 93 lines**. `actions/canvas_plan.py`, which produces *proposals a human then reviews*, has 160.
+
+The artefact that gets human review is six times better tested than the executor that does not.
+
+### 3.3 Dead scaffolding no tool can detect
+
+Roughly **20 live references to `self.session`** remain in `main.py`, all permanently unreachable because `_gemini_live_enabled()` ends in `return bool(wants_gemini and False)`.
+
+This already cost one entire capability for the whole local-first era. Nothing flags it -- not the compiler, not the type checker, not 1,041 tests. Every remaining reference is a place where a future feature can be built, appear wired, and silently do nothing.
+
+### 3.4 Keyword routing remains fragile
+
+**57 literal keywords** perform model-class selection. The documented history is poor: `"cited report"` inside anti-fabrication boilerplate routed *every tool summary in the system* into a 14B research chain; `"repo"` matched `weather_report`; `"ram"` matched `program` and `diagram`; `"read"` matched `already` and `thread`.
+
+Route pinning fixed the worst path. The mechanism is unchanged, and its failures are silent and expensive.
+
+### 3.5 Concentration
+
+`actions/jarvis_memory.py` is 4,518 lines; `main.py` is 4,271. The top five modules are **32%** of non-test source. `main.py` holds the turn lifecycle, tool dispatch, deterministic workflow bootstraps, and dead Gemini remnants in one file -- which is a large part of why the vision defect could hide in it.
+
+### 3.6 Local model quality is the actual ceiling
+
+Measured, not asserted:
+
+- An identical prompt produced **three different answers across three runs**.
+- `unlimited-ocr` produced 4,766 usable characters on one screen and **164** on another.
+- A screen question costs **76-145 seconds**.
+
+No amount of plumbing improves this. It bounds what the product can be, and roadmap decisions should treat it as a constraint rather than something to engineer around.
+
+## 4. Ranked next actions
+
+1. **Delete the Gemini scaffolding.** Not deprecate -- delete. It has already caused one silent capability loss and can cause more. Highest value per hour available in the repository.
+2. **Establish that return values describe completed effects**, with regression tests on the seven repaired sites. This attacks the cause in section 1, not its instances.
+3. **Contract tests for the seven untested high-risk tools.** Not full coverage -- "does it do what it says, and does it report failure honestly."
+4. **Raise `dual_orchestrator` test density** toward the planning layer's.
+
+## 5. Caveat on the numbers
+
+"Never imported by a test" is a **coverage proxy, not line coverage**. A module can be imported and barely exercised. The 18% figure (8,314 of 46,878 first-party lines, 30 of 79 modules) is a *floor* on the gap, not a measurement of it. A real coverage run would be a cheap and worthwhile follow-up.
+
+## Related Notes
+
+- [[2026-07-30-local-vision-wiring-and-model-measurements]]
+- [[09 Implementation Log and Known Boundaries]]
+- [[01 Runtime Architecture and Turn Lifecycle]]
+- [[02 Capability Registry MCP and Safety]]

@@ -22,7 +22,7 @@ schema_version: "jarvis_developer_handbook/v1"
 # Runtime Architecture and Turn Lifecycle
 
 > [!abstract] Runtime model
-> MARK XLVIII is a desktop Python application. Router mode is the only live path: Gemini Live is disabled in code, local STT/TTS remains available, and model/tool requests go through the same guarded router.
+> MARK XLVIII is a desktop Python application. Router mode is the only path: local STT/TTS, and model/tool requests through one guarded router.
 
 ## Startup Sequence
 
@@ -32,10 +32,15 @@ schema_version: "jarvis_developer_handbook/v1"
 4. Router mode warms the local TTS service asynchronously, places the UI in `LISTENING`, and starts the local microphone loop.
 5. Background loops perform model cleanup and, only when explicitly enabled, scheduled task reviews.
 
-> [!warning] Live mode is disabled, not optional — and code behind it is dead code
-> Gemini Live has a separate realtime session path, and `_gemini_live_enabled()` ends in `return bool(wants_gemini and False)`. The `and False` is hardcoded, so `self.session` is always `None` no matter how the runtime is configured. Nothing local needs it: tools, speech, plans, reports, memory, reminders, and LM Studio routing all run without it.
+> [!success] There is exactly one runtime path
+> `run()` starts router mode and nothing else. Gemini Live was **deleted** on 2026-07-30 — not deprecated — along with 758 lines of code that could never execute.
 >
-> The consequence is not cosmetic. **Any branch guarded by `if self.session:` never executes.** Screenshot understanding lived entirely inside one such branch and was therefore non-functional while appearing wired — it captured the screen, announced that the image would arrive next turn, and the image never arrived. When auditing a capability, check whether its live path is behind the session guard before assuming it works.
+> It had been hardcoded off (`return bool(wants_gemini and False)`) for the whole local-first era, which meant **every branch guarded by `if self.session:` was unreachable**. Screenshot understanding lived entirely inside one: it captured the screen, announced that the image would arrive next turn, and answered from nothing. Two smaller costs surfaced during removal — every dashboard command polled 8 seconds for a session that could never appear, and `_execute_tool` returned a `google.genai` type, so a machine without that SDK would have crashed on every tool call.
+>
+> `test_no_gemini_live_session_path_remains` now fails the suite if `self.session`, `genai.Client`, `live.connect`, or `send_client_content` reappears in `main.py`.
+
+> [!warning] Two features were removed with it and are not wired to router mode
+> `SystemMonitor` threshold alerts and `ProactiveEngine` idle check-ins were started only as Gemini Live background tasks, so both have been inert since Live was switched off. The engines themselves are untouched in `actions/system_monitor.py` and `actions/proactive.py`; each produces a prompt string, so rewiring either to router mode is small. They are left **unwired rather than kept as dead attributes**, so the gap stays visible.
 
 ## One Conversational Turn
 
