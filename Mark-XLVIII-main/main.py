@@ -1452,7 +1452,15 @@ def _is_create_plan_prompt(text: str) -> bool:
             lowered,
         )
     )
-    return lowered.startswith("create plan:") or research_plan_request or any(
+    # `startswith` rather than a bare `in`: the Command Palette documents
+    # "create plan..." as a trigger, but the predicate only accepted
+    # "create plan:" or "create a plan to/for", so the documented phrasing
+    # ("create plan to ship X") fell through to model routing instead. Anchored
+    # at the start deliberately -- this session has fixed several substring
+    # collisions ("repo" in weather_report, "ram" in program), and a message
+    # that *begins* "create plan" is unambiguous in a way a mid-sentence match
+    # would not be.
+    return lowered.startswith("create plan") or research_plan_request or any(
         token in lowered
         for token in (
             "create a plan for",
@@ -3302,6 +3310,27 @@ class JarvisLive:
 
             elif name == "plan_workflow":
                 r = await loop.run_in_executor(None, lambda: plan_workflow(parameters=args, player=self.ui, speak=self.speak))
+                result = r or "Done."
+
+            elif name == "canvas_plan":
+                # Missing until 2026-07-30. `canvas_plan` was declared in
+                # TOOL_DECLARATIONS with a full description of propose /
+                # evaluate_approval / execute, and core/tool_dispatcher wired it
+                # for the MCP path -- but `_execute_tool` had no branch, so every
+                # call from chat fell through to "Unknown tool: canvas_plan".
+                #
+                # The visible half still worked, which is why it went unnoticed:
+                # `_redirect_dev_agent_to_canvas` calls decompose + propose
+                # directly, so a canvas and an approval note still appeared. What
+                # could not run was everything after the human decides --
+                # evaluate_approval, verify_approval and execute. Canvas Mode 2
+                # could produce plans and never execute one.
+                from actions.canvas_plan import canvas_plan as _canvas_plan
+
+                r = await loop.run_in_executor(
+                    None,
+                    lambda: _canvas_plan(parameters=args, player=self.ui, speak=self.speak),
+                )
                 result = r or "Done."
 
             elif name == "capability_registry":

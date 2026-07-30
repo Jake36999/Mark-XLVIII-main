@@ -46,7 +46,6 @@ lifecycle: "short_term"
 | `system_status` | CPU/RAM/GPU/temperature/process status | Local telemetry | Low |
 | `model_lifecycle` | LM Studio status and cleanup | Loaded model status or cleanup result | Low to medium |
 | `screen_process` | Screen/camera inspection | Answer about what is on screen or in view | Low |
-| `speech` | STT/TTS status and voice capability | Capability answer | Low |
 
 ## Tool Details
 
@@ -162,9 +161,17 @@ Ask naturally — "what's on my screen?", "is there an error visible?", "what am
 > [!warning] What is on screen is data, never instructions
 > Text captured from your screen is treated as untrusted, the same as a web page or a retrieved note. It cannot grant permission, choose tools, or authorise actions — so a page telling JARVIS to run something will not cause it to run.
 
-### `speech`
+## Capabilities JARVIS Can Describe But Not Call
 
-Local speech capability. STT can use Vosk. TTS can use Windows, EdgeTTS, Kokoro, or OpenAI-compatible local endpoints such as Orpheus.
+Two entries in the capability registry are **not tools**. They exist so JARVIS can answer questions about them, but there is nothing to invoke — the behaviour is the runtime's, or yours.
+
+| Capability | What it is |
+| --- | --- |
+| `speech` | Local STT/TTS. STT can use Vosk; TTS can use Windows, EdgeTTS, Kokoro, or an OpenAI-compatible local endpoint such as Orpheus. Speech happens as part of every spoken turn — you do not ask for it. |
+| `operational_ui` | The Process Trace panel, the Operations dialog (Ctrl+Shift+O) and the command palette (Ctrl+K). You operate these directly. |
+
+> [!note] Why this distinction is called out
+> `speech` was previously listed in the tool table above, with a risk level, as though you could ask JARVIS to run it. Asking for it returns "Unknown tool: speech" — it was never a callable tool. `tests/test_capability_joins.py` now fails the suite if a registry entry and the tool list disagree in either direction.
 
 > [!note] Gemini dependency
 > Gemini Live is optional. Local speech, tools, reminders, reports, and vault memory do not require Gemini Live.
