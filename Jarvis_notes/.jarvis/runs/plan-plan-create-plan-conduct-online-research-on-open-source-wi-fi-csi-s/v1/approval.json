@@ -1,0 +1,16 @@
+{
+  "schema_version": "jarvis_approval/v1",
+  "plan_id": "plan-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensin",
+  "plan_version": 1,
+  "approval_projection_hash": "15ee5bf6c88a79954de398ad0428e8ea89caf727d5a5931e9d5d7b2951010553",
+  "workflow_hash": "c8578cd91ce4e34ce8856ebdd3c64d7a60fbffa7ab54038ee676d6eb9212028e",
+  "manifest_hash": "2d9f90042d17f72eea8c0cbd4ff068d594140b589aee85cf01110e36d7e50982",
+  "approved_action_ids": [
+    "p01",
+    "p02",
+    "p03",
+    "p04"
+  ],
+  "approved_at": "2026-07-26T14:02:25Z",
+  "signature": "e63fb94c929f2922d43f5d4cf13b42f82fdb82a8cf71528586a675340d2dcb6e"
+}

@@ -1,0 +1,639 @@
+{
+  "nodes": [
+    {
+      "id": "jarvis-95a610f2d04515d2",
+      "type": "file",
+      "file": "Plans/2026-07-26-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensing-datase.md",
+      "x": 0,
+      "y": 0,
+      "width": 460,
+      "height": 280,
+      "jarvis": {
+        "layout_profile": "plan",
+        "layout_baseline": {
+          "x": 0,
+          "y": 0,
+          "width": 460,
+          "height": 280
+        }
+      }
+    },
+    {
+      "id": "jarvis-880d6249b1a7465a",
+      "type": "text",
+      "text": "# Plan - Create plan: Conduct online research on open-source Wi-Fi CSI sensing datasets and compile\n**Status:** queued\n**Approval:** approved\n**Execution:** queued\n**Visible tasks:** 17 of 17\n\n> This Canvas is a rolling view. The linked Markdown plan is authoritative.",
+      "x": 580,
+      "y": 0,
+      "width": 420,
+      "height": 230,
+      "color": "4",
+      "jarvis": {
+        "kind": "status",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-26-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensing-datase.md",
+        "layout_profile": "plan",
+        "layout_baseline": {
+          "x": 580,
+          "y": 0,
+          "width": 420,
+          "height": 230
+        }
+      }
+    },
+    {
+      "id": "jarvis-4d0e12cfaedfedc6",
+      "type": "text",
+      "text": "## [ ] **Approve** — execute the plan exactly as compiled.\n\n`plan-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensin-171`\n\nSource line 171",
+      "x": 1120,
+      "y": 480,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensin-171",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-26-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensing-datase.md",
+        "source_line": 171,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "53b0be375345da80e38db625263c48ee1cd2df0411158dcda59c7ccb61c4b087",
+        "layout_profile": "plan",
+        "layout_baseline": {
+          "x": 1120,
+          "y": 480,
+          "width": 350,
+          "height": 170
+        }
+      }
+    },
+    {
+      "id": "jarvis-968b0861571b07f9",
+      "type": "text",
+      "text": "## [ ] **Correct** — the plan needs changes before it can run.\n\n`plan-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensin-172`\n\nSource line 172",
+      "x": 1540,
+      "y": 240,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensin-172",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-26-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensing-datase.md",
+        "source_line": 172,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "4a67c8166580939faedc31463e3aac1e19ce5a26e7fa224082cc4ed89e3bfce5",
+        "layout_profile": "plan",
+        "layout_baseline": {
+          "x": 1540,
+          "y": 240,
+          "width": 350,
+          "height": 170
+        }
+      }
+    },
+    {
+      "id": "jarvis-9be66c2e4caa2bc3",
+      "type": "text",
+      "text": "## [ ] **Deny** — do not execute this plan.\n\n`plan-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensin-173`\n\nSource line 173",
+      "x": 1540,
+      "y": 480,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensin-173",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-26-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensing-datase.md",
+        "source_line": 173,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "83a9b9f130f3b286bd46a0c135f2fe0b1b57c20425cab7e894379dcf829fc8b7",
+        "layout_profile": "plan",
+        "layout_baseline": {
+          "x": 1540,
+          "y": 480,
+          "width": 350,
+          "height": 170
+        }
+      }
+    },
+    {
+      "id": "jarvis-a485182943e8f3bf",
+      "type": "text",
+      "text": "## [ ] Approval gates are visible.\n\n`plan-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensin-51`\n\nSource line 51",
+      "x": 2500,
+      "y": 480,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensin-51",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-26-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensing-datase.md",
+        "source_line": 51,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "3db7d1c8271e1968b421107a5a3799b9eb95a43809b14ae9019d2eae58dbec58",
+        "layout_profile": "plan",
+        "layout_baseline": {
+          "x": 2500,
+          "y": 480,
+          "width": 350,
+          "height": 170
+        }
+      }
+    },
+    {
+      "id": "jarvis-8c6c55557209a94e",
+      "type": "text",
+      "text": "## [ ] Blockers and design decision points are explicit.\n\n`plan-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensin-50`\n\nSource line 50",
+      "x": 2970,
+      "y": 0,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensin-50",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-26-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensing-datase.md",
+        "source_line": 50,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "a8573b37f17db9ab1513b94a5969bda3c5e2bbb887a62db40d13b9286a09adea",
+        "layout_profile": "plan",
+        "layout_baseline": {
+          "x": 2970,
+          "y": 0,
+          "width": 350,
+          "height": 170
+        }
+      }
+    },
+    {
+      "id": "jarvis-fd1b8b8d1e5b1f16",
+      "type": "text",
+      "text": "## [ ] Completion summary requirements are defined.\n\n`plan-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensin-52`\n\nSource line 52",
+      "x": 1960,
+      "y": 240,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensin-52",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-26-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensing-datase.md",
+        "source_line": 52,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "cbe70f4bb52360dd35f74bdf79c8821c9d64fd85cc3a27066987ea68c5b8e7f8",
+        "layout_profile": "plan",
+        "layout_baseline": {
+          "x": 1960,
+          "y": 240,
+          "width": 350,
+          "height": 170
+        }
+      }
+    },
+    {
+      "id": "jarvis-7ba734f42efe7420",
+      "type": "text",
+      "text": "## [ ] Destructive actions explicitly confirmed.\n\n`plan-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensin-123`\n\nSource line 123",
+      "x": 1540,
+      "y": 0,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensin-123",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-26-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensing-datase.md",
+        "source_line": 123,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "4903cb7a0bc008e68a6c8e757ea67f179875ac29be9ec7a76a1f8315de1f9b87",
+        "layout_profile": "plan",
+        "layout_baseline": {
+          "x": 1540,
+          "y": 0,
+          "width": 350,
+          "height": 170
+        }
+      }
+    },
+    {
+      "id": "jarvis-ab081cea07672fa1",
+      "type": "text",
+      "text": "## [ ] Execution milestones are ordered.\n\n`plan-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensin-49`\n\nSource line 49",
+      "x": 1960,
+      "y": 0,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensin-49",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-26-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensing-datase.md",
+        "source_line": 49,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "7f4c137231ce0641757e8fc62b129a51dcc09af5dc0b6a5309f3a47df7d693e2",
+        "layout_profile": "plan",
+        "layout_baseline": {
+          "x": 1960,
+          "y": 0,
+          "width": 350,
+          "height": 170
+        }
+      }
+    },
+    {
+      "id": "jarvis-4af333439f89b0a4",
+      "type": "text",
+      "text": "## [ ] High-cost model use approved when needed.\n\n`plan-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensin-124`\n\nSource line 124",
+      "x": 1120,
+      "y": 240,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensin-124",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-26-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensing-datase.md",
+        "source_line": 124,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "cb1fbd40ab4f4925cf2414e5b8d39f955bf96b9a3b840c3e307d726d4a4848af",
+        "layout_profile": "plan",
+        "layout_baseline": {
+          "x": 1120,
+          "y": 240,
+          "width": 350,
+          "height": 170
+        }
+      }
+    },
+    {
+      "id": "jarvis-f00811911e61ef46",
+      "type": "text",
+      "text": "## [ ] JARVIS creates a summary or blocker note after execution starts.\n\n`plan-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensin-132`\n\nSource line 132",
+      "x": 2970,
+      "y": 240,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensin-132",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-26-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensing-datase.md",
+        "source_line": 132,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "a232ce6cd8ad42a309ed3525be63864bcded4308b38d83145f9e44092f636992",
+        "layout_profile": "plan",
+        "layout_baseline": {
+          "x": 2970,
+          "y": 240,
+          "width": 350,
+          "height": 170
+        }
+      }
+    },
+    {
+      "id": "jarvis-9e03dcfba573b799",
+      "type": "text",
+      "text": "## [ ] JARVIS updates the plan if the goal changes.\n\n`plan-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensin-131`\n\nSource line 131",
+      "x": 1540,
+      "y": 720,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensin-131",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-26-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensing-datase.md",
+        "source_line": 131,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "2968a645bf76ac79ae078b2d974bce4cec26574ef36da21a3782a30d9401c292",
+        "layout_profile": "plan",
+        "layout_baseline": {
+          "x": 1540,
+          "y": 720,
+          "width": 350,
+          "height": 170
+        }
+      }
+    },
+    {
+      "id": "jarvis-598e7db4186f1b0f",
+      "type": "text",
+      "text": "## [ ] Plan approved by user.\n\n`plan-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensin-122`\n\nSource line 122",
+      "x": 1120,
+      "y": 720,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensin-122",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-26-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensing-datase.md",
+        "source_line": 122,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "af466f708b8c947dad485e4d7ff17ad6d77749b1e0d0969b1d3b677d55eee78a",
+        "layout_profile": "plan",
+        "layout_baseline": {
+          "x": 1120,
+          "y": 720,
+          "width": 350,
+          "height": 170
+        }
+      }
+    },
+    {
+      "id": "jarvis-0131c9f2d74bb811",
+      "type": "text",
+      "text": "## [ ] Plan reviewed in Obsidian.\n\n`plan-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensin-47`\n\nSource line 47",
+      "x": 2500,
+      "y": 0,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensin-47",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-26-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensing-datase.md",
+        "source_line": 47,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "adae1169b554eb59572186679fb8518d493edd52d059cb194deeb335e7a0dda0",
+        "layout_profile": "plan",
+        "layout_baseline": {
+          "x": 2500,
+          "y": 0,
+          "width": 350,
+          "height": 170
+        }
+      }
+    },
+    {
+      "id": "jarvis-60f9260824e76829",
+      "type": "text",
+      "text": "## [ ] Scope and out-of-scope items are clear.\n\n`plan-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensin-48`\n\nSource line 48",
+      "x": 1120,
+      "y": 960,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensin-48",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-26-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensing-datase.md",
+        "source_line": 48,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "3438169b8e51a2a2b8c274d8841930ff0abea85f9703b80fdc572f7044aa5d9c",
+        "layout_profile": "plan",
+        "layout_baseline": {
+          "x": 1120,
+          "y": 960,
+          "width": 350,
+          "height": 170
+        }
+      }
+    },
+    {
+      "id": "jarvis-4a5dd49084093f57",
+      "type": "text",
+      "text": "## [ ] Subagent delegation approved when needed.\n\n`plan-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensin-125`\n\nSource line 125",
+      "x": 1120,
+      "y": 0,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensin-125",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-26-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensing-datase.md",
+        "source_line": 125,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "a9ca1fff6403f3766620c83047f90bd3a33782a930ba5b61ee73297d07c127a9",
+        "layout_profile": "plan",
+        "layout_baseline": {
+          "x": 1120,
+          "y": 0,
+          "width": 350,
+          "height": 170
+        }
+      }
+    },
+    {
+      "id": "jarvis-a3cedaab07b2e64d",
+      "type": "text",
+      "text": "## [ ] User requests edits or approves execution.\n\n`plan-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensin-130`\n\nSource line 130",
+      "x": 1540,
+      "y": 960,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensin-130",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-26-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensing-datase.md",
+        "source_line": 130,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "8babd3bfeeed7cb5348043a77739c48b64ecde547230dd521e0a24f0cce3f6e4",
+        "layout_profile": "plan",
+        "layout_baseline": {
+          "x": 1540,
+          "y": 960,
+          "width": 350,
+          "height": 170
+        }
+      }
+    },
+    {
+      "id": "jarvis-9874ca16a2f93cdb",
+      "type": "text",
+      "text": "## [ ] User reviews this plan in Obsidian.\n\n`plan-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensin-129`\n\nSource line 129",
+      "x": 2500,
+      "y": 240,
+      "width": 350,
+      "height": 170,
+      "color": "3",
+      "jarvis": {
+        "kind": "task",
+        "task_id": "plan-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensin-129",
+        "source_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\2026-07-26-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensing-datase.md",
+        "source_line": 129,
+        "source_done": false,
+        "source_permission": "propose",
+        "source_run_id": "",
+        "source_hash": "848c22a9e1b0205223f112a58ede4c90683cf0f780158f0993ac2321b9054be7",
+        "layout_profile": "plan",
+        "layout_baseline": {
+          "x": 2500,
+          "y": 240,
+          "width": 350,
+          "height": 170
+        }
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "jarvis-cebaf540db260b24",
+      "fromNode": "jarvis-95a610f2d04515d2",
+      "fromSide": "right",
+      "toNode": "jarvis-880d6249b1a7465a",
+      "toSide": "left",
+      "label": "current state"
+    },
+    {
+      "id": "jarvis-64f14c6ee2d9974a",
+      "fromNode": "jarvis-880d6249b1a7465a",
+      "fromSide": "right",
+      "toNode": "jarvis-4d0e12cfaedfedc6",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-4b24d9f7cf74aff9",
+      "fromNode": "jarvis-880d6249b1a7465a",
+      "fromSide": "right",
+      "toNode": "jarvis-968b0861571b07f9",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-f76f949157db8933",
+      "fromNode": "jarvis-880d6249b1a7465a",
+      "fromSide": "right",
+      "toNode": "jarvis-9be66c2e4caa2bc3",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-26b2c4b083f17a51",
+      "fromNode": "jarvis-880d6249b1a7465a",
+      "fromSide": "right",
+      "toNode": "jarvis-a485182943e8f3bf",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-7a2bece7b841b8b1",
+      "fromNode": "jarvis-880d6249b1a7465a",
+      "fromSide": "right",
+      "toNode": "jarvis-8c6c55557209a94e",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-4d687527ebfdd853",
+      "fromNode": "jarvis-880d6249b1a7465a",
+      "fromSide": "right",
+      "toNode": "jarvis-fd1b8b8d1e5b1f16",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-230adf5942f098d3",
+      "fromNode": "jarvis-880d6249b1a7465a",
+      "fromSide": "right",
+      "toNode": "jarvis-7ba734f42efe7420",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-743b57e7da4559d7",
+      "fromNode": "jarvis-880d6249b1a7465a",
+      "fromSide": "right",
+      "toNode": "jarvis-ab081cea07672fa1",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-4775004985ab8cc4",
+      "fromNode": "jarvis-880d6249b1a7465a",
+      "fromSide": "right",
+      "toNode": "jarvis-4af333439f89b0a4",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-2a97538ad0110705",
+      "fromNode": "jarvis-880d6249b1a7465a",
+      "fromSide": "right",
+      "toNode": "jarvis-f00811911e61ef46",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-1e4e14502afde60e",
+      "fromNode": "jarvis-880d6249b1a7465a",
+      "fromSide": "right",
+      "toNode": "jarvis-9e03dcfba573b799",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-868deb0b20fe6d4a",
+      "fromNode": "jarvis-880d6249b1a7465a",
+      "fromSide": "right",
+      "toNode": "jarvis-598e7db4186f1b0f",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-b10471ea566e4607",
+      "fromNode": "jarvis-880d6249b1a7465a",
+      "fromSide": "right",
+      "toNode": "jarvis-0131c9f2d74bb811",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-eb73ff3ef708f513",
+      "fromNode": "jarvis-880d6249b1a7465a",
+      "fromSide": "right",
+      "toNode": "jarvis-60f9260824e76829",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-5c3c6a00060139f1",
+      "fromNode": "jarvis-880d6249b1a7465a",
+      "fromSide": "right",
+      "toNode": "jarvis-4a5dd49084093f57",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-7912bf9f76c5015e",
+      "fromNode": "jarvis-880d6249b1a7465a",
+      "fromSide": "right",
+      "toNode": "jarvis-a3cedaab07b2e64d",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-3afc483afd082817",
+      "fromNode": "jarvis-880d6249b1a7465a",
+      "fromSide": "right",
+      "toNode": "jarvis-9874ca16a2f93cdb",
+      "toSide": "left"
+    }
+  ],
+  "jarvis": {
+    "view_kind": "plan",
+    "title": "Plan - Create plan: Conduct online research on open-source Wi-Fi CSI sensing datasets and compile",
+    "source_notes": [
+      "Plans/2026-07-26-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensing-datase.md"
+    ],
+    "plan_id": "plan-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-sensin"
+  }
+}

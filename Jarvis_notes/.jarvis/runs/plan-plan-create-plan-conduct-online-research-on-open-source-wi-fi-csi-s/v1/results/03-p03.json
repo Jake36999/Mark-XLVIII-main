@@ -1,0 +1,77 @@
+{
+  "schema_version": "jarvis_work_result/v1",
+  "run_id": "plan-plan-create-plan-conduct-online-research-on-open-source-wi-fi-csi-s-v1",
+  "item_id": "p03",
+  "verdict": "ACCEPT",
+  "defects": [],
+  "result": {
+    "ok": true,
+    "mode": "research",
+    "query": "Create plan: Conduct online research on open-source Wi-Fi CSI sensing datasets and compile a resource guide in the vault.: Synthesize the gathered evidence, preserve citations, and identify unresolved contradictions",
+    "effective_query": "Create plan: Conduct online research on open-source Wi-Fi CSI sensing datasets and compile a resource guide in the vault.: Synthesize the gathered evidence, preserve citations, and identify unresolved contradictions",
+    "date_from": "",
+    "date_to": "",
+    "retrieved_at": "2026-07-26T14:06:11Z",
+    "require_citations": true,
+    "results": [
+      {
+        "title": "GitHub - NTUMARS/Awesome-WiFi-CSI-Sensing: A list of awesome papers and ...",
+        "snippet": "A list of awesome papers and cool resources on WiFi CSI sensing . Link to the Github if available is also present. You are very welcome to suggest resources via pull requests.",
+        "url": "https://github.com/NTUMARS/Awesome-WiFi-CSI-Sensing",
+        "source": "github.com",
+        "published_at": "",
+        "retrieved_at": "2026-07-26T14:06:11Z",
+        "backend": "ddg_html"
+      },
+      {
+        "title": "A survey on CSI-based Wi-Fi sensing datasets and models with a focus on ...",
+        "snippet": "The objective of this work is to identify CSI -based sensing proposals that are potentially reproducible based on the published information. Our goal is to provide a focused review of resources that can serve as a concrete starting point for researchers and practitioners seeking to experiment with and advance the field of Wi-Fi sensing .",
+        "url": "https://www.sciencedirect.com/science/article/pii/S0140366426000216",
+        "source": "sciencedirect.com",
+        "published_at": "",
+        "retrieved_at": "2026-07-26T14:06:11Z",
+        "backend": "ddg_html"
+      },
+      {
+        "title": "GitHub - xyanchen/WiFi-CSI-Sensing-Benchmark",
+        "snippet": "SenseFi is the first open-source benchmark and library for WiFi CSI human sensing , implemented by PyTorch. The state-of-the-art networks, including MLP, CNN, RNN, Transformers, etc, are evaluated on four public datasets across different WiFi CSI platforms. The details are illustrated in our paper SenseFi: A Library and Benchmark on Deep-Learning-Empowered WiFi Human Sensing that has been ...",
+        "url": "https://github.com/xyanchen/WiFi-CSI-Sensing-Benchmark",
+        "source": "github.com",
+        "published_at": "",
+        "retrieved_at": "2026-07-26T14:06:11Z",
+        "backend": "ddg_html"
+      },
+      {
+        "title": "CSI-Bench: A Large-Scale In-the-Wild Dataset for Multitask WiFi Sensing",
+        "snippet": "We introduce CSI -Bench, a large-scale, in-the-wild benchmark dataset collected from commercial WiFi edge devices deployed in real homes with real users. It includes single-task datasets for fall detection, breathing monitoring, localization, and motion source recognition, as well as a multitask dataset with joint labels for user identity, activity, and proximity. Some samples include multiple ...",
+        "url": "https://ai-iot-sensing.github.io/projects/project.html",
+        "source": "ai-iot-sensing.github.io",
+        "published_at": "",
+        "retrieved_at": "2026-07-26T14:06:11Z",
+        "backend": "ddg_html"
+      },
+      {
+        "title": "Open Source WiFi CSI Sensing Projects: GitHub Guide",
+        "snippet": "Compare open source WiFi CSI sensing projects, GitHub repositories, hardware paths, datasets , and validation checks before building human presence or activity detection.",
+        "url": "https://ruview.blog/wifi-csi-sensing-open-source/",
+        "source": "ruview.blog",
+        "published_at": "",
+        "retrieved_at": "2026-07-26T14:06:11Z",
+        "backend": "ddg_html"
+      },
+      {
+        "title": "Wi-Fi sensing - IEEE DataPort",
+        "snippet": "Wi-Fi sensing has emerged as a promising non-intrusive approach for human activity recognition (HAR), leveraging the widespread availability of Wi - Fi -enabled devices. While machine learning tools help extract meaningful features from complex wireless propagation patterns, developing robust and domain-adaptive models remains challenging without diverse datasets .",
+        "url": "https://ieee-dataport.org/keywords/wi-fi-sensing",
+        "source": "ieee-dataport.org",
+        "published_at": "",
+        "retrieved_at": "2026-07-26T14:06:11Z",
+        "backend": "ddg_html"
+      }
+    ],
+    "text": "Search results: Create plan: Conduct online research on open-source Wi-Fi CSI sensing datasets and compile a resource guide in the vault.: Synthesize the gathered evidence, preserve citations, and identify unresolved contradictions\n\n1. GitHub - NTUMARS/Awesome-WiFi-CSI-Sensing: A list of awesome papers and ... [github.com]\n   A list of awesome papers and cool resources on WiFi CSI sensing . Link to the Github if available is also present. You are very welcome to suggest resources via pull requests.\n   Source: https://github.com/NTUMARS/Awesome-WiFi-CSI-Sensing\n\n2. A survey on CSI-based Wi-Fi sensing datasets and models with a focus on ... [sciencedirect.com]\n   The objective of this work is to identify CSI -based sensing proposals that are potentially reproducible based on the published information. Our goal is to provide a focused review of resources that can serve as a concrete starting point fo\n   Source: https://www.sciencedirect.com/science/article/pii/S0140366426000216\n\n3. GitHub - xyanchen/WiFi-CSI-Sensing-Benchmark [github.com]\n   SenseFi is the first open-source benchmark and library for WiFi CSI human sensing , implemented by PyTorch. The state-of-the-art networks, including MLP, CNN, RNN, Transformers, etc, are evaluated on four public datasets across different Wi\n   Source: https://github.com/xyanchen/WiFi-CSI-Sensing-Benchmark\n\n4. CSI-Bench: A Large-Scale In-the-Wild Dataset for Multitask WiFi Sensing [ai-iot-sensing.github.io]\n   We introduce CSI -Bench, a large-scale, in-the-wild benchmark dataset collected from commercial WiFi edge devices deployed in real homes with real users. It includes single-task datasets for fall detection, breathing monitoring, localizatio\n   Source: https://ai-iot-sensing.github.io/projects/project.html\n\n5. Open Source WiFi CSI Sensing Projects: GitHub Guide [ruview.blog]\n   Compare open source WiFi CSI sensing projects, GitHub repositories, hardware paths, datasets , and validation checks before building human presence or activity detection.\n   Source: https://ruview.blog/wifi-csi-sensing-open-source/\n\n6. Wi-Fi sensing - IEEE DataPort [ieee-dataport.org]\n   Wi-Fi sensing has emerged as a promising non-intrusive approach for human activity recognition (HAR), leveraging the widespread availability of Wi - Fi -enabled devices. While machine learning tools help extract meaningful features from com\n   Source: https://ieee-dataport.org/keywords/wi-fi-sensing",
+    "message": ""
+  },
+  "model_provenance": null,
+  "completed_at": "2026-07-26T14:06:12Z"
+}
