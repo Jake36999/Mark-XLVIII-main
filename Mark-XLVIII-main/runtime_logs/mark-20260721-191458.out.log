@@ -1,7 +1,0 @@
-[JARVIS] Router mode active. Gemini Live disabled/unavailable.
-[Dashboard] https://192.168.0.190:8000
-[Dashboard] Press 'Remote Control' in JARVIS UI to get the QR code.
-[Dashboard] Manual entry:  192.168.0.190:8001  (type in browser, accept cert once)
-[STT] Loading Vosk model…
-[STT] Vosk ready.
-[JARVIS] Router STT mic stream open on Microphone (Jabra Evolve2 40)

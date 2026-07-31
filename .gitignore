@@ -98,3 +98,39 @@ Mark-XLVIII-main/runtime_validation/openclaw-worker/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# -----------------------------
+# Build artifacts and live runtime state (untracked 2026-07-31)
+# -----------------------------
+# These were tracked, and they rewrite on almost every run: `git status` was
+# never clean, and ~75% of every byte ever committed was these files churning.
+# SQLite does not delta-compress, so each commit stored a fresh whole copy of an
+# 8 MB index. Packing plus untracking took .git from 87 MB to ~21 MB.
+#
+# All of it is regenerated automatically; nothing here is a source of truth.
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Live vault databases -- the RAG index, model runtime state, workflow runs.
+# Recreated on demand from the Markdown notes, which remain canonical.
+Jarvis_notes/.jarvis/*.sqlite
+Jarvis_notes/.jarvis/*.sqlite3
+Jarvis_notes/.jarvis/*.db
+# ...but keep recorded eval evidence and migration backups, which do not churn
+# and are the only copy of what a past run actually did.
+!Jarvis_notes/.jarvis/evals/**
+!Jarvis_notes/.jarvis/backups/**
+# The negation above re-includes whole directories, which pulled bytecode from
+# the demo project inside an eval artifact back in. Evidence of what a run did,
+# yes; the .pyc files it happened to leave behind, no. Placed after the negation
+# so it wins.
+Jarvis_notes/.jarvis/evals/**/__pycache__/
+
+# Aletheia operator runtime state (queue, control plane, chroma index)
+Mark-XLVIII-main/.aletheia_operator/
+
+# Rotating service logs
+Mark-XLVIII-main/runtime_logs/

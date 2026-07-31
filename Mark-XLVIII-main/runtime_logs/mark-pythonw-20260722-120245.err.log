@@ -1,2 +1,0 @@
-F:\Mark-XLVIII-main\Mark-XLVIII-main\main.py:21: DeprecationWarning: 'audioop' is deprecated and slated for removal in Python 3.13
-  import audioop

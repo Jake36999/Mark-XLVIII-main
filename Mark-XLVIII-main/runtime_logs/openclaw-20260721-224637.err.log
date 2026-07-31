@@ -1,2 +1,0 @@
-2026-07-21T22:48:29.277+01:00 [gateway] security audit: device access upgrade requested reason=scope-upgrade device=79d354973150442c8d1d5c8f6aa27db5d8c021c397e1f47e0f81d93b0a15c083 ip=unknown-ip auth=token roleFrom=operator roleTo=operator scopesFrom=operator.read scopesTo=operator.write client=cli conn=44d5f813-2f14-4ea5-863d-1d895ac80232
-2026-07-21T22:48:29.320+01:00 [ws] closed before connect conn=44d5f813-2f14-4ea5-863d-1d895ac80232 peer=127.0.0.1:53533->127.0.0.1:18789 remote=127.0.0.1 fwd=n/a origin=n/a host=127.0.0.1:18789 ua=n/a code=1008 reason=connect failed
