@@ -3639,7 +3639,13 @@ class JarvisLive:
                 result = await asyncio.to_thread(run_task_review, scheduled=True)
                 if result.get("status") == "review_complete":
                     summary = result.get("summary") or {}
-                    self.ui.log(
+                    # `self.ui.log` -- JarvisUI has no `log`, only `write_log`. Every
+                    # completed scheduled review raised AttributeError here, so the
+                    # summary never reached the log and the user saw an error on
+                    # stdout instead of their overdue count. Invisible to the test
+                    # suite because every test builds `jarvis.ui = mock.Mock()`, and
+                    # a Mock answers to any attribute name at all.
+                    self.ui.write_log(
                         "TASKS: Scheduled review complete - "
                         f"{summary.get('overdue_count', 0)} overdue, {summary.get('stale_count', 0)} stale."
                     )
