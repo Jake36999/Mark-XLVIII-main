@@ -2661,6 +2661,10 @@ class JarvisLive:
                 self.ui.write_log(f"SYS: Skipped stale {source} turn.")
                 return
             self.ui.set_state("THINKING")
+            # Whether the user has been given a reply this turn. Read by the
+            # outermost failure handler, which must speak when the turn produced
+            # nothing -- but must not contradict a reply already delivered.
+            answered = False
             self._record_upload_announcement(text)
             turn = TurnContext(turn_id=turn_id or "", source=source, user_text=text)
             turn.advance(
@@ -2870,6 +2874,7 @@ class JarvisLive:
                     detail={"summary_model_skipped": skipped_summary_model},
                 )
                 self.speak(reply)
+                answered = True
                 self._dispatch_pending_plan_after_turn()
             except Exception as exc:
                 self.ui.write_log(f"ERR: Router model unavailable - {str(exc)[:180]}")
@@ -2881,6 +2886,30 @@ class JarvisLive:
                     severity="error",
                     turn_id=turn_id or "",
                 )
+                # Answer in the channel the question was asked in. This branch
+                # used to log and emit a trace event and then return silently,
+                # so a turn that failed outright produced no reply at all -- the
+                # user asked something and JARVIS simply said nothing. A voice
+                # user got no signal whatsoever; a chat user had to notice a
+                # line in the activity log. The success path already refuses to
+                # end on an empty reply (see the guard above); failure should
+                # not be the one case that does.
+                #
+                # Found on 2026-07-31 by a validation battery that ran while LM
+                # Studio happened to be stopped: all eight scenarios returned an
+                # empty string to the user.
+                #
+                # `answered` matters: bookkeeping after `speak(reply)` can raise
+                # too (plan dispatch, vault acknowledgement), and the user has
+                # already had their answer by then. Reporting a failure at that
+                # point would contradict the reply they just received.
+                if not answered and not self._is_stale_router_turn(turn_id):
+                    detail = str(exc).strip()
+                    if "Failed to establish a new connection" in detail or "Max retries exceeded" in detail:
+                        reason = "I can't reach the local model server, sir. LM Studio may not be running."
+                    else:
+                        reason = f"That turn failed before I could answer, sir: {type(exc).__name__}."
+                    self.speak(reason)
             finally:
                 self._schedule_listening_check(0.1)
 
