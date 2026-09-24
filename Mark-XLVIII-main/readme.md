@@ -2,6 +2,8 @@
 
 MARK XLVIII is the local desktop platform and runtime shell for **JARVIS**. The current build is local-first: Gemini Live has been removed, and every capability — including screen and camera understanding — runs against local models.
 
+Built on two open-source foundations: [Mark-L](https://github.com/FatihMakes/Mark-L) (CC BY-NC 4.0 — see License below) as the base platform, and [ClawTeam](https://github.com/HKUDS/ClawTeam) (MIT) for computer/browser control, used throughout `actions/` and `core/mcp_server.py` / `core/tool_dispatcher.py`.
+
 ## Current Architecture
 
 - **Router mode:** Selects deterministic workflows, tools, or a model route.

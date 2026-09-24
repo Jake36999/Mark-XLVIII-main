@@ -1,0 +1,120 @@
+{
+  "created_at": "2026-09-23T22:41:37Z",
+  "items": [
+    {
+      "acceptance_criteria": {
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [],
+      "description": "Create a detailed specification of the script E:\\Aletheia_project\\DEV_TOOLS\\ToolSet\\aletheia_toolchain\\notebook_packager_v3.1.py covering purpose, functions, classes, dependencies, inputs/outputs, invariants, edge cases, and flag inferred information. This is a read\u2011only research and documentation task; no code changes are made.",
+      "id": "create_spec_plan_2ed0a1",
+      "idempotency_key": "16ac5a9a5b3c6ad3de88b3fed5d04a20b7927d72a8b3824835d4df9d5772d92d",
+      "inputs": {
+        "canvas_node_id": "create_spec_plan",
+        "canvas_role": "plan"
+      },
+      "max_attempts": 1,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "deterministic",
+      "outputs": {
+        "result": "result.create_spec_plan_2ed0a1"
+      },
+      "required_outputs": [],
+      "requires_confirmation": false,
+      "resource_class": "io",
+      "retry_safe": true,
+      "risk_tier": "T1",
+      "sequence": 1,
+      "side_effects": "none",
+      "step_type": "gate",
+      "target": "plan_milestone"
+    },
+    {
+      "acceptance_criteria": {
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [
+        "create_spec_plan_2ed0a1"
+      ],
+      "description": "Open the file E:\\Aletheia_project\\DEV_TOOLS\\ToolSet\\aletheia_toolchain\\notebook_packager_v3.1.py and thoroughly analyze its source. Identify the script's overall purpose, each function and class with its role, real dependencies between components, expected inputs and outputs, any invariants or edge cases handled, and note any aspects that are inferred rather than explicitly present in the code.",
+      "id": "read_script_da5af9",
+      "idempotency_key": "b7cad3cf9aa7ddc594d57aacc9dfb2ddf26f0a6dafce47019f6db7183dd64213",
+      "inputs": {
+        "canvas_node_id": "read_script",
+        "canvas_role": "research",
+        "context_injected": true,
+        "evidence": [
+          {
+            "bind": {
+              "from_step": "create_spec_plan_2ed0a1",
+              "path": "result.summary"
+            }
+          }
+        ],
+        "prompt": "System goal: Create a detailed specification of the script E:\\Aletheia_project\\DEV_TOOLS\\ToolSet\\aletheia_toolchain\\notebook_packager_v3.1.py covering purpose, functions, classes, dependencies, inputs/outputs, invariants, edge cases\u2026\n\nOpen the file E:\\Aletheia_project\\DEV_TOOLS\\ToolSet\\aletheia_toolchain\\notebook_packager_v3.1.py and thoroughly analyze its source. Identify the script's overall purpose, each function and class with its role, real dependencies between components, expected inputs and outputs, any invariants or edge cases handled, and note any aspects that are inferred rather than explicitly present in the code."
+      },
+      "max_attempts": 1,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "cognitive",
+      "outputs": {
+        "result": "result.read_script_da5af9"
+      },
+      "required_outputs": [],
+      "requires_confirmation": false,
+      "resource_class": "model",
+      "retry_safe": true,
+      "risk_tier": "T1",
+      "sequence": 2,
+      "side_effects": "none",
+      "step_type": "model_reasoning",
+      "target": "reasoning"
+    },
+    {
+      "acceptance_criteria": {
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [
+        "read_script_da5af9"
+      ],
+      "description": "Using the analysis from the previous step, compose a comprehensive specification document as a vault note. Structure the note with clear sections for purpose, detailed descriptions of every function and class (including signatures, responsibilities, and interactions), dependency graph, input/output contracts, invariants, edge\u2011case handling, and a separate list of inferred items. Save this note in the vault for future reference.",
+      "id": "write_spec_note_25ce07",
+      "idempotency_key": "4f734d5bdc5991c2bf18d5fdb7d52997a5431fcae75215b4e664bfc7ffe61718",
+      "inputs": {
+        "canvas_node_id": "write_spec_note",
+        "canvas_role": "reference"
+      },
+      "max_attempts": 1,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "deterministic",
+      "outputs": {
+        "result": "result.write_spec_note_25ce07"
+      },
+      "required_outputs": [],
+      "requires_confirmation": false,
+      "resource_class": "io",
+      "retry_safe": true,
+      "risk_tier": "T1",
+      "sequence": 3,
+      "side_effects": "local_read",
+      "step_type": "gate",
+      "target": "reference_context"
+    }
+  ],
+  "manifest_hash": "b44fe76b122fbf3e0cb09a11198f072e2ab39f8bd2843432c9aa920d97cca2fe",
+  "preflight": {
+    "checked_at": "2026-09-23T22:41:37Z",
+    "checks": [],
+    "ok": true
+  },
+  "preview_only": false,
+  "schema_version": "jarvis_work_manifest/v1",
+  "workflow_hash": "0d1363cdf89b1b4b93289ee23b42b24acaa4e4ff74e72ebf361b17748ac59515",
+  "workflow_id": "canvas_plan",
+  "workflow_version": "canvas-1"
+}

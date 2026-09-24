@@ -620,3 +620,165 @@ class ResearchStateTruthfulnessTests(unittest.TestCase):
         self.assertEqual(metadata["research_state"], "failed")
         self.assertIn("network unreachable", metadata["web_error"])
         self.assertIn("Degraded research evidence", body)
+
+
+class WebResearchMethodQueryTests(unittest.TestCase):
+    """Regression: a real 'research todays geopolitical news in relation to
+    the uk' plan cited Wikipedia's "Research" article, Google Scholar's
+    homepage and a "What is Research?" explainer instead of any actual news --
+    caused by the web_research method's query concatenating ctx.task (always
+    just the objective re-wrapped in this method's own boilerplate lead-in)
+    onto ctx.prompt, duplicating the objective and burying it under generic
+    planning words ("collect", "cited", "sources", "approved", "objective")."""
+
+    def _context(self, prompt: str, task: str) -> "pw.TaskMethodContext":
+        return pw.TaskMethodContext(
+            plan_id="plan-1", step_id="s1", task=task, clean_task=task,
+            lowered=task.lower(), prompt=prompt, output_root=None, source_path=None,
+            project_id=None, multi_agent=False, dependencies=[], previous="",
+            steps_so_far=[],
+        )
+
+    def test_web_research_query_is_the_objective_not_the_boilerplate_task_text(self):
+        prompt = "research todays geopolitical news in relation to the uk"
+        task = f"[parallel] Collect cited web sources for the approved objective: {prompt}"
+        ctx = self._context(prompt, task)
+
+        registry = pw.default_task_method_registry()
+        spec = registry.select(ctx)
+
+        self.assertEqual(spec.method_id, "web_research")
+        built = spec.build(ctx)
+        self.assertEqual(built["inputs"]["query"], prompt)
+        self.assertNotIn("Collect cited web sources", built["inputs"]["query"])
+        self.assertNotIn("approved objective", built["inputs"]["query"])
+
+
+class PlanShapeTests(unittest.TestCase):
+    """_plan_shape() -- the ground-truth classifier _prepare_plan_bundle uses
+    to decide whether Subagent Delegation / Decision Points / Approval Gates
+    show their full generic content or a trimmed one, based on the plan's
+    own compiled work items rather than a keyword guess at the objective."""
+
+    def test_pure_read_only_items_have_no_openclaw_and_no_write(self):
+        items = [
+            {"target": "web_search", "side_effects": "external_read"},
+            {"target": "jarvis_memory", "side_effects": "local_read"},
+            {"target": "vault_create_note", "side_effects": "local_write"},
+        ]
+        shape = pw._plan_shape(items)
+        self.assertFalse(shape["has_openclaw"])
+        self.assertTrue(shape["has_write"])  # vault_create_note does write
+
+    def test_all_reads_and_no_effects_has_no_write(self):
+        items = [
+            {"target": "web_search", "side_effects": "external_read"},
+            {"target": "jarvis_memory", "side_effects": "local_read"},
+            {"target": "approval_gate", "side_effects": "none"},
+        ]
+        shape = pw._plan_shape(items)
+        self.assertFalse(shape["has_write"])
+
+    def test_project_operator_target_sets_has_openclaw(self):
+        items = [{"target": "project_operator", "side_effects": "local_write"}]
+        shape = pw._plan_shape(items)
+        self.assertTrue(shape["has_openclaw"])
+        self.assertTrue(shape["has_write"])
+
+    def test_empty_items_are_falsy_not_an_error(self):
+        shape = pw._plan_shape([])
+        self.assertFalse(shape["has_openclaw"])
+        self.assertFalse(shape["has_write"])
+
+
+class PlanTemplateSeparationOfConcernsTests(unittest.TestCase):
+    """A real plan (pure web research) showed the full Subagent Delegation
+    table (OpenClaw, a high-tier planner) and the full destructive-action
+    danger box, despite every one of its own work items being a read-only
+    web_search/jarvis_memory call. _prepare_plan_bundle now trims those
+    sections once the real work items are known -- these pin both that the
+    trim happens for a plan that doesn't need the boilerplate, and that nothing
+    is trimmed for a plan that genuinely does."""
+
+    def cfg(self, root: Path) -> dict:
+        resolved = jm.resolve_config(
+            {
+                "jarvis_notes_root": str(root),
+                "remember_enabled": False,
+                "remember_project_id": "jarvis_notes",
+                "remember_project_name": "Jarvis Notes",
+            }
+        )
+        resolved["enforce_model_quality_floor"] = False
+        resolved["model_health_enabled"] = False
+        resolved["model_health_probe_enabled"] = False
+        return resolved
+
+    def web_payload(self):
+        return {
+            "ok": True,
+            "retrieved_at": "2026-07-21T10:00:00Z",
+            "results": [
+                {
+                    "title": "Planning Systems Need Review Gates",
+                    "snippet": "Review gates reduce accidental execution risk.",
+                    "url": "https://example.com/planning-gates",
+                    "source": "Example Research",
+                    "published_at": "2026-07-21",
+                    "retrieved_at": "2026-07-21T10:00:00Z",
+                    "backend": "test",
+                }
+            ],
+        }
+
+    def test_pure_research_plan_trims_delegation_but_keeps_gates(self):
+        """This plan's own final step (vault_create_note) does write, so
+        has_write is correctly True -- the danger box stays, matching
+        PlanShapeTests' own finding that a research plan still writes once.
+        What should trim is Subagent Delegation/Decision Points: nothing in
+        a plan like this ever targets project_operator."""
+        with tempfile.TemporaryDirectory() as tmp:
+            cfg = self.cfg(Path(tmp))
+            with mock.patch("actions.plan_workflow.structured_web_search", return_value=self.web_payload()):
+                result = pw.create_plan(
+                    "research todays geopolitical news in relation to the uk",
+                    cfg=cfg, internet=True,
+                )
+            _, body, _ = jm.read_note(Path(result["path"]))
+
+            self.assertIn("Not applicable to this plan", body)
+            self.assertNotIn("| OpenClaw |", body)
+            self.assertNotIn("Which project or folder is authoritative", body)
+            self.assertIn(
+                "Delete, overwrite, move, broad refactors, browser submissions, purchases, account changes",
+                body,
+            )
+            # Headings survive the trim -- APPROVAL_SECTIONS still finds them.
+            self.assertIn("## Subagent Delegation", body)
+            self.assertIn("## Approval Gates", body)
+            self.assertIn("## Decision Points", body)
+
+    def test_plan_reaching_openclaw_keeps_full_delegation_and_gates(self):
+        """delegate_development (the only method that ever targets
+        project_operator) ternary-branches on ctx.project_id: no registered
+        project -> a safe 'registered_project_required' gate (also correctly
+        untrimmed-Subagent-Delegation-not-needed); a real one -> the actual
+        T3 OpenClaw dispatch. Mocking _registered_project_id is what makes a
+        plain "implement a fix" prompt actually reach the second branch."""
+        with tempfile.TemporaryDirectory() as tmp:
+            cfg = self.cfg(Path(tmp))
+            with mock.patch("actions.plan_workflow.structured_web_search", return_value=self.web_payload()), \
+                 mock.patch("actions.plan_workflow._registered_project_id", return_value="mark_platform"):
+                result = pw.create_plan(
+                    "implement a fix for the login bug in this repository",
+                    cfg=cfg, internet=True,
+                )
+            _, body, _ = jm.read_note(Path(result["path"]))
+
+            self.assertIn("`project_operator`", body)
+            self.assertNotIn("Not applicable to this plan", body)
+            self.assertIn("| OpenClaw |", body)
+            self.assertIn(
+                "Delete, overwrite, move, broad refactors, browser submissions, purchases, account changes",
+                body,
+            )

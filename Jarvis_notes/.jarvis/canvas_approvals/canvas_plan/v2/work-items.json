@@ -1,0 +1,181 @@
+{
+  "created_at": "2026-09-23T22:45:35Z",
+  "items": [
+    {
+      "acceptance_criteria": {
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [],
+      "description": "Create a comprehensive specification of the script E:\\Aletheia_project\\DEV_TOOLS\\ToolSet\\aletheia_toolchain\\notebook_packager_v3.1.py, covering purpose, all functions/classes, dependencies, I/O, invariants, edge cases, and flagging inferred details. Produce the specification as a detailed Markdown note in the vault.",
+      "id": "plan_bed971",
+      "idempotency_key": "ff1a296823b9637e1ba73497a706225fcb6bc90a8fec980d97e3c60756baf706",
+      "inputs": {
+        "canvas_node_id": "plan",
+        "canvas_role": "plan"
+      },
+      "max_attempts": 1,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "deterministic",
+      "outputs": {
+        "result": "result.plan_bed971"
+      },
+      "required_outputs": [],
+      "requires_confirmation": false,
+      "resource_class": "io",
+      "retry_safe": true,
+      "risk_tier": "T1",
+      "sequence": 1,
+      "side_effects": "none",
+      "step_type": "gate",
+      "target": "plan_milestone"
+    },
+    {
+      "acceptance_criteria": {
+        "deliverables": [
+          "structured_summary"
+        ],
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [
+        "plan_bed971"
+      ],
+      "description": "Read the source file notebook_packager_v3.1.py and extract a structured description of: the script's overall purpose, every function and class (including signatures, docstrings, and role), real dependencies between them, expected inputs and outputs, invariants, edge cases, and any behavior that is not obvious from a surface read. Mark any points that are inferred rather than directly evident.\n\nDeliverables:\n- structured_summary",
+      "id": "research_script_808633",
+      "idempotency_key": "6154c2ed2b57578b5c76dd262832785f19ad0f2adb17cf115bf1a0e8f0d23fb5",
+      "inputs": {
+        "canvas_node_id": "research_script",
+        "canvas_role": "research",
+        "context_injected": true,
+        "evidence": [
+          {
+            "bind": {
+              "from_step": "plan_bed971",
+              "path": "result.summary"
+            }
+          }
+        ],
+        "file": "E:\\Aletheia_project\\DEV_TOOLS\\ToolSet\\aletheia_toolchain\\notebook_packager_v3.1.py",
+        "prompt": "System goal: Create a comprehensive specification of the script E:\\Aletheia_project\\DEV_TOOLS\\ToolSet\\aletheia_toolchain\\notebook_packager_v3.1.py, covering purpose, all functions/classes, dependencies, I/O, invariants, edge cases,\u2026\n\nRead the source file notebook_packager_v3.1.py and extract a structured description of: the script's overall purpose, every function and class (including signatures, docstrings, and role), real dependencies between them, expected inputs and outputs, invariants, edge cases, and any behavior that is not obvious from a surface read. Mark any points that are inferred rather than directly evident.\n\nDeliverables:\n- structured_summary"
+      },
+      "max_attempts": 1,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "cognitive",
+      "outputs": {
+        "result": "result.research_script_808633"
+      },
+      "required_outputs": [],
+      "requires_confirmation": false,
+      "resource_class": "model",
+      "retry_safe": true,
+      "risk_tier": "T1",
+      "sequence": 2,
+      "side_effects": "none",
+      "step_type": "model_reasoning",
+      "target": "reasoning"
+    },
+    {
+      "acceptance_criteria": {
+        "deliverables": [
+          "NotebookPackagerSpec.md"
+        ],
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [
+        "research_script_808633"
+      ],
+      "description": "Using the structured_summary from the research step, write a new Markdown note in the vault that contains the full specification. Ensure the note includes sections for: overall purpose, detailed function and class specifications, dependency graph, I/O contracts, invariants and edge\u2011case handling, and a clear flagging of inferred information. The document must be detailed enough for a competent engineer to rebuild the script from scratch.\n\nDeliverables:\n- NotebookPackagerSpec.md",
+      "id": "compile_spec_8873f4",
+      "idempotency_key": "a88ece07f71d7eebff3a0295d56fef7a74fa0d20c9658370e64c818526f12e86",
+      "inputs": {
+        "canvas_node_id": "compile_spec",
+        "canvas_role": "review",
+        "context_injected": true,
+        "evidence": [
+          {
+            "bind": {
+              "from_step": "research_script_808633",
+              "path": "result.summary"
+            }
+          }
+        ],
+        "prompt": "System goal: Create a comprehensive specification of the script E:\\Aletheia_project\\DEV_TOOLS\\ToolSet\\aletheia_toolchain\\notebook_packager_v3.1.py, covering purpose, all functions/classes, dependencies, I/O, invariants, edge cases,\u2026\n\nUsing the structured_summary from the research step, write a new Markdown note in the vault that contains the full specification. Ensure the note includes sections for: overall purpose, detailed function and class specifications, dependency graph, I/O contracts, invariants and edge\u2011case handling, and a clear flagging of inferred information. The document must be detailed enough for a competent engineer to rebuild the script from scratch.\n\nDeliverables:\n- NotebookPackagerSpec.md"
+      },
+      "max_attempts": 1,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "cognitive",
+      "outputs": {
+        "result": "result.compile_spec_8873f4"
+      },
+      "required_outputs": [],
+      "requires_confirmation": false,
+      "resource_class": "model",
+      "retry_safe": true,
+      "risk_tier": "T1",
+      "sequence": 3,
+      "side_effects": "none",
+      "step_type": "review",
+      "target": "reviewer"
+    },
+    {
+      "acceptance_criteria": {
+        "deliverables": [
+          "verification_report"
+        ],
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [
+        "compile_spec_8873f4"
+      ],
+      "description": "Review the generated NotebookPackagerSpec.md and verify that it contains all required sections and that each section provides the depth and completeness described in the plan. Confirm that any inferred details are explicitly flagged. Report any missing or insufficient content.\n\nDeliverables:\n- verification_report",
+      "id": "verify_spec_ef96ea",
+      "idempotency_key": "41c81a3cf674ccd501c8181cb0ebf17d31e23052c3576f2bd1c4a1e9ad85fa05",
+      "inputs": {
+        "args": [
+          "NotebookPackagerSpec.md"
+        ],
+        "canvas_node_id": "verify_spec",
+        "canvas_role": "verification"
+      },
+      "max_attempts": 2,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "deterministic",
+      "outputs": {
+        "result": "result.verify_spec_ef96ea"
+      },
+      "required_outputs": [],
+      "requires_confirmation": false,
+      "resource_class": "command",
+      "retry_safe": true,
+      "risk_tier": "T2",
+      "sequence": 4,
+      "side_effects": "local_read",
+      "step_type": "command",
+      "target": "pytest_focused"
+    }
+  ],
+  "manifest_hash": "42d14d9bb16e040d81c7e3694d75c878c3ec9231f63a11e092bfbcedca068ad1",
+  "preflight": {
+    "checked_at": "2026-09-23T22:45:35Z",
+    "checks": [
+      {
+        "command_id": "pytest_focused",
+        "item_id": "verify_spec_ef96ea",
+        "ok": true
+      }
+    ],
+    "ok": true
+  },
+  "preview_only": false,
+  "schema_version": "jarvis_work_manifest/v1",
+  "workflow_hash": "5cd397c6f5ee4f946348c21fafa6b9b578cd852d2dc0f265985513c169278474",
+  "workflow_id": "canvas_plan",
+  "workflow_version": "canvas-1"
+}

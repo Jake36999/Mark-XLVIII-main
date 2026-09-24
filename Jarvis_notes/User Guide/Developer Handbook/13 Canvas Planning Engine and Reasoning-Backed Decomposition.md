@@ -4,7 +4,7 @@ title: "Canvas Planning Engine and Reasoning-Backed Decomposition"
 type: "guide"
 status: "active"
 created: "2026-07-25"
-updated: "2026-07-30T01:49:08Z"
+updated: "2026-09-24T18:22:21Z"
 project_id: "jarvis_notes"
 source: "claude"
 tags: ["developer-handbook", "canvas-plan", "planning", "mode-2", "tier/short-term"]
@@ -13,7 +13,7 @@ index_state: "indexed_local"
 remember_note_id: ""
 rag_index: true
 confidence: 0.9
-content_hash: "7b425cff113f41dd77ef573171328acebe1fbdcebab28bd2b45b57ebc001bae0"
+content_hash: "df52789f3eb30c6d2760b4414b3ec4055baaca90f7ea3ced705879542b1af032"
 lifecycle: "short_term"
 project_key: "mark_xlviii"
 schema_version: "jarvis_developer_handbook/v1"
@@ -96,12 +96,19 @@ The owner's vocabulary pass gives distinct names to concepts this engine already
 | Role | step_type | Side effects | Notes |
 | --- | --- | --- | --- |
 | `plan` (write `role: workflow`) | gate | none | anchors the graph; exactly one required |
-| `research` | model_reasoning | none | |
+| `research` | model_reasoning | none | `inputs.role` set to `"research"` so dispatch actually uses `model_router`'s dedicated `research` route rather than falling back to `worker` (2026-09-24 fix — see below); carries `allowed_tools`/`suggested_tools` (below) |
 | `note` | *(excluded)* | none | WS4c pass-forward fact; never dispatched — `compile_canvas` resolves any `depends_on` through it to the real upstream step |
 | `review` | review | none | T5 dual critic (below) |
 | `reference` | gate | local_read | |
-| `verification` | command | local_read | runs `pytest_focused`; `requires_confirmation: false` |
+| `verification` | command **or** closing_check | local_read | `command`/`pytest_focused` when the node's ancestry reaches an `implementation` node anywhere (code may have been touched, safe default); **`closing_check`/`document_completeness` instead when it doesn't** — a document-completeness check against what a `document` ancestor actually produced, replacing a meaningless full-suite run against nothing relevant to it. Routed purely from graph structure at compile time (`_ancestor_roles_and_documents`), never from a runtime log (2026-09-24) |
+| `document` | artifact | local_write | `vault_create_note`; a plain vault-note write, distinct from `implementation` — added because `implementation` used to be the *only* role that could write anything durable, forcing pure documentation goals through OpenClaw's project-gated delegation path for no reason |
 | `implementation` | tool | external_write | `project_operator` → `delegate_openclaw`; `requires_confirmation: true` |
+
+### Dispatch-time additions (2026-09-24)
+
+- **Tool-call intent check.** Every `step_type: "tool"` dispatch now goes through `WorkflowRuntime._check_tool_intent` before `_dispatch_tool` runs it — a larger/planner-tier model judges the resolved arguments against the item's declared intent and can deny the call outright (converting straight to `REPAIR`/`REJECT_REPLAN`) before it ever executes, not just after. Additive to the existing T4 human approval gate, never a substitute for it; fails closed on any error. Injectable via `intent_checker=` on `WorkflowRuntime`, mirroring `reviewer=`.
+- **`retry_rejected_item(run_id, item_id)`.** `REJECT_REPLAN` is deliberately terminal within a run — `execute_run`'s dispatch loop never revisits it automatically, unlike `ESCALATE` (which `execute_canvas_plan` already retries on every call). This is the explicit, human-invoked escape hatch for the narrow case where a human has confirmed the rejection was an infrastructure/operator problem (a run dispatched against an unlinked credential, say) rather than a genuine plan or model failure. Never called automatically.
+- **`propose_canvas_plan(..., force=True)`.** The plan fingerprint only ever tracks human-authored canvas content — it has no way to see that `compile_canvas`'s own logic changed. `force=True` skips the fingerprint check and produces a fresh `pending_review` note even on a byte-identical canvas, for exactly that case (a compiler fix or newly-wired feature that needs to reach an already-proposed plan). Still produces a genuine new decision to make, never a re-approval shortcut.
 
 ## WS1 — anti-fabrication in the approval preview
 
@@ -140,9 +147,18 @@ Optional `deliverables` per node compiles into real, node-specific `step["accept
 > [!success] Live-measured, not just structurally present
 > Two focused before/after comparisons (same node, same model, bare prose vs. the real compiled preamble) found a genuine architectural-consistency failure without context: a frontend node with no visibility into a sibling backend branch's stated constraint ("the frontend never sees the OAuth token directly") recommended storing the token client-side. With the sibling-branch line present, the same node correctly honored the constraint throughout. See [[2026-07-25-ws4d-execution-quality-evaluation]].
 
-## WS3 — cloud tiering
+## WS3 — cloud tiering (superseded 2026-09-23/24 — see [[07 Models Credentials Speech and Resource Lifecycle|Note 07]])
 
-`role="planner"` (WS4a/b's decomposition and critique calls) resolves cloud-first, large-local-fallback: `resolve_settings` tries the configured cloud provider (OpenAI or Anthropic, whichever key is linked via the session key box) and falls back to LM Studio automatically on any failure or missing key — never a hard failure. `core/model_router.py` treats `anthropic`/`claude` and `openai` as first-class, parallel providers.
+The OpenAI/Anthropic-first, LM-Studio-fallback description this section originally had is no longer how routing works. `planner_provider`, `worker_provider`, `research_provider`, and `reviewer_provider` are now all pinned to `deepinfra` in `config/runtime.json` (decoupled from LM Studio for cost — DeepInfra's measured per-token price undercut local hosting enough to make the switch, not a reliability concern). There is currently no automatic cross-provider fallback chain if DeepInfra is unavailable; a dead/unlinked route surfaces as a dispatch failure through the normal REPAIR/REJECT_REPLAN path rather than silently degrading to LM Studio. Note 07 has the full provider architecture.
+
+### Two real bugs found live in this routing, both fixed 2026-09-24
+
+- **`research` nodes dispatched on the `worker` route, not `research`, for their entire existence until this fix.** `dual_orchestrator.py`'s `model_reasoning` dispatch reads `inputs["role"]` to pick the `model_router` role, defaulting to `"worker"` when absent — and `compile_canvas` never set it. Every research-role canvas node silently ignored the dedicated `research_provider`/`research_model` config, running on the cheaper worker-tier model instead. A shallow research output that traced back to this, not (only) the retry-budget gap below, is what surfaced it.
+- **The `research` role had no repair budget.** No `retry_policy` on `_ROLE_SPECS["research"]` meant it inherited the schema default (`max_attempts: 1`) — so a `REPAIR` verdict from T5's independent reviewer (e.g. "did not provide the required structured outline of all functions and classes") converted straight to `REJECT_REPLAN` without the step ever getting a real second attempt. Now `{"safe": true, "max_attempts": 2}` — safe to retry since the step has no side effects.
+
+## The Centralised Capability Schema (2026-09-24)
+
+`core/capability_schema.py` is a new, stable data source — one canonical `Capability` shape (`id`, `kind`, `keywords`, `risk_tier`, `requires_confirmation`, `allowed_roles`, `health_eligible`) that several previously-scattered, independently-drifting lists now read from instead of hardcoding their own copies: `core/tool_catalogue.py`'s `DISPATCHABLE_TOOL_IDS`, `canvas_plan.py`'s `_KNOWN_MODEL_ROUTER_ROLES` and `_ROLE_SPECS["research"]["allowed_tools"]`, and the compiled workflow schema's `target` enum (generated at schema-load time whenever `step_type == "tool"`, closing a gap where `target` used to be unconstrained free text). `core/tool_catalogue.py` itself ranks candidate tools by fused lexical + semantic relevance (Reciprocal Rank Fusion) and surfaces the result as a research node's `inputs.suggested_tools` — visible in the approval preview, not yet consumed by dispatch. `scripts/derive_capability_keywords.py` is a separate, offline, two-step blind LLM pipeline (never run at compile/dispatch time) that derives `keywords` from a capability's own functional description rather than hand-typing them, written to `config/derived_capability_keywords.json` and kept as `derived_keywords` — deliberately never merged into the hand-authored `keywords` field.
 
 ## Known boundaries
 
@@ -150,6 +166,9 @@ Optional `deliverables` per node compiles into real, node-specific `step["accept
 - Evidence-binding does not cover `verification`/`implementation` dependencies (command/tool results have no common `summary` field) — would need normalizing `dual_orchestrator.py`'s shared result-construction code, deliberately not done given its blast radius across Mode 1 workflows too.
 - The WS4d execution-quality finding is two illustrative comparisons, not a statistically controlled study.
 - VRAM-aware model admission (a byte-budget alternative to the flat `max_task_models_loaded` count) remains unbuilt — see [[07 Models Credentials Speech and Resource Lifecycle|Note 07]].
+- `model_reasoning`/`review` dispatch never calls `call_with_tools` — a research node has zero live tool-calling ability at dispatch time regardless of `suggested_tools`; that field is currently visible-but-inert (same shape as `recommended_model`'s original gap). Wiring a bounded, single-round tool-calling loop into dispatch is the natural next step, not yet built.
+- The `closing_check`/document-completeness routing only covers the case a canvas's ancestry is fully code-free; an `implementation` ancestor anywhere still falls back to `pytest_focused` against the whole suite, because `delegate_openclaw` reports no structured touched-files list a "blast radius" could scope a narrower test run against. A real fix needs git-diff snapshotting around the delegation, not yet designed.
+- `derive_capability_keywords.py`'s output is measurably unreliable run-to-run on identical prompts (a real run reproduced this: `jarvis_memory` scored 7 good scenarios once, zero on an identical retry) — one retry-on-empty is built in, but the derived keywords should still be read as a first draft, not authoritative, until compared against the hand-authored `keywords` by a person.
 
 ## Related Notes
 

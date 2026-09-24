@@ -1,0 +1,145 @@
+schema_version: jarvis_dual_orchestrator/v1
+workflow_id: canvas_plan
+version: canvas-1
+name: Canvas Plan
+description: Compiled from an Obsidian Canvas graph (Mode 2 planning).
+max_steps: 4
+variables:
+  source: canvas
+  node_step_ids:
+    plan: plan_bed971
+    research_script: research_script_808633
+    compile_spec: compile_spec_8873f4
+    verify_spec: verify_spec_ef96ea
+steps:
+- step_id: plan_bed971
+  orchestrator: deterministic
+  step_type: gate
+  target: plan_milestone
+  description: Create a comprehensive specification of the script E:\Aletheia_project\DEV_TOOLS\ToolSet\aletheia_toolchain\notebook_packager_v3.1.py,
+    covering purpose, all functions/classes, dependencies, I/O, invariants, edge cases,
+    and flagging inferred details. Produce the specification as a detailed Markdown
+    note in the vault.
+  risk_tier: T1
+  side_effects: none
+  depends_on: []
+  inputs:
+    canvas_role: plan
+    canvas_node_id: plan
+  outputs:
+    result: result.plan_bed971
+  acceptance_criteria:
+    required: true
+- step_id: research_script_808633
+  orchestrator: cognitive
+  step_type: model_reasoning
+  target: reasoning
+  description: 'Read the source file notebook_packager_v3.1.py and extract a structured
+    description of: the script''s overall purpose, every function and class (including
+    signatures, docstrings, and role), real dependencies between them, expected inputs
+    and outputs, invariants, edge cases, and any behavior that is not obvious from
+    a surface read. Mark any points that are inferred rather than directly evident.
+
+
+    Deliverables:
+
+    - structured_summary'
+  risk_tier: T1
+  side_effects: none
+  depends_on:
+  - plan_bed971
+  inputs:
+    canvas_role: research
+    canvas_node_id: research_script
+    prompt: "System goal: Create a comprehensive specification of the script E:\\\
+      Aletheia_project\\DEV_TOOLS\\ToolSet\\aletheia_toolchain\\notebook_packager_v3.1.py,\
+      \ covering purpose, all functions/classes, dependencies, I/O, invariants, edge\
+      \ cases,\u2026\n\nRead the source file notebook_packager_v3.1.py and extract\
+      \ a structured description of: the script's overall purpose, every function\
+      \ and class (including signatures, docstrings, and role), real dependencies\
+      \ between them, expected inputs and outputs, invariants, edge cases, and any\
+      \ behavior that is not obvious from a surface read. Mark any points that are\
+      \ inferred rather than directly evident.\n\nDeliverables:\n- structured_summary"
+    context_injected: true
+    file: E:\Aletheia_project\DEV_TOOLS\ToolSet\aletheia_toolchain\notebook_packager_v3.1.py
+    evidence:
+    - bind:
+        from_step: plan_bed971
+        path: result.summary
+  outputs:
+    result: result.research_script_808633
+  acceptance_criteria:
+    required: true
+    deliverables:
+    - structured_summary
+- step_id: compile_spec_8873f4
+  orchestrator: cognitive
+  step_type: review
+  target: reviewer
+  description: "Using the structured_summary from the research step, write a new Markdown\
+    \ note in the vault that contains the full specification. Ensure the note includes\
+    \ sections for: overall purpose, detailed function and class specifications, dependency\
+    \ graph, I/O contracts, invariants and edge\u2011case handling, and a clear flagging\
+    \ of inferred information. The document must be detailed enough for a competent\
+    \ engineer to rebuild the script from scratch.\n\nDeliverables:\n- NotebookPackagerSpec.md"
+  risk_tier: T1
+  side_effects: none
+  depends_on:
+  - research_script_808633
+  inputs:
+    canvas_role: review
+    canvas_node_id: compile_spec
+    prompt: "System goal: Create a comprehensive specification of the script E:\\\
+      Aletheia_project\\DEV_TOOLS\\ToolSet\\aletheia_toolchain\\notebook_packager_v3.1.py,\
+      \ covering purpose, all functions/classes, dependencies, I/O, invariants, edge\
+      \ cases,\u2026\n\nUsing the structured_summary from the research step, write\
+      \ a new Markdown note in the vault that contains the full specification. Ensure\
+      \ the note includes sections for: overall purpose, detailed function and class\
+      \ specifications, dependency graph, I/O contracts, invariants and edge\u2011\
+      case handling, and a clear flagging of inferred information. The document must\
+      \ be detailed enough for a competent engineer to rebuild the script from scratch.\n\
+      \nDeliverables:\n- NotebookPackagerSpec.md"
+    context_injected: true
+    evidence:
+    - bind:
+        from_step: research_script_808633
+        path: result.summary
+  outputs:
+    result: result.compile_spec_8873f4
+  acceptance_criteria:
+    required: true
+    deliverables:
+    - NotebookPackagerSpec.md
+- step_id: verify_spec_ef96ea
+  orchestrator: deterministic
+  step_type: command
+  target: pytest_focused
+  description: 'Review the generated NotebookPackagerSpec.md and verify that it contains
+    all required sections and that each section provides the depth and completeness
+    described in the plan. Confirm that any inferred details are explicitly flagged.
+    Report any missing or insufficient content.
+
+
+    Deliverables:
+
+    - verification_report'
+  risk_tier: T2
+  side_effects: local_read
+  depends_on:
+  - compile_spec_8873f4
+  inputs:
+    canvas_role: verification
+    canvas_node_id: verify_spec
+    args:
+    - NotebookPackagerSpec.md
+  outputs:
+    result: result.verify_spec_ef96ea
+  acceptance_criteria:
+    required: true
+    deliverables:
+    - verification_report
+  requires_confirmation: false
+  retry_policy:
+    safe: true
+    max_attempts: 2
+  on_failure: halt

@@ -4,7 +4,7 @@ title: "Planning, Approval, and Dual Orchestration"
 type: "guide"
 status: "active"
 created: "2026-07-22"
-updated: "2026-07-25T14:33:58Z"
+updated: "2026-09-24T18:22:21Z"
 project_id: "jarvis_notes"
 source: "codex"
 tags: ["developer-handbook", "planning", "approval", "yaml", "orchestration", "tier/short-term"]
@@ -13,7 +13,7 @@ index_state: "indexed_local"
 remember_note_id: ""
 rag_index: true
 confidence: 0.97
-content_hash: "31575d21e912f0b0843a48a2b5cd5e0bfb06ec9efefa8d24d34f0cff339c9bb8"
+content_hash: "9e402c7cb85531bdbcae0250c02e3c112648a94909a33af0ee2fe5b56a3ce1c3"
 lifecycle: "short_term"
 project_key: "mark_xlviii"
 schema_version: "jarvis_developer_handbook/v1"
@@ -93,7 +93,7 @@ The strict dialect is `jarvis_dual_orchestrator/v1`. A step declares:
 - optional registered compensation hook;
 - failure behavior.
 
-Supported step types include tools, Python hooks, commands, model reasoning, gates, reviews, artifacts, memory commits, and fan-out aggregation.
+Supported step types include tools, Python hooks, commands, model reasoning, gates, reviews, artifacts, memory commits, fan-out aggregation, and (2026-09-24) `closing_check` — a document-completeness check `canvas_plan.py`'s Mode 2 compiler routes a `verification` node to instead of a pytest run, when that node's ancestry never reaches an `implementation` node (see [[13 Canvas Planning Engine and Reasoning-Backed Decomposition|Note 13]]).
 
 > [!danger] No generated code execution
 > The workflow cannot embed Python and cannot execute arbitrary shell text. Targets must already exist in a registered hook, command, or tool registry.
@@ -106,7 +106,7 @@ Supported step types include tools, Python hooks, commands, model reasoning, gat
 2. Reject duplicate or missing step IDs.
 3. Build a dependency graph and topologically sort it.
 4. Reject cycles and unknown dependencies.
-5. Verify every tool, hook, and command target.
+5. Verify every tool, hook, and command target — a `tool` step's `target` is now also constrained by the JSON schema itself (2026-09-24): `_load_schema()` generates a closed `enum` for it from `core/capability_schema.py`'s registered tool ids, so an invalid tool target fails schema validation before it ever reaches this Python-level check, not only when a caller happens to pass `tool_names`.
 6. Require confirmation metadata for registered commands that need it.
 7. Restrict bindings to approved paths such as `result.<field>` and require the source step to be a dependency.
 8. Assign resource classes and deterministic idempotency keys.

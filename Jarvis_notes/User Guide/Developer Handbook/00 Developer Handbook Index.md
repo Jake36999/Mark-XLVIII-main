@@ -4,7 +4,7 @@ title: "JARVIS Developer Handbook"
 type: "guide"
 status: "active"
 created: "2026-07-22"
-updated: "2026-07-29T21:53:32Z"
+updated: "2026-09-24T18:22:21Z"
 project_id: "jarvis_notes"
 source: "codex"
 tags: ["developer-handbook", "jarvis", "architecture", "index", "tier/short-term"]
@@ -13,7 +13,7 @@ index_state: "indexed_local"
 remember_note_id: ""
 rag_index: true
 confidence: 0.97
-content_hash: "03653d1ccd0a539952de8a92ea6f24fea9467f23c1bedcf284bb6b37e7e88e40"
+content_hash: "65bde598fb7d09625d5782efc1c43776fe848f3e42ff04eb9826cf74dad63665"
 lifecycle: "short_term"
 project_key: "mark_xlviii"
 schema_version: "jarvis_developer_handbook/v1"
@@ -22,7 +22,7 @@ schema_version: "jarvis_developer_handbook/v1"
 # JARVIS Developer Handbook
 
 > [!abstract] Purpose
-> This handbook describes the current MARK XLVIII implementation as it exists on 2026-07-22. It explains how JARVIS receives a turn, selects capabilities and models, executes approved workflows, produces reports, and records durable memory.
+> This handbook describes the current MARK XLVIII implementation, originally written 2026-07-22 and kept current through 2026-09-24 (DeepInfra provider migration, the canvas capability-router, and Mode 2 closing-check routing are the most recent additions — individual pages carry their own per-section dates for anything narrower). It explains how JARVIS receives a turn, selects capabilities and models, executes approved workflows, produces reports, and records durable memory.
 
 > [!important] Identity and authority
 > **JARVIS** is the assistant. **MARK XLVIII** is the local application and runtime shell. Markdown in `Jarvis_notes` is authoritative for user intent and durable knowledge. RAG, Canvas, SQLite queues, and model output are derived or operational layers.
@@ -105,6 +105,11 @@ flowchart LR
 | `Mark-XLVIII-main/core/canvas_index.py` | Derived Canvas nodes, edges, references, and cross-view relationships |
 | `Mark-XLVIII-main/core/process_events.py` | Redacted session event hub for operational trace, plus `TurnContext` phase enforcement |
 | `Mark-XLVIII-main/core/operations_state.py` | Worker-thread health and workflow telemetry provider |
+| `Mark-XLVIII-main/core/capability_schema.py` | (2026-09-24) Centralised, stable capability data source — `id`/`kind`/`keywords`/`risk_tier`/`allowed_roles` per tool and model-router role; `tool_catalogue.py`, `canvas_plan.py`'s role specs, and the workflow schema's `target` enum all read from it instead of hand-copied lists |
+| `Mark-XLVIII-main/core/tool_catalogue.py` | (2026-09-24) Weighted tool-relevance scoring for a canvas role's `suggested_tools` — Reciprocal Rank Fusion over lexical (`capability_registry`) + semantic (embedding) signals |
+| `Mark-XLVIII-main/core/document_completeness.py` | (2026-09-24) Deterministic topic-coverage check for a generated vault document — backs the `closing_check` step_type |
+| `Mark-XLVIII-main/core/session_credentials.py` | Multi-provider (OpenAI/Anthropic/Gemini/DeepInfra) session-only credential broker — see [[07 Models Credentials Speech and Resource Lifecycle|Note 07]] |
+| `Mark-XLVIII-main/core/session_key_store.py` | (2026-09-23) Opt-in persistent "remember this key" storage, separate from `runtime_config.py`'s secret-stripping `sanitize_config` |
 
 ## Related User Documentation
 

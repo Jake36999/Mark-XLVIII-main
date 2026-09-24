@@ -3,9 +3,10 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 import yaml
 
@@ -678,6 +679,30 @@ def _replace_or_append_section(body: str, section_name: str, content: str) -> st
     return "\n".join(lines[:start] + section_lines + lines[end:]).strip() + "\n"
 
 
+def _plan_shape(items: list[dict[str, Any]]) -> dict[str, bool]:
+    """Real, ground-truth signal for which generic plan sections actually
+    apply to this plan -- computed from the compiled work items' own
+    target/side_effects, not a keyword guess at the objective text. Only
+    meaningful post-compile (see _prepare_plan_bundle), once manifest items
+    with real per-item data exist -- build_plan_sections runs before that and
+    always produces the full, generic version, exactly as before.
+
+    Motivated by a real plan (a pure web-research objective) that showed the
+    full Subagent Delegation table (OpenClaw, a high-tier planner) and the
+    full destructive-action danger box, despite every one of its own work
+    items being a read-only web_search/jarvis_memory call plus one vault
+    write -- none of that boilerplate applied, and there was no signal in the
+    note distinguishing "generic, unreviewed default" from "reviewed and
+    still true for this plan."
+    """
+    targets = {str(item.get("target") or "") for item in items}
+    side_effects = {str(item.get("side_effects") or "") for item in items}
+    return {
+        "has_openclaw": "project_operator" in targets,
+        "has_write": bool(side_effects & {"local_write", "external_write", "destructive"}),
+    }
+
+
 def _work_item_table(items: list[dict[str, Any]]) -> str:
     rows = [
         "| ID | Sequence | Action | Target | Risk | Side effects | Depends on |",
@@ -715,6 +740,329 @@ def _markdown_work_item_ids(body: str) -> list[str]:
     return ids
 
 
+@dataclass(frozen=True)
+class TaskMethodContext:
+    """What a task-to-step method needs in order to decide the step's shape.
+
+    Carries exactly the loop state `_workflow_from_tasks` already threads through
+    the elif chain this replaces, so a method's `build` can be a pure function of it
+    instead of a closure over loop-local variables.
+    """
+
+    plan_id: str
+    step_id: str
+    task: str
+    clean_task: str
+    lowered: str
+    prompt: str
+    output_root: Path | None
+    source_path: Path | None
+    project_id: str | None
+    multi_agent: bool
+    dependencies: list[str]
+    previous: str
+    steps_so_far: list[dict[str, Any]]
+
+
+@dataclass(frozen=True)
+class TaskMethodSpec:
+    """A named, registered recipe for turning one recognized task shape into a step.
+
+    `actions/dual_orchestrator.py` already registers *primitives* by name with
+    validated metadata (`PythonHookRegistry`, `CommandRegistry`) -- nothing
+    registered which *task phrasing* resolves to which primitive call. That
+    mapping lived only as an unnamed if/elif chain here. A spec is exactly that
+    mapping, made inspectable (`TaskMethodRegistry.candidates()`) and testable in
+    isolation instead of only reachable by exercising the whole plan pipeline.
+    """
+
+    method_id: str
+    description: str
+    matches: Callable[[TaskMethodContext], bool]
+    build: Callable[[TaskMethodContext], dict[str, Any]]
+
+
+class TaskMethodRegistry:
+    def __init__(self) -> None:
+        self._methods: list[TaskMethodSpec] = []
+        self._ids: set[str] = set()
+
+    def register(self, spec: TaskMethodSpec) -> None:
+        if not spec.method_id or not spec.description:
+            raise WorkflowError("a task method requires a method_id and a description")
+        if spec.method_id in self._ids:
+            raise WorkflowError(f"duplicate task method id: {spec.method_id}")
+        self._methods.append(spec)
+        self._ids.add(spec.method_id)
+
+    def select(self, ctx: TaskMethodContext) -> TaskMethodSpec | None:
+        """First registered method whose pattern matches -- order is priority."""
+        for spec in self._methods:
+            if spec.matches(ctx):
+                return spec
+        return None
+
+    def candidates(self) -> list[TaskMethodSpec]:
+        return list(self._methods)
+
+
+def _step_defaults(built: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "risk_tier": "T1",
+        "retry_safe": True,
+        "max_attempts": 2,
+        "requires_confirmation": False,
+        **built,
+    }
+
+
+def default_task_method_registry() -> TaskMethodRegistry:
+    """The task-phrasing-to-primitive mapping, as registered methods.
+
+    Registration order is match priority, preserved from the original elif chain:
+    specific literal prefixes first, the `web`/`source`/... keyword match second
+    to last, and the true fallback (nothing recognized -> hand it to inference as
+    a `model_reasoning` step) is deliberately *not* registered here -- it is not a
+    recognized shape, it is what happens when nothing is.
+    """
+
+    registry = TaskMethodRegistry()
+
+    registry.register(TaskMethodSpec(
+        method_id="approval_gate_output_root",
+        description="Validate the approved output root before any write happens.",
+        matches=lambda ctx: ctx.lowered.startswith("validate the approved output root"),
+        build=lambda ctx: _step_defaults({
+            "step_type": "gate", "target": "approval_gate",
+            "inputs": {"passed": bool(ctx.output_root), "output_root": ctx.output_root},
+            "orchestrator": "deterministic", "side_effects": "none",
+            "acceptance_criteria": {"required": True, "required_keys": ["status"]},
+        }),
+    ))
+    registry.register(TaskMethodSpec(
+        method_id="build_python_job_runner",
+        description="Build the modular Python job-runner demo under the approved output root.",
+        matches=lambda ctx: ctx.lowered.startswith("build the modular python job runner"),
+        build=lambda ctx: _step_defaults({
+            "step_type": "python_hook", "target": "build_python_job_runner",
+            "inputs": {"output_root": ctx.output_root, "request": ctx.prompt},
+            "orchestrator": "deterministic", "side_effects": "local_write",
+            "acceptance_criteria": {"required": True, "required_keys": ["artifacts", "tests", "fresh_process"]},
+        }),
+    ))
+    registry.register(TaskMethodSpec(
+        method_id="validate_python_project",
+        description="Run fresh-process success validation on a built Python project.",
+        matches=lambda ctx: ctx.lowered.startswith("run fresh-process success"),
+        build=lambda ctx: _step_defaults({
+            "step_type": "python_hook", "target": "validate_python_project",
+            "inputs": {"output_root": ctx.output_root},
+            "orchestrator": "deterministic", "side_effects": "local_read",
+            "acceptance_criteria": {"required": True, "required_keys": ["returncode", "missing"]},
+        }),
+    ))
+    registry.register(TaskMethodSpec(
+        method_id="vault_inventory",
+        description="Inventory the configured Markdown vault, read-only.",
+        matches=lambda ctx: ctx.lowered.startswith("inventory the configured markdown vault"),
+        build=lambda ctx: _step_defaults({
+            "step_type": "python_hook", "target": "vault_inventory", "inputs": {},
+            "orchestrator": "deterministic", "side_effects": "local_read",
+            "acceptance_criteria": {"required": True, "required_keys": ["notes", "count"]},
+        }),
+    ))
+    registry.register(TaskMethodSpec(
+        method_id="create_vault_documentation_set",
+        description="Create the linked evaluation MOC and companion documentation artifacts.",
+        matches=lambda ctx: ctx.lowered.startswith("create the linked evaluation moc"),
+        build=lambda ctx: _step_defaults({
+            "step_type": "python_hook", "target": "create_vault_documentation_set",
+            "inputs": {"request": ctx.prompt},
+            "orchestrator": "deterministic", "side_effects": "local_write",
+            "acceptance_criteria": {"required": True, "required_keys": ["artifacts", "moc_path", "architecture_path", "gaps_path"]},
+        }),
+    ))
+    registry.register(TaskMethodSpec(
+        method_id="validate_vault_artifacts",
+        description="Validate generated frontmatter and links on the previous step's artifacts.",
+        matches=lambda ctx: ctx.lowered.startswith("validate generated frontmatter"),
+        build=lambda ctx: _step_defaults({
+            "step_type": "python_hook", "target": "validate_vault_artifacts",
+            "inputs": {"artifacts": {"bind": {"from_step": ctx.previous, "path": "result.artifacts"}}},
+            "orchestrator": "deterministic", "side_effects": "local_read",
+            "acceptance_criteria": {"required": True, "required_keys": ["errors", "unresolved_links"]},
+        }),
+    ))
+    registry.register(TaskMethodSpec(
+        method_id="productivity_assessment",
+        description="Classify canonical task ids for a productivity assessment.",
+        matches=lambda ctx: ctx.lowered.startswith("classify canonical task ids"),
+        build=lambda ctx: _step_defaults({
+            "step_type": "python_hook", "target": "productivity_assessment",
+            "inputs": {"source_path": str(ctx.source_path or "")},
+            "orchestrator": "deterministic", "side_effects": "local_write",
+            "acceptance_criteria": {"required": True, "required_keys": ["tasks", "artifact_path"]},
+        }),
+    ))
+    registry.register(TaskMethodSpec(
+        method_id="approval_gate_generic",
+        description="Pause at a generic approval gate bound to the current run.",
+        matches=lambda ctx: ctx.lowered.startswith("pause at the approval gate"),
+        build=lambda ctx: _step_defaults({
+            "step_type": "gate", "target": "approval_gate",
+            "inputs": {"passed": True, "approval_bound_to_run": True},
+            "orchestrator": "deterministic", "side_effects": "none",
+            "acceptance_criteria": {"required": True, "required_keys": ["status"]},
+        }),
+    ))
+    _RECORD_ARTIFACT_PREFIXES = (
+        "record project artifacts", "record project learning artifacts",
+        "record documentation artifacts", "record research artifacts",
+        "record the analysis report", "create a bounded task-assessment artifact",
+        "create an execution summary",
+    )
+    registry.register(TaskMethodSpec(
+        method_id="record_artifact",
+        description="Record a completion-evidence artifact note for the approved work item.",
+        matches=lambda ctx: ctx.lowered.startswith(_RECORD_ARTIFACT_PREFIXES),
+        build=lambda ctx: _step_defaults({
+            "step_type": "artifact", "target": "vault_create_note",
+            "inputs": {
+                "note_type": "report",
+                "title": f"Workflow Evidence - {ctx.plan_id} - {ctx.step_id}",
+                "content": (
+                    {"bind": {"from_step": ctx.dependencies[-1], "path": "result.text"}}
+                    if len(ctx.dependencies) == 1
+                    else f"Approved work item `{ctx.step_id}` completed. Review the linked run results for: {ctx.clean_task}"
+                ),
+                "tags": ["workflow-evidence", "completion-evidence"],
+            },
+            "orchestrator": "deterministic", "side_effects": "local_write",
+            "acceptance_criteria": {"required": True, "required_keys": ["path"]},
+            "risk_tier": "T2",
+        }),
+    ))
+    registry.register(TaskMethodSpec(
+        method_id="query_local_vault",
+        description="Query local vault memory for context relevant to the plan's prompt.",
+        matches=lambda ctx: ctx.lowered.startswith("query local vault"),
+        build=lambda ctx: _step_defaults({
+            "step_type": "tool", "target": "jarvis_memory",
+            "inputs": {"operation": "query_local", "query": ctx.prompt, "limit": 8},
+            "orchestrator": "deterministic", "side_effects": "local_read",
+            "acceptance_criteria": {"required": True, "required_keys": ["results"]},
+        }),
+    ))
+    registry.register(TaskMethodSpec(
+        method_id="learn_project_readonly",
+        description="Learn the approved repository through the read-only project workflow.",
+        matches=lambda ctx: ctx.lowered.startswith("learn the approved repository through the read-only project workflow"),
+        build=lambda ctx: _step_defaults({
+            "step_type": "tool", "target": "project_operator",
+            "inputs": {
+                "operation": "learn_project",
+                "project_id": ctx.project_id if ctx.project_id else (
+                    "mark_platform"
+                    if any(token in ctx.prompt.lower() for token in ("this project", "this repository", "this repo", "this codebase"))
+                    else ctx.project_id
+                ),
+                "path": str(ctx.source_path or ""),
+                "intent": ctx.prompt,
+                "use_aletheia": True,
+            },
+            "orchestrator": "deterministic", "side_effects": "local_write",
+            "acceptance_criteria": {"required": True, "required_keys": ["brief_path", "memory_path", "snapshot_path"]},
+            "risk_tier": "T2",
+        }),
+    ))
+    registry.register(TaskMethodSpec(
+        method_id="delegate_development",
+        description="Delegate the approved development objective to a coding agent, if a project is registered.",
+        matches=lambda ctx: ctx.lowered.startswith("delegate the approved development objective"),
+        build=lambda ctx: (
+            _step_defaults({
+                "step_type": "tool", "target": "project_operator",
+                "inputs": {
+                    "operation": "delegate_openclaw",
+                    "project_id": ctx.project_id,
+                    "intent": ctx.prompt,
+                    "agents": 2 if ctx.multi_agent else 1,
+                    "timeout": 600,
+                },
+                "orchestrator": "deterministic", "side_effects": "local_write",
+                "acceptance_criteria": {"required": True, "required_keys": ["spawned"], "independent_review": True},
+                "risk_tier": "T3", "retry_safe": False, "max_attempts": 1, "requires_confirmation": True,
+            })
+            if ctx.project_id else
+            _step_defaults({
+                "step_type": "gate", "target": "registered_project_required",
+                "inputs": {"passed": False, "reason": "No registered project could be resolved from the approved plan."},
+                "orchestrator": "deterministic", "side_effects": "none",
+                "acceptance_criteria": {"required": True, "required_keys": ["status"]},
+            })
+        ),
+    ))
+    registry.register(TaskMethodSpec(
+        method_id="web_research",
+        description="Collect cited web sources when the task text implies external research.",
+        matches=lambda ctx: any(token in ctx.lowered for token in ("web", "source", "citation", "internet", "current research")),
+        build=lambda ctx: _step_defaults({
+            "step_type": "tool", "target": "web_search",
+            "inputs": {
+                # ctx.task is always the objective re-wrapped in this method's
+                # own boilerplate lead-in ("Collect cited web sources for the
+                # approved objective: {prompt}") -- every branch in
+                # _default_tasks_for_prompt that can reach this method
+                # constructs it that way. Concatenating it duplicated the
+                # objective and buried it under generic planning words
+                # ("collect", "cited", "sources", "approved", "objective"),
+                # which is exactly why a real "research todays geopolitical
+                # news" plan came back citing Wikipedia's "Research" article,
+                # Google Scholar's homepage and a "What is Research?"
+                # explainer -- confirmed live, not a guess.
+                "query": ctx.prompt,
+                "mode": "research", "max_results": 6, "require_citations": True,
+            },
+            "orchestrator": "deterministic", "side_effects": "external_read",
+            "acceptance_criteria": {"required": True, "required_keys": ["results"], "citations_required": True},
+        }),
+    ))
+    return registry
+
+
+_DEFAULT_TASK_METHODS = default_task_method_registry()
+
+
+def _fallback_model_reasoning_step(ctx: TaskMethodContext) -> dict[str, Any]:
+    """What happens when no registered method recognizes the task shape.
+
+    This is the honest escape hatch, not an afterthought: nothing about having a
+    method registry should make the system unable to handle a task it hasn't seen
+    a pattern for. It costs a full inference pass instead of a free-standing
+    typed call, same as it always has.
+    """
+
+    inputs: dict[str, Any] = {"prompt": ctx.clean_task, "role": "worker"}
+    if ctx.dependencies:
+        evidence_bindings = []
+        for dependency in ctx.dependencies:
+            source = next((step for step in ctx.steps_so_far if step["step_id"] == dependency), {})
+            if source.get("target") in {"web_search", "jarvis_memory"}:
+                path = "result.results"
+            elif source.get("target") == "project_operator":
+                operation = str((source.get("inputs") or {}).get("operation") or "")
+                path = "result.takeaways" if operation == "learn_project" else "result.spawned"
+            else:
+                path = "result.text"
+            evidence_bindings.append({"bind": {"from_step": dependency, "path": path}})
+        inputs["evidence"] = evidence_bindings
+    return _step_defaults({
+        "step_type": "model_reasoning", "target": "local_worker", "inputs": inputs,
+        "orchestrator": "cognitive", "side_effects": "none",
+        "acceptance_criteria": {"required": True, "min_length": 40, "independent_review": True},
+    })
+
+
 def _workflow_from_tasks(plan_id: str, version: int, tasks: list[str], prompt: str) -> dict[str, Any]:
     steps: list[dict[str, Any]] = []
     previous = ""
@@ -737,167 +1085,23 @@ def _workflow_from_tasks(plan_id: str, version: int, tasks: list[str], prompt: s
             dependencies = list(parallel_ids) if parallel_ids else ([previous] if previous else [])
             parallel_ids = []
             parallel_anchor = ""
-        risk_tier = "T1"
-        retry_safe = True
-        max_attempts = 2
-        requires_confirmation = False
-        if lowered.startswith("validate the approved output root"):
-            step_type = "gate"
-            target = "approval_gate"
-            inputs = {"passed": bool(output_root), "output_root": output_root}
-            orchestrator = "deterministic"
-            effects = "none"
-            criteria = {"required": True, "required_keys": ["status"]}
-        elif lowered.startswith("build the modular python job runner"):
-            step_type = "python_hook"
-            target = "build_python_job_runner"
-            inputs = {"output_root": output_root, "request": prompt}
-            orchestrator = "deterministic"
-            effects = "local_write"
-            criteria = {"required": True, "required_keys": ["artifacts", "tests", "fresh_process"]}
-        elif lowered.startswith("run fresh-process success"):
-            step_type = "python_hook"
-            target = "validate_python_project"
-            inputs = {"output_root": output_root}
-            orchestrator = "deterministic"
-            effects = "local_read"
-            criteria = {"required": True, "required_keys": ["returncode", "missing"]}
-        elif lowered.startswith("inventory the configured markdown vault"):
-            step_type = "python_hook"
-            target = "vault_inventory"
-            inputs = {}
-            orchestrator = "deterministic"
-            effects = "local_read"
-            criteria = {"required": True, "required_keys": ["notes", "count"]}
-        elif lowered.startswith("create the linked evaluation moc"):
-            step_type = "python_hook"
-            target = "create_vault_documentation_set"
-            inputs = {"request": prompt}
-            orchestrator = "deterministic"
-            effects = "local_write"
-            criteria = {"required": True, "required_keys": ["artifacts", "moc_path", "architecture_path", "gaps_path"]}
-        elif lowered.startswith("validate generated frontmatter"):
-            step_type = "python_hook"
-            target = "validate_vault_artifacts"
-            inputs = {"artifacts": {"bind": {"from_step": previous, "path": "result.artifacts"}}}
-            orchestrator = "deterministic"
-            effects = "local_read"
-            criteria = {"required": True, "required_keys": ["errors", "unresolved_links"]}
-        elif lowered.startswith("classify canonical task ids"):
-            step_type = "python_hook"
-            target = "productivity_assessment"
-            inputs = {"source_path": str(source_path or "")}
-            orchestrator = "deterministic"
-            effects = "local_write"
-            criteria = {"required": True, "required_keys": ["tasks", "artifact_path"]}
-        elif lowered.startswith("pause at the approval gate"):
-            step_type = "gate"
-            target = "approval_gate"
-            inputs = {"passed": True, "approval_bound_to_run": True}
-            orchestrator = "deterministic"
-            effects = "none"
-            criteria = {"required": True, "required_keys": ["status"]}
-        elif lowered.startswith(("record project artifacts", "record project learning artifacts", "record documentation artifacts", "record research artifacts", "record the analysis report", "create a bounded task-assessment artifact", "create an execution summary")):
-            step_type = "artifact"
-            target = "vault_create_note"
-            inputs = {
-                "note_type": "report",
-                "title": f"Workflow Evidence - {plan_id} - {step_id}",
-                "content": (
-                    {"bind": {"from_step": dependencies[-1], "path": "result.text"}}
-                    if len(dependencies) == 1
-                    else f"Approved work item `{step_id}` completed. Review the linked run results for: {clean_task}"
-                ),
-                "tags": ["workflow-evidence", "completion-evidence"],
-            }
-            orchestrator = "deterministic"
-            effects = "local_write"
-            criteria = {"required": True, "required_keys": ["path"]}
-            risk_tier = "T2"
-        elif lowered.startswith("query local vault"):
-            step_type = "tool"
-            target = "jarvis_memory"
-            inputs = {"operation": "query_local", "query": prompt, "limit": 8}
-            orchestrator = "deterministic"
-            effects = "local_read"
-            criteria = {"required": True, "required_keys": ["results"]}
-        elif lowered.startswith("learn the approved repository through the read-only project workflow"):
-            resolved_project = project_id
-            if not resolved_project and any(token in prompt.lower() for token in ("this project", "this repository", "this repo", "this codebase")):
-                resolved_project = "mark_platform"
-            step_type = "tool"
-            target = "project_operator"
-            inputs = {
-                "operation": "learn_project",
-                "project_id": resolved_project,
-                "path": str(source_path or ""),
-                "intent": prompt,
-                "use_aletheia": True,
-            }
-            orchestrator = "deterministic"
-            effects = "local_write"
-            criteria = {"required": True, "required_keys": ["brief_path", "memory_path", "snapshot_path"]}
-            risk_tier = "T2"
-        elif lowered.startswith("delegate the approved development objective"):
-            if project_id:
-                step_type = "tool"
-                target = "project_operator"
-                inputs = {
-                    "operation": "delegate_openclaw",
-                    "project_id": project_id,
-                    "intent": prompt,
-                    "agents": 2 if multi_agent else 1,
-                    "timeout": 600,
-                }
-                orchestrator = "deterministic"
-                effects = "local_write"
-                criteria = {"required": True, "required_keys": ["spawned"], "independent_review": True}
-                risk_tier = "T3"
-                retry_safe = False
-                max_attempts = 1
-                requires_confirmation = True
-            else:
-                step_type = "gate"
-                target = "registered_project_required"
-                inputs = {"passed": False, "reason": "No registered project could be resolved from the approved plan."}
-                orchestrator = "deterministic"
-                effects = "none"
-                criteria = {"required": True, "required_keys": ["status"]}
-        elif any(token in lowered for token in ("web", "source", "citation", "internet", "current research")):
-            step_type = "tool"
-            target = "web_search"
-            inputs = {
-                "query": f"{prompt}: {task}",
-                "mode": "research",
-                "max_results": 6,
-                "require_citations": True,
-            }
-            orchestrator = "deterministic"
-            effects = "external_read"
-            criteria = {"required": True, "required_keys": ["results"], "citations_required": True}
-        else:
-            step_type = "model_reasoning"
-            target = "local_worker"
-            inputs = {
-                "prompt": clean_task,
-                "role": "worker",
-            }
-            if dependencies:
-                evidence_bindings = []
-                for dependency in dependencies:
-                    source = next((step for step in steps if step["step_id"] == dependency), {})
-                    if source.get("target") in {"web_search", "jarvis_memory"}:
-                        path = "result.results"
-                    elif source.get("target") == "project_operator":
-                        operation = str((source.get("inputs") or {}).get("operation") or "")
-                        path = "result.takeaways" if operation == "learn_project" else "result.spawned"
-                    else:
-                        path = "result.text"
-                    evidence_bindings.append({"bind": {"from_step": dependency, "path": path}})
-                inputs["evidence"] = evidence_bindings
-            orchestrator = "cognitive"
-            effects = "none"
-            criteria = {"required": True, "min_length": 40, "independent_review": True}
+        ctx = TaskMethodContext(
+            plan_id=plan_id, step_id=step_id, task=task, clean_task=clean_task, lowered=lowered,
+            prompt=prompt, output_root=output_root, source_path=source_path, project_id=project_id,
+            multi_agent=multi_agent, dependencies=dependencies, previous=previous, steps_so_far=steps,
+        )
+        spec = _DEFAULT_TASK_METHODS.select(ctx)
+        built = spec.build(ctx) if spec is not None else _fallback_model_reasoning_step(ctx)
+        step_type = built["step_type"]
+        target = built["target"]
+        inputs = built["inputs"]
+        orchestrator = built["orchestrator"]
+        effects = built["side_effects"]
+        criteria = built["acceptance_criteria"]
+        risk_tier = built["risk_tier"]
+        retry_safe = built["retry_safe"]
+        max_attempts = built["max_attempts"]
+        requires_confirmation = built["requires_confirmation"]
         steps.append(
             {
                 "step_id": step_id,
@@ -986,6 +1190,39 @@ def _prepare_plan_bundle(
         command_registry=runtime.commands,
     )
     body = _replace_or_append_section(body, "Executable Work Items", _work_item_table(manifest["items"]))
+    shape = _plan_shape(manifest["items"])
+    if not shape["has_openclaw"]:
+        body = _replace_or_append_section(
+            body, "Subagent Delegation",
+            "> [!note] Not applicable to this plan\n"
+            "> No work item above targets `project_operator` (OpenClaw / high-tier delegation). "
+            "The JARVIS router and local worker model cover everything here.",
+        )
+        body = _replace_or_append_section(
+            body, "Decision Points",
+            "\n".join(
+                [
+                    "- Which parts of the plan are in scope for automated execution?",
+                    "- What should stop execution and return to the user?",
+                ]
+            ),
+        )
+    if not shape["has_write"]:
+        body = _replace_or_append_section(
+            body, "Approval Gates",
+            "\n".join(
+                [
+                    "> [!success] Read-only plan",
+                    "> Every work item above is `local_read`, `external_read`, or has no side effects -- "
+                    "nothing here can write, delete, move a file, spend money, or change an account.",
+                    "",
+                    "- [ ] Plan approved by user.",
+                    "- [ ] Destructive actions explicitly confirmed. _(no destructive item exists in this plan)_",
+                    "- [ ] High-cost model use approved when needed.",
+                    "- [ ] Subagent delegation approved when needed.",
+                ]
+            ),
+        )
     # Reset to a blank decision every time this bundle is (re)built -- i.e. on
     # creation and on every revision. approval_projection only hashes the fixed
     # APPROVAL_SECTIONS tuple, which this section is deliberately not part of,

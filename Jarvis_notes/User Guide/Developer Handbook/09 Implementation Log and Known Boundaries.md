@@ -4,7 +4,7 @@ title: "Implementation Log and Known Boundaries"
 type: "log"
 status: "active"
 created: "2026-07-22"
-updated: "2026-07-25T14:33:58Z"
+updated: "2026-09-24T18:22:21Z"
 project_id: "jarvis_notes"
 source: "codex"
 tags: ["developer-handbook", "implementation-log", "validation", "known-boundaries", "tier/short-term"]
@@ -13,7 +13,7 @@ index_state: "indexed_local"
 remember_note_id: ""
 rag_index: true
 confidence: 0.98
-content_hash: "2e7f08c6d8046d0d7faf21acde707cc82925b7deb607df2367d9112f1066dd17"
+content_hash: "4b0a10b963d5923728750db0eaed239665445de422dc5cd9a31c0eb6fb292775"
 lifecycle: "short_term"
 project_key: "mark_xlviii"
 schema_version: "jarvis_developer_handbook/v1"
@@ -88,10 +88,26 @@ schema_version: "jarvis_developer_handbook/v1"
 - Removed the 8-second session poll from the dashboard command relay.
 - Added `test_no_gemini_live_session_path_remains` so the path cannot return unnoticed.
 
+### DeepInfra provider migration and cost-driven LM Studio decoupling (2026-09-23)
+
+- Wired DeepInfra as a full `core/model_router.py` provider (text, tools, TTS); fixed a credential-broker link-probe bug (OpenAI's `/responses` shape doesn't work for DeepInfra) and a hardcoded `provider="openai"` mislabelling bug in the tool-call path.
+- Flipped `planner`/`worker`/`research` routes from `lmstudio` to `deepinfra`, driven by measured cost, not a reliability finding — see [[07 Models Credentials Speech and Resource Lifecycle|Note 07]].
+- Added `core/session_key_store.py` (opt-in persistent "remember this key") and `core/tts.py`'s `DeepInfraTTSEngine`.
+- Fixed `WorkflowRuntime`'s model-concurrency semaphore, hardcoded to one slot regardless of `max_workers` since the only prior provider was LM Studio holding one local model in VRAM — no longer correct against a cloud provider, now defaults to `max_workers`.
+
+### Canvas Mode 2 hardening: a document-writing role, dispatch bugs, and a centralised capability schema (2026-09-23/24)
+
+- Added the `document` role (`_ROLE_SPECS`) — a plain vault-note write, distinct from `implementation`'s OpenClaw-gated path, closing a gap where a pure documentation goal had no role that could write anything durable without going through project-gated delegation for no reason.
+- Found and fixed two real dispatch bugs live: `research`-role nodes were dispatching on the generic `worker` model tier, never the dedicated `research` route, because nothing set `inputs["role"]`; and the `research` role had no repair budget at all (`max_attempts: 1` by schema default), converting the first `REPAIR` verdict straight to `REJECT_REPLAN`.
+- Added `WorkflowRuntime.retry_rejected_item` (a deliberate, human-invoked-only escape hatch for `REJECT_REPLAN`, mirroring `retry_escalated_item`) and a pre-dispatch tool-call intent check (`_check_tool_intent`) — see [[04 Fan-Out Workers Review and Recovery|Note 04]].
+- Found `reviewer_provider` was never configured at all, silently falling through to a dead LM Studio default — fixed alongside the DeepInfra migration above.
+- Added a `closing_check` step_type: a `verification` node whose ancestry never reaches an `implementation` node now gets a deterministic document-completeness check instead of running the full test suite against nothing relevant to it, routed purely from canvas graph structure at compile time.
+- Added `core/capability_schema.py` — a single, stable capability data source that `tool_catalogue.py`, `canvas_plan.py`'s role specs, and (new) the compiled workflow schema's `target` enum all read from, replacing several independently-drifting hardcoded lists. Built an offline, two-step blind LLM pipeline (`scripts/derive_capability_keywords.py`) to derive tool keywords from functional descriptions rather than hand-typing them; found and fixed a real data gap along the way (`capability_registry` had no `CAPABILITY_HELP` entry, so the pipeline hallucinated a plausible-but-wrong description for it) and a real reliability gap (added a retry after an identical prompt scored 7 good scenarios once and zero the next call). See [[13 Canvas Planning Engine and Reasoning-Backed Decomposition|Note 13]] and [[02 Capability Registry MCP and Safety|Note 02]].
+
 ## Current Validation
 
 > [!success] Automated suite
-> The complete MARK test suite passed on 2026-07-30: **1041 passed**, in 126s under `pytest-xdist` (`addopts = -n auto`), with the existing Python `audioop` deprecation warning. The suite was 292 tests on 2026-07-22 and 880 before the finalisation work began.
+> The complete MARK test suite passed on 2026-09-24: **1336 passed**, under `pytest-xdist`, with the existing Python `audioop` deprecation warning. The suite was 1041 tests on 2026-07-30, 292 on 2026-07-22, and 880 before the finalisation work began.
 >
 > `pytest.ini` deliberately sets **no** `testpaths`. Setting it to `tests` silently dropped six vendored tests from `jarvis-ui-components` — making the run faster must not make it smaller.
 
@@ -185,6 +201,9 @@ Two GPUs improve model placement, but the safe runtime policy remains one active
 - Validate browser, reminder, weather, and desktop tools against the current host session.
 - Exercise a user edit to an active plan and verify three-way reconciliation and renewed approval.
 - Validate Canvas task changes flowing back into Markdown under explicit permission.
+- Get a real canvas Mode 2 run through to completion end-to-end with the `document`/`closing_check` pair live (the notebook_packager_v3.1.py spec experiment is the in-progress case — approved but not yet observed completing a full run).
+- Compare `derive_capability_keywords.py`'s output against the hand-authored `CAPABILITY_HELP` keywords for all four tools by hand; nothing has actually consumed `derived_keywords` for ranking yet.
+- Exercise the tool-call intent check (`_check_tool_intent`) and `retry_rejected_item` against a genuine live failure, not just the unit-test harness — neither has been observed catching a real problem in production use yet.
 
 ## Change Discipline
 

@@ -4,7 +4,7 @@ title: "Fan-Out, Workers, Review, and Recovery"
 type: "guide"
 status: "active"
 created: "2026-07-22"
-updated: "2026-07-25T14:33:58Z"
+updated: "2026-09-24T18:22:21Z"
 project_id: "jarvis_notes"
 source: "codex"
 tags: ["developer-handbook", "fan-out", "workers", "review", "recovery", "tier/short-term"]
@@ -13,7 +13,7 @@ index_state: "indexed_local"
 remember_note_id: ""
 rag_index: true
 confidence: 0.97
-content_hash: "13ccc8a9c1188e34fb401656804ef2f67b36be9ae8f6b97d6b762a7f7883761b"
+content_hash: "8543430a8506b5f5c630c55ad3fc7887bb5aa13fc244573cc59c06e2583a9a7a"
 lifecycle: "short_term"
 project_key: "mark_xlviii"
 schema_version: "jarvis_developer_handbook/v1"
@@ -59,11 +59,14 @@ flowchart TD
 | Class | Runtime capacity | Examples |
 | --- | --- | --- |
 | `io` | Up to the general worker limit | Search, file reads, deterministic hooks, note creation |
-| `model` | One active slot | Model reasoning and independent model review |
+| `model` | `max_workers` by default (was a hardcoded single slot, see below) | Model reasoning and independent model review |
 | `openclaw` | One active slot | Approved coding scout or development task |
 | `command` | General pool plus command policy | Registered executable and argument specification |
 
-The one-slot model semaphore prevents the local research model from receiving two heavy generations at once. The one-slot OpenClaw semaphore prevents overlapping coding sessions from competing for the same project and resources.
+> [!important] The model semaphore is no longer hardcoded to one slot (2026-09-23)
+> This used to be a fixed `BoundedSemaphore(1)` regardless of `max_workers`, because the only provider was LM Studio holding one local model in VRAM at a time. That constraint doesn't apply to a cloud provider — see [[07 Models Credentials Speech and Resource Lifecycle|Note 07]] on the DeepInfra move — so it now defaults to `max_workers` itself (genuinely concurrent model dispatch), overridable via `model_concurrency=` for a caller that needs to stay under a specific provider's own rate limit.
+
+The one-slot OpenClaw semaphore is unrelated and still serialised regardless of provider — it exists to prevent overlapping coding sessions from competing for the same project and resources, not for model-VRAM reasons.
 
 > [!important] LM Studio `parallel=4`
 > LM Studio's parallel value is an instance configuration, not four agents. JARVIS does not interpret it as permission to submit four complete TTS or research requests.
@@ -128,11 +131,17 @@ Review verdicts are:
 
 High-risk or model-generated work can require an independent reviewer context. The reviewer receives the original evidence and acceptance criteria rather than only a worker summary. Model provenance is stored with the result.
 
+> [!important] Pre-dispatch intent check for tool calls (2026-09-24)
+> Everything above judges a result *after* dispatch. A `step_type: "tool"` item now also gets checked *before* it runs: `WorkflowRuntime._check_tool_intent` shows a larger/planner-tier model the item's declared intent alongside its fully-resolved arguments (bindings already substituted) and can deny the call outright, converting straight to `REPAIR`/`REJECT_REPLAN` without `_dispatch_tool` ever executing it. This exists because a compiled tool step's arguments are frozen at compile time and dispatched verbatim — nothing previously checked that what actually got bound in (a binding result, a directive value) still matched the item's own description. Additive to every gate above, never a replacement; fails closed on any error (an unavailable checker denies rather than waving the call through). Injectable via `intent_checker=`, mirroring `reviewer=`.
+
 ## Retry and Repair
 
 The compiler caps attempts at three. A repair is allowed only when the step is marked retry-safe. Reaching the attempt limit converts another repair request into `REJECT_REPLAN`.
 
 Percentage error estimates may be retained as telemetry, but they do not authorize execution.
+
+> [!important] `ESCALATE` and `REJECT_REPLAN` are both terminal to the automatic dispatch loop, but recover differently
+> Neither state is ever revisited by `execute_run`'s own scheduling pass. `retry_escalated_item(run_id, item_id)` is the entry point a human-in-the-loop decision (or a driver acting on one) uses to resume an `ESCALATE`d item — refunding the attempt it resumes, so a role with no inflated `max_attempts` can still be escalated and retried more than once. `execute_canvas_plan` calls it automatically on every invocation for any currently-`ESCALATE`d item, so Mode 2 resumes on its own once a human note is resolved. `retry_rejected_item(run_id, item_id)` (2026-09-24) is the equivalent for `REJECT_REPLAN`, but deliberately **never** called automatically by anything — `REJECT_REPLAN` usually means a genuine plan or model failure that needs a human to actually look at it, not just retry blindly; this is the explicit escape hatch for the narrower case a human has confirmed the rejection was an infrastructure problem (a run dispatched against an unlinked credential, say) rather than the model actually failing the task.
 
 ## Leases and Checkpoints
 

@@ -4,7 +4,7 @@ title: "Models, Credentials, Speech, and Resource Lifecycle"
 type: "guide"
 status: "active"
 created: "2026-07-22"
-updated: "2026-07-30T01:49:08Z"
+updated: "2026-09-24T18:22:21Z"
 project_id: "jarvis_notes"
 source: "codex"
 tags: ["developer-handbook", "models", "lmstudio", "credentials", "speech", "tier/short-term"]
@@ -13,7 +13,7 @@ index_state: "indexed_local"
 remember_note_id: ""
 rag_index: true
 confidence: 0.97
-content_hash: "9fdc3242050b62103b9c2b44dbbc2fa944b34cf9ab14ffac5afc88653d1ba91a"
+content_hash: "4226553ae6c38839fd3e69244663fd5df9f8d85ce9b9b800ee2256d9a26c994a"
 lifecycle: "short_term"
 project_key: "mark_xlviii"
 schema_version: "jarvis_developer_handbook/v1"
@@ -24,19 +24,32 @@ schema_version: "jarvis_developer_handbook/v1"
 > [!abstract] Split compute model
 > High-capability models plan, synthesize, and review. Smaller local models handle bounded work. Model lifecycle leases and quality floors prevent the runtime from treating every installed model or LM Studio parallel slot as an active agent.
 
-## Provider Roles
+## Provider Roles (superseded 2026-09-23/24 — see DeepInfra Integration below)
 
-| Role | Preferred behavior |
+| Role | Current behavior |
 | --- | --- |
-| Planner | Session-linked OpenAI when healthy; otherwise strongest local model meeting the floor |
-| Research | Qwen 14B DeepResearch, Marco 8B DeepResearch, then approved reasoning fallback |
-| Reasoning/code | DeepSeek 8B or Qwen 9B route according to health |
-| Worker/extraction | Qwen 4B baseline and bounded local alternatives |
-| Vision | `unlimited-ocr` for transcription, Qwen VL route for scene description |
-| Speech | Orpheus baseline plus Windows SAPI fallback |
-| Embeddings | Nomic Embed Q4 loaded on demand |
+| Planner | `deepinfra` / `openai/gpt-oss-120b` (`config/runtime.json`'s `planner_provider`/`planner_model`) — was session-linked OpenAI with local fallback |
+| Worker | `deepinfra` / `openai/gpt-oss-20b` — was Qwen 4B baseline and bounded local alternatives |
+| Research | `deepinfra` / `deepseek-ai/DeepSeek-V4-Flash-0731` — was Qwen 14B DeepResearch → Marco 8B → reasoning fallback |
+| Reviewer | `deepinfra` / `openai/gpt-oss-20b` — this role's provider config was itself a gap found and fixed 2026-09-24 (below); previously fell through to a hardcoded LM Studio default with no config at all |
+| Vision | Unchanged — local-only by design, see Local Vision below |
+| Speech | `deepinfra` TTS engine now primary (below); Windows SAPI remains the fallback |
+| Embeddings | Unchanged — Nomic Embed Q4 loaded on demand via LM Studio |
 
-The model registry records role suitability, structured-output reliability, tool support, context window, VRAM requirement, parallel capacity, health, and known failure modes.
+The model registry (`actions/model_registry.py`) still records role suitability, structured-output reliability, tool support, context window, VRAM requirement, parallel capacity, health, and known failure modes — but this health-aware `select_for_role` selection is only wired into Mode 1's `plan_workflow.approve_plan` as a pre-flight gate, not into Mode 2's canvas execution or into per-item dispatch in either mode. See [[13 Canvas Planning Engine and Reasoning-Backed Decomposition|Note 13]]'s capability-router section.
+
+## DeepInfra Integration (2026-09-23/24)
+
+Wired as a full `core/model_router.py` provider alongside `openai`/`anthropic`/`gemini`/`lmstudio` — `resolve_settings`, `call_text`, `call_with_tools`, and `call_with_tools`'s tool-call path all have a `deepinfra` branch. Driven by cost, not reliability: DeepInfra's measured per-token price undercut continuing to run these roles locally enough to justify decoupling from LM Studio for `planner`/`worker`/`research`/`reviewer`.
+
+Two real bugs found and fixed while wiring it in:
+
+- **The credential-broker link probe used OpenAI's `/responses` request shape for DeepInfra**, which doesn't support it — DeepInfra needs `/chat/completions`. A DeepInfra key could never successfully link until this was given its own branch in `session_credentials.py::_link_validation_request`.
+- **`reviewer_provider` was never configured at all** (2026-09-24, found live). `resolve_settings("reviewer", ...)` isn't one of the special-cased roles (`planner`/`worker`), so it fell through to `cfg.get("reviewer_provider")` — which didn't exist — defaulting to the generic `lmstudio` branch. T5's independent reviewer silently ran against a dead local endpoint with no config anyone had set, the same silent-fallback shape as the OpenAI-to-local fallback below, just for a role nobody had actually configured yet. Now `reviewer_provider`/`reviewer_model` are explicit keys in `config/runtime.json`.
+
+`core/session_key_store.py` is a new, separate, opt-in persistence mechanism (`config/session_keys.env`) for a "remember this key" checkbox in the UI — deliberately distinct from `runtime_config.py`'s `sanitize_config`, which strips secret-shaped fields from `runtime.json` rather than ever storing them. The session-only broker below still owns the actual linked session; this only lets a saved key re-link automatically on the next launch rather than requiring the user to re-paste it.
+
+`core/tts.py` gained a `DeepInfraTTSEngine` (native `/v1/inference/{model}`, `hexgrad/Kokoro-82M` default, Qwen3-TTS special-cased), falling back to Windows SAPI, and is now the primary TTS engine per `config/runtime.json`'s `tts_engine`.
 
 ## Prompt-Based Model Routes
 
@@ -57,7 +70,9 @@ Source evidence cannot pin its own route; only the trusted system channel may us
 >
 > Removing the offending words was not sufficient: the remaining text contained "plan", which scores as `main` — also a heavy chain. The durable fix is the pin. `_handle_router_text_command` now sends the summary call with `[jarvis-route:worker]` on the trusted system channel, which short-circuits keyword matching entirely. Measured: the summary chain went from seven candidates including three 8–14B models down to three small ones.
 
-## Local-First Model Economics (2026-07-29)
+## Local-First Model Economics (2026-07-29 — now a secondary/fallback path, not primary)
+
+Everything in this section describes LM Studio's own internal candidate-chain machinery, which is unchanged and still exists — but as of the DeepInfra Integration above, `planner`/`worker`/`research`/`reviewer` no longer route through it by default. This section applies when LM Studio is explicitly selected for a role, or for roles not yet migrated (embeddings, vision).
 
 This host serves every model from one LM Studio instance holding a single task model at a time, so each extra candidate in a chain is a cold multi-gigabyte load. Optimising for the *system* rather than for the largest runnable model is a correctness concern, not a micro-optimisation: live testing measured a 1109-second turn in which roughly 90% of the wall-clock was walking dead candidates.
 
@@ -133,9 +148,9 @@ Before an important workflow selects a model, the registry can require minimum s
 
 Every generated artifact can record provider, model, role, fallback reason, context/token budget, confidence, availability, and whether the preferred model was unavailable.
 
-## Session-Only OpenAI Credential Broker
+## Session-Only Credential Broker (now multi-provider)
 
-The OpenAI key is owned by a dedicated child process:
+Originally OpenAI-only; the same broker mechanism now links `anthropic`, `gemini`, and `deepinfra` sessions too, each with a provider-specific link-validation request (`_link_validation_request`) — DeepInfra's needed its own branch, see DeepInfra Integration above. The key is owned by a dedicated child process regardless of provider:
 
 1. The masked UI field sends the key over an inherited multiprocessing pipe.
 2. The broker stores it in a mutable byte buffer and returns an opaque session handle.
@@ -149,9 +164,12 @@ Error classification preserves a linked key for quota, policy, region, rate-limi
 > [!warning] Best-effort memory clearing
 > Python and HTTP libraries can create immutable copies. Process isolation, minimal copies, redacted logs, and broker termination are the primary controls.
 
-## OpenAI to Local Fallback
+## Provider Fallback Behavior (revised 2026-09-24)
 
-For text and tool calls, an unlinked or unavailable OpenAI session falls back to LM Studio. OpenAI request failures also fall back when the failure is safe to retry locally. Model provenance records the fallback reason.
+For text and tool calls, an unlinked or unavailable OpenAI/Anthropic/DeepInfra session falls back to LM Studio, and a provider request failure also falls back when safe to retry locally — this per-call fallback mechanism itself is unchanged. What changed is which providers actually reach it in practice: `planner`/`worker`/`research`/`reviewer` are now pinned to `deepinfra` (above), so this fallback only fires today if that specific session is unlinked or DeepInfra itself is unavailable, not as part of a designed multi-tier cascade the way OpenAI-first used to work.
+
+> [!warning] There is no automatic cross-provider reallocation if DeepInfra is degraded mid-run
+> This fallback is per-call (unlinked session, request failure) — it is not health-aware selection across *providers* the way `model_registry.select_for_role` is health-aware across LM Studio *models*. A DeepInfra outage surfaces as ordinary dispatch failures working through the normal `REPAIR`/`REJECT_REPLAN` path, not a silent reroute to a different cloud provider. Identified as a real gap, not yet built — see [[13 Canvas Planning Engine and Reasoning-Backed Decomposition|Note 13]]'s capability-router section.
 
 The runtime does not silently read an environment key as a replacement for the session UI key.
 

@@ -35,6 +35,19 @@ DEFAULT_LMSTUDIO_URL = "http://localhost:1234/v1"
 DEFAULT_GEMINI_MODEL = "gemini-2.5-flash"
 DEFAULT_ANTHROPIC_MODEL = "claude-sonnet-5"
 DEFAULT_ANTHROPIC_URL = "https://api.anthropic.com/v1"
+DEFAULT_DEEPINFRA_MODEL = "openai/gpt-oss-20b"
+DEFAULT_DEEPINFRA_URL = "https://api.deepinfra.com/v1/openai"
+# gpt-oss-20b, like most of DeepInfra's catalogue, is reasoning-tagged: hidden
+# chain-of-thought lands in a separate `reasoning_content` field and is drawn
+# from the same max_tokens budget before any visible `content` is written.
+# Measured live in the Resource Library's own DeepInfra evaluation
+# (2026-09-23): a 20-token budget returned empty text that looked like a
+# refusal but was a budget problem; 200 tokens worked on a short probe task.
+# Real Mark-XLVIII prompts run longer than that probe, so this floor carries
+# headroom above the measured minimum -- it is not copied from the
+# OpenAI/Anthropic branches' 900-token default, which assumes no hidden
+# reasoning tokens at all.
+DEFAULT_DEEPINFRA_MAX_TOKENS = 2048
 # Cap on how many local models one call may walk before giving up. This host
 # holds one task model at a time, so each extra candidate is a cold multi-GB
 # load; a long tail produces timeout cascades rather than resilience.
@@ -178,6 +191,8 @@ def _clean_provider(value: str | None, default: str) -> str:
         return "lmstudio"
     if provider in {"claude", "anthropic"}:
         return "anthropic"
+    if provider in {"deepinfra", "deep_infra"}:
+        return "deepinfra"
     if provider in {"openai", "gemini", "ollama"}:
         return provider
     return default
@@ -482,6 +497,15 @@ def resolve_settings(
             api_key=None,
         )
 
+    if provider == "deepinfra":
+        return ProviderSettings(
+            role=normalized_role,
+            provider=provider,
+            model=str(selected_model or cfg.get("deepinfra_model") or DEFAULT_DEEPINFRA_MODEL),
+            base_url=_clean_base_url(cfg.get("deepinfra_url"), DEFAULT_DEEPINFRA_URL),
+            api_key=None,
+        )
+
     return ProviderSettings(
         role=normalized_role,
         provider="lmstudio",
@@ -740,19 +764,75 @@ def _call_openai_with_tools(
     }
     broker = credential_broker or get_session_broker()
     result = broker.request(
-        provider="openai",
+        provider=settings.provider,
         base_url=settings.base_url,
         path="chat/completions",
         payload=payload,
         timeout=timeout,
     )
     if not result.get("ok"):
-        raise RuntimeError(f"OpenAI broker tools request failed: {result.get('reason') or result.get('error')}")
+        raise RuntimeError(f"{settings.provider} broker tools request failed: {result.get('reason') or result.get('error')}")
     parsed = _parse_chat_response(result.get("data") or {})
     if not parsed.text and not parsed.tool_calls:
-        raise RuntimeError("OpenAI broker tools request returned no text or tool calls.")
-    _record_provenance(provider="openai", model=settings.model, role=settings.role)
+        raise RuntimeError(f"{settings.provider} broker tools request returned no text or tool calls.")
+    _record_provenance(provider=settings.provider, model=settings.model, role=settings.role)
     return parsed
+
+
+def _deepinfra_key_is_valid(
+    settings: ProviderSettings,
+    *,
+    credential_broker=None,
+) -> bool:
+    try:
+        broker = credential_broker or get_session_broker()
+        if _broker_has_no_linked_session(broker):
+            return False
+        status = broker.status("deepinfra")
+        return status.get("state") in {"linked", "degraded"}
+    except Exception:
+        return False
+
+
+def _call_deepinfra_responses(
+    prompt: str,
+    settings: ProviderSettings,
+    *,
+    system: str | None,
+    timeout: int,
+    max_tokens: int | None = None,
+    credential_broker=None,
+) -> str:
+    """DeepInfra has no Responses API -- only the OpenAI-compatible Chat
+    Completions endpoint. Reuses _parse_chat_response so a reasoning-tagged
+    model's hidden `reasoning_content` doesn't get mistaken for the visible
+    answer; max_tokens defaults to DEFAULT_DEEPINFRA_MAX_TOKENS rather than
+    whatever budget the caller sized for a non-reasoning provider."""
+    messages: list[dict] = []
+    if system:
+        messages.append({"role": "system", "content": system})
+    messages.append({"role": "user", "content": prompt})
+    payload = {
+        "model": settings.model,
+        "messages": messages,
+        "stream": False,
+        "max_tokens": max(1, int(max_tokens or DEFAULT_DEEPINFRA_MAX_TOKENS)),
+    }
+    broker = credential_broker or get_session_broker()
+    result = broker.request(
+        provider="deepinfra",
+        base_url=settings.base_url,
+        path="chat/completions",
+        payload=payload,
+        timeout=timeout,
+    )
+    if not result.get("ok"):
+        raise RuntimeError(f"DeepInfra broker request failed: {result.get('reason') or result.get('error')}")
+    parsed = _parse_chat_response(result.get("data") or {})
+    if not parsed.text:
+        raise RuntimeError("DeepInfra request returned no text.")
+    _record_provenance(provider="deepinfra", model=settings.model, role=settings.role)
+    return parsed.text
 
 
 def _anthropic_key_is_valid(
@@ -1882,6 +1962,40 @@ def call_text(
                 fallback_reason=f"anthropic_request_failed:{type(exc).__name__}",
                 max_tokens=max_tokens,
             )
+    if settings.provider == "deepinfra":
+        if not _deepinfra_key_is_valid(settings, credential_broker=credential_broker):
+            return _call_lmstudio_fallback(
+                prompt,
+                role=role,
+                system=system,
+                timeout=timeout,
+                config=cfg,
+                environ=environ,
+                post=post,
+                fallback_reason="deepinfra_session_unlinked_or_unavailable",
+                max_tokens=max_tokens,
+            )
+        try:
+            return _call_deepinfra_responses(
+                prompt,
+                settings,
+                system=system,
+                timeout=timeout,
+                max_tokens=max_tokens,
+                credential_broker=credential_broker,
+            )
+        except Exception as exc:
+            return _call_lmstudio_fallback(
+                prompt,
+                role=role,
+                system=system,
+                timeout=timeout,
+                config=cfg,
+                environ=environ,
+                post=post,
+                fallback_reason=f"deepinfra_request_failed:{type(exc).__name__}",
+                max_tokens=max_tokens,
+            )
     if settings.provider == "gemini":
         return _call_gemini(prompt, settings)
     candidates = select_lmstudio_models(
@@ -2054,6 +2168,41 @@ def call_with_tools(
                 post=post,
                 tools=tools,
                 fallback_reason=f"anthropic_request_failed:{type(exc).__name__}",
+            )
+    if settings.provider == "deepinfra":
+        if not _deepinfra_key_is_valid(settings, credential_broker=credential_broker):
+            return _call_lmstudio_tools_fallback(
+                prompt,
+                role=role,
+                system=system,
+                timeout=timeout,
+                config=cfg,
+                environ=environ,
+                post=post,
+                tools=tools,
+                fallback_reason="deepinfra_session_unlinked_or_unavailable",
+            )
+        try:
+            return _call_openai_with_tools(
+                prompt,
+                settings,
+                system=system,
+                tools=tools,
+                timeout=timeout,
+                credential_broker=credential_broker,
+                max_tokens=DEFAULT_DEEPINFRA_MAX_TOKENS,
+            )
+        except Exception as exc:
+            return _call_lmstudio_tools_fallback(
+                prompt,
+                role=role,
+                system=system,
+                timeout=timeout,
+                config=cfg,
+                environ=environ,
+                post=post,
+                tools=tools,
+                fallback_reason=f"deepinfra_request_failed:{type(exc).__name__}",
             )
     if settings.provider == "gemini":
         text = _call_gemini(prompt, settings)

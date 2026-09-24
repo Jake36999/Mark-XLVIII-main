@@ -718,6 +718,97 @@ class ElevenLabsTTSEngine:
         _play_audio_bytes(resp.content)
 
 
+class DeepInfraTTSEngine:
+    """DeepInfra-hosted TTS, reusing whatever key core/model_router.py's
+    worker/research routes already have linked via the session credential
+    broker -- no separate key entry for TTS.
+
+    Defaults to hexgrad/Kokoro-82M: the same model KokoroTTSEngine runs
+    locally, just off-box, and the fastest/cheapest of the three DeepInfra
+    TTS options measured this session (chatterbox-turbo, Qwen3-TTS) -- see
+    `D:\\Resource-Library\\branch offerings\\Mark-XLVIII\\DeepInfra Model-to-
+    Service Match - Capability Test Results.md`.
+
+    DeepInfra's TTS models live behind a *different* endpoint shape than the
+    OpenAI-compatible chat surface (and than OpenAICompatibleTTSEngine
+    below): POST https://api.deepinfra.com/v1/inference/{model_id}, not
+    /v1/audio/speech. Confirmed live: Kokoro/chatterbox take {"text": ...};
+    Qwen3-TTS needs {"input": ..., "voice": ...} instead (its own 422 named
+    the missing field). Response is JSON with an "audio" field, either a
+    data: URI or a plain URL -- both handled below, both confirmed live.
+
+    Falls back to Windows SAPI on any failure (unlinked key, network error,
+    timeout) rather than going silent. Deliberately not built on
+    ResilientTTSEngine below: that class's retry/backoff is specifically
+    about an Orpheus *local bridge process* needing time to warm up and load
+    a model -- a cloud API has no such warm-up, so that machinery doesn't
+    apply and isn't reused here.
+    """
+
+    def __init__(
+        self,
+        model: str = "hexgrad/Kokoro-82M",
+        voice: str = "",
+        request_timeout_seconds: float = 30.0,
+        fallback_voice: str = "",
+        fallback_rate: int = 0,
+        fallback_volume: int = 100,
+    ):
+        self.model = model or "hexgrad/Kokoro-82M"
+        self.voice = voice or ""
+        self.request_timeout_seconds = float(request_timeout_seconds)
+        self._fallback = WindowsSapiTTSEngine(voice=fallback_voice, rate=fallback_rate, volume=fallback_volume)
+        self.last_backend = ""
+        self.last_error = ""
+
+    def _synthesize(self, text: str) -> bytes:
+        from core.session_credentials import get_session_broker
+
+        broker = get_session_broker()
+        status = broker.status("deepinfra")
+        if status.get("state") not in {"linked", "degraded"}:
+            raise RuntimeError("deepinfra_session_unlinked_or_unavailable")
+
+        if self.model == "Qwen/Qwen3-TTS":
+            body: dict[str, Any] = {"input": text, "voice": self.voice or "Vivian"}
+        else:
+            body = {"text": text}
+            if self.voice:
+                body["voice"] = self.voice
+
+        result = broker.request(
+            provider="deepinfra",
+            base_url="https://api.deepinfra.com/v1/inference",
+            path=self.model,
+            payload=body,
+            timeout=int(self.request_timeout_seconds),
+        )
+        if not result.get("ok"):
+            raise RuntimeError(f"deepinfra_tts_failed: {result.get('reason') or result.get('error')}")
+        data = result.get("data") or {}
+        audio_field = data.get("audio")
+        if isinstance(audio_field, str) and audio_field.startswith("data:"):
+            import base64
+            return base64.b64decode(audio_field.split(",", 1)[1])
+        if isinstance(audio_field, str) and audio_field.startswith("http"):
+            import requests
+            resp = requests.get(audio_field, timeout=self.request_timeout_seconds)
+            resp.raise_for_status()
+            return resp.content
+        raise RuntimeError("deepinfra_tts_no_audio_in_response")
+
+    def speak(self, text: str) -> None:
+        try:
+            audio_bytes = self._synthesize(text)
+            _play_audio_bytes(audio_bytes)
+            self.last_backend = "deepinfra"
+            self.last_error = ""
+        except Exception as exc:
+            self.last_backend = "sapi_fallback"
+            self.last_error = str(exc)
+            self._fallback.speak(text)
+
+
 class OpenAICompatibleTTSEngine:
     """OpenAI-compatible local/cloud TTS endpoint.
 
@@ -1065,6 +1156,15 @@ def create_tts_player(config: dict) -> TTSPlayer:
         api_key  = config.get("elevenlabs_api_key", "")
         voice_id = config.get("tts_voice", "pNInz6obpgDQGcFmaJgB")
         engine   = ElevenLabsTTSEngine(api_key=api_key, voice_id=voice_id)
+    elif engine_name == "deepinfra":
+        engine = DeepInfraTTSEngine(
+            model=config.get("tts_deepinfra_model") or config.get("deepinfra_tts_model") or "hexgrad/Kokoro-82M",
+            voice=config.get("tts_voice", ""),
+            request_timeout_seconds=float(config.get("tts_request_timeout_seconds", 30.0)),
+            fallback_voice=config.get("tts_fallback_voice", ""),
+            fallback_rate=int(config.get("tts_fallback_rate", config.get("tts_rate", 0))),
+            fallback_volume=int(config.get("tts_volume", 100)),
+        )
     elif engine_name in ("openai_compatible", "openai_tts", "lmstudio_tts", "orpheus"):
         primary = OpenAICompatibleTTSEngine(
             base_url=config.get("tts_url") or config.get("tts_base_url") or config.get("orpheus_tts_url", ""),

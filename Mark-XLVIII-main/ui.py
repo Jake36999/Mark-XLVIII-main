@@ -15,6 +15,17 @@ import psutil
 
 from core.runtime_config import RUNTIME_CONFIG_PATH, load_runtime_config, save_runtime_config
 from core.session_credentials import detect_key_provider, get_session_broker
+from core.session_key_store import load_session_key, save_session_key, saved_providers
+
+# core/session_credentials.py::detect_key_provider only distinguishes anthropic
+# (self-identifying `sk-ant-` prefix) from "everything else, call it openai" --
+# DeepInfra keys have no recognisable prefix at all (confirmed against a real
+# key: a plain opaque token, no vendor marker), so they can't be shape-detected
+# and were silently misclassified as openai, sent to api.openai.com, and
+# rejected. This is the closed set the UI's provider selector offers instead of
+# guessing; add a provider here only once core/model_router.py actually
+# supports it (see resolve_settings's provider branches).
+LINKABLE_PROVIDERS = ("openai", "anthropic", "deepinfra")
 
 if platform.system() == "Windows":
     _WIN_HIDE: dict = {"creationflags": subprocess.CREATE_NO_WINDOW}
@@ -31,9 +42,9 @@ from PyQt6.QtGui import (
     QRadialGradient, QShortcut,
 )
 from PyQt6.QtWidgets import (
-    QApplication, QFileDialog, QFrame, QHBoxLayout, QLabel, QLineEdit,
-    QMainWindow, QPushButton, QScrollArea, QSizePolicy, QSplitter,
-    QStackedWidget, QTextEdit, QVBoxLayout, QWidget, QProgressBar,
+    QApplication, QCheckBox, QComboBox, QFileDialog, QFrame, QHBoxLayout,
+    QLabel, QLineEdit, QMainWindow, QPushButton, QScrollArea, QSizePolicy,
+    QSplitter, QStackedWidget, QTextEdit, QVBoxLayout, QWidget, QProgressBar,
 )
 
 from jarvis_ui_components.command_palette import CommandPalette
@@ -1398,6 +1409,7 @@ class MainWindow(QMainWindow):
 
         self._left_panel = self._build_left_panel()
         body.addWidget(self._left_panel, stretch=0)
+        self._restore_saved_keys()
 
         # Center column: HUD + resizable content panel via QSplitter
         self.hud = HudCanvas(face_path)
@@ -2041,14 +2053,30 @@ class MainWindow(QMainWindow):
         lay.addWidget(info_panel)
         lay.addSpacing(4)
 
-        key_hdr = QLabel("API KEY (OPENAI / ANTHROPIC)")
+        key_hdr = QLabel("API KEY")
         key_hdr.setFont(QFont("Courier New", 7, QFont.Weight.Bold))
         key_hdr.setStyleSheet(f"color: {C.PRI}; background: transparent; border: none;")
         lay.addWidget(key_hdr)
 
+        # Explicit choice, not shape-guessed: detect_key_provider only tells
+        # anthropic (self-identifying sk-ant- prefix) apart from "everything
+        # else" -- a DeepInfra key has no recognisable prefix at all and was
+        # silently misclassified as openai, sent to the wrong endpoint, and
+        # rejected. The combo is the source of truth at link time; paste still
+        # auto-selects a sensible guess for convenience.
+        self._key_provider_select = QComboBox()
+        self._key_provider_select.addItems([p.upper() for p in LINKABLE_PROVIDERS])
+        self._key_provider_select.setFixedHeight(24)
+        self._key_provider_select.setFont(QFont("Courier New", 8))
+        self._key_provider_select.setStyleSheet(
+            f"background: #000d12; color: {C.TEXT}; border: 1px solid {C.BORDER}; "
+            "border-radius: 3px; padding: 2px 5px;"
+        )
+        lay.addWidget(self._key_provider_select)
+
         self._openai_session_key = QLineEdit()
         self._openai_session_key.setEchoMode(QLineEdit.EchoMode.Password)
-        self._openai_session_key.setPlaceholderText("sk-... or sk-ant-...")
+        self._openai_session_key.setPlaceholderText("paste session key...")
         self._openai_session_key.setFixedHeight(26)
         self._openai_session_key.setFont(QFont("Courier New", 8))
         self._openai_session_key.setStyleSheet(
@@ -2056,7 +2084,13 @@ class MainWindow(QMainWindow):
             "border-radius: 3px; padding: 3px 5px;"
         )
         self._openai_session_key.returnPressed.connect(self._link_api_key)
+        self._openai_session_key.textChanged.connect(self._guess_key_provider)
         lay.addWidget(self._openai_session_key)
+
+        self._remember_key_cb = QCheckBox("remember (saves plaintext to config/session_keys.env)")
+        self._remember_key_cb.setFont(QFont("Courier New", 6))
+        self._remember_key_cb.setStyleSheet(f"color: {C.TEXT_DIM}; background: transparent;")
+        lay.addWidget(self._remember_key_cb)
 
         key_buttons = QHBoxLayout()
         key_buttons.setSpacing(3)
@@ -2103,29 +2137,60 @@ class MainWindow(QMainWindow):
 
         return w
 
+    def _guess_key_provider(self, text: str) -> None:
+        """Only ever acts on Anthropic's own confident, self-identifying
+        sk-ant- prefix. detect_key_provider's non-anthropic branch is a
+        *fallback* default (openai), not a positive detection -- treating
+        it as a guess was a real bug: it fired on every textChanged,
+        including the empty string _link_api_key produces by clearing the
+        field, and silently reset an explicit DEEPINFRA selection back to
+        OPENAI right before it was read. Leaving the combo untouched for
+        every shape but the one unambiguous signal means an explicit
+        choice always wins, including "nothing recognisable" (DeepInfra)."""
+        if str(text or "").strip().lower().startswith("sk-ant-"):
+            index = self._key_provider_select.findText("ANTHROPIC")
+            if index >= 0:
+                self._key_provider_select.setCurrentIndex(index)
+
+    def _provider_link_args(self, provider: str, cfg: dict) -> tuple[str, str]:
+        """(base_url, model) for the tiny validation probe link() sends."""
+        if provider == "anthropic":
+            return (str(cfg.get("anthropic_url") or "https://api.anthropic.com/v1"),
+                    str(cfg.get("anthropic_model") or "claude-sonnet-5"))
+        if provider == "deepinfra":
+            return (str(cfg.get("deepinfra_url") or "https://api.deepinfra.com/v1/openai"),
+                    str(cfg.get("worker_model") or cfg.get("deepinfra_model") or "openai/gpt-oss-20b"))
+        return (str(cfg.get("openai_url") or "https://api.openai.com/v1"),
+                str(cfg.get("planner_model") or cfg.get("openai_model") or "gpt-5.5"))
+
     def _link_api_key(self) -> None:
         key = self._openai_session_key.text().strip()
+        # Read the combo BEFORE clearing the key field, not after: clearing
+        # fires textChanged("") -> _guess_key_provider, and even now that
+        # that handler ignores an unrecognised shape, reading first removes
+        # any dependency on that ordering rather than just moving the trap.
+        provider = self._key_provider_select.currentText().strip().lower()
+        remember = self._remember_key_cb.isChecked()
         self._openai_session_key.clear()
         if not key:
             self._apply_credential_status({"state": "invalid", "reason": "empty_key"})
             return
-        provider = detect_key_provider(key)
         self._linked_key_provider = provider
         self._link_key_btn.setEnabled(False)
         self._openai_key_status.setText("CHECKING")
         self._openai_key_status.setStyleSheet(f"color: {C.ACC2}; background: transparent; border: none;")
         cfg = _load_api_config()
+        base_url, model = self._provider_link_args(provider, cfg)
 
         def _link() -> None:
             secret = key
             try:
-                if provider == "anthropic":
-                    base_url = str(cfg.get("anthropic_url") or "https://api.anthropic.com/v1")
-                    model = str(cfg.get("anthropic_model") or "claude-sonnet-5")
-                else:
-                    base_url = str(cfg.get("openai_url") or "https://api.openai.com/v1")
-                    model = str(cfg.get("planner_model") or cfg.get("openai_model") or "gpt-5.5")
                 result = get_session_broker().link(provider, secret, base_url=base_url, model=model)
+                if remember and result.get("state") in {"linked", "degraded"}:
+                    try:
+                        save_session_key(provider, secret)
+                    except Exception:
+                        pass  # a failed save must not be reported as a failed link
             except Exception as exc:
                 result = {"ok": False, "provider": provider, "state": "degraded", "reason": f"broker_error: {exc}"}
             finally:
@@ -2133,6 +2198,32 @@ class MainWindow(QMainWindow):
             self._credential_sig.emit(result)
 
         threading.Thread(target=_link, name=f"{provider}-key-link", daemon=True).start()
+
+    def _restore_saved_keys(self) -> None:
+        """Silently relink whatever was previously saved via the 'remember'
+        checkbox -- the actual point of that feature: stop re-pasting an
+        expiring OpenAI key every session. No-op if nothing was ever saved.
+        Runs once at startup, off the UI thread; failures are silent (same
+        as any other link attempt failing) rather than surfaced as an error
+        the user never asked to see."""
+        providers = saved_providers()
+        if not providers:
+            return
+        cfg = _load_api_config()
+
+        def _restore() -> None:
+            for provider in providers:
+                key = load_session_key(provider)
+                if not key:
+                    continue
+                base_url, model = self._provider_link_args(provider, cfg)
+                try:
+                    result = get_session_broker().link(provider, key, base_url=base_url, model=model)
+                except Exception as exc:
+                    result = {"ok": False, "provider": provider, "state": "degraded", "reason": f"broker_error: {exc}"}
+                self._credential_sig.emit(result)
+
+        threading.Thread(target=_restore, name="restore-saved-keys", daemon=True).start()
 
     def _unlink_api_key(self) -> None:
         provider = self._linked_key_provider

@@ -1,0 +1,16 @@
+{
+  "approval_projection_hash": "c2654e975cb076ee4eca67f36fd1dec1c6fa720388c8de1436f82158213e0825",
+  "approved_action_ids": [
+    "plan_root_c1fa02",
+    "read_source_94ba6c",
+    "verify_spec_ef96ea",
+    "write_spec_f1da76"
+  ],
+  "approved_at": "2026-09-23T23:07:43Z",
+  "manifest_hash": "9f1cbc73ce0614b9bba041e2869a32fb2fbaa3cfb486aa2262a2b10f64777703",
+  "plan_id": "canvas_plan",
+  "plan_version": 3,
+  "schema_version": "jarvis_approval/v1",
+  "signature": "012ba77f19044f00bd8c5959c8c022c9c0340f0b551f7b86f3f35b3bea8ef4a4",
+  "workflow_hash": "a55ceb613176f7781342eefaa31a8cd3a8811e43a267599a645a118c4771f73b"
+}

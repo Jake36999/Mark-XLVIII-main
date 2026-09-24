@@ -55,6 +55,7 @@ _ANTHROPIC_VERSION = "2023-06-01"
 _PROVIDER_DEFAULT_BASE_URL = {
     "openai": "https://api.openai.com/v1",
     "anthropic": "https://api.anthropic.com/v1",
+    "deepinfra": "https://api.deepinfra.com/v1/openai",
 }
 
 
@@ -81,6 +82,19 @@ def _link_validation_request(provider: str, model: str) -> tuple[str, dict]:
         return "messages", {
             "model": model,
             "max_tokens": 8,
+            "messages": [{"role": "user", "content": "Reply with OK."}],
+        }
+    if provider == "deepinfra":
+        # DeepInfra's OpenAI-compatible surface has no /responses endpoint --
+        # only /chat/completions. max_tokens is set well above the 8-token
+        # OpenAI/Anthropic probe because most of DeepInfra's catalogue is
+        # reasoning-tagged: hidden chain-of-thought is drawn from the same
+        # budget before any visible content is written, and 8 tokens measured
+        # empty on a live reasoning model (see model_router.py's
+        # DEFAULT_DEEPINFRA_MAX_TOKENS for the same tradeoff on real calls).
+        return "chat/completions", {
+            "model": model,
+            "max_tokens": 200,
             "messages": [{"role": "user", "content": "Reply with OK."}],
         }
     return "responses", {"model": model, "input": "Reply with OK.", "max_output_tokens": 8}

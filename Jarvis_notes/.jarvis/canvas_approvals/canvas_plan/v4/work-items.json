@@ -1,0 +1,177 @@
+{
+  "created_at": "2026-09-23T23:33:04Z",
+  "items": [
+    {
+      "acceptance_criteria": {
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [],
+      "description": "Create a detailed specification of the script E:\\Aletheia_project\\DEV_TOOLS\\ToolSet\\aletheia_toolchain\\notebook_packager_v3.1.py that would allow a competent engineer to rebuild it from scratch.",
+      "id": "plan_root_c1fa02",
+      "idempotency_key": "6ca09880f6a7d8440d4d5283234aa6536e787a2edc4d634c542db935d09768a0",
+      "inputs": {
+        "canvas_node_id": "plan_root",
+        "canvas_role": "plan"
+      },
+      "max_attempts": 1,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "deterministic",
+      "outputs": {
+        "result": "result.plan_root_c1fa02"
+      },
+      "required_outputs": [],
+      "requires_confirmation": false,
+      "resource_class": "io",
+      "retry_safe": true,
+      "risk_tier": "T1",
+      "sequence": 1,
+      "side_effects": "none",
+      "step_type": "gate",
+      "target": "plan_milestone"
+    },
+    {
+      "acceptance_criteria": {
+        "deliverables": [
+          "For every function and class defined in the file, one entry with its name, full signature, one-line purpose, and a short description of its internal logic and interactions.",
+          "A structured outline of all functions, classes, and their relationships extracted from the source."
+        ],
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [
+        "plan_root_c1fa02"
+      ],
+      "description": "Open and parse the source file, extracting every function and class definition, their signatures, docstrings, and a concise description of their internal logic and interactions.\n\nDeliverables:\n- For EVERY function and class defined in the file, skip nothing: output one entry with its name, full signature, one-line purpose, and a short description of its internal logic and how it interacts with the rest of the file.\n- A structured outline of all functions, classes, and their relationships extracted from the source.\n\nDo not summarize or omit any function or class for brevity. The deliverable is the full per-symbol breakdown, not a high-level summary.\n\n<!-- jarvis-forward-scout: do not edit below this line -->\n> **Context from `plan_root_c1fa02`:** Create a detailed specification of the script E:\\Aletheia_project\\DEV_TOOLS\\ToolSet\\aletheia_toolchain\\notebook_packager_v3.1.py that would allow a competent engineer to rebuild it from scratch.",
+      "id": "read_source_94ba6c",
+      "idempotency_key": "3c725f016773ed55cd1ef891da5dbc53409b2aa8b78057caa577b4d490fa7398",
+      "inputs": {
+        "canvas_node_id": "read_source",
+        "canvas_role": "research",
+        "context_injected": true,
+        "evidence": [
+          {
+            "bind": {
+              "from_step": "plan_root_c1fa02",
+              "path": "result.summary"
+            }
+          }
+        ],
+        "file": "E:\\Aletheia_project\\DEV_TOOLS\\ToolSet\\aletheia_toolchain\\notebook_packager_v3.1.py",
+        "prompt": "System goal: Create a detailed specification of the script E:\\Aletheia_project\\DEV_TOOLS\\ToolSet\\aletheia_toolchain\\notebook_packager_v3.1.py that would allow a competent engineer to rebuild it from scratch.\n\nOpen and parse the source file, extracting every function and class definition, their signatures, docstrings, and a concise description of their internal logic and interactions.\n\nDeliverables:\n- For EVERY function and class defined in the file, skip nothing: output one entry with its name, full signature, one-line purpose, and a short description of its internal logic and how it interacts with the rest of the file.\n- A structured outline of all functions, classes, and their relationships extracted from the source.\n\nDo not summarize or omit any function or class for brevity. The deliverable is the full per-symbol breakdown, not a high-level summary.\n\n<!-- jarvis-forward-scout: do not edit below this line -->\n> **Context from `plan_root_c1fa02`:** Create a detailed specification of the script E:\\Aletheia_project\\DEV_TOOLS\\ToolSet\\aletheia_toolchain\\notebook_packager_v3.1.py that would allow a competent engineer to rebuild it from scratch."
+      },
+      "max_attempts": 2,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "cognitive",
+      "outputs": {
+        "result": "result.read_source_94ba6c"
+      },
+      "required_outputs": [],
+      "requires_confirmation": false,
+      "resource_class": "model",
+      "retry_safe": true,
+      "risk_tier": "T1",
+      "sequence": 2,
+      "side_effects": "none",
+      "step_type": "model_reasoning",
+      "target": "reasoning"
+    },
+    {
+      "acceptance_criteria": {
+        "deliverables": [
+          "A Markdown file in the vault containing the full specification."
+        ],
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [
+        "read_source_94ba6c"
+      ],
+      "description": "Compose a comprehensive Markdown note in the vault that includes:\n- The script's overall purpose.\n- Detailed entries for each function and class (role, signature, inputs, outputs, invariants, edge cases).\n- The real dependency graph between components.\n- The inferred items from the previous note.\n- Any other relevant observations.\nThe note should be self\u2011contained and clear enough for a new engineer to re\u2011implement the script.\n\nDeliverables:\n- A Markdown file in the vault containing the full specification.",
+      "id": "write_spec_f1da76",
+      "idempotency_key": "d6603d9357385ea4eb8edbfa015ebe63b08e168b9d52ccb9695cb953aabdb21c",
+      "inputs": {
+        "canvas_node_id": "write_spec",
+        "canvas_role": "document",
+        "content": {
+          "bind": {
+            "from_step": "read_source_94ba6c",
+            "path": "result.text"
+          }
+        },
+        "context_injected": true,
+        "title": "Compose a comprehensive Markdown note in the vault that includes:\n- The script's overall purpose.\n- Detailed entries for each function and class (role, signature, inputs, outputs, invariants, edge cas"
+      },
+      "max_attempts": 1,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "deterministic",
+      "outputs": {
+        "result": "result.write_spec_f1da76"
+      },
+      "required_outputs": [],
+      "requires_confirmation": false,
+      "resource_class": "io",
+      "retry_safe": true,
+      "risk_tier": "T2",
+      "sequence": 3,
+      "side_effects": "local_write",
+      "step_type": "artifact",
+      "target": "vault_create_note"
+    },
+    {
+      "acceptance_criteria": {
+        "deliverables": [
+          "Confirmation that the specification meets the goal criteria."
+        ],
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [
+        "write_spec_f1da76"
+      ],
+      "description": "Review the generated specification for completeness, correctness, and clarity. Ensure all functions/classes are covered, inputs/outputs are described, and inferred flags are clearly marked.\n\nDeliverables:\n- Confirmation that the specification meets the goal criteria.",
+      "id": "verify_spec_ef96ea",
+      "idempotency_key": "60bd974c966733d52ff5c8bc5b7472b4c5f5d688e61fc00765d7dba9de29a303",
+      "inputs": {
+        "canvas_node_id": "verify_spec",
+        "canvas_role": "verification"
+      },
+      "max_attempts": 2,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "deterministic",
+      "outputs": {
+        "result": "result.verify_spec_ef96ea"
+      },
+      "required_outputs": [],
+      "requires_confirmation": false,
+      "resource_class": "command",
+      "retry_safe": true,
+      "risk_tier": "T2",
+      "sequence": 4,
+      "side_effects": "local_read",
+      "step_type": "command",
+      "target": "pytest_focused"
+    }
+  ],
+  "manifest_hash": "82ed95c554d0fee4fb57385b166be9e2953bd2cb328809fc105857beeeaf285c",
+  "preflight": {
+    "checked_at": "2026-09-23T23:33:04Z",
+    "checks": [
+      {
+        "command_id": "pytest_focused",
+        "item_id": "verify_spec_ef96ea",
+        "ok": true
+      }
+    ],
+    "ok": true
+  },
+  "preview_only": false,
+  "schema_version": "jarvis_work_manifest/v1",
+  "workflow_hash": "c95db8c8587e8862b57c7ef4129043fdb5ed8e553caa5efefb7f8a4807054978",
+  "workflow_id": "canvas_plan",
+  "workflow_version": "canvas-1"
+}

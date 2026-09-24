@@ -4,7 +4,7 @@ title: "Capability Registry MCP and Safety"
 type: "guide"
 status: "active"
 created: "2026-07-22"
-updated: "2026-07-25T14:55:45Z"
+updated: "2026-09-24T18:22:21Z"
 project_id: "jarvis_notes"
 source: "codex"
 tags: ["developer-handbook", "capabilities", "mcp", "tools", "safety", "tier/short-term"]
@@ -13,7 +13,7 @@ index_state: "indexed_local"
 remember_note_id: ""
 rag_index: true
 confidence: 0.96
-content_hash: "ab9c673842f08328b0b99e8afa0cdf59eb6fbff442470a1bdc0cf5eae3e7d1ad"
+content_hash: "fd92bfe7d1353aae749ede59bcaaf8e98ad8932d6d497e5d7553a477b705eee0"
 lifecycle: "short_term"
 project_key: "mark_xlviii"
 schema_version: "jarvis_developer_handbook/v1"
@@ -170,6 +170,13 @@ Sites keep their own domain words where those read better (`cancellation_request
 
 > [!success] These tests were verified to have teeth
 > `tests/test_effect_honesty.py` restores each original bug by mutation and requires the naming test to fail. All confirmed: hardcoded `"complete"`, bare-boolean cancel, `screen_process` returning `True` on dispatch, the resolver appending to the baseline, vision claiming an answer it never received, and — with both guards disabled — the Canvas silent no-op. A regression test that passes against the bug it names is decoration, so this check is worth repeating when the file grows.
+
+## A Second Consumer: the Canvas Capability Schema (2026-09-24)
+
+`core/capability_schema.py` reads this registry's `CAPABILITY_HELP`/`CAPABILITY_POLICY` data for the narrow subset of capabilities `dual_orchestrator.py`'s `WorkflowRuntime._dispatch_tool` actually implements a branch for (`web_search`, `jarvis_memory`, `project_operator`, `capability_registry` itself) — a different, smaller surface than the ~20-entry L0 card set this page describes, scoped to what a compiled **workflow** step can reach rather than everything a live chat turn can call. It's a consumer, not a fork: `keywords`/`risk_level`/`requires_confirmation` still come from this page's own `CAPABILITY_HELP`/`CAPABILITY_POLICY`, not a duplicated copy. See [[13 Canvas Planning Engine and Reasoning-Backed Decomposition|Note 13]] for what reads it.
+
+> [!note] `capability_registry` itself had no `CAPABILITY_HELP` entry until 2026-09-24
+> It had a `CAPABILITY_POLICY` entry (risk/confirmation) but no L0 card content — `_tool_help()`'s fallback silently produced almost no real description (just the title). Found running the offline keyword-derivation pipeline (Note 13) against it: with nothing real to reason from, the model confidently generated a plausible-sounding but wrong "generic distributed-systems service registry" story instead. Fixed by writing a real entry; a genuine gap in this page's own catalogue, not a pipeline defect — the same pipeline produced accurate output for every other capability, which already had real entries.
 
 ## Extending the Registry
 

@@ -6,5 +6,8 @@
   "openai_url": "https://api.openai.com/v1",
   "worker_provider": "lmstudio",
   "worker_model": "qwen/qwen3-4b",
-  "lmstudio_url": "http://localhost:1234/v1"
+  "lmstudio_url": "http://localhost:1234/v1",
+  "_deepinfra_example": "set worker_provider to 'deepinfra' to route the worker role there; link a DeepInfra key in-session first, same as openai/anthropic",
+  "deepinfra_model": "openai/gpt-oss-20b",
+  "deepinfra_url": "https://api.deepinfra.com/v1/openai"
 }

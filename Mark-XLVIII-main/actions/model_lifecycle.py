@@ -207,10 +207,18 @@ def resolve_config(overrides: dict[str, Any] | None = None) -> dict[str, Any]:
         raw.update({key: value for key, value in overrides.items() if value is not None})
 
     baseline = _split_models(raw.get("baseline_models")) or list(DEFAULT_BASELINE_MODELS)
-    # The always-warm worker is baseline by definition; configs list it too, so
-    # this is normally a no-op that just tolerates it being omitted.
+    # The always-warm worker is baseline by definition -- but only when it's
+    # actually an LM Studio model kept resident in this host's VRAM. Promoting
+    # it unconditionally assumed worker_provider was always "lmstudio" (true
+    # when this was written); since the worker route moved to DeepInfra
+    # (2026-09-23), worker_model is a cloud model id with no local residency
+    # concept at all, and appending it here just fabricated an "effective"
+    # baseline the config never declared -- caught live by
+    # scripts/config_audit.py, whose entire job is catching exactly this
+    # class of silent resolver drift.
+    worker_provider = str(raw.get("worker_provider") or "lmstudio").strip().lower()
     worker_model = str(raw.get("worker_model") or "").strip()
-    if worker_model:
+    if worker_model and worker_provider == "lmstudio":
         baseline.append(worker_model)
     # Speech models are deliberately NOT promoted here. This used to append
     # `tts_model` and, for the Orpheus engine, `orpeus_text_to_speech` -- which

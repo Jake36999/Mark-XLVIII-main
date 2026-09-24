@@ -108,6 +108,119 @@ class CompileCanvasTests(unittest.TestCase):
             sorted([canvas_plan.node_step_id("b"), canvas_plan.node_step_id("c")]),
         )
 
+
+class DocumentRoleTests(unittest.TestCase):
+    """The "document" role: a plain vault-note write, added because
+    "implementation" was previously the *only* role that could write
+    anything durable -- confirmed live (2026-09-23) forcing a pure
+    documentation goal through OpenClaw's project-gated delegation path for
+    no reason, since it never needed a registered project at all."""
+
+    def test_compiles_to_the_vault_create_note_artifact_hook(self):
+        payload = {
+            "nodes": [
+                _node("r", "Investigate the auth module.", role="research"),
+                _node("d", "Specification: Auth Module", role="document"),
+            ],
+            "edges": [_edge("e1", "r", "d")],
+        }
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="doc_plan", name="Doc Plan")
+
+        by_id = {step["step_id"]: step for step in workflow["steps"]}
+        doc_step = by_id[canvas_plan.node_step_id("d")]
+        self.assertEqual(doc_step["step_type"], "artifact")
+        self.assertEqual(doc_step["target"], "vault_create_note")
+        self.assertEqual(doc_step["risk_tier"], "T2")
+        self.assertEqual(doc_step["side_effects"], "local_write")
+
+    def test_title_comes_from_the_nodes_own_prose(self):
+        payload = {
+            "nodes": [
+                _node("r", "Investigate the auth module.", role="research"),
+                _node("d", "Specification: Auth Module", role="document"),
+            ],
+            "edges": [_edge("e1", "r", "d")],
+        }
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="doc_plan", name="Doc Plan")
+
+        doc_step = next(s for s in workflow["steps"] if s["step_type"] == "artifact")
+        self.assertEqual(doc_step["inputs"]["title"], "Specification: Auth Module")
+
+    def test_single_dependency_binds_content_to_its_real_result_text(self):
+        """The single-dependency case: content must be a live runtime binding
+        to the research step's actual output (result.text), not just
+        canvas-declared context -- model_reasoning/review steps return
+        {"text": ...} at dispatch (dual_orchestrator.py), so this is the
+        correct path, confirmed against the real dispatcher, not assumed."""
+        payload = {
+            "nodes": [
+                _node("r", "Investigate the auth module.", role="research"),
+                _node("d", "Specification: Auth Module", role="document"),
+            ],
+            "edges": [_edge("e1", "r", "d")],
+        }
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="doc_plan", name="Doc Plan")
+
+        doc_step = next(s for s in workflow["steps"] if s["step_type"] == "artifact")
+        research_step_id = canvas_plan.node_step_id("r")
+        self.assertEqual(
+            doc_step["inputs"]["content"],
+            {"bind": {"from_step": research_step_id, "path": "result.text"}},
+        )
+
+    def test_multiple_dependencies_fall_back_to_preamble_not_a_crash(self):
+        payload = {
+            "nodes": [
+                _node("a", "Branch one.", role="research"),
+                _node("b", "Branch two.", role="research"),
+                _node("d", "Specification: Merged Findings", role="document"),
+            ],
+            "edges": [_edge("e1", "a", "d"), _edge("e2", "b", "d")],
+        }
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="doc_plan", name="Doc Plan")
+
+        doc_step = next(s for s in workflow["steps"] if s["step_type"] == "artifact")
+        # Must not be a binding (no single obvious source) and must not be empty.
+        self.assertNotIsInstance(doc_step["inputs"]["content"], dict)
+        self.assertTrue(str(doc_step["inputs"]["content"]).strip())
+
+    def test_document_survives_real_schema_and_semantic_validation(self):
+        payload = {
+            "nodes": [
+                _node("root", "The goal.", role="plan"),
+                _node("r", "Research the topic.", role="research"),
+                _node("d", "Specification: Topic", role="document"),
+            ],
+            "edges": [_edge("e1", "root", "r"), _edge("e2", "r", "d")],
+        }
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="doc_full", name="Doc Full")
+
+        validated = validate_workflow(workflow)
+        self.assertEqual(len(validated["steps"]), 3)
+
+    def test_role_aliases_resolve_to_document(self):
+        for alias in ("write", "publish", "save", "record"):
+            with self.subTest(alias=alias):
+                payload = {
+                    "nodes": [
+                        _node("r", "Investigate.", role="research"),
+                        _node("d", "A title.", role=alias),
+                    ],
+                    "edges": [_edge("e1", "r", "d")],
+                }
+                workflow = canvas_plan.compile_canvas(payload, workflow_id=f"alias_{alias}", name="Alias")
+                doc_step = next(s for s in workflow["steps"] if s["step_type"] == "artifact")
+                self.assertEqual(doc_step["target"], "vault_create_note")
+
+    def test_document_is_a_recognised_decomposition_role(self):
+        self.assertIn("document", canvas_plan._VALID_DECOMPOSE_ROLES)
+
+    def test_decompose_system_prompt_advertises_the_role(self):
+        """The model can only choose a role it's told exists -- this is the
+        exact bug class that made the planner reach for "implementation"
+        instead: the role existed nowhere in its own instructions."""
+        self.assertIn("document", canvas_plan._DECOMPOSE_SYSTEM_PROMPT)
+
     def test_review_step_evidence_is_bound_to_upstream_results(self):
         # T5: a review node must critique its upstream's real output, not
         # dispatch with only the human's review instruction and no evidence.
@@ -213,6 +326,71 @@ class CompileCanvasTests(unittest.TestCase):
     def test_empty_canvas_is_refused(self):
         with self.assertRaises(canvas_plan.CanvasCompileError):
             canvas_plan.compile_canvas({"nodes": [], "edges": []}, workflow_id="empty", name="Empty")
+
+
+class ResearchRetryPolicyTests(unittest.TestCase):
+    """Confirmed live (2026-09-24): a research node had no retry_policy, so
+    it fell back to dual_orchestrator's schema default (max_attempts=1).
+    T5's independent reviewer returning REPAIR (e.g. "missing the required
+    structured outline of functions and classes") then converted straight to
+    REJECT_REPLAN -- the attempt-budget check trips on the very first
+    attempt, so the step never actually got a repair cycle."""
+
+    def test_research_step_gets_a_real_repair_budget(self):
+        payload = {"nodes": [_node("r", "Investigate the auth module.", role="research")], "edges": []}
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="retry_budget", name="Retry Budget")
+
+        step = workflow["steps"][0]
+        self.assertEqual(step["step_type"], "model_reasoning")
+        self.assertEqual(step["retry_policy"], {"safe": True, "max_attempts": 2})
+
+    def test_research_retry_policy_survives_real_schema_validation(self):
+        payload = {"nodes": [_node("r", "Investigate the auth module.", role="research")], "edges": []}
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="retry_budget_valid", name="Retry Budget Valid")
+
+        validated = validate_workflow(workflow)
+        self.assertEqual(validated["steps"][0]["retry_policy"]["max_attempts"], 2)
+
+
+class ResearchSuggestedToolsTests(unittest.TestCase):
+    """core.tool_catalogue wiring (2026-09-24): a research node's compiled
+    step is annotated with weighted tool suggestions, restricted to the
+    role's declared allowed_tools ceiling -- surfaced for the approval
+    preview, mirroring how recommended_model is surfaced, but (unlike that
+    directive's original "inert" gap) explicitly not yet consumed by
+    dispatch."""
+
+    def test_research_node_gets_suggested_tools_restricted_to_allowed_tools(self):
+        payload = {"nodes": [_node("r", "Search the web for the latest release notes.", role="research")], "edges": []}
+        with mock.patch("core.tool_catalogue.relevant_tool_ids", return_value=["web_search", "jarvis_memory"]) as fn:
+            workflow = canvas_plan.compile_canvas(payload, workflow_id="suggested_tools_test")
+
+        self.assertEqual(workflow["steps"][0]["inputs"]["suggested_tools"], ["web_search", "jarvis_memory"])
+        fn.assert_called_once()
+        self.assertEqual(fn.call_args.kwargs["allowed_tools"], canvas_plan._ROLE_SPECS["research"]["allowed_tools"])
+
+    def test_no_suggested_tools_key_when_nothing_scores(self):
+        payload = {"nodes": [_node("r", "Investigate the auth module.", role="research")], "edges": []}
+        with mock.patch("core.tool_catalogue.relevant_tool_ids", return_value=[]):
+            workflow = canvas_plan.compile_canvas(payload, workflow_id="suggested_tools_empty")
+
+        self.assertNotIn("suggested_tools", workflow["steps"][0]["inputs"])
+
+    def test_compilation_survives_a_scoring_failure(self):
+        payload = {"nodes": [_node("r", "Investigate the auth module.", role="research")], "edges": []}
+        with mock.patch("core.tool_catalogue.relevant_tool_ids", side_effect=RuntimeError("boom")):
+            workflow = canvas_plan.compile_canvas(payload, workflow_id="suggested_tools_failure")
+
+        self.assertNotIn("suggested_tools", workflow["steps"][0]["inputs"])
+        self.assertEqual(workflow["steps"][0]["step_type"], "model_reasoning")
+
+    def test_non_research_roles_never_get_suggested_tools(self):
+        payload = {"nodes": [_node("v", "Run the test suite.", role="verification")], "edges": []}
+        with mock.patch("core.tool_catalogue.relevant_tool_ids", return_value=["web_search"]) as fn:
+            workflow = canvas_plan.compile_canvas(payload, workflow_id="suggested_tools_scope")
+
+        fn.assert_not_called()
+        self.assertNotIn("suggested_tools", workflow["steps"][0]["inputs"])
 
 
 class NoteRoleAndBranchCompileTests(unittest.TestCase):
@@ -490,6 +668,124 @@ class CompileCanvasDirectiveWiringTests(unittest.TestCase):
         workflow = canvas_plan.compile_canvas(payload, workflow_id="node_project")
         self.assertEqual(workflow["steps"][0]["inputs"]["project_id"], "mark_platform")
 
+
+    # --- VerificationClosingCheckRoutingTests (2026-09-24): a verification
+    # node routes to the closing_check step_type instead of pytest_focused
+    # when its full transitive ancestry never reaches an implementation node
+    # -- see canvas_plan._ancestor_roles_and_documents. Nothing code-related
+    # was ever touched, so a document-completeness check against what a
+    # document ancestor actually produced replaces running the whole suite
+    # against nothing relevant to it.
+
+    def test_doc_only_chain_routes_to_closing_check(self):
+        payload = {
+            "nodes": [
+                _node("r", "Investigate the source.", role="research"),
+                _node("d", "Write the specification.", role="document"),
+                _node("v", "Review the generated specification for completeness.", role="verification"),
+            ],
+            "edges": [_edge("e1", "r", "d"), _edge("e2", "d", "v")],
+        }
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="doc_only_chain")
+
+        verify_step = next(s for s in workflow["steps"] if s["description"].startswith("Review the generated"))
+        self.assertEqual(verify_step["step_type"], "closing_check")
+        self.assertEqual(verify_step["target"], "document_completeness")
+
+    def test_doc_only_chain_binds_the_documents_upstream_path_and_requirements(self):
+        payload = {
+            "nodes": [
+                _node("d", "Write the specification.", role="document"),
+                _node(
+                    "v", "Review it.", role="verification"
+                ),
+            ],
+            "edges": [_edge("e1", "d", "v")],
+        }
+        payload["nodes"][0]["deliverables"] = ["The script's overall purpose.", "Detailed function entries."]
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="doc_only_bindings")
+
+        doc_step_id = canvas_plan.node_step_id("d")
+        verify_step = next(s for s in workflow["steps"] if s["step_type"] == "closing_check")
+        documents = verify_step["inputs"]["documents"]
+        self.assertEqual(len(documents), 1)
+        self.assertEqual(documents[0]["path"], {"bind": {"from_step": doc_step_id, "path": "result.path"}})
+        self.assertIn("Write the specification.", documents[0]["requirements"])
+        self.assertIn("The script's overall purpose.", documents[0]["requirements"])
+        self.assertIn("Detailed function entries.", documents[0]["requirements"])
+
+    def test_implementation_ancestor_keeps_pytest_focused_unchanged(self):
+        payload = {
+            "nodes": [
+                _node("i", "Apply the change.", role="implementation"),
+                _node("v", "Run the tests.", role="verification"),
+            ],
+            "edges": [_edge("e1", "i", "v")],
+        }
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="impl_ancestor")
+
+        verify_step = next(s for s in workflow["steps"] if s["step_type"] != "tool")
+        self.assertEqual(verify_step["step_type"], "command")
+        self.assertEqual(verify_step["target"], "pytest_focused")
+
+    def test_document_and_implementation_both_upstream_keeps_pytest_focused(self):
+        # Mixed ancestry -- code was touched somewhere in the chain, so the
+        # safe default (run the suite) applies even though a document
+        # ancestor also exists.
+        payload = {
+            "nodes": [
+                _node("r", "Investigate.", role="research"),
+                _node("d", "Write the specification.", role="document"),
+                _node("i", "Apply the change.", role="implementation"),
+                _node("v", "Verify everything.", role="verification"),
+            ],
+            "edges": [
+                _edge("e1", "r", "d"),
+                _edge("e2", "d", "i"),
+                _edge("e3", "i", "v"),
+            ],
+        }
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="mixed_ancestry")
+
+        verify_step = next(s for s in workflow["steps"] if s["description"] == "Verify everything.")
+        self.assertEqual(verify_step["step_type"], "command")
+        self.assertEqual(verify_step["target"], "pytest_focused")
+
+    def test_verification_with_no_ancestors_at_all_keeps_pytest_focused(self):
+        payload = {"nodes": [_node("v", "Run everything.", role="verification")], "edges": []}
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="no_ancestors")
+
+        self.assertEqual(workflow["steps"][0]["step_type"], "command")
+        self.assertEqual(workflow["steps"][0]["target"], "pytest_focused")
+
+    def test_multiple_document_ancestors_all_get_bound(self):
+        payload = {
+            "nodes": [
+                _node("d1", "Write part one.", role="document"),
+                _node("d2", "Write part two.", role="document"),
+                _node("v", "Review both.", role="verification"),
+            ],
+            "edges": [_edge("e1", "d1", "v"), _edge("e2", "d2", "v")],
+        }
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="multi_doc")
+
+        verify_step = next(s for s in workflow["steps"] if s["step_type"] == "closing_check")
+        self.assertEqual(len(verify_step["inputs"]["documents"]), 2)
+
+    def test_closing_check_survives_real_schema_validation(self):
+        payload = {
+            "nodes": [
+                _node("d", "Write the specification.", role="document"),
+                _node("v", "Review it.", role="verification"),
+            ],
+            "edges": [_edge("e1", "d", "v")],
+        }
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="closing_check_valid")
+
+        validated = validate_workflow(workflow)
+        self.assertEqual(len(validated["steps"]), 2)
+
+
     def test_implementation_intent_always_forwards_the_stripped_prose(self):
         payload = {
             "nodes": [
@@ -573,7 +869,13 @@ class CompileCanvasDirectiveWiringTests(unittest.TestCase):
         workflow = canvas_plan.compile_canvas(payload, workflow_id="file_test")
         self.assertEqual(workflow["steps"][0]["inputs"]["file"], "scratch/notes.md")
 
-    def test_recommended_model_directive_is_threaded_through_but_inert(self):
+    def test_recommended_model_directive_with_no_known_route_is_surfaced_but_inert(self):
+        # "developer (openclaw)" isn't a model_router role with real provider
+        # config -- see _KNOWN_MODEL_ROUTER_ROLES -- so it's still threaded
+        # through for the approval preview, but must not set inputs["role"]:
+        # doing so would risk resolve_settings silently falling through to
+        # lmstudio for an unrecognised role, the exact bug class found live
+        # 2026-09-24 with the "reviewer" role.
         payload = {
             "nodes": [
                 _node(
@@ -586,8 +888,50 @@ class CompileCanvasDirectiveWiringTests(unittest.TestCase):
         }
         workflow = canvas_plan.compile_canvas(payload, workflow_id="recommended_model_test")
         self.assertEqual(workflow["steps"][0]["inputs"]["recommended_model"], "developer (openclaw)")
-        # Inert: it doesn't change the role, target, or any other compiled field.
         self.assertEqual(workflow["steps"][0]["target"], "project_operator")
+        self.assertNotIn("role", workflow["steps"][0]["inputs"])
+
+    def test_research_node_gets_the_research_dispatch_role_by_default(self):
+        # Confirmed live (2026-09-24): dual_orchestrator.py's model_reasoning
+        # dispatch reads inputs["role"] to pick the model_router role,
+        # defaulting to "worker" when absent -- and nothing ever set it, so
+        # every "research" node dispatched on the generic worker tier this
+        # whole time, silently ignoring the dedicated research_provider/
+        # research_model config that exists specifically for this task.
+        payload = {"nodes": [_node("r", "Investigate the auth module.", role="research")], "edges": []}
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="research_role_default")
+        self.assertEqual(workflow["steps"][0]["inputs"]["role"], "research")
+
+    def test_research_role_spec_allowed_tools_matches_the_capability_schema(self):
+        # Locks in the actual value, not just self-consistency with whatever
+        # tool_ids_for_role("research") happens to return -- catches a
+        # regression in core.capability_schema._TOOL_ALLOWED_ROLES itself,
+        # not only a drift between the two.
+        self.assertEqual(
+            frozenset(canvas_plan._ROLE_SPECS["research"]["allowed_tools"]),
+            frozenset({"web_search", "jarvis_memory", "capability_registry"}),
+        )
+
+    def test_recommended_model_directive_overrides_the_dispatch_role_when_recognised(self):
+        payload = {
+            "nodes": [
+                _node("r", "role: research\nrecommended model: reviewer\nInvestigate the auth module.", role="research")
+            ],
+            "edges": [],
+        }
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="recommended_model_override")
+        self.assertEqual(workflow["steps"][0]["inputs"]["role"], "reviewer")
+
+    def test_unrecognised_recommended_model_falls_back_to_the_role_default(self):
+        payload = {
+            "nodes": [
+                _node("r", "role: research\nrecommended model: banana\nInvestigate the auth module.", role="research")
+            ],
+            "edges": [],
+        }
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="recommended_model_unknown")
+        self.assertEqual(workflow["steps"][0]["inputs"]["recommended_model"], "banana")
+        self.assertEqual(workflow["steps"][0]["inputs"]["role"], "research")
 
 
 class ContextPreambleTests(unittest.TestCase):
@@ -747,6 +1091,23 @@ class PreviewResolvedTargetTests(unittest.TestCase):
         summary = canvas_plan._resolved_target_summary(item)
         self.assertIn("no scope", summary.lower())
         self.assertIn("entire suite", summary.lower())
+
+    def test_closing_check_shows_document_completeness_not_the_pytest_warning(self):
+        # Confirmed live (2026-09-24): the preview still showed "runs the
+        # entire suite" for a verification node already routed to
+        # closing_check -- correct Type column, wrong Resolved target text.
+        item = {
+            "step_type": "closing_check",
+            "inputs": {"canvas_role": "verification", "documents": [{"path": {"bind": {}}, "requirements": "x"}]},
+        }
+        summary = canvas_plan._resolved_target_summary(item)
+        self.assertIn("document completeness", summary.lower())
+        self.assertNotIn("entire suite", summary.lower())
+
+    def test_closing_check_with_no_documents_warns_nothing_to_check(self):
+        item = {"step_type": "closing_check", "inputs": {"canvas_role": "verification", "documents": []}}
+        summary = canvas_plan._resolved_target_summary(item)
+        self.assertIn("nothing to check", summary.lower())
 
     def test_implementation_with_project_shows_it(self):
         item = self._manifest_item(canvas_role="implementation", project_id="mark_platform")
@@ -1187,6 +1548,32 @@ class ProposeCanvasPlanTests(unittest.TestCase):
             self.assertFalse(second["changed"])
             self.assertEqual(second["plan_version"], 1)
             self.assertEqual(second["plan_fingerprint_hash"], first["plan_fingerprint_hash"])
+
+    def test_force_reproposes_an_unchanged_canvas(self):
+        # The fingerprint only ever tracks human-authored canvas content --
+        # it can't see that compile_canvas's own logic changed (confirmed
+        # live 2026-09-24, twice). force=True is the escape hatch: a fresh
+        # pending_review note even though the canvas itself is untouched,
+        # still requiring its own human decision, never a re-approval
+        # shortcut.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            cfg = _cfg(root)
+            path = root / "Canvases" / "JARVIS" / "plan.canvas"
+            canvas.write_canvas(path, self._payload())
+
+            first = canvas_plan.propose_canvas_plan(path, workflow_id="demo", name="Demo", cfg=cfg)
+            second = canvas_plan.propose_canvas_plan(path, workflow_id="demo", name="Demo", cfg=cfg, force=True)
+
+            self.assertTrue(second["changed"])
+            self.assertEqual(second["plan_version"], 2)
+            self.assertEqual(second["plan_fingerprint_hash"], first["plan_fingerprint_hash"])
+            from actions import jarvis_memory as memory
+            from core import approval_response
+
+            metadata, body, _ = memory.read_note(Path(second["note_path"]))
+            self.assertEqual(metadata["approval_state"], "pending_review")
+            self.assertEqual(approval_response.parse_approval_response(body)["decision"], "pending")
 
     def test_own_writeback_from_sync_step_status_does_not_trigger_reproposal(self):
         # This is the exact failure mode being guarded against: JARVIS's own
@@ -1826,6 +2213,94 @@ class CanvasExecutionReceiptTests(unittest.TestCase):
         self.assertIsNone(completion_call.kwargs["detail"])
 
 
+class ScopingReportsTests(unittest.TestCase):
+    """The sub-agent scoping-report phase (2026-09-24): before the real
+    decomposition call, a goal that names a real file gets a handful of
+    small worker-tier answers about that file's actual content, grounding
+    the plan instead of letting the planner reason only about process.
+    Confirmed live: a planner given only goal text produced a generic
+    "extract every function and class" instruction without ever having
+    looked at the file, so it had no way to calibrate scope."""
+
+    def test_infer_source_file_finds_an_existing_path_in_the_goal(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "widget.py"
+            target.write_text("def foo(): pass\n", encoding="utf-8")
+            goal = f"Write a spec for the script {target} so it can be rebuilt."
+            self.assertEqual(canvas_plan._infer_source_file(goal), str(target))
+
+    def test_infer_source_file_returns_empty_for_a_goal_with_no_path(self):
+        self.assertEqual(canvas_plan._infer_source_file("Fix the login bug"), "")
+
+    def test_infer_source_file_ignores_a_path_that_does_not_exist(self):
+        goal = r"Document C:\definitely\not\a\real\path\ghost.py please."
+        self.assertEqual(canvas_plan._infer_source_file(goal), "")
+
+    def test_infer_source_file_refuses_to_guess_between_two_matches(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            a = Path(tmp) / "a.py"
+            b = Path(tmp) / "b.py"
+            a.write_text("pass\n", encoding="utf-8")
+            b.write_text("pass\n", encoding="utf-8")
+            goal = f"Compare {a} against {b}."
+            self.assertEqual(canvas_plan._infer_source_file(goal), "")
+
+    def test_gather_scoping_reports_builds_grounding_from_worker_answers(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "widget.py"
+            target.write_text("def foo():\n    pass\n\ndef bar():\n    pass\n", encoding="utf-8")
+            questions_json = json.dumps(
+                {"questions": ["How many functions does it define?", "Any natural sub-groupings?"]}
+            )
+            with mock.patch(
+                "core.model_router.call_text",
+                side_effect=[questions_json, "It defines two functions: foo and bar.", "No, it's a flat module."],
+            ) as call_text:
+                grounding, stages = canvas_plan._gather_scoping_reports("Spec this file", str(target))
+
+            self.assertIn("How many functions does it define?", grounding)
+            self.assertIn("It defines two functions: foo and bar.", grounding)
+            self.assertIn(str(target), grounding)
+            self.assertEqual(call_text.call_count, 3)
+            self.assertEqual(call_text.call_args_list[0].kwargs["role"], "planner")
+            self.assertEqual(call_text.call_args_list[1].kwargs["role"], "worker")
+            self.assertIn("accepted", [s["status"] for s in stages])
+
+    def test_gather_scoping_reports_degrades_to_empty_when_questions_call_fails(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "widget.py"
+            target.write_text("pass\n", encoding="utf-8")
+            with mock.patch("core.model_router.call_text", side_effect=RuntimeError("route down")):
+                grounding, stages = canvas_plan._gather_scoping_reports("Spec this file", str(target))
+
+            self.assertEqual(grounding, "")
+            self.assertEqual(stages[0]["status"], "failed")
+
+    def test_gather_scoping_reports_degrades_to_empty_for_an_unreadable_file(self):
+        ghost = str(Path(tempfile.gettempdir()) / "definitely_missing_widget.py")
+        grounding, stages = canvas_plan._gather_scoping_reports("Spec this file", ghost)
+
+        self.assertEqual(grounding, "")
+        self.assertEqual(stages[0]["stage"], "scoping_read")
+        self.assertEqual(stages[0]["status"], "failed")
+
+    def test_gather_scoping_reports_keeps_partial_answers_when_one_worker_call_fails(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "widget.py"
+            target.write_text("def foo(): pass\n", encoding="utf-8")
+            questions_json = json.dumps({"questions": ["Q1?", "Q2?"]})
+            with mock.patch(
+                "core.model_router.call_text",
+                side_effect=[questions_json, "Answer one.", RuntimeError("worker route down")],
+            ):
+                grounding, stages = canvas_plan._gather_scoping_reports("Spec this file", str(target))
+
+            self.assertIn("Answer one.", grounding)
+            self.assertNotIn("Q2?", grounding)
+            failed = [s for s in stages if s.get("question") == "Q2?"]
+            self.assertEqual(failed[0]["status"], "failed")
+
+
 class _DecomposeRegistryIsolated(unittest.TestCase):
     """Decomposition tests run against a fixed registry, not the user's real one.
 
@@ -1934,6 +2409,34 @@ class DecomposeGoalToCanvasTests(_DecomposeRegistryIsolated):
 
             edge_pairs = {(edge["fromNode"], edge["toNode"]) for edge in document["edges"]}
             self.assertEqual(edge_pairs, {("root", "look_around"), ("look_around", "make_change"), ("make_change", "check_it")})
+
+    def test_decomposition_grounds_the_planning_prompt_with_scoping_reports_when_a_source_file_is_named(self):
+        # The scoping-report phase: a goal naming a real file gets small
+        # worker-tier answers about its actual content folded into the real
+        # decomposition prompt, so the planner isn't reasoning about process
+        # alone. A goal with no file reference (the test above) must see none
+        # of this -- call_text.assert_called_once() there proves it stays a
+        # no-op when there's nothing concrete to ground against.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            cfg = _cfg(root)
+            target = root / "widget.py"
+            target.write_text("def foo():\n    pass\n\ndef bar():\n    pass\n", encoding="utf-8")
+            goal = f"Create a detailed specification of the script {target}."
+            questions_json = json.dumps({"questions": ["How many functions does it define?"]})
+            responses = [
+                questions_json,
+                "It defines two functions: foo and bar.",
+                json.dumps(self._good_payload()),
+            ]
+            with mock.patch("core.model_router.call_text", side_effect=responses) as call_text:
+                result = canvas_plan.decompose_goal_to_canvas(goal, cfg=cfg)
+
+            self.assertTrue(result["ok"], result)
+            self.assertIn("scoping_reports", result)
+            self.assertEqual(call_text.call_count, 3)
+            final_prompt = call_text.call_args_list[-1].args[0]
+            self.assertIn("It defines two functions: foo and bar.", final_prompt)
 
     def test_user_workflow_mode_is_written_onto_the_plan_node_and_returned(self):
         # A minimal payload for the compile step specifically -- _good_payload()'s

@@ -24,7 +24,7 @@
         "properties": {
           "step_id": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
           "orchestrator": {"enum": ["cognitive", "deterministic"]},
-          "step_type": {"enum": ["tool", "python_hook", "command", "model_reasoning", "gate", "fanout", "review", "artifact", "memory_commit"]},
+          "step_type": {"enum": ["tool", "python_hook", "command", "model_reasoning", "gate", "fanout", "review", "artifact", "memory_commit", "closing_check"]},
           "target": {"type": "string", "minLength": 1},
           "description": {"type": "string", "minLength": 1},
           "depends_on": {"type": "array", "items": {"type": "string"}},

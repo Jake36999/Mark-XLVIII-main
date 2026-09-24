@@ -211,6 +211,15 @@ CAPABILITY_HELP: dict[str, dict[str, Any]] = {
         "safety": "Uses configured local audio devices and local/cloud TTS only when configured.",
         "keywords": ["speech", "voice", "microphone", "stt", "tts", "audio", "text to speech", "speech to text"],
     },
+    "capability_registry": {
+        "title": "Capability Discovery",
+        "categories": ["meta", "discovery", "introspection"],
+        "summary": "Lets JARVIS discover its own callable tools and workflows by natural-language query -- what it can do, not doing it.",
+        "details": "operation='search'/'cards' ranks JARVIS's own registered tools and workflows against a query by keyword overlap; 'describe'/'help' returns a chosen one's full manifest (inputs, safety, examples); 'list' returns everything registered; 'health' reports native-tool availability. Purely metadata-only self-reflection -- it never executes the capability it finds, and a caller still has to invoke that capability separately.",
+        "examples": ["what can you do", "which tool handles reminders", "is there a tool for reading PDFs", "show me everything you're capable of"],
+        "safety": "Read-only introspection over JARVIS's own registered capabilities; cannot execute anything.",
+        "keywords": ["what can you do", "capabilities", "what tools", "which tool", "self discovery", "list capabilities", "help", "what are you able to do"],
+    },
 }
 
 

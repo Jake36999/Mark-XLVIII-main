@@ -1215,6 +1215,120 @@ class AnthropicProviderTests(unittest.TestCase):
         self.assertEqual(broker.requests[0]["payload"]["tools"][0]["input_schema"], {"type": "object", "properties": {}})
 
 
+class DeepInfraProviderTests(unittest.TestCase):
+    """DeepInfra as a cloud worker tier: OpenAI-wire-compatible (chat/completions,
+    Bearer auth), added the same way AnthropicProviderTests proved out Anthropic --
+    same lmstudio-fallback safety net, no Responses API (chat/completions instead,
+    see _call_deepinfra_responses), and a wider max_tokens floor because the
+    catalogue is reasoning-tagged (see DEFAULT_DEEPINFRA_MAX_TOKENS)."""
+
+    def test_resolve_settings_routes_worker_to_deepinfra(self):
+        from core import model_router
+
+        settings = model_router.resolve_settings(
+            "worker",
+            config={"worker_provider": "deepinfra", "worker_model": "openai/gpt-oss-20b"},
+        )
+
+        self.assertEqual(settings.provider, "deepinfra")
+        self.assertEqual(settings.model, "openai/gpt-oss-20b")
+        self.assertEqual(settings.base_url, "https://api.deepinfra.com/v1/openai")
+        self.assertIsNone(settings.api_key)
+
+    def test_resolve_settings_deepinfra_default_model_does_not_leak_from_openai(self):
+        from core import model_router
+
+        settings = model_router.resolve_settings("worker", config={"worker_provider": "deepinfra"})
+
+        self.assertEqual(settings.model, model_router.DEFAULT_DEEPINFRA_MODEL)
+        self.assertNotEqual(settings.model, model_router.DEFAULT_OPENAI_MODEL)
+
+    def test_unrecognised_provider_string_falls_through_rather_than_silently_resolving(self):
+        """A typo'd provider must not silently become lmstudio and look like
+        DeepInfra was never reached -- _clean_provider's closed set is what
+        makes that distinction possible, so this pins 'deepinfra' being in it."""
+        from core import model_router
+
+        self.assertEqual(model_router._clean_provider("deepinfra", "lmstudio"), "deepinfra")
+        self.assertEqual(model_router._clean_provider("DeepInfra", "lmstudio"), "deepinfra")
+        self.assertEqual(model_router._clean_provider("deep-infra", "lmstudio"), "deepinfra")
+
+    def test_deepinfra_call_uses_chat_completions_and_returns_visible_text(self):
+        from core import model_router
+
+        broker = FakeBroker(
+            response={"ok": True, "data": {"choices": [{"message": {"content": "worked", "reasoning_content": "thinking..."}}]}}
+        )
+
+        result = model_router.call_text(
+            "summarise this",
+            role="worker",
+            config={"worker_provider": "deepinfra", "worker_model": "openai/gpt-oss-20b"},
+            environ={},
+            credential_broker=broker,
+        )
+
+        self.assertEqual(result, "worked")
+        self.assertEqual(broker.requests[0]["provider"], "deepinfra")
+        self.assertEqual(broker.requests[0]["base_url"], "https://api.deepinfra.com/v1/openai")
+        self.assertEqual(broker.requests[0]["path"], "chat/completions")
+        self.assertEqual(broker.requests[0]["payload"]["max_tokens"], model_router.DEFAULT_DEEPINFRA_MAX_TOKENS)
+
+    def test_invalid_deepinfra_key_falls_back_to_local_models(self):
+        from core import model_router
+
+        def fake_post(url, **kwargs):
+            return FakeResponse({"choices": [{"message": {"content": "local fallback"}}]})
+
+        result = model_router.call_text(
+            "hello jarvis",
+            role="worker",
+            config={
+                "worker_provider": "deepinfra",
+                "worker_model": "openai/gpt-oss-20b",
+                "lmstudio_url": "http://localhost:1234/v1",
+                "model_routes": {"quick": ["mistralai/mistral-7b-instruct-v0.3"]},
+            },
+            environ={},
+            post=fake_post,
+            credential_broker=FakeBroker(state="invalid"),
+        )
+
+        self.assertEqual(result, "local fallback")
+
+    def test_deepinfra_tools_request_asks_broker_for_a_deepinfra_labelled_key(self):
+        """Regression guard for the bug this integration would otherwise have:
+        _call_openai_with_tools used to hardcode provider="openai" in its broker
+        call, which would have asked the broker for an OpenAI key while actually
+        talking to DeepInfra's endpoint -- silently mislabelling the credential."""
+        from core import model_router
+
+        broker = FakeBroker(
+            response={"ok": True, "data": {"choices": [{"message": {"content": "", "tool_calls": [
+                {"id": "call_1", "function": {"name": "project_operator", "arguments": "{}"}}
+            ]}}]}}
+        )
+
+        result = model_router.call_with_tools(
+            "list my projects",
+            tools=[
+                {
+                    "type": "function",
+                    "function": {"name": "project_operator", "description": "", "parameters": {"type": "object", "properties": {}}},
+                }
+            ],
+            role="worker",
+            config={"worker_provider": "deepinfra", "worker_model": "openai/gpt-oss-20b"},
+            environ={},
+            credential_broker=broker,
+        )
+
+        self.assertEqual(len(result.tool_calls), 1)
+        self.assertEqual(result.tool_calls[0].name, "project_operator")
+        self.assertEqual(broker.requests[0]["provider"], "deepinfra")
+        self.assertEqual(broker.requests[0]["payload"]["max_tokens"], model_router.DEFAULT_DEEPINFRA_MAX_TOKENS)
+
+
 class ModelHealthTelemetryTests(unittest.TestCase):
     """Task A3: every LM Studio generation records an attributable health outcome."""
 

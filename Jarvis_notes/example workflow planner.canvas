@@ -1,0 +1,32 @@
+{
+	"nodes":[
+		{"id":"62ea1377561beb87","type":"text","text":"This canvas is just an example of the way the workflows could be developed in a similar way to open ai's agent. ","x":-552,"y":-610,"width":292,"height":90},
+		{"id":"9701083976488ba9","type":"text","text":"---\nupdated: \"2026-07-24T11:25:39Z\"\nindex_state: \"indexed_local\"\ncontent_hash: \"d2e0874562af005675ccaf01d13bea021011e75caff666556a7309e8bc378577\"\n---\nexample - here should be instructions for agent initiation and orientation process.\n\"research topics found on cats\"","x":-542,"y":-472,"width":272,"height":152,"color":"3"},
+		{"id":"c6fd6f3bdd6c15fb","x":-531,"y":-160,"width":250,"height":174,"type":"text","text":"placeholder example for the intitiation process for an agent"},
+		{"id":"ad2520f6dc7b8e8a","x":-208,"y":-160,"width":250,"height":174,"type":"text","text":"🧭\nan example note for if else function that provides a decision gate whether based on infering the result, or a hardcoded gate. "},
+		{"id":"de152dfe662c3cce","x":-208,"y":-472,"width":250,"height":152,"color":"3","type":"text","text":"example - here should be instructions providing the how the decision will be gated, or what to consider when making the decision\n\n\"assess the resources on cats, did you find anything that would be considered interesting?\""},
+		{"id":"c414fe8a68ca3bde","type":"text","text":"📝\nplaceholder note for instructing an agent to make a note\n","x":360,"y":-516,"width":250,"height":174},
+		{"id":"117a79b0ac4dd7e0","type":"text","text":"example - here is an action type instruction.\n\"make a note and document sources reviewed\"","x":360,"y":-828,"width":250,"height":152,"color":"3"},
+		{"id":"f28dfc64e5fdfe5a","type":"text","text":"📝\nplaceholder note for instructing an agent to make a note\n","x":360,"y":76,"width":250,"height":174},
+		{"id":"dfdd0815c62df3c8","type":"text","text":"example - here is an action type instruction.\n\"make a note and document sources reviewed\"","x":360,"y":-236,"width":250,"height":152,"color":"3"},
+		{"id":"6ae8696b7b7e0895","x":642,"y":76,"width":250,"height":174,"type":"text","text":"🚫\na placeholder note to provide a clear end point for an agent."},
+		{"id":"dca931e8de895a87","x":654,"y":-236,"width":250,"height":163,"color":"3","type":"text","text":"example - here is an action type instruction. \n\"as there was no interesting information, now that it is reviewed, end task and start closing process.\""},
+		{"id":"22d9b2a39eabf2ae","x":720,"y":-480,"width":250,"height":60,"type":"text","text":"task continues..."}
+	],
+	"edges":[
+		{"id":"35d701a2ac0687c1","fromNode":"9701083976488ba9","fromSide":"bottom","toNode":"c6fd6f3bdd6c15fb","toSide":"top"},
+		{"id":"3596e1be4b1b3527","fromNode":"c6fd6f3bdd6c15fb","fromSide":"top","toNode":"9701083976488ba9","toSide":"bottom"},
+		{"id":"a87ab0a80bed2c8b","fromNode":"de152dfe662c3cce","fromSide":"bottom","toNode":"ad2520f6dc7b8e8a","toSide":"top"},
+		{"id":"469c7e22afde8de5","fromNode":"ad2520f6dc7b8e8a","fromSide":"top","toNode":"de152dfe662c3cce","toSide":"bottom"},
+		{"id":"15345e1d46b2579d","fromNode":"c414fe8a68ca3bde","fromSide":"top","toNode":"117a79b0ac4dd7e0","toSide":"bottom"},
+		{"id":"b3e8f3c29f35b960","fromNode":"117a79b0ac4dd7e0","fromSide":"bottom","toNode":"c414fe8a68ca3bde","toSide":"top"},
+		{"id":"7c6eb91dd3cce38c","fromNode":"f28dfc64e5fdfe5a","fromSide":"top","toNode":"dfdd0815c62df3c8","toSide":"bottom"},
+		{"id":"6b4ffe3bc0631a9e","fromNode":"dfdd0815c62df3c8","fromSide":"bottom","toNode":"f28dfc64e5fdfe5a","toSide":"top"},
+		{"id":"ca17215f6dbfd15a","fromNode":"ad2520f6dc7b8e8a","fromSide":"right","toNode":"c414fe8a68ca3bde","toSide":"left","label":"yes"},
+		{"id":"5e1a7a5af51ac113","fromNode":"ad2520f6dc7b8e8a","fromSide":"right","toNode":"f28dfc64e5fdfe5a","toSide":"left","label":"no"},
+		{"id":"6be827af565a594c","fromNode":"dca931e8de895a87","fromSide":"bottom","toNode":"6ae8696b7b7e0895","toSide":"top"},
+		{"id":"fe830d93e3ba4e61","fromNode":"6ae8696b7b7e0895","fromSide":"top","toNode":"dca931e8de895a87","toSide":"bottom"},
+		{"id":"aba00c809be7e7f8","fromNode":"c414fe8a68ca3bde","fromSide":"right","toNode":"22d9b2a39eabf2ae","toSide":"left"},
+		{"id":"a186b72a88d0be13","fromNode":"c6fd6f3bdd6c15fb","fromSide":"right","toNode":"ad2520f6dc7b8e8a","toSide":"left"}
+	]
+}

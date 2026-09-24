@@ -1,0 +1,186 @@
+schema_version: jarvis_dual_orchestrator/v1
+workflow_id: canvas_plan
+version: canvas-1
+name: Canvas Plan
+description: Compiled from an Obsidian Canvas graph (Mode 2 planning).
+max_steps: 4
+variables:
+  source: canvas
+  node_step_ids:
+    plan_root: plan_root_c1fa02
+    read_source: read_source_94ba6c
+    write_spec: write_spec_f1da76
+    verify_spec: verify_spec_ef96ea
+steps:
+- step_id: plan_root_c1fa02
+  orchestrator: deterministic
+  step_type: gate
+  target: plan_milestone
+  description: Create a detailed specification of the script E:\Aletheia_project\DEV_TOOLS\ToolSet\aletheia_toolchain\notebook_packager_v3.1.py
+    that would allow a competent engineer to rebuild it from scratch.
+  risk_tier: T1
+  side_effects: none
+  depends_on: []
+  inputs:
+    canvas_role: plan
+    canvas_node_id: plan_root
+  outputs:
+    result: result.plan_root_c1fa02
+  acceptance_criteria:
+    required: true
+- step_id: read_source_94ba6c
+  orchestrator: cognitive
+  step_type: model_reasoning
+  target: reasoning
+  description: 'Open and parse the source file, extracting every function and class
+    definition, their signatures, docstrings, and a concise description of their internal
+    logic and interactions.
+
+
+    Deliverables:
+
+    - For EVERY function and class defined in the file, skip nothing: output one entry
+    with its name, full signature, one-line purpose, and a short description of its
+    internal logic and how it interacts with the rest of the file.
+
+    - A structured outline of all functions, classes, and their relationships extracted
+    from the source.
+
+
+    Do not summarize or omit any function or class for brevity. The deliverable is
+    the full per-symbol breakdown, not a high-level summary.
+
+
+    <!-- jarvis-forward-scout: do not edit below this line -->
+
+    > **Context from `plan_root_c1fa02`:** Create a detailed specification of the
+    script E:\Aletheia_project\DEV_TOOLS\ToolSet\aletheia_toolchain\notebook_packager_v3.1.py
+    that would allow a competent engineer to rebuild it from scratch.'
+  risk_tier: T1
+  side_effects: none
+  depends_on:
+  - plan_root_c1fa02
+  inputs:
+    canvas_role: research
+    canvas_node_id: read_source
+    role: research
+    prompt: 'System goal: Create a detailed specification of the script E:\Aletheia_project\DEV_TOOLS\ToolSet\aletheia_toolchain\notebook_packager_v3.1.py
+      that would allow a competent engineer to rebuild it from scratch.
+
+
+      Open and parse the source file, extracting every function and class definition,
+      their signatures, docstrings, and a concise description of their internal logic
+      and interactions.
+
+
+      Deliverables:
+
+      - For EVERY function and class defined in the file, skip nothing: output one
+      entry with its name, full signature, one-line purpose, and a short description
+      of its internal logic and how it interacts with the rest of the file.
+
+      - A structured outline of all functions, classes, and their relationships extracted
+      from the source.
+
+
+      Do not summarize or omit any function or class for brevity. The deliverable
+      is the full per-symbol breakdown, not a high-level summary.
+
+
+      <!-- jarvis-forward-scout: do not edit below this line -->
+
+      > **Context from `plan_root_c1fa02`:** Create a detailed specification of the
+      script E:\Aletheia_project\DEV_TOOLS\ToolSet\aletheia_toolchain\notebook_packager_v3.1.py
+      that would allow a competent engineer to rebuild it from scratch.'
+    context_injected: true
+    file: E:\Aletheia_project\DEV_TOOLS\ToolSet\aletheia_toolchain\notebook_packager_v3.1.py
+    evidence:
+    - bind:
+        from_step: plan_root_c1fa02
+        path: result.summary
+  outputs:
+    result: result.read_source_94ba6c
+  acceptance_criteria:
+    required: true
+    deliverables:
+    - For every function and class defined in the file, one entry with its name, full
+      signature, one-line purpose, and a short description of its internal logic and
+      interactions.
+    - A structured outline of all functions, classes, and their relationships extracted
+      from the source.
+  retry_policy:
+    safe: true
+    max_attempts: 2
+- step_id: write_spec_f1da76
+  orchestrator: deterministic
+  step_type: artifact
+  target: vault_create_note
+  description: "Compose a comprehensive Markdown note in the vault that includes:\n\
+    - The script's overall purpose.\n- Detailed entries for each function and class\
+    \ (role, signature, inputs, outputs, invariants, edge cases).\n- The real dependency\
+    \ graph between components.\n- The inferred items from the previous note.\n- Any\
+    \ other relevant observations.\nThe note should be self\u2011contained and clear\
+    \ enough for a new engineer to re\u2011implement the script.\n\nDeliverables:\n\
+    - A Markdown file in the vault containing the full specification."
+  risk_tier: T2
+  side_effects: local_write
+  depends_on:
+  - read_source_94ba6c
+  inputs:
+    canvas_role: document
+    canvas_node_id: write_spec
+    title: 'Compose a comprehensive Markdown note in the vault that includes:
+
+      - The script''s overall purpose.
+
+      - Detailed entries for each function and class (role, signature, inputs, outputs,
+      invariants, edge cas'
+    content:
+      bind:
+        from_step: read_source_94ba6c
+        path: result.text
+    context_injected: true
+  outputs:
+    result: result.write_spec_f1da76
+  acceptance_criteria:
+    required: true
+    deliverables:
+    - A Markdown file in the vault containing the full specification.
+- step_id: verify_spec_ef96ea
+  orchestrator: deterministic
+  step_type: closing_check
+  target: document_completeness
+  description: 'Review the generated specification for completeness, correctness,
+    and clarity. Ensure all functions/classes are covered, inputs/outputs are described,
+    and inferred flags are clearly marked.
+
+
+    Deliverables:
+
+    - Confirmation that the specification meets the goal criteria.'
+  risk_tier: T1
+  side_effects: local_read
+  depends_on:
+  - write_spec_f1da76
+  inputs:
+    canvas_role: verification
+    canvas_node_id: verify_spec
+    documents:
+    - path:
+        bind:
+          from_step: write_spec_f1da76
+          path: result.path
+      requirements: "Compose a comprehensive Markdown note in the vault that includes:\n\
+        - The script's overall purpose.\n- Detailed entries for each function and\
+        \ class (role, signature, inputs, outputs, invariants, edge cases).\n- The\
+        \ real dependency graph between components.\n- The inferred items from the\
+        \ previous note.\n- Any other relevant observations.\nThe note should be self\u2011\
+        contained and clear enough for a new engineer to re\u2011implement the script.\n\
+        \nDeliverables:\n- A Markdown file in the vault containing the full specification.\n\
+        - A Markdown file in the vault containing the full specification."
+  outputs:
+    result: result.verify_spec_ef96ea
+  acceptance_criteria:
+    required: true
+    deliverables:
+    - Confirmation that the specification meets the goal criteria.
