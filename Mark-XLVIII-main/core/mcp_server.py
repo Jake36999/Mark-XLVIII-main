@@ -18,6 +18,9 @@ from core.tool_dispatcher import DispatchContext, get_tool_dispatcher
 
 
 PROTOCOL_VERSION = "2025-11-25"
+# Every released revision this server's messages are valid under; the tasks
+# capability is ignored by clients of the earlier ones.
+SUPPORTED_PROTOCOL_VERSIONS = ("2025-11-25", "2025-06-18", "2025-03-26", "2024-11-05")
 SERVER_INFO = {"name": "jarvis-mark", "version": "1.0.0"}
 
 
@@ -126,8 +129,17 @@ class JarvisMCPServer:
     def call_method(self, method: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
         params = dict(params or {})
         if method == "initialize":
+            # Answer with the client's requested version when we support it,
+            # rather than always our own default: a strict client (Claude
+            # Code's `mcp` package among them) validates the negotiated
+            # version against its own supported set and drops the connection
+            # if the server insists on one it doesn't recognise. A version we
+            # don't know gets our own, and the client decides (the spec's
+            # negotiation rule).
+            requested = str(params.get("protocolVersion") or "")
+            negotiated = requested if requested in SUPPORTED_PROTOCOL_VERSIONS else PROTOCOL_VERSION
             return {
-                "protocolVersion": PROTOCOL_VERSION,
+                "protocolVersion": negotiated,
                 "capabilities": {"tools": {"listChanged": False}, "tasks": {"requests": {"tools": {"call": {}}}}},
                 "serverInfo": SERVER_INFO,
                 "instructions": "JARVIS tools use Mark approval gates. Effectful calls require an approved workflow action.",

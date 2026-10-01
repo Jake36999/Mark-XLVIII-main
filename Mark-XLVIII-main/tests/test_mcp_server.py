@@ -35,6 +35,19 @@ class MCPServerTests(unittest.TestCase):
         self.assertFalse(called["result"]["isError"])
         self.assertEqual(called["result"]["structuredContent"]["source"], "mcp")
 
+    def test_initialize_answers_the_requested_version_when_supported(self):
+        server = self.server()
+
+        def negotiated(version):
+            params = {"protocolVersion": version} if version else {}
+            reply = server.handle({"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": params})
+            return reply["result"]["protocolVersion"]
+
+        self.assertEqual(negotiated("2025-06-18"), "2025-06-18")    # a strict client's own version
+        self.assertEqual(negotiated("2025-11-25"), "2025-11-25")
+        self.assertEqual(negotiated("2099-01-01"), "2025-11-25")    # unknown: ours, the client decides
+        self.assertEqual(negotiated(""), "2025-11-25")
+
     def test_http_transport_requires_bearer_token_and_allowed_origin(self):
         service = self.server()
         httpd = ThreadingHTTPServer(("127.0.0.1", 0), make_http_handler(service, "secret"))
