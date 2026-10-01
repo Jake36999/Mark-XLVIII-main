@@ -1,0 +1,413 @@
+{
+  "nodes": [
+    {
+      "id": "overall_plan",
+      "type": "text",
+      "text": "role: plan\nproject: resource_library\n\nCreate a phased research plan to identify concrete, well-scoped R&D objectives for extending the Mark-XLVIII assistant platform. This plan will be reviewed before any execution begins.",
+      "x": 0,
+      "y": 0,
+      "width": 420,
+      "height": 180,
+      "jarvis": {
+        "layout_profile": "dependency",
+        "layout_baseline": {
+          "x": 0,
+          "y": 0,
+          "width": 420,
+          "height": 180
+        },
+        "kind": "plan_step",
+        "step_id": "overall_plan_ec8453",
+        "workflow_id": "mark_rd_scouting",
+        "run_id": "mark_rd_scouting-v7",
+        "step_state": "ACCEPTED",
+        "attempt": 0,
+        "updated_at": "2026-09-24T21:08:05Z"
+      },
+      "color": "4"
+    },
+    {
+      "id": "evidence_mark_platform",
+      "type": "text",
+      "text": "role: evidence\nproject: mark_platform\n\nRead the Mark-XLVIII platform's real source code read-only (project_operator learn_project) so the self-assessment step has genuine, file-grounded evidence instead of a guess.",
+      "x": 500,
+      "y": 320,
+      "width": 420,
+      "height": 180,
+      "deliverables": [
+        "Real, file-grounded takeaways about Mark-XLVIII's actual subsystems, sourced from project_operator learn_project"
+      ],
+      "jarvis": {
+        "layout_profile": "dependency",
+        "layout_baseline": {
+          "x": 500,
+          "y": 320,
+          "width": 420,
+          "height": 180
+        },
+        "kind": "plan_step",
+        "step_id": "evidence_mark_platform_8146ff",
+        "workflow_id": "mark_rd_scouting",
+        "run_id": "mark_rd_scouting-v7",
+        "step_state": "ACCEPTED",
+        "attempt": 0,
+        "updated_at": "2026-09-24T21:08:05Z",
+        "scout_context": {
+          "overall_plan_ec8453": {
+            "summary": "Create a phased research plan to identify concrete, well-scoped R&D objectives for extending the Mark-XLVIII assistant platform. This plan will be reviewed before any execution begins.",
+            "updated_at": "2026-09-24T20:49:17Z"
+          }
+        }
+      },
+      "color": "4"
+    },
+    {
+      "id": "evidence_resource_library",
+      "type": "text",
+      "text": "role: evidence\nproject: resource_library\n\nRead the Resource Library vault read-only (project_operator learn_project) so the source-identification step has genuine, file-grounded evidence of what is actually catalogued instead of a guess.",
+      "x": 500,
+      "y": 640,
+      "width": 420,
+      "height": 180,
+      "deliverables": [
+        "Real, file-grounded takeaways about what the Resource Library actually catalogues, sourced from project_operator learn_project"
+      ],
+      "jarvis": {
+        "layout_profile": "dependency",
+        "layout_baseline": {
+          "x": 500,
+          "y": 640,
+          "width": 420,
+          "height": 180
+        },
+        "kind": "plan_step",
+        "step_id": "evidence_resource_library_3ac86a",
+        "workflow_id": "mark_rd_scouting",
+        "run_id": "mark_rd_scouting-v7",
+        "step_state": "ACCEPTED",
+        "attempt": 0,
+        "updated_at": "2026-09-24T21:08:05Z",
+        "scout_context": {
+          "overall_plan_ec8453": {
+            "summary": "Create a phased research plan to identify concrete, well-scoped R&D objectives for extending the Mark-XLVIII assistant platform. This plan will be reviewed before any execution begins.",
+            "updated_at": "2026-09-24T20:49:17Z"
+          }
+        }
+      },
+      "color": "4"
+    },
+    {
+      "id": "self_assessment",
+      "type": "text",
+      "text": "role: research\n\nUsing ONLY the real, file-grounded evidence already provided below (from a completed, read-only scan of the Mark-XLVIII source -- you do not need to read or scan anything yourself), enumerate its major subject areas/subsystems. Do not guess or rely on generic assumptions about what a typical AI assistant platform contains; if the evidence does not support a claim, leave it out rather than filling the gap with a plausible-sounding guess. If the evidence below is limited to scan metadata only (a root path, a snapshot hash, a file count) with no real descriptive content about what the code actually does, say so explicitly as a single-line caveat instead of treating that metadata itself as if it were a subject area.\n\nDeliverables:\n- List of concrete subject areas grounded in the provided evidence, or an explicit caveat that the evidence was too thin to enumerate them\n\n<!-- jarvis-forward-scout: do not edit below this line -->\n> **Context from `evidence_mark_platform_8146ff`:** - The canonical project root is `F:\\Mark-XLVIII-main`.\n- The current repository snapshot is `1f86e8cba90bebd0507eb0ae1cfe0db670e9b66ad768d175c1178e7b46749ec4`.\n- JARVIS read 36 selected files and skipped 4 sensitive files.\n> **Context from `overall_plan_ec8453`:** Create a phased research plan to identify concrete, well-scoped R&D objectives for extending the Mark-XLVIII assistant platform. This plan will be reviewed before any execution begins.",
+      "x": 0,
+      "y": 320,
+      "width": 420,
+      "height": 180,
+      "deliverables": [
+        "List of concrete subject areas derived directly from the code"
+      ],
+      "jarvis": {
+        "layout_profile": "dependency",
+        "layout_baseline": {
+          "x": 0,
+          "y": 320,
+          "width": 420,
+          "height": 180
+        },
+        "kind": "plan_step",
+        "step_id": "self_assessment_ad3289",
+        "workflow_id": "mark_rd_scouting",
+        "run_id": "mark_rd_scouting-v7",
+        "step_state": "ACCEPTED",
+        "attempt": 1,
+        "updated_at": "2026-09-24T21:08:05Z",
+        "scout_context": {
+          "overall_plan_ec8453": {
+            "summary": "Create a phased research plan to identify concrete, well-scoped R&D objectives for extending the Mark-XLVIII assistant platform. This plan will be reviewed before any execution begins.",
+            "updated_at": "2026-09-24T20:08:25Z"
+          },
+          "evidence_mark_platform_8146ff": {
+            "summary": "- The canonical project root is `F:\\Mark-XLVIII-main`.\n- The current repository snapshot is `1f86e8cba90bebd0507eb0ae1cfe0db670e9b66ad768d175c1178e7b46749ec4`.\n- JARVIS read 36 selected files and skipped 4 sensitive files.",
+            "updated_at": "2026-09-24T21:08:05Z"
+          }
+        }
+      },
+      "color": "4"
+    },
+    {
+      "id": "source_identification",
+      "type": "text",
+      "text": "role: research\nproject: resource_library\n\nThe Resource Library findings below are already real evidence from a completed, read-only scan (project_operator learn_project has already run -- you do not need to run anything yourself, and nothing in the evidence is asking you to authorize or invoke a tool). Using ONLY that evidence and the self-assessment's subject-area list above, write the actual mapping report now: for each subject area, name which catalogued resources are genuinely relevant and explain why. Produce the report itself, not a plan or process for producing one later. If the self-assessment above is itself a caveat that its own evidence was too thin to enumerate real subject areas, say so explicitly and note that this mapping cannot proceed meaningfully until a fuller scan is available -- do not invent subject areas to map against.\n\nDeliverables:\n- Report linking subject areas to relevant Resource Library entries, or an explicit note that the upstream self-assessment was too thin to map against",
+      "x": 0,
+      "y": 640,
+      "width": 420,
+      "height": 180,
+      "deliverables": [
+        "Report linking subject areas to relevant Resource Library entries"
+      ],
+      "jarvis": {
+        "layout_profile": "dependency",
+        "layout_baseline": {
+          "x": 0,
+          "y": 640,
+          "width": 420,
+          "height": 180
+        },
+        "kind": "plan_step",
+        "step_id": "source_identification_1d3f39",
+        "workflow_id": "mark_rd_scouting",
+        "run_id": "mark_rd_scouting-v7",
+        "step_state": "ACCEPTED",
+        "attempt": 1,
+        "updated_at": "2026-09-24T21:08:05Z",
+        "scout_context": {
+          "evidence_resource_library_3ac86a": {
+            "summary": "- The canonical project root is `D:\\Resource-Library`.\n- The current repository snapshot is `ec88bab6703d18570e4c45cefd66124cc18812aaf6b7a6fc0c9774a9c0c07e30`.\n- JARVIS read 36 selected files and skipped 0 sensitive files.",
+            "updated_at": "2026-09-24T20:49:17Z"
+          },
+          "self_assessment_ad3289": {
+            "summary": "Based solely on the provided evidence, the major subject areas/subsystems that can be enumerated are:\n\n1. **Project Structure/Location**: The canonical project root is `F:\\Mark-XLVIII-main`.\n2. **Version Control/Repository**: The current repository snapshot is identified by the hash `ddf27c40dd078bf392e820b949fbb954bcedeff278dc31d05f0f955ca2af129b`.\n3. **File Inventory**: The scan covered 36 selected files.\n4. **Sensitive/Excluded Files**: 4 files were skipped as sensitive.\n\nNo other subject are",
+            "updated_at": "2026-09-24T20:57:55Z"
+          }
+        }
+      },
+      "color": "4"
+    },
+    {
+      "id": "synthesize_objectives",
+      "type": "text",
+      "text": "role: research\n\nCombine the self‑assessment list and the source‑identification report to craft 3‑5 concrete, individually actionable research objectives. Each objective must be specific enough to guide real research steps and must not merely restate existing functionality.\n\nDeliverables:\n- List of 3‑5 concrete research objectives",
+      "x": 0,
+      "y": 960,
+      "width": 420,
+      "height": 180,
+      "deliverables": [
+        "List of 3‑5 concrete research objectives"
+      ],
+      "jarvis": {
+        "layout_profile": "dependency",
+        "layout_baseline": {
+          "x": 0,
+          "y": 960,
+          "width": 420,
+          "height": 180
+        },
+        "kind": "plan_step",
+        "step_id": "synthesize_objectives_88106c",
+        "workflow_id": "mark_rd_scouting",
+        "run_id": "mark_rd_scouting-v7",
+        "step_state": "ACCEPTED",
+        "attempt": 1,
+        "updated_at": "2026-09-24T21:08:05Z"
+      },
+      "color": "4"
+    },
+    {
+      "id": "review_synthesis",
+      "type": "text",
+      "text": "role: review\n\nCheck that the objectives produced by the synthesis step are genuinely concrete, individually actionable, non-redundant with Mark-XLVIII's existing functionality, and grounded in the real self-assessment and source-identification evidence rather than generic aspirations.\n\nDeliverables:\n- Pass/fail assessment of the synthesized objectives, with reasons",
+      "x": 500,
+      "y": 960,
+      "width": 420,
+      "height": 180,
+      "deliverables": [
+        "Pass/fail assessment of the synthesized objectives, with reasons"
+      ],
+      "jarvis": {
+        "layout_profile": "dependency",
+        "layout_baseline": {
+          "x": 500,
+          "y": 960,
+          "width": 420,
+          "height": 180
+        },
+        "kind": "plan_step",
+        "step_id": "review_synthesis_5556f0",
+        "workflow_id": "mark_rd_scouting",
+        "run_id": "mark_rd_scouting-v7",
+        "step_state": "ESCALATE",
+        "attempt": 1,
+        "updated_at": "2026-09-24T21:08:05Z"
+      },
+      "color": "1"
+    },
+    {
+      "id": "phase_plan",
+      "type": "text",
+      "text": "role: research\n\nFor each research objective, break it into ordered steps, assign dependency ordering, and group objectives that can be pursued independently into separate branches (e.g., Branch A, Branch B) to allow parallel work. Produce the full phased plan ready for review.\n\nDeliverables:\n- Complete phased research plan with branch structure and step ordering",
+      "x": 0,
+      "y": 1280,
+      "width": 420,
+      "height": 180,
+      "deliverables": [
+        "Complete phased research plan with branch structure and step ordering"
+      ],
+      "jarvis": {
+        "layout_profile": "dependency",
+        "layout_baseline": {
+          "x": 0,
+          "y": 1280,
+          "width": 420,
+          "height": 180
+        },
+        "kind": "plan_step",
+        "step_id": "phase_plan_5610f6",
+        "workflow_id": "mark_rd_scouting",
+        "run_id": "mark_rd_scouting-v7",
+        "step_state": "PENDING",
+        "attempt": 0,
+        "updated_at": "2026-09-24T21:08:05Z"
+      }
+    },
+    {
+      "id": "review_final_plan",
+      "type": "text",
+      "text": "role: review\n\nIndependently check the full phased research plan for internal consistency: dependency ordering is correct, branches genuinely can run in parallel, and no phase silently depends on unstated prior work.\n\nDeliverables:\n- Pass/fail assessment of the phased plan's internal consistency, with reasons",
+      "x": 500,
+      "y": 1280,
+      "width": 420,
+      "height": 180,
+      "deliverables": [
+        "Pass/fail assessment of the phased plan's internal consistency, with reasons"
+      ],
+      "jarvis": {
+        "layout_profile": "dependency",
+        "layout_baseline": {
+          "x": 500,
+          "y": 1280,
+          "width": 420,
+          "height": 180
+        },
+        "kind": "plan_step",
+        "step_id": "review_final_plan_57f6b5",
+        "workflow_id": "mark_rd_scouting",
+        "run_id": "mark_rd_scouting-v7",
+        "step_state": "PENDING",
+        "attempt": 0,
+        "updated_at": "2026-09-24T21:08:05Z"
+      }
+    },
+    {
+      "id": "final_document",
+      "type": "text",
+      "text": "role: document\nfile: Mark-XLVIII_Research_Plan.md\n\nSpecification: Mark-XLVIII Research Plan – write a markdown document containing the phased plan produced in the previous step.\n\nDeliverables:\n- Markdown file Mark-XLVIII_Research_Plan.md containing the reviewed phased plan",
+      "x": 0,
+      "y": 1600,
+      "width": 420,
+      "height": 180,
+      "deliverables": [
+        "Markdown file Mark-XLVIII_Research_Plan.md containing the reviewed phased plan"
+      ],
+      "jarvis": {
+        "layout_profile": "dependency",
+        "layout_baseline": {
+          "x": 0,
+          "y": 1600,
+          "width": 420,
+          "height": 180
+        },
+        "kind": "plan_step",
+        "step_id": "final_document_939100",
+        "workflow_id": "mark_rd_scouting",
+        "run_id": "mark_rd_scouting-v7",
+        "step_state": "PENDING",
+        "attempt": 0,
+        "updated_at": "2026-09-24T21:08:05Z"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "jarvis-80d85cc92dc9bf35",
+      "fromNode": "overall_plan",
+      "fromSide": "right",
+      "toNode": "self_assessment",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-e5760473a7165792",
+      "fromNode": "self_assessment",
+      "fromSide": "right",
+      "toNode": "source_identification",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-01cc8fdc65be32e3",
+      "fromNode": "source_identification",
+      "fromSide": "right",
+      "toNode": "synthesize_objectives",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-4ffe71527f7c0aca",
+      "fromNode": "synthesize_objectives",
+      "fromSide": "right",
+      "toNode": "phase_plan",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-4d195a95e7273dcc",
+      "fromNode": "phase_plan",
+      "fromSide": "right",
+      "toNode": "final_document",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-evidence-plan-to-mp",
+      "fromNode": "overall_plan",
+      "fromSide": "right",
+      "toNode": "evidence_mark_platform",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-evidence-mp-to-sa",
+      "fromNode": "evidence_mark_platform",
+      "fromSide": "right",
+      "toNode": "self_assessment",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-evidence-plan-to-rl",
+      "fromNode": "overall_plan",
+      "fromSide": "right",
+      "toNode": "evidence_resource_library",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-evidence-rl-to-si",
+      "fromNode": "evidence_resource_library",
+      "fromSide": "right",
+      "toNode": "source_identification",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-synth-to-review",
+      "fromNode": "synthesize_objectives",
+      "fromSide": "right",
+      "toNode": "review_synthesis",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-review-to-phase",
+      "fromNode": "review_synthesis",
+      "fromSide": "right",
+      "toNode": "phase_plan",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-phase-to-review-final",
+      "fromNode": "phase_plan",
+      "fromSide": "right",
+      "toNode": "review_final_plan",
+      "toSide": "left"
+    },
+    {
+      "id": "jarvis-review-final-to-doc",
+      "fromNode": "review_final_plan",
+      "fromSide": "right",
+      "toNode": "final_document",
+      "toSide": "left"
+    }
+  ]
+}

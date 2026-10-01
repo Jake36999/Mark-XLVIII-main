@@ -21,7 +21,7 @@ GEMINI_MODEL       = "gemini-2.5-flash"
 
 def _get_gemini(model: str = GEMINI_MODEL):
     selected_model = None if model == GEMINI_MODEL else model
-    return get_model_wrapper(role="worker", model=selected_model)
+    return get_model_wrapper(role="code", model=selected_model)
 
 
 def _clean_code(text: str) -> str:

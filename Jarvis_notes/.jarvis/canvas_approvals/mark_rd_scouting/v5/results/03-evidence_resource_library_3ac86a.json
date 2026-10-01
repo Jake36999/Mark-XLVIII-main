@@ -1,0 +1,100 @@
+{
+  "schema_version": "jarvis_work_result/v1",
+  "run_id": "mark_rd_scouting-v5",
+  "item_id": "evidence_resource_library_3ac86a",
+  "verdict": "ACCEPT",
+  "defects": [],
+  "result": {
+    "ok": true,
+    "status": "complete_degraded",
+    "quality_state": "degraded",
+    "read_only": true,
+    "project_id": "resource_library",
+    "project_root": "D:\\Resource-Library",
+    "snapshot_hash": "ec88bab6703d18570e4c45cefd66124cc18812aaf6b7a6fc0c9774a9c0c07e30",
+    "inventory_file_count": 933,
+    "inventory_total_bytes": 11386042,
+    "files_read_count": 36,
+    "files_read": [
+      "README.md",
+      ".gitignore",
+      ".utility/librarian/cli.py",
+      ".utility/scout/cli.py",
+      ".utility/librarian/tests/test_consult.py",
+      ".utility/librarian/tests/test_contribution.py",
+      "03-Patterns/Pattern - CAD Workflow.md",
+      "06-Papers/Aalst, 2003 - Workflow Patterns.md",
+      ".utility/librarian/consult.py",
+      ".Data/README.md",
+      {
+        "files_omitted": 26
+      }
+    ],
+    "files_mapped_count": 36,
+    "files_mapped": [
+      ".Data/README.md",
+      ".gitignore",
+      ".utility/README.md",
+      ".utility/librarian/README.md",
+      ".utility/librarian/cli.py",
+      ".utility/librarian/consult.py",
+      ".utility/librarian/tests/test_consult.py",
+      ".utility/librarian/tests/test_contribution.py",
+      ".utility/librarian/tests/test_digest.py",
+      ".utility/librarian/tests/test_enrich.py",
+      {
+        "files_omitted": 26
+      }
+    ],
+    "skipped_sensitive_count": 0,
+    "map_batches": 4,
+    "takeaways": [
+      "The canonical project root is `D:\\Resource-Library`.",
+      "The current repository snapshot is `ec88bab6703d18570e4c45cefd66124cc18812aaf6b7a6fc0c9774a9c0c07e30`.",
+      "JARVIS read 36 selected files and skipped 0 sensitive files."
+    ],
+    "brief_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Projects\\resource-library\\Project Brief.md",
+    "memory_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Projects\\resource-library\\Project Memory.md",
+    "snapshot_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\project_learning\\resource-library.json",
+    "index": {
+      "ok": true,
+      "backend": "local_sqlite",
+      "index_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\memory.sqlite",
+      "indexed_notes": 128,
+      "excluded_notes": 61,
+      "excluded_by_reason": {
+        "rag_index_disabled": 27,
+        "template_source": 34
+      },
+      "exclusion_policy": "Only uninstantiated template sources, explicit RAG opt-outs, deleted notes, protected sensitivity levels, and unreadable notes are excluded.",
+      "superseded_notes": 0,
+      "deduplicated_notes": 1,
+      "changed_notes": 5,
+      "unchanged_notes": 123,
+      "removed_notes": 0,
+      "embedding": {
+        "ok": true,
+        "status": "available",
+        "provider": "lmstudio",
+        "model": "text-embedding-nomic-embed-text-v1.5@q4_k_m",
+        "instance_id": "text-embedding-nomic-embed-text-v1.5@q4_k_m",
+        "dimensions": 768,
+        "indexed_this_run": 5,
+        "requested_notes": 5,
+        "failed_notes": [],
+        "indexed_notes": 111
+      }
+    },
+    "diagnostics": [
+      "Repository final synthesis failed: LM Studio local model route failed. Tried: qwen/qwen3-4b-2507: LM Studio chat request failed: {\"error\":\"The number of tokens to keep from the initial prompt is greater than the context length (n_keep: 4120>= n_ctx: 4096). Try to load the model with a larger context length, or provid"
+    ],
+    "policy": {
+      "action": "allow",
+      "requires_confirmation": false,
+      "reason": "Operation 'learn_project' is allowed."
+    },
+    "summary": "- The canonical project root is `D:\\Resource-Library`.\n- The current repository snapshot is `ec88bab6703d18570e4c45cefd66124cc18812aaf6b7a6fc0c9774a9c0c07e30`.\n- JARVIS read 36 selected files and skipped 0 sensitive files."
+  },
+  "model_provenance": null,
+  "completed_at": "2026-09-24T20:46:55Z"
+}

@@ -1832,13 +1832,17 @@ class HealthGatedCandidateTests(unittest.TestCase):
 
 
 class ActionRouterWiringTests(unittest.TestCase):
-    def test_code_helper_uses_worker_router_wrapper(self):
+    def test_code_helper_uses_code_router_wrapper(self):
+        # Confirmed live (2026-09-25): code_helper routed every action through
+        # the generic "worker" model, silently ignoring the dedicated "code"
+        # route added the same day (a real coder model, not the small
+        # general-purpose worker tier).
         import actions.code_helper as code_helper
 
         with mock.patch("actions.code_helper.get_model_wrapper") as get_wrapper:
             code_helper._get_gemini()
 
-        get_wrapper.assert_called_once_with(role="worker", model=None)
+        get_wrapper.assert_called_once_with(role="code", model=None)
 
     def test_dev_agent_maps_planner_and_writer_models_to_roles(self):
         import actions.dev_agent as dev_agent

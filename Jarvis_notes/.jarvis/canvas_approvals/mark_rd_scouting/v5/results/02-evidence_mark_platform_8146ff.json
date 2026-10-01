@@ -1,0 +1,100 @@
+{
+  "schema_version": "jarvis_work_result/v1",
+  "run_id": "mark_rd_scouting-v5",
+  "item_id": "evidence_mark_platform_8146ff",
+  "verdict": "ACCEPT",
+  "defects": [],
+  "result": {
+    "ok": true,
+    "status": "complete_degraded",
+    "quality_state": "degraded",
+    "read_only": true,
+    "project_id": "mark_platform",
+    "project_root": "F:\\Mark-XLVIII-main",
+    "snapshot_hash": "1f86e8cba90bebd0507eb0ae1cfe0db670e9b66ad768d175c1178e7b46749ec4",
+    "inventory_file_count": 477,
+    "inventory_total_bytes": 16303943,
+    "files_read_count": 36,
+    "files_read": [
+      "Mark-XLVIII-main/README.md",
+      "ClawTeam-OpenClaw-main/ClawTeam-OpenClaw-main/pyproject.toml",
+      "Mark-XLVIII-main/main.py",
+      "ClawTeam-OpenClaw-main/ClawTeam-OpenClaw-main/clawteam/mcp/server.py",
+      "Mark-XLVIII-main/config/__init__.py",
+      "Mark-XLVIII-main/tests/test_dual_orchestrator.py",
+      "ClawTeam-OpenClaw-main/ClawTeam-OpenClaw-main/tests/test_cli_commands.py",
+      "Mark-XLVIII-main/actions/dual_orchestrator.py",
+      "ClawTeam-OpenClaw-main/ClawTeam-OpenClaw-main/docs/skills/clawteam/references/workflows.md",
+      "Mark-XLVIII-main/actions/jarvis_memory.py",
+      {
+        "files_omitted": 26
+      }
+    ],
+    "files_mapped_count": 36,
+    "files_mapped": [
+      ".claude/settings.json",
+      "ClawTeam-OpenClaw-main/ClawTeam-OpenClaw-main/.gitignore",
+      "ClawTeam-OpenClaw-main/ClawTeam-OpenClaw-main/CLAUDE.md",
+      "ClawTeam-OpenClaw-main/ClawTeam-OpenClaw-main/clawteam/board/server.py",
+      "ClawTeam-OpenClaw-main/ClawTeam-OpenClaw-main/clawteam/harness/orchestrator.py",
+      "ClawTeam-OpenClaw-main/ClawTeam-OpenClaw-main/clawteam/mcp/server.py",
+      "ClawTeam-OpenClaw-main/ClawTeam-OpenClaw-main/docs/index.html",
+      "ClawTeam-OpenClaw-main/ClawTeam-OpenClaw-main/docs/skills/clawteam/references/workflows.md",
+      "ClawTeam-OpenClaw-main/ClawTeam-OpenClaw-main/pyproject.toml",
+      "ClawTeam-OpenClaw-main/ClawTeam-OpenClaw-main/tests/test_cli_commands.py",
+      {
+        "files_omitted": 26
+      }
+    ],
+    "skipped_sensitive_count": 4,
+    "map_batches": 4,
+    "takeaways": [
+      "The canonical project root is `F:\\Mark-XLVIII-main`.",
+      "The current repository snapshot is `1f86e8cba90bebd0507eb0ae1cfe0db670e9b66ad768d175c1178e7b46749ec4`.",
+      "JARVIS read 36 selected files and skipped 4 sensitive files."
+    ],
+    "brief_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Projects\\mark-platform\\Project Brief.md",
+    "memory_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Projects\\mark-platform\\Project Memory.md",
+    "snapshot_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\project_learning\\mark-platform.json",
+    "index": {
+      "ok": true,
+      "backend": "local_sqlite",
+      "index_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\memory.sqlite",
+      "indexed_notes": 128,
+      "excluded_notes": 61,
+      "excluded_by_reason": {
+        "rag_index_disabled": 27,
+        "template_source": 34
+      },
+      "exclusion_policy": "Only uninstantiated template sources, explicit RAG opt-outs, deleted notes, protected sensitivity levels, and unreadable notes are excluded.",
+      "superseded_notes": 0,
+      "deduplicated_notes": 1,
+      "changed_notes": 2,
+      "unchanged_notes": 126,
+      "removed_notes": 0,
+      "embedding": {
+        "ok": true,
+        "status": "available",
+        "provider": "lmstudio",
+        "model": "text-embedding-nomic-embed-text-v1.5@q4_k_m",
+        "instance_id": "text-embedding-nomic-embed-text-v1.5@q4_k_m",
+        "dimensions": 768,
+        "indexed_this_run": 2,
+        "requested_notes": 2,
+        "failed_notes": [],
+        "indexed_notes": 111
+      }
+    },
+    "diagnostics": [
+      "Repository final synthesis was incomplete; missing sections: Repository Profile, Architecture And Components, Entry Points And Workflows, Dependencies And Tests, Operational Guidance, Risks, Gaps, And Questions, RAG Takeaways"
+    ],
+    "policy": {
+      "action": "allow",
+      "requires_confirmation": false,
+      "reason": "Operation 'learn_project' is allowed."
+    },
+    "summary": "- The canonical project root is `F:\\Mark-XLVIII-main`.\n- The current repository snapshot is `1f86e8cba90bebd0507eb0ae1cfe0db670e9b66ad768d175c1178e7b46749ec4`.\n- JARVIS read 36 selected files and skipped 4 sensitive files."
+  },
+  "model_provenance": null,
+  "completed_at": "2026-09-24T20:48:52Z"
+}

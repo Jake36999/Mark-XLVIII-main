@@ -1,0 +1,506 @@
+{
+  "ok": true,
+  "run_id": "mark_rd_scouting-v7",
+  "execution_state": "escalated",
+  "run_status": {
+    "ok": true,
+    "run": {
+      "run_id": "mark_rd_scouting-v7",
+      "plan_id": "mark_rd_scouting",
+      "plan_version": 7,
+      "status": "ESCALATED",
+      "bundle_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\canvas_approvals\\mark_rd_scouting\\v7",
+      "manifest_hash": "a704a0b0fcd96828e92e2a9b58446ac72f4ef5754f63d96719b298993f8712e6",
+      "approval_projection_hash": "8ffb65748c55874b9d38a82005932c0885167e01043007542d3fea61d08db4a0",
+      "workflow_hash": "7857db0cfd43fde344bd813783571bd053195d5ac4a9b2afcf9413ed720b2400",
+      "cancel_requested": 0,
+      "created_at": "2026-09-24T21:06:22Z",
+      "updated_at": "2026-09-24T21:08:05Z"
+    },
+    "items": [
+      {
+        "item_id": "overall_plan_ec8453",
+        "state": "ACCEPTED",
+        "attempt": 0,
+        "repair_count": 0,
+        "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\canvas_approvals\\mark_rd_scouting\\v1\\results\\01-overall_plan_ec8453.json",
+        "error": null
+      },
+      {
+        "item_id": "evidence_mark_platform_8146ff",
+        "state": "ACCEPTED",
+        "attempt": 0,
+        "repair_count": 0,
+        "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\canvas_approvals\\mark_rd_scouting\\v5\\results\\02-evidence_mark_platform_8146ff.json",
+        "error": null
+      },
+      {
+        "item_id": "evidence_resource_library_3ac86a",
+        "state": "ACCEPTED",
+        "attempt": 0,
+        "repair_count": 0,
+        "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\canvas_approvals\\mark_rd_scouting\\v5\\results\\03-evidence_resource_library_3ac86a.json",
+        "error": null
+      },
+      {
+        "item_id": "self_assessment_ad3289",
+        "state": "ACCEPTED",
+        "attempt": 1,
+        "repair_count": 0,
+        "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\canvas_approvals\\mark_rd_scouting\\v7\\results\\04-self_assessment_ad3289.json",
+        "error": null
+      },
+      {
+        "item_id": "source_identification_1d3f39",
+        "state": "ACCEPTED",
+        "attempt": 1,
+        "repair_count": 0,
+        "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\canvas_approvals\\mark_rd_scouting\\v7\\results\\05-source_identification_1d3f39.json",
+        "error": null
+      },
+      {
+        "item_id": "synthesize_objectives_88106c",
+        "state": "ACCEPTED",
+        "attempt": 1,
+        "repair_count": 0,
+        "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\canvas_approvals\\mark_rd_scouting\\v7\\results\\06-synthesize_objectives_88106c.json",
+        "error": null
+      },
+      {
+        "item_id": "review_synthesis_5556f0",
+        "state": "ESCALATE",
+        "attempt": 1,
+        "repair_count": 0,
+        "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\canvas_approvals\\mark_rd_scouting\\v7\\results\\07-review_synthesis_5556f0.json",
+        "error": "[\"awaiting_user_review\"]"
+      },
+      {
+        "item_id": "phase_plan_5610f6",
+        "state": "PENDING",
+        "attempt": 0,
+        "repair_count": 0,
+        "result_path": null,
+        "error": null
+      },
+      {
+        "item_id": "review_final_plan_57f6b5",
+        "state": "PENDING",
+        "attempt": 0,
+        "repair_count": 0,
+        "result_path": null,
+        "error": null
+      },
+      {
+        "item_id": "final_document_939100",
+        "state": "PENDING",
+        "attempt": 0,
+        "repair_count": 0,
+        "result_path": null,
+        "error": null
+      }
+    ],
+    "events": [
+      {
+        "item_id": null,
+        "event_type": "run_registered",
+        "details_json": "{\"item_count\": 10}",
+        "created_at": "2026-09-24T21:06:22Z",
+        "details": {
+          "item_count": 10
+        }
+      },
+      {
+        "item_id": null,
+        "event_type": "run_approved",
+        "details_json": "{}",
+        "created_at": "2026-09-24T21:06:22Z",
+        "details": {}
+      },
+      {
+        "item_id": "overall_plan_ec8453",
+        "event_type": "idempotency_reused",
+        "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\canvas_approvals\\\\mark_rd_scouting\\\\v1\\\\results\\\\01-overall_plan_ec8453.json\"}",
+        "created_at": "2026-09-24T21:06:22Z",
+        "details": {
+          "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\canvas_approvals\\mark_rd_scouting\\v1\\results\\01-overall_plan_ec8453.json"
+        }
+      },
+      {
+        "item_id": "evidence_mark_platform_8146ff",
+        "event_type": "idempotency_reused",
+        "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\canvas_approvals\\\\mark_rd_scouting\\\\v5\\\\results\\\\02-evidence_mark_platform_8146ff.json\"}",
+        "created_at": "2026-09-24T21:06:22Z",
+        "details": {
+          "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\canvas_approvals\\mark_rd_scouting\\v5\\results\\02-evidence_mark_platform_8146ff.json"
+        }
+      },
+      {
+        "item_id": "evidence_resource_library_3ac86a",
+        "event_type": "idempotency_reused",
+        "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\canvas_approvals\\\\mark_rd_scouting\\\\v5\\\\results\\\\03-evidence_resource_library_3ac86a.json\"}",
+        "created_at": "2026-09-24T21:06:22Z",
+        "details": {
+          "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\canvas_approvals\\mark_rd_scouting\\v5\\results\\03-evidence_resource_library_3ac86a.json"
+        }
+      },
+      {
+        "item_id": "self_assessment_ad3289",
+        "event_type": "item_started",
+        "details_json": "{\"worker_id\": \"canvas-plan-driver:self_assessment_ad3289:b8d44dd9\"}",
+        "created_at": "2026-09-24T21:06:22Z",
+        "details": {
+          "worker_id": "canvas-plan-driver:self_assessment_ad3289:b8d44dd9"
+        }
+      },
+      {
+        "item_id": "self_assessment_ad3289",
+        "event_type": "item_reviewed",
+        "details_json": "{\"defects\": [], \"verdict\": \"ACCEPT\"}",
+        "created_at": "2026-09-24T21:06:31Z",
+        "details": {
+          "defects": [],
+          "verdict": "ACCEPT"
+        }
+      },
+      {
+        "item_id": "source_identification_1d3f39",
+        "event_type": "item_started",
+        "details_json": "{\"worker_id\": \"canvas-plan-driver:source_identification_1d3f39:fd6931f2\"}",
+        "created_at": "2026-09-24T21:06:31Z",
+        "details": {
+          "worker_id": "canvas-plan-driver:source_identification_1d3f39:fd6931f2"
+        }
+      },
+      {
+        "item_id": "source_identification_1d3f39",
+        "event_type": "lease_heartbeat",
+        "details_json": "{\"worker_id\": \"canvas-plan-driver:source_identification_1d3f39:fd6931f2\"}",
+        "created_at": "2026-09-24T21:06:46Z",
+        "details": {
+          "worker_id": "canvas-plan-driver:source_identification_1d3f39:fd6931f2"
+        }
+      },
+      {
+        "item_id": "source_identification_1d3f39",
+        "event_type": "item_reviewed",
+        "details_json": "{\"defects\": [], \"verdict\": \"ACCEPT\"}",
+        "created_at": "2026-09-24T21:06:50Z",
+        "details": {
+          "defects": [],
+          "verdict": "ACCEPT"
+        }
+      },
+      {
+        "item_id": "synthesize_objectives_88106c",
+        "event_type": "item_started",
+        "details_json": "{\"worker_id\": \"canvas-plan-driver:synthesize_objectives_88106c:eb40b8e3\"}",
+        "created_at": "2026-09-24T21:06:50Z",
+        "details": {
+          "worker_id": "canvas-plan-driver:synthesize_objectives_88106c:eb40b8e3"
+        }
+      },
+      {
+        "item_id": "synthesize_objectives_88106c",
+        "event_type": "lease_heartbeat",
+        "details_json": "{\"worker_id\": \"canvas-plan-driver:synthesize_objectives_88106c:eb40b8e3\"}",
+        "created_at": "2026-09-24T21:07:05Z",
+        "details": {
+          "worker_id": "canvas-plan-driver:synthesize_objectives_88106c:eb40b8e3"
+        }
+      },
+      {
+        "item_id": "synthesize_objectives_88106c",
+        "event_type": "item_reviewed",
+        "details_json": "{\"defects\": [], \"verdict\": \"ACCEPT\"}",
+        "created_at": "2026-09-24T21:07:18Z",
+        "details": {
+          "defects": [],
+          "verdict": "ACCEPT"
+        }
+      },
+      {
+        "item_id": "review_synthesis_5556f0",
+        "event_type": "item_started",
+        "details_json": "{\"worker_id\": \"canvas-plan-driver:review_synthesis_5556f0:91211af1\"}",
+        "created_at": "2026-09-24T21:07:18Z",
+        "details": {
+          "worker_id": "canvas-plan-driver:review_synthesis_5556f0:91211af1"
+        }
+      },
+      {
+        "item_id": "review_synthesis_5556f0",
+        "event_type": "lease_heartbeat",
+        "details_json": "{\"worker_id\": \"canvas-plan-driver:review_synthesis_5556f0:91211af1\"}",
+        "created_at": "2026-09-24T21:07:33Z",
+        "details": {
+          "worker_id": "canvas-plan-driver:review_synthesis_5556f0:91211af1"
+        }
+      },
+      {
+        "item_id": "review_synthesis_5556f0",
+        "event_type": "lease_heartbeat",
+        "details_json": "{\"worker_id\": \"canvas-plan-driver:review_synthesis_5556f0:91211af1\"}",
+        "created_at": "2026-09-24T21:07:48Z",
+        "details": {
+          "worker_id": "canvas-plan-driver:review_synthesis_5556f0:91211af1"
+        }
+      },
+      {
+        "item_id": "review_synthesis_5556f0",
+        "event_type": "lease_heartbeat",
+        "details_json": "{\"worker_id\": \"canvas-plan-driver:review_synthesis_5556f0:91211af1\"}",
+        "created_at": "2026-09-24T21:08:03Z",
+        "details": {
+          "worker_id": "canvas-plan-driver:review_synthesis_5556f0:91211af1"
+        }
+      },
+      {
+        "item_id": "review_synthesis_5556f0",
+        "event_type": "item_reviewed",
+        "details_json": "{\"defects\": [\"awaiting_user_review\"], \"verdict\": \"ESCALATE\"}",
+        "created_at": "2026-09-24T21:08:05Z",
+        "details": {
+          "defects": [
+            "awaiting_user_review"
+          ],
+          "verdict": "ESCALATE"
+        }
+      },
+      {
+        "item_id": null,
+        "event_type": "run_finished",
+        "details_json": "{\"status\": \"ESCALATED\"}",
+        "created_at": "2026-09-24T21:08:05Z",
+        "details": {
+          "status": "ESCALATED"
+        }
+      }
+    ],
+    "checkpoints": [
+      {
+        "item_id": "self_assessment_ad3289",
+        "phase": "side_effect_prepared",
+        "idempotency_key": "21eaabe0e38722eb93b30885db92b9a7e8efd0b9a89cd3e54c9aff889dc7075e",
+        "details_json": "{\"side_effects\": \"none\"}",
+        "created_at": "2026-09-24T21:06:22Z",
+        "details": {
+          "side_effects": "none"
+        }
+      },
+      {
+        "item_id": "self_assessment_ad3289",
+        "phase": "before_dispatch",
+        "idempotency_key": "21eaabe0e38722eb93b30885db92b9a7e8efd0b9a89cd3e54c9aff889dc7075e",
+        "details_json": "{\"side_effects\": \"none\"}",
+        "created_at": "2026-09-24T21:06:22Z",
+        "details": {
+          "side_effects": "none"
+        }
+      },
+      {
+        "item_id": "self_assessment_ad3289",
+        "phase": "side_effect_started",
+        "idempotency_key": "21eaabe0e38722eb93b30885db92b9a7e8efd0b9a89cd3e54c9aff889dc7075e",
+        "details_json": "{\"resource_class\": \"model\"}",
+        "created_at": "2026-09-24T21:06:22Z",
+        "details": {
+          "resource_class": "model"
+        }
+      },
+      {
+        "item_id": "self_assessment_ad3289",
+        "phase": "result_written",
+        "idempotency_key": "21eaabe0e38722eb93b30885db92b9a7e8efd0b9a89cd3e54c9aff889dc7075e",
+        "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\canvas_approvals\\\\mark_rd_scouting\\\\v7\\\\results\\\\04-self_assessment_ad3289.json\", \"verdict\": \"ACCEPT\"}",
+        "created_at": "2026-09-24T21:06:31Z",
+        "details": {
+          "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\canvas_approvals\\mark_rd_scouting\\v7\\results\\04-self_assessment_ad3289.json",
+          "verdict": "ACCEPT"
+        }
+      },
+      {
+        "item_id": "self_assessment_ad3289",
+        "phase": "side_effect_committed",
+        "idempotency_key": "21eaabe0e38722eb93b30885db92b9a7e8efd0b9a89cd3e54c9aff889dc7075e",
+        "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\canvas_approvals\\\\mark_rd_scouting\\\\v7\\\\results\\\\04-self_assessment_ad3289.json\"}",
+        "created_at": "2026-09-24T21:06:31Z",
+        "details": {
+          "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\canvas_approvals\\mark_rd_scouting\\v7\\results\\04-self_assessment_ad3289.json"
+        }
+      },
+      {
+        "item_id": "self_assessment_ad3289",
+        "phase": "committed",
+        "idempotency_key": "21eaabe0e38722eb93b30885db92b9a7e8efd0b9a89cd3e54c9aff889dc7075e",
+        "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\canvas_approvals\\\\mark_rd_scouting\\\\v7\\\\results\\\\04-self_assessment_ad3289.json\"}",
+        "created_at": "2026-09-24T21:06:31Z",
+        "details": {
+          "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\canvas_approvals\\mark_rd_scouting\\v7\\results\\04-self_assessment_ad3289.json"
+        }
+      },
+      {
+        "item_id": "source_identification_1d3f39",
+        "phase": "side_effect_prepared",
+        "idempotency_key": "c2e5796c10f0fb3554970d2f97e5744e7c3b72571a837276959d80d8e9fdc109",
+        "details_json": "{\"side_effects\": \"none\"}",
+        "created_at": "2026-09-24T21:06:31Z",
+        "details": {
+          "side_effects": "none"
+        }
+      },
+      {
+        "item_id": "source_identification_1d3f39",
+        "phase": "before_dispatch",
+        "idempotency_key": "c2e5796c10f0fb3554970d2f97e5744e7c3b72571a837276959d80d8e9fdc109",
+        "details_json": "{\"side_effects\": \"none\"}",
+        "created_at": "2026-09-24T21:06:31Z",
+        "details": {
+          "side_effects": "none"
+        }
+      },
+      {
+        "item_id": "source_identification_1d3f39",
+        "phase": "side_effect_started",
+        "idempotency_key": "c2e5796c10f0fb3554970d2f97e5744e7c3b72571a837276959d80d8e9fdc109",
+        "details_json": "{\"resource_class\": \"model\"}",
+        "created_at": "2026-09-24T21:06:31Z",
+        "details": {
+          "resource_class": "model"
+        }
+      },
+      {
+        "item_id": "source_identification_1d3f39",
+        "phase": "result_written",
+        "idempotency_key": "c2e5796c10f0fb3554970d2f97e5744e7c3b72571a837276959d80d8e9fdc109",
+        "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\canvas_approvals\\\\mark_rd_scouting\\\\v7\\\\results\\\\05-source_identification_1d3f39.json\", \"verdict\": \"ACCEPT\"}",
+        "created_at": "2026-09-24T21:06:50Z",
+        "details": {
+          "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\canvas_approvals\\mark_rd_scouting\\v7\\results\\05-source_identification_1d3f39.json",
+          "verdict": "ACCEPT"
+        }
+      },
+      {
+        "item_id": "source_identification_1d3f39",
+        "phase": "side_effect_committed",
+        "idempotency_key": "c2e5796c10f0fb3554970d2f97e5744e7c3b72571a837276959d80d8e9fdc109",
+        "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\canvas_approvals\\\\mark_rd_scouting\\\\v7\\\\results\\\\05-source_identification_1d3f39.json\"}",
+        "created_at": "2026-09-24T21:06:50Z",
+        "details": {
+          "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\canvas_approvals\\mark_rd_scouting\\v7\\results\\05-source_identification_1d3f39.json"
+        }
+      },
+      {
+        "item_id": "source_identification_1d3f39",
+        "phase": "committed",
+        "idempotency_key": "c2e5796c10f0fb3554970d2f97e5744e7c3b72571a837276959d80d8e9fdc109",
+        "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\canvas_approvals\\\\mark_rd_scouting\\\\v7\\\\results\\\\05-source_identification_1d3f39.json\"}",
+        "created_at": "2026-09-24T21:06:50Z",
+        "details": {
+          "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\canvas_approvals\\mark_rd_scouting\\v7\\results\\05-source_identification_1d3f39.json"
+        }
+      },
+      {
+        "item_id": "synthesize_objectives_88106c",
+        "phase": "side_effect_prepared",
+        "idempotency_key": "fcf393cf249c417d173c80a52597fef167adb94d6148b3de67fe28b1fded0cfa",
+        "details_json": "{\"side_effects\": \"none\"}",
+        "created_at": "2026-09-24T21:06:50Z",
+        "details": {
+          "side_effects": "none"
+        }
+      },
+      {
+        "item_id": "synthesize_objectives_88106c",
+        "phase": "before_dispatch",
+        "idempotency_key": "fcf393cf249c417d173c80a52597fef167adb94d6148b3de67fe28b1fded0cfa",
+        "details_json": "{\"side_effects\": \"none\"}",
+        "created_at": "2026-09-24T21:06:50Z",
+        "details": {
+          "side_effects": "none"
+        }
+      },
+      {
+        "item_id": "synthesize_objectives_88106c",
+        "phase": "side_effect_started",
+        "idempotency_key": "fcf393cf249c417d173c80a52597fef167adb94d6148b3de67fe28b1fded0cfa",
+        "details_json": "{\"resource_class\": \"model\"}",
+        "created_at": "2026-09-24T21:06:50Z",
+        "details": {
+          "resource_class": "model"
+        }
+      },
+      {
+        "item_id": "synthesize_objectives_88106c",
+        "phase": "result_written",
+        "idempotency_key": "fcf393cf249c417d173c80a52597fef167adb94d6148b3de67fe28b1fded0cfa",
+        "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\canvas_approvals\\\\mark_rd_scouting\\\\v7\\\\results\\\\06-synthesize_objectives_88106c.json\", \"verdict\": \"ACCEPT\"}",
+        "created_at": "2026-09-24T21:07:18Z",
+        "details": {
+          "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\canvas_approvals\\mark_rd_scouting\\v7\\results\\06-synthesize_objectives_88106c.json",
+          "verdict": "ACCEPT"
+        }
+      },
+      {
+        "item_id": "synthesize_objectives_88106c",
+        "phase": "side_effect_committed",
+        "idempotency_key": "fcf393cf249c417d173c80a52597fef167adb94d6148b3de67fe28b1fded0cfa",
+        "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\canvas_approvals\\\\mark_rd_scouting\\\\v7\\\\results\\\\06-synthesize_objectives_88106c.json\"}",
+        "created_at": "2026-09-24T21:07:18Z",
+        "details": {
+          "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\canvas_approvals\\mark_rd_scouting\\v7\\results\\06-synthesize_objectives_88106c.json"
+        }
+      },
+      {
+        "item_id": "synthesize_objectives_88106c",
+        "phase": "committed",
+        "idempotency_key": "fcf393cf249c417d173c80a52597fef167adb94d6148b3de67fe28b1fded0cfa",
+        "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\canvas_approvals\\\\mark_rd_scouting\\\\v7\\\\results\\\\06-synthesize_objectives_88106c.json\"}",
+        "created_at": "2026-09-24T21:07:18Z",
+        "details": {
+          "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\canvas_approvals\\mark_rd_scouting\\v7\\results\\06-synthesize_objectives_88106c.json"
+        }
+      },
+      {
+        "item_id": "review_synthesis_5556f0",
+        "phase": "side_effect_prepared",
+        "idempotency_key": "9cccb53a2d38e4fd6e23f23ffc1efab1c139efba7843d8a5e146de75280bf2ea",
+        "details_json": "{\"side_effects\": \"none\"}",
+        "created_at": "2026-09-24T21:07:18Z",
+        "details": {
+          "side_effects": "none"
+        }
+      },
+      {
+        "item_id": "review_synthesis_5556f0",
+        "phase": "before_dispatch",
+        "idempotency_key": "9cccb53a2d38e4fd6e23f23ffc1efab1c139efba7843d8a5e146de75280bf2ea",
+        "details_json": "{\"side_effects\": \"none\"}",
+        "created_at": "2026-09-24T21:07:18Z",
+        "details": {
+          "side_effects": "none"
+        }
+      },
+      {
+        "item_id": "review_synthesis_5556f0",
+        "phase": "side_effect_started",
+        "idempotency_key": "9cccb53a2d38e4fd6e23f23ffc1efab1c139efba7843d8a5e146de75280bf2ea",
+        "details_json": "{\"resource_class\": \"model\"}",
+        "created_at": "2026-09-24T21:07:18Z",
+        "details": {
+          "resource_class": "model"
+        }
+      },
+      {
+        "item_id": "review_synthesis_5556f0",
+        "phase": "result_written",
+        "idempotency_key": "9cccb53a2d38e4fd6e23f23ffc1efab1c139efba7843d8a5e146de75280bf2ea",
+        "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\canvas_approvals\\\\mark_rd_scouting\\\\v7\\\\results\\\\07-review_synthesis_5556f0.json\", \"verdict\": \"ESCALATE\"}",
+        "created_at": "2026-09-24T21:08:05Z",
+        "details": {
+          "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\canvas_approvals\\mark_rd_scouting\\v7\\results\\07-review_synthesis_5556f0.json",
+          "verdict": "ESCALATE"
+        }
+      }
+    ]
+  }
+}

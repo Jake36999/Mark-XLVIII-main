@@ -1,0 +1,14 @@
+{
+  "schema_version": "jarvis_work_result/v1",
+  "run_id": "mark_rd_scouting-v1",
+  "item_id": "overall_plan_ec8453",
+  "verdict": "ACCEPT",
+  "defects": [],
+  "result": {
+    "ok": true,
+    "status": "passed",
+    "summary": "Create a phased research plan to identify concrete, well-scoped R&D objectives for extending the Mark-XLVIII assistant platform. This plan will be reviewed before any execution begins."
+  },
+  "model_provenance": null,
+  "completed_at": "2026-09-24T20:08:06Z"
+}

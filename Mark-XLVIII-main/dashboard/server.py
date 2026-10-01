@@ -590,8 +590,9 @@ class DashboardServer:
                     return JSONResponse({"error": "Decryption failed"}, status_code=400)
             else:
                 text = (body.get("text") or "").strip()
+            effort = str(body.get("effort") or "").strip().lower()
             if text:
-                await self._command_queue.put(text)
+                await self._command_queue.put((text, effort))
                 if self._wake_callback:
                     self._wake_callback()
             return JSONResponse({"ok": True})
@@ -739,8 +740,9 @@ class DashboardServer:
                     if data.get("type") == "command":
                         enc = data.get("enc", "")
                         t   = self._decrypt(tok, enc) if enc else (data.get("text") or "").strip()
+                        eff = str(data.get("effort") or "").strip().lower()
                         if t:
-                            await self._command_queue.put(t)
+                            await self._command_queue.put((t, eff))
                             if self._wake_callback:
                                 self._wake_callback()
             except WebSocketDisconnect:

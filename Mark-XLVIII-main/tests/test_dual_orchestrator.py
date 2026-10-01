@@ -621,6 +621,51 @@ class DualOrchestratorTests(RuntimeHarness):
             }
         )
 
+    def test_project_operator_takeaways_synthesise_a_summary_field(self):
+        """canvas_plan.py's "evidence" role (2026-09-24) binds a downstream
+        research node's evidence to result.summary -- the one field every
+        _RELIABLE_SUMMARY_ROLES role produces -- but learn_repository's real
+        return has no summary key, only takeaways. Confirmed live: without
+        this, an evidence node's real, grounded findings never actually
+        reached the research node that depended on it.
+        """
+        with tempfile.TemporaryDirectory() as tmp, mock.patch(
+            "actions.project_operator.project_operator",
+            return_value=json.dumps(
+                {
+                    "ok": True,
+                    "status": "complete",
+                    "takeaways": ["Uses DeepInfra for model routing.", "Canvas Mode 2 compiles goals to a DAG."],
+                    "brief_path": "Projects/mark_platform/Project Brief.md",
+                }
+            ),
+        ):
+            runtime = do.WorkflowRuntime(Path(tmp))
+            result = runtime._dispatch_tool("project_operator", {"operation": "learn_project", "project_id": "mark_platform"})
+
+        self.assertIn("Uses DeepInfra for model routing.", result["summary"])
+        self.assertIn("Canvas Mode 2 compiles goals to a DAG.", result["summary"])
+
+    def test_existing_summary_field_is_not_overwritten(self):
+        with tempfile.TemporaryDirectory() as tmp, mock.patch(
+            "actions.project_operator.project_operator",
+            return_value=json.dumps({"ok": True, "summary": "already set", "takeaways": ["ignored"]}),
+        ):
+            runtime = do.WorkflowRuntime(Path(tmp))
+            result = runtime._dispatch_tool("project_operator", {"operation": "learn_project"})
+
+        self.assertEqual("already set", result["summary"])
+
+    def test_no_takeaways_means_no_summary_added(self):
+        with tempfile.TemporaryDirectory() as tmp, mock.patch(
+            "actions.project_operator.project_operator",
+            return_value=json.dumps({"ok": True, "agents": 1}),
+        ):
+            runtime = do.WorkflowRuntime(Path(tmp))
+            result = runtime._dispatch_tool("project_operator", {"operation": "delegate_openclaw"})
+
+        self.assertNotIn("summary", result)
+
 
 class ClosingCheckDispatchTests(RuntimeHarness):
     """A `closing_check` step_type: canvas_plan.py routes a verification

@@ -107,6 +107,25 @@
         "Deploy, stop, service restart, and mode changes require confirmation."
       ]
     },
+    "resource_library": {
+      "display_name": "Resource Library",
+      "root": "D:\\Resource-Library",
+      "summary": "The owner's cross-project knowledge-base vault (librarian-curated resources, patterns, papers, branch offerings) -- read-only from Mark-XLVIII's side. No formal MCP 'Reader' connection exists yet (registered 2026-09-24 as the read-only substitute: project_operator's learn_project/scout against the vault directly, since setting up real MCP client wiring is separate, larger infrastructure work outside this task's scope).",
+      "preferred_agents": {
+        "analysis": "claude",
+        "coding": "codex",
+        "continuity": "openclaw"
+      },
+      "safe_operations": ["list", "status", "scout", "code_map", "learn_project", "health"],
+      "confirmation_operations": ["handoff", "delegate_openclaw"],
+      "blocked_operations": ["reset_git", "delete_embedded_repo"],
+      "safe_commands": [],
+      "confirmation_commands": [],
+      "notes": [
+        "Read-only by design -- Mark-XLVIII is a Reader here, never a Librarian. Nothing should ever write into this vault from a Mark-XLVIII-driven task.",
+        "delegate_openclaw requires confirmation deliberately: coding continuity work has no business running against someone else's knowledge base."
+      ]
+    },
     "archive": {
       "display_name": "Vault Archive (Tier 3)",
       "root": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Archive",

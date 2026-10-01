@@ -1,0 +1,15 @@
+{
+  "ok": true,
+  "status": "approved",
+  "approval_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\canvas_approvals\\mark_rd_scouting\\v1\\approval.json",
+  "workflow_hash": "8a020c5b7b50e47c4c51772d668ccbb2894244937d44acbd07e733d338aea1da",
+  "manifest_hash": "06441409dd20b0f93ef513899306e4256475c3c4dabb463130f919241c3e0ae8",
+  "approved_action_ids": [
+    "final_document_939100",
+    "overall_plan_ec8453",
+    "phase_plan_5610f6",
+    "self_assessment_ad3289",
+    "source_identification_1d3f39",
+    "synthesize_objectives_88106c"
+  ]
+}

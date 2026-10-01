@@ -1,0 +1,31 @@
+{
+  "schema_version": "jarvis_work_result/v1",
+  "run_id": "mark_rd_scouting-v6",
+  "item_id": "source_identification_1d3f39",
+  "verdict": "ESCALATE",
+  "defects": [],
+  "result": {
+    "ok": true,
+    "text": "# Resource Library Mapping Report: Subject Areas to Catalogued Resources\n\n## Scope and Method\n\nThis report maps each enumerated subject area of the Mark-XLVIII platform to the specific Resource Library entries genuinely relevant to it. The mapping is based exclusively on the provided evidence from the completed read-only scan.\n\n---\n\n## 1. Project Structure/Location\n\n**Relevant Resource Library Entries:** None\n\n**Rationale:** The canonical project root `F:\\Mark-XLVIII-main` appears in the evidence, but the Resource Library's own canonical root is `D:\\Resource-Library`. No catalogued resource in the evidence addresses project location, directory layout, or path configuration for Mark-XLVIII. The two root paths are distinct and unrelated.\n\n---\n\n## 2. Version Control/Repository\n\n**Relevant Resource Library Entries:** None\n\n**Rationale:** The evidence defines two separate repository snapshots:\n- Mark-XLVIII: `ddf27c40dd078bf392e820b949fbb954bcedeff278dc31d05f0f955ca2af129b`\n- Resource Library: `ec88bab6703d18570e4c45cefd66124cc18812aaf6b7a6fc0c9774a9c0c07e30`\n\nNo Resource Library entry discusses version control workflows, repository management, or snapshot handling. The evidence treats these as independent facts with no cross-referenced content.\n\n---\n\n## 3. File Inventory\n\n**Relevant Resource Library Entries:** None\n\n**Rationale:** Both systems report file scan counts (36 selected files for both), but the Resource Library contains no catalogue entry about file inventory methods, selection criteria, or scan procedures. The counts are separate facts; no resource documents how inventories are compiled or used.\n\n---\n\n## 4. Sensitive/Excluded Files\n\n**Relevant Resource Library Entries:** None\n\n**Rationale:** The evidence states Mark-XLVIII had 4 sensitive files skipped while the Resource Library had 0. No catalogued resource addresses sensitive-file handling, exclusion policies, or access controls. The Resource Library's own inventory contains zero sensitive-file entries, meaning there is nothing in its catalogue that relates to this subject area.\n\n---\n\n## 5. Additional Subject Areas\n\n**Relevant Resource Library Entries:** None\n\n**Rationale:** The evidence explicitly concludes \"No other subject areas\" can be enumerated beyond the four listed above (Project Structure, Version Control, File Inventory, Sensitive Files). Therefore, no additional mapping exists.\n\n---\n\n## Summary Table\n\n| Subject Area (Mark-XLVIII) | Relevant Resource Library Entries | Explanation |\n|---------------------------|-----------------------------------|-------------|\n| Project Structure/Location | None | Disjoint root paths; no resource addresses layout |\n| Version Control/Repository | None | Independent snapshots; no resource discusses VCS |\n| File Inventory | None | Separate scan counts; no catalogue entry on inventory methods |\n| Sensitive/Excluded Files | None | Mark-XLVIII has 4; Resource Library has 0; no resource addresses policy |\n| Additional Subject Areas | None | Evidence confirms no other enumerable areas |\n\n---\n\n## Conclusion\n\nBased solely on the provided evidence, **no Resource Library entries are relevant to any Mark-XLVIII subject area.** The Resource Library scan produced only its own repository metadata (root path, snapshot hash, file count, sensitive-file count) with no catalogued resources that overlap or inform Mark-XLVIII's structure, versioning, inventory, or file-handling practices. The two systems are independent with zero intersection in the evidence.",
+    "summary": "# Resource Library Mapping Report: Subject Areas to Catalogued Resources\n\n## Scope and Method\n\nThis report maps each enumerated subject area of the Mark-XLVIII platform to the specific Resource Library entries genuinely relevant to it. The mapping is based exclusively on the provided evidence from the completed read-only scan.\n\n---\n\n## 1. Project Structure/Location\n\n**Relevant Resource Library Entries:** None\n\n**Rationale:** The canonical project root `F:\\Mark-XLVIII-main` appears in the evidenc",
+    "model_provenance": {
+      "provider": "deepinfra",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "role": "research",
+      "fallback_reason": "",
+      "preferred_model_unavailable": false,
+      "metrics": {},
+      "recorded_at": 1790283472.261917
+    }
+  },
+  "model_provenance": {
+    "provider": "deepinfra",
+    "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+    "role": "research",
+    "fallback_reason": "",
+    "preferred_model_unavailable": false,
+    "metrics": {},
+    "recorded_at": 1790283472.261917
+  },
+  "completed_at": "2026-09-24T20:57:55Z"
+}

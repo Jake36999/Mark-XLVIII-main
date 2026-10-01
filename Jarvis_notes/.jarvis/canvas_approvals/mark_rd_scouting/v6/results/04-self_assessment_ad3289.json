@@ -1,0 +1,31 @@
+{
+  "schema_version": "jarvis_work_result/v1",
+  "run_id": "mark_rd_scouting-v6",
+  "item_id": "self_assessment_ad3289",
+  "verdict": "ACCEPT",
+  "defects": [],
+  "result": {
+    "ok": true,
+    "text": "Based solely on the provided evidence, the major subject areas/subsystems that can be enumerated are:\n\n1. **Project Structure/Location**: The canonical project root is `F:\\Mark-XLVIII-main`.\n2. **Version Control/Repository**: The current repository snapshot is identified by the hash `ddf27c40dd078bf392e820b949fbb954bcedeff278dc31d05f0f955ca2af129b`.\n3. **File Inventory**: The scan covered 36 selected files.\n4. **Sensitive/Excluded Files**: 4 files were skipped as sensitive.\n\nNo other subject areas or subsystems can be identified from the provided evidence.",
+    "summary": "Based solely on the provided evidence, the major subject areas/subsystems that can be enumerated are:\n\n1. **Project Structure/Location**: The canonical project root is `F:\\Mark-XLVIII-main`.\n2. **Version Control/Repository**: The current repository snapshot is identified by the hash `ddf27c40dd078bf392e820b949fbb954bcedeff278dc31d05f0f955ca2af129b`.\n3. **File Inventory**: The scan covered 36 selected files.\n4. **Sensitive/Excluded Files**: 4 files were skipped as sensitive.\n\nNo other subject are",
+    "model_provenance": {
+      "provider": "deepinfra",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "role": "research",
+      "fallback_reason": "",
+      "preferred_model_unavailable": false,
+      "metrics": {},
+      "recorded_at": 1790283415.5069873
+    }
+  },
+  "model_provenance": {
+    "provider": "deepinfra",
+    "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+    "role": "research",
+    "fallback_reason": "",
+    "preferred_model_unavailable": false,
+    "metrics": {},
+    "recorded_at": 1790283415.5069873
+  },
+  "completed_at": "2026-09-24T20:56:59Z"
+}

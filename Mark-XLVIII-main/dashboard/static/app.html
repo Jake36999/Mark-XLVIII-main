@@ -86,7 +86,34 @@
     .fc-dl:hover { opacity: 0.8; }
 
     /* ── FOOTER ── */
-    footer { flex-shrink:0; padding:10px 14px; border-top:1px solid var(--border); background:rgba(7,9,15,0.95); display:flex; gap:8px; align-items:center; }
+    footer { flex-shrink:0; padding:10px 14px 12px; border-top:1px solid var(--border); background:rgba(7,9,15,0.95); display:flex; flex-direction:column; gap:8px; }
+    .footer-row { display:flex; gap:8px; align-items:center; }
+
+    /* ── EFFORT BAR ── */
+    .effort-bar { padding:2px 2px 0; }
+    .effort-top { display:flex; align-items:center; gap:6px; margin-bottom:6px; }
+    .effort-label { font-size:10px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); }
+    .effort-label strong { color:var(--text); font-weight:700; }
+    .effort-help {
+      width:14px; height:14px; border-radius:50%; border:1px solid var(--border);
+      color:var(--muted); font-size:9px; font-weight:700; line-height:12px; text-align:center;
+      cursor:help; flex-shrink:0;
+    }
+    .effort-help:hover { border-color:var(--accent); color:var(--accent); }
+    #effort-slider {
+      -webkit-appearance:none; appearance:none; width:100%; height:3px;
+      background:var(--border); border-radius:2px; outline:none; cursor:pointer; display:block;
+    }
+    #effort-slider::-webkit-slider-thumb {
+      -webkit-appearance:none; appearance:none; width:15px; height:15px; border-radius:50%;
+      background:var(--accent); border:2px solid var(--bg); box-shadow:0 0 0 1px var(--accent);
+      cursor:pointer;
+    }
+    #effort-slider::-moz-range-thumb {
+      width:15px; height:15px; border-radius:50%; background:var(--accent);
+      border:2px solid var(--bg); box-shadow:0 0 0 1px var(--accent); cursor:pointer;
+    }
+    .effort-ends { display:flex; justify-content:space-between; margin-top:5px; font-size:9px; color:var(--muted); letter-spacing:0.5px; }
     #inp { flex:1; padding:11px 14px; background:var(--surface); border:1.5px solid var(--border); border-radius:12px; color:var(--text); font-size:14px; outline:none; transition:border-color 0.15s; }
     #inp:focus { border-color: var(--accent); }
     #inp::placeholder { color: var(--muted); }
@@ -144,12 +171,22 @@
   </header>
   <main id="feed"></main>
   <footer>
-    <input id="inp" placeholder="Send a command to JARVIS…" autocomplete="off">
-    <label class="btn-attach" for="file-inp" title="Send file">📎</label>
-    <input type="file" id="file-inp" multiple accept="*/*" style="display:none">
-    <button id="mic-btn" onclick="doMic()" title="Voice command">🎤</button>
-    <button class="btn btn-wake" id="wake" onclick="doWake()">WAKE</button>
-    <button class="btn btn-send" onclick="doSend()">SEND</button>
+    <div class="effort-bar">
+      <div class="effort-top">
+        <span class="effort-label">Effort <strong id="effort-value">Balanced</strong></span>
+        <span class="effort-help" title="How much a reply costs to think about. Faster uses the cheap quick model. Balanced is the default. Thorough and Max give the model more time to answer; Max also tries twice on a plain reply and keeps the more complete one.">?</span>
+      </div>
+      <input type="range" id="effort-slider" min="0" max="3" step="1" value="1" aria-label="Effort level">
+      <div class="effort-ends"><span>Faster</span><span>Smarter</span></div>
+    </div>
+    <div class="footer-row">
+      <input id="inp" placeholder="Send a command to JARVIS…" autocomplete="off">
+      <label class="btn-attach" for="file-inp" title="Send file">📎</label>
+      <input type="file" id="file-inp" multiple accept="*/*" style="display:none">
+      <button id="mic-btn" onclick="doMic()" title="Voice command">🎤</button>
+      <button class="btn btn-wake" id="wake" onclick="doWake()">WAKE</button>
+      <button class="btn btn-send" onclick="doSend()">SEND</button>
+    </div>
   </footer>
 
   <script>
@@ -371,6 +408,36 @@
       this.value = ''; // reset so the same file can be re-sent
     });
 
+    // ── Effort ────────────────────────────────────────────────────────────────
+    // Levels match main.py's _EFFORT_CALL_KWARGS exactly -- index here is the
+    // single source of truth for the mapping, so relabeling a tier on either
+    // side without the other silently breaks the signal, not just the label.
+    const EFFORT_LEVELS = ['faster', 'balanced', 'thorough', 'max'];
+    const EFFORT_LABELS = ['Faster', 'Balanced', 'Thorough', 'Max'];
+    const effortSlider  = document.getElementById('effort-slider');
+    const effortValue   = document.getElementById('effort-value');
+
+    function _applyEffortDisplay(i) {
+      effortValue.textContent = EFFORT_LABELS[i];
+    }
+
+    (function _restoreEffort() {
+      const saved = parseInt(localStorage.getItem('jarvis_effort'), 10);
+      const i = Number.isInteger(saved) && saved >= 0 && saved < EFFORT_LEVELS.length ? saved : 1;
+      effortSlider.value = i;
+      _applyEffortDisplay(i);
+    })();
+
+    effortSlider.addEventListener('input', () => {
+      const i = parseInt(effortSlider.value, 10);
+      _applyEffortDisplay(i);
+      try { localStorage.setItem('jarvis_effort', String(i)); } catch {}
+    });
+
+    function currentEffort() {
+      return EFFORT_LEVELS[parseInt(effortSlider.value, 10)] || 'balanced';
+    }
+
     // ── Commands ──────────────────────────────────────────────────────────────
     function doSend() {
       const inp = document.getElementById('inp');
@@ -379,7 +446,7 @@
       inp.value = '';
       append('user', txt);
       const enc  = _encrypt(txt);
-      const body = enc ? { enc } : { text: txt };
+      const body = Object.assign(enc ? { enc } : { text: txt }, { effort: currentEffort() });
       _authFetch('/api/command', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

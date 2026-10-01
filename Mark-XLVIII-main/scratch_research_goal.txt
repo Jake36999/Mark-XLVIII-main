@@ -1,0 +1,11 @@
+Identify concrete, well-scoped research-and-development objectives for extending or improving the Mark-XLVIII assistant platform, structured as a phased research plan for the user's review -- this is a planning and research pass only, not an implementation pass; no code should be changed as part of this goal.
+
+Phase 1 -- self-assessment: investigate Mark-XLVIII's own current architecture (read the actual source, not assumptions) to identify its major subject areas -- the concrete services and subsystems it already uses today, for example: model routing and cloud providers, canvas-based planning and workflow orchestration, the capability/tool registry, local memory and retrieval, credentials and session handling, speech. Ground this in what the code actually does, not a generic description.
+
+Phase 2 -- source identification: for each subject area from Phase 1, look for relevant prior art, techniques, or comparisons already catalogued in the registered "resource_library" project (a separate, read-only knowledge-base vault at D:\Resource-Library) using project_operator's learn_project/scout operations against it. Produce a brief report naming which catalogued resources are actually relevant to which subject area and why -- skip anything not genuinely on-topic.
+
+Phase 3 -- synthesis: combine the Phase 1 self-assessment and Phase 2 source-identification report into a small number (roughly 3-5) of concrete, individually actionable research objectives. Each objective must be specific enough to scope real steps from, not a restatement of what already exists or a vague aspiration.
+
+Phase 4 -- phasing: break each objective from Phase 3 into dependency-ordered steps, and group objectives that can be researched independently into separate branches so they could run in parallel, while objectives that build on each other's findings stay sequential.
+
+The deliverable is the phased plan itself, for review before any execution begins.

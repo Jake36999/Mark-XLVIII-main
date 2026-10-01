@@ -20,6 +20,20 @@ MAX_FIX_ATTEMPTS = 5
 MODEL_PLANNER    = "gemini-2.5-flash"
 MODEL_WRITER     = "gemini-2.5-flash"
 
+# Confirmed live (2026-09-25): a one-off single-file script request and a
+# genuine multi-file project both arrived here as "dev_agent" and got
+# identical treatment -- main.py's tool-call interception redirected every
+# single one to a reviewable Canvas plan before anything ran, since a real
+# multi-file build (dependency installs, an iterative fix loop) is never
+# safe to run unsupervised. That blanket rule is right for what it was
+# guarding against, but it made the fast, common case -- "write me a quick
+# script" -- pay the same review overhead as scaffolding a real project.
+# These thresholds gate estimate_scope()'s is_small verdict: at or under
+# both, main.py's dynamic router skips the canvas gate and goes straight to
+# code_helper's already-live write action instead.
+_SMALL_TASK_MAX_FILES = 1
+_SMALL_TASK_MAX_DEPENDENCIES = 0
+
 def _get_model(model_name: str, role: str = "worker"):
     return get_model_wrapper(role=role, model=None)
 
@@ -138,6 +152,36 @@ JSON:"""
         if _is_rate_limit(e):
             raise RateLimitError(str(e))
         raise
+
+
+def estimate_scope(description: str, language: str = "python") -> dict:
+    """Plan a request without writing anything, so a caller can decide
+    whether it is small enough to skip the full build (and the review that
+    otherwise gates it) before anything runs.
+
+    Deliberately stops at the planning call. `_build_project` and everything
+    downstream of it (the write/install/run/fix loop) has never actually run
+    end-to-end from a live conversation -- main.py's dev_agent tool-call
+    interception redirects to a Canvas plan before dev_agent() itself is
+    ever called, and an approved plan executes through OpenClaw, not back
+    into this module. This function only reuses the one piece of the
+    pipeline already exercised on its own.
+    """
+    try:
+        plan = _plan_project(description, language)
+    except RateLimitError as exc:
+        return {"ok": False, "error": str(exc)}
+    except ValueError as exc:
+        return {"ok": False, "error": str(exc)}
+    files = plan.get("files") or []
+    dependencies = plan.get("dependencies") or []
+    return {
+        "ok": True,
+        "plan": plan,
+        "file_count": len(files),
+        "dependency_count": len(dependencies),
+        "is_small": len(files) <= _SMALL_TASK_MAX_FILES and len(dependencies) <= _SMALL_TASK_MAX_DEPENDENCIES,
+    }
 
 def _write_file(
     file_info: dict,

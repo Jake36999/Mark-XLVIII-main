@@ -648,7 +648,8 @@ class ProjectLearningTests(unittest.TestCase):
 
         report = (
             "## Architecture And Components\nUses a router [app/core/router.py] and metadata "
-            "[deterministic_ground_truth] plus [file:root_readme_excerpt] and [file:root:app/core/router.py].\n\n"
+            "[deterministic_ground_truth] plus [file:root_readme_excerpt] and [file:root:app/core/router.py] "
+            "and [file:aletheia_preview].\n\n"
             "## Files Read\n- [router.py]\n\n"
             "## RAG Takeaways\n- Routing is explicit.\n"
         )
@@ -662,6 +663,13 @@ class ProjectLearningTests(unittest.TestCase):
         self.assertIn("(root README excerpt)", normalized)
         self.assertIn("- [file:app/tests/test_router.py]", normalized)
         self.assertNotIn("- [router.py]", normalized)
+        # Confirmed live (2026-09-24): the synthesis prompt forgot this profile
+        # field in its "never cite these as files" list -- the model cited it
+        # anyway, and the unresolved [file:aletheia_preview] then tripped the
+        # unknown-file-citation quality gate, discarding an otherwise-good
+        # project brief down to the thin generic fallback.
+        self.assertIn("(Aletheia bridge preview data)", normalized)
+        self.assertNotIn("[file:aletheia_preview]", normalized)
 
     def test_runtime_model_wrapper_receives_workflow_specific_timeout(self):
         from actions.project_learning import _model
@@ -866,6 +874,126 @@ class ProjectLearningTests(unittest.TestCase):
 
         self.assertEqual(result["status"], "complete_degraded")
         self.assertTrue(any("missing sections" in item.lower() for item in result["diagnostics"]))
+
+    def test_a_bad_first_attempt_retries_and_uses_the_clean_second_one(self):
+        """Confirmed live (2026-09-25): one failed check on the only attempt
+        discarded an otherwise-good brief down to the thin generic fallback.
+        The checks are right to reject a bad synthesis; the fix is retrying,
+        not loosening them -- same prompt, fresh sampling, keep the first
+        attempt that actually clears every existing check.
+        """
+        from actions.project_learning import learn_repository
+
+        GOOD_BRIEF = (
+            "## Executive Summary\nThe service starts in [file:src/main.py].\n\n"
+            "## Repository Profile\nPython project configured by [file:pyproject.toml].\n\n"
+            "## Architecture And Components\nThe entry module calls the core service [file:src/main.py].\n\n"
+            "## Entry Points And Workflows\nRun the main module [file:README.md].\n\n"
+            "## Dependencies And Tests\nPytest is configured [file:pyproject.toml].\n\n"
+            "## Operational Guidance\nUse the documented command [file:README.md].\n\n"
+            "## Risks, Gaps, And Questions\nRuntime deployment is not described [file:README.md].\n\n"
+            "## Files Read\n- [file:README.md]\n- [file:src/main.py]\n\n"
+            "## RAG Takeaways\n- The service entry point is `src/main.py`.\n"
+            "- Project setup is defined in `pyproject.toml`."
+        )
+        # An unresolved citation to a file outside mapped_files trips
+        # _report_quality_conflicts's unknown-file-citations check.
+        BAD_BRIEF = GOOD_BRIEF.replace(
+            "## Operational Guidance\nUse the documented command [file:README.md].",
+            "## Operational Guidance\nUse the documented command [file:this/file/does/not/exist.py].",
+        )
+
+        class FlakyOnceModel:
+            def __init__(self, role):
+                self.role = role
+                self.planner_calls = 0
+
+            def generate_content(self, prompt):
+                if self.role != "planner":
+                    return _Response("Repository map [file:README.md].")
+                self.planner_calls += 1
+                return _Response(BAD_BRIEF if self.planner_calls == 1 else GOOD_BRIEF)
+
+        models: list[FlakyOnceModel] = []
+
+        def factory(role, system):
+            model = FlakyOnceModel(role)
+            models.append(model)
+            return model
+
+        with tempfile.TemporaryDirectory() as tmp:
+            temp = Path(tmp)
+            root = temp / "repo"
+            vault = temp / "vault"
+            root.mkdir()
+            vault.mkdir()
+            self.make_repo(root)
+            with mock.patch("actions.jarvis_memory.reindex_local", return_value={"ok": True}):
+                result = learn_repository(
+                    root,
+                    project_id="demo",
+                    params={
+                        "memory_config": {"jarvis_notes_root": str(vault), "remember_enabled": False},
+                        "max_read_files": 4,
+                        "max_batches": 1,
+                    },
+                    model_factory=factory,
+                )
+
+            self.assertEqual(result["status"], "complete")
+            planner_models = [m for m in models if m.role == "planner"]
+            self.assertEqual(1, len(planner_models))
+            self.assertEqual(2, planner_models[0].planner_calls)
+            self.assertTrue(any("attempt 1" in item.lower() for item in result["diagnostics"]))
+            brief_text = Path(result["brief_path"]).read_text(encoding="utf-8")
+            self.assertNotIn("this/file/does/not/exist.py", brief_text)
+
+    def test_every_attempt_failing_still_bounds_the_retry_and_falls_back(self):
+        from actions.project_learning import SYNTHESIS_MAX_ATTEMPTS, learn_repository
+
+        class AlwaysBadModel:
+            def __init__(self, role):
+                self.role = role
+                self.planner_calls = 0
+
+            def generate_content(self, prompt):
+                if self.role != "planner":
+                    return _Response("Repository map [file:README.md].")
+                self.planner_calls += 1
+                return _Response("## Executive Summary\nAlways partial [file:README.md].")
+
+        models: list[AlwaysBadModel] = []
+
+        def factory(role, system):
+            model = AlwaysBadModel(role)
+            models.append(model)
+            return model
+
+        with tempfile.TemporaryDirectory() as tmp:
+            temp = Path(tmp)
+            root = temp / "repo"
+            vault = temp / "vault"
+            root.mkdir()
+            vault.mkdir()
+            self.make_repo(root)
+            with mock.patch("actions.jarvis_memory.reindex_local", return_value={"ok": True}):
+                result = learn_repository(
+                    root,
+                    project_id="demo",
+                    params={
+                        "memory_config": {"jarvis_notes_root": str(vault), "remember_enabled": False},
+                        "max_read_files": 4,
+                        "max_batches": 1,
+                    },
+                    model_factory=factory,
+                )
+
+        self.assertEqual(result["status"], "complete_degraded")
+        planner_models = [m for m in models if m.role == "planner"]
+        self.assertEqual(1, len(planner_models))
+        self.assertEqual(SYNTHESIS_MAX_ATTEMPTS, planner_models[0].planner_calls)
+        attempt_tags = [f"attempt {n}" in " ".join(result["diagnostics"]).lower() for n in range(1, SYNTHESIS_MAX_ATTEMPTS + 1)]
+        self.assertTrue(all(attempt_tags))
 
 
 if __name__ == "__main__":

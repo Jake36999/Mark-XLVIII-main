@@ -1,0 +1,249 @@
+{
+  "ok": true,
+  "run_id": "mark_rd_scouting-v1",
+  "execution_state": "escalated",
+  "run_status": {
+    "ok": true,
+    "run": {
+      "run_id": "mark_rd_scouting-v1",
+      "plan_id": "mark_rd_scouting",
+      "plan_version": 1,
+      "status": "ESCALATED",
+      "bundle_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\canvas_approvals\\mark_rd_scouting\\v1",
+      "manifest_hash": "06441409dd20b0f93ef513899306e4256475c3c4dabb463130f919241c3e0ae8",
+      "approval_projection_hash": "3c4ee34581b3218690daf3e08c18bdc5288f8efb3d3d89d34b9bd18c11557ed4",
+      "workflow_hash": "8a020c5b7b50e47c4c51772d668ccbb2894244937d44acbd07e733d338aea1da",
+      "cancel_requested": 0,
+      "created_at": "2026-09-24T20:08:06Z",
+      "updated_at": "2026-09-24T20:08:25Z"
+    },
+    "items": [
+      {
+        "item_id": "overall_plan_ec8453",
+        "state": "ACCEPTED",
+        "attempt": 1,
+        "repair_count": 0,
+        "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\canvas_approvals\\mark_rd_scouting\\v1\\results\\01-overall_plan_ec8453.json",
+        "error": null
+      },
+      {
+        "item_id": "self_assessment_ad3289",
+        "state": "ESCALATE",
+        "attempt": 1,
+        "repair_count": 0,
+        "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\canvas_approvals\\mark_rd_scouting\\v1\\results\\02-self_assessment_ad3289.json",
+        "error": "[]"
+      },
+      {
+        "item_id": "source_identification_1d3f39",
+        "state": "PENDING",
+        "attempt": 0,
+        "repair_count": 0,
+        "result_path": null,
+        "error": null
+      },
+      {
+        "item_id": "synthesize_objectives_88106c",
+        "state": "PENDING",
+        "attempt": 0,
+        "repair_count": 0,
+        "result_path": null,
+        "error": null
+      },
+      {
+        "item_id": "phase_plan_5610f6",
+        "state": "PENDING",
+        "attempt": 0,
+        "repair_count": 0,
+        "result_path": null,
+        "error": null
+      },
+      {
+        "item_id": "final_document_939100",
+        "state": "PENDING",
+        "attempt": 0,
+        "repair_count": 0,
+        "result_path": null,
+        "error": null
+      }
+    ],
+    "events": [
+      {
+        "item_id": null,
+        "event_type": "run_registered",
+        "details_json": "{\"item_count\": 6}",
+        "created_at": "2026-09-24T20:08:06Z",
+        "details": {
+          "item_count": 6
+        }
+      },
+      {
+        "item_id": null,
+        "event_type": "run_approved",
+        "details_json": "{}",
+        "created_at": "2026-09-24T20:08:06Z",
+        "details": {}
+      },
+      {
+        "item_id": "overall_plan_ec8453",
+        "event_type": "item_started",
+        "details_json": "{\"worker_id\": \"canvas-plan-driver:overall_plan_ec8453:dca5e7c3\"}",
+        "created_at": "2026-09-24T20:08:06Z",
+        "details": {
+          "worker_id": "canvas-plan-driver:overall_plan_ec8453:dca5e7c3"
+        }
+      },
+      {
+        "item_id": "overall_plan_ec8453",
+        "event_type": "item_reviewed",
+        "details_json": "{\"defects\": [], \"verdict\": \"ACCEPT\"}",
+        "created_at": "2026-09-24T20:08:06Z",
+        "details": {
+          "defects": [],
+          "verdict": "ACCEPT"
+        }
+      },
+      {
+        "item_id": "self_assessment_ad3289",
+        "event_type": "item_started",
+        "details_json": "{\"worker_id\": \"canvas-plan-driver:self_assessment_ad3289:9e1e77a2\"}",
+        "created_at": "2026-09-24T20:08:06Z",
+        "details": {
+          "worker_id": "canvas-plan-driver:self_assessment_ad3289:9e1e77a2"
+        }
+      },
+      {
+        "item_id": "self_assessment_ad3289",
+        "event_type": "lease_heartbeat",
+        "details_json": "{\"worker_id\": \"canvas-plan-driver:self_assessment_ad3289:9e1e77a2\"}",
+        "created_at": "2026-09-24T20:08:21Z",
+        "details": {
+          "worker_id": "canvas-plan-driver:self_assessment_ad3289:9e1e77a2"
+        }
+      },
+      {
+        "item_id": "self_assessment_ad3289",
+        "event_type": "item_reviewed",
+        "details_json": "{\"defects\": [], \"verdict\": \"ESCALATE\"}",
+        "created_at": "2026-09-24T20:08:25Z",
+        "details": {
+          "defects": [],
+          "verdict": "ESCALATE"
+        }
+      },
+      {
+        "item_id": null,
+        "event_type": "run_finished",
+        "details_json": "{\"status\": \"ESCALATED\"}",
+        "created_at": "2026-09-24T20:08:25Z",
+        "details": {
+          "status": "ESCALATED"
+        }
+      }
+    ],
+    "checkpoints": [
+      {
+        "item_id": "overall_plan_ec8453",
+        "phase": "side_effect_prepared",
+        "idempotency_key": "d16176269f10cb9ba61e6e71efed35ccdb61fcadce179a26f1ecbd20f971e7aa",
+        "details_json": "{\"side_effects\": \"none\"}",
+        "created_at": "2026-09-24T20:08:06Z",
+        "details": {
+          "side_effects": "none"
+        }
+      },
+      {
+        "item_id": "overall_plan_ec8453",
+        "phase": "before_dispatch",
+        "idempotency_key": "d16176269f10cb9ba61e6e71efed35ccdb61fcadce179a26f1ecbd20f971e7aa",
+        "details_json": "{\"side_effects\": \"none\"}",
+        "created_at": "2026-09-24T20:08:06Z",
+        "details": {
+          "side_effects": "none"
+        }
+      },
+      {
+        "item_id": "overall_plan_ec8453",
+        "phase": "side_effect_started",
+        "idempotency_key": "d16176269f10cb9ba61e6e71efed35ccdb61fcadce179a26f1ecbd20f971e7aa",
+        "details_json": "{\"resource_class\": \"io\"}",
+        "created_at": "2026-09-24T20:08:06Z",
+        "details": {
+          "resource_class": "io"
+        }
+      },
+      {
+        "item_id": "overall_plan_ec8453",
+        "phase": "result_written",
+        "idempotency_key": "d16176269f10cb9ba61e6e71efed35ccdb61fcadce179a26f1ecbd20f971e7aa",
+        "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\canvas_approvals\\\\mark_rd_scouting\\\\v1\\\\results\\\\01-overall_plan_ec8453.json\", \"verdict\": \"ACCEPT\"}",
+        "created_at": "2026-09-24T20:08:06Z",
+        "details": {
+          "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\canvas_approvals\\mark_rd_scouting\\v1\\results\\01-overall_plan_ec8453.json",
+          "verdict": "ACCEPT"
+        }
+      },
+      {
+        "item_id": "overall_plan_ec8453",
+        "phase": "side_effect_committed",
+        "idempotency_key": "d16176269f10cb9ba61e6e71efed35ccdb61fcadce179a26f1ecbd20f971e7aa",
+        "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\canvas_approvals\\\\mark_rd_scouting\\\\v1\\\\results\\\\01-overall_plan_ec8453.json\"}",
+        "created_at": "2026-09-24T20:08:06Z",
+        "details": {
+          "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\canvas_approvals\\mark_rd_scouting\\v1\\results\\01-overall_plan_ec8453.json"
+        }
+      },
+      {
+        "item_id": "overall_plan_ec8453",
+        "phase": "committed",
+        "idempotency_key": "d16176269f10cb9ba61e6e71efed35ccdb61fcadce179a26f1ecbd20f971e7aa",
+        "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\canvas_approvals\\\\mark_rd_scouting\\\\v1\\\\results\\\\01-overall_plan_ec8453.json\"}",
+        "created_at": "2026-09-24T20:08:06Z",
+        "details": {
+          "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\canvas_approvals\\mark_rd_scouting\\v1\\results\\01-overall_plan_ec8453.json"
+        }
+      },
+      {
+        "item_id": "self_assessment_ad3289",
+        "phase": "side_effect_prepared",
+        "idempotency_key": "631c23fec89f338e72903ce4578e909c63334c163cb2f32318fcd0097941d110",
+        "details_json": "{\"side_effects\": \"none\"}",
+        "created_at": "2026-09-24T20:08:06Z",
+        "details": {
+          "side_effects": "none"
+        }
+      },
+      {
+        "item_id": "self_assessment_ad3289",
+        "phase": "before_dispatch",
+        "idempotency_key": "631c23fec89f338e72903ce4578e909c63334c163cb2f32318fcd0097941d110",
+        "details_json": "{\"side_effects\": \"none\"}",
+        "created_at": "2026-09-24T20:08:06Z",
+        "details": {
+          "side_effects": "none"
+        }
+      },
+      {
+        "item_id": "self_assessment_ad3289",
+        "phase": "side_effect_started",
+        "idempotency_key": "631c23fec89f338e72903ce4578e909c63334c163cb2f32318fcd0097941d110",
+        "details_json": "{\"resource_class\": \"model\"}",
+        "created_at": "2026-09-24T20:08:06Z",
+        "details": {
+          "resource_class": "model"
+        }
+      },
+      {
+        "item_id": "self_assessment_ad3289",
+        "phase": "result_written",
+        "idempotency_key": "631c23fec89f338e72903ce4578e909c63334c163cb2f32318fcd0097941d110",
+        "details_json": "{\"result_path\": \"F:\\\\Mark-XLVIII-main\\\\Jarvis_notes\\\\.jarvis\\\\canvas_approvals\\\\mark_rd_scouting\\\\v1\\\\results\\\\02-self_assessment_ad3289.json\", \"verdict\": \"ESCALATE\"}",
+        "created_at": "2026-09-24T20:08:25Z",
+        "details": {
+          "result_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\canvas_approvals\\mark_rd_scouting\\v1\\results\\02-self_assessment_ad3289.json",
+          "verdict": "ESCALATE"
+        }
+      }
+    ]
+  }
+}

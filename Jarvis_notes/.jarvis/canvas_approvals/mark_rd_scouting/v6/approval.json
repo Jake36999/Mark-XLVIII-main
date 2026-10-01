@@ -1,0 +1,22 @@
+{
+  "approval_projection_hash": "c56f937eb82b39475194647a99381b411aa4203126f601bf4000d888e212fc5e",
+  "approved_action_ids": [
+    "evidence_mark_platform_8146ff",
+    "evidence_resource_library_3ac86a",
+    "final_document_939100",
+    "overall_plan_ec8453",
+    "phase_plan_5610f6",
+    "review_final_plan_57f6b5",
+    "review_synthesis_5556f0",
+    "self_assessment_ad3289",
+    "source_identification_1d3f39",
+    "synthesize_objectives_88106c"
+  ],
+  "approved_at": "2026-09-24T20:53:43Z",
+  "manifest_hash": "0584e1a0afc42bd7ca05aeeac687023f55e51ce98800041f671bcdbe1688badb",
+  "plan_id": "mark_rd_scouting",
+  "plan_version": 6,
+  "schema_version": "jarvis_approval/v1",
+  "signature": "a106bf384e160c79df336b516c5e19fbf712a1c8b6340066a9c73435c200c450",
+  "workflow_hash": "9e6ca37a26f2e4296cd6cb208e46e79f1966239072b56f74c3aed0f1ea8e0375"
+}

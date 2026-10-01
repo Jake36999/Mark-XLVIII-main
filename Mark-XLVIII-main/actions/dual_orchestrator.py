@@ -1369,7 +1369,19 @@ class WorkflowRuntime:
         if target == "project_operator":
             from actions.project_operator import project_operator
 
-            return json.loads(project_operator(inputs))
+            result = json.loads(project_operator(inputs))
+            # canvas_plan.py's "evidence" role (2026-09-24) dispatches learn_project
+            # specifically so a downstream research/review node can bind to its real,
+            # file-grounded output -- but that binding only ever reads result.summary
+            # (the one path every _RELIABLE_SUMMARY_ROLES role already produces), and
+            # learn_repository's actual return has no summary key, only a takeaways
+            # list. Synthesising one here, generically, means any future tool-dispatched
+            # role gets the same free ride rather than needing its own special case.
+            if isinstance(result, dict) and "summary" not in result:
+                takeaways = result.get("takeaways")
+                if isinstance(takeaways, list) and takeaways:
+                    result["summary"] = "\n".join(f"- {item}" for item in takeaways)[:2000]
+            return result
         if target == "capability_registry":
             from actions.capability_registry import capability_registry
 

@@ -9,6 +9,7 @@ import subprocess
 import sys
 import threading
 import time
+import webbrowser
 from pathlib import Path
 
 import psutil
@@ -1381,6 +1382,7 @@ class MainWindow(QMainWindow):
 
         self.on_text_command   = None
         self.on_remote_clicked = None   # callable: () -> (url, key) | None
+        self.on_open_chat_clicked = None   # callable: () -> (url, key, auto_login_url, manual_url) | None
         self.on_interrupt      = None   # callable: () -> None — stop JARVIS mid-speech
         self.on_mute_changed   = None   # callable: (muted: bool) -> None
         self._muted            = False
@@ -2370,6 +2372,22 @@ class MainWindow(QMainWindow):
         remote_btn.clicked.connect(self._open_remote)
         lay.addWidget(remote_btn)
 
+        open_chat_btn = QPushButton("💬  OPEN CHAT INTERFACE")
+        open_chat_btn.setFixedHeight(30)
+        open_chat_btn.setFont(QFont("Courier New", 8, QFont.Weight.Bold))
+        open_chat_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        open_chat_btn.setStyleSheet(f"""
+            QPushButton {{
+                background: #00091a; color: {C.PRI};
+                border: 1px solid {C.PRI_DIM}; border-radius: 3px;
+            }}
+            QPushButton:hover {{
+                background: {C.PRI_GHO}; border: 1px solid {C.PRI};
+            }}
+        """)
+        open_chat_btn.clicked.connect(self._open_chat_interface)
+        lay.addWidget(open_chat_btn)
+
         fs_btn = QPushButton("⛶  FULLSCREEN  [F11]")
         fs_btn.setFixedHeight(26)
         fs_btn.setFont(QFont("Courier New", 7))
@@ -2639,6 +2657,27 @@ class MainWindow(QMainWindow):
         ov.show()
         self._remote_overlay = ov
         self._log.append_log(f"SYS: Remote key generated — manual: {manual or url}")
+
+    def _open_chat_interface(self):
+        """The dashboard's web chat only ever surfaced via the Remote Control
+        QR overlay, meant for a phone scanning a code -- nothing told a
+        desktop user the page existed or how to reach it without typing a
+        pairing key by hand. Reuses the exact same one-time-key + auto-login
+        URL on_remote_clicked already builds, just opens it directly instead
+        of showing the QR overlay. First open trips a one-time self-signed
+        certificate warning in the browser (accept once, since the cert is
+        this machine's own dashboard, not a stranger's).
+        """
+        if not self.on_open_chat_clicked:
+            self._log.append_log("SYS: Dashboard not running — chat interface unavailable.")
+            return
+        result = self.on_open_chat_clicked()
+        if not result or len(result) < 3 or not result[2]:
+            self._log.append_log("SYS: Could not generate a chat interface link.")
+            return
+        auto_login_url = result[2]
+        webbrowser.open(auto_login_url)
+        self._log.append_log("SYS: Opening chat interface in your browser...")
 
     def _do_interrupt(self):
         if self.on_interrupt:
@@ -2919,6 +2958,14 @@ class JarvisUI:
     @on_remote_clicked.setter
     def on_remote_clicked(self, cb):
         self._win.on_remote_clicked = cb
+
+    @property
+    def on_open_chat_clicked(self):
+        return self._win.on_open_chat_clicked
+
+    @on_open_chat_clicked.setter
+    def on_open_chat_clicked(self, cb):
+        self._win.on_open_chat_clicked = cb
 
     @property
     def on_interrupt(self):

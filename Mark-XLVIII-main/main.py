@@ -279,6 +279,28 @@ def _build_tool_summary_prompt(user_text: str, tool_results: list[dict]) -> str:
     )
 
 
+# The "effort" bar (2026-09-25) is the chat interface's first real user-facing
+# control over how much a plain conversational turn actually costs -- "faster"
+# routes to the cheap quick tier (properly configured for DeepInfra as of this
+# same session's role reconfiguration), "balanced" reproduces exactly what
+# every turn already did before this existed (role="planner", timeout=120),
+# and "thorough"/"max" widen the generation timeout rather than claiming a
+# bigger model exists when today's config only has one route ("planner") at
+# that tier. Deliberately scoped, not the full "spin up parallel agents to
+# validate" version discussed earlier -- see _maybe_reroll_for_max_effort for
+# the one narrow, safe form of that this does implement.
+_EFFORT_CALL_KWARGS = {
+    "faster":   {"role": "quick",   "timeout": 60},
+    "balanced": {"role": "planner", "timeout": 120},
+    "thorough": {"role": "planner", "timeout": 240},
+    "max":      {"role": "planner", "timeout": 360},
+}
+
+
+def _effort_call_kwargs(effort: str) -> dict[str, Any]:
+    return dict(_EFFORT_CALL_KWARGS.get((effort or "balanced").strip().lower(), _EFFORT_CALL_KWARGS["balanced"]))
+
+
 def _tool_receipt(name: str, arguments: dict, raw_result: Any) -> dict[str, Any]:
     """A factual, runtime-produced record of what a tool call actually did and
     returned (WS2, 2026-07-24 planning roadmap, D4). This is what the process
@@ -1820,6 +1842,7 @@ class JarvisLive:
         self._interrupted          = False   # True after a user interrupt, until the next turn starts
         self.ui.on_text_command   = self._on_text_command
         self.ui.on_remote_clicked = self._make_remote_key
+        self.ui.on_open_chat_clicked = self._make_remote_key
         self.ui.on_interrupt      = self.interrupt
         self.ui.on_mute_changed   = self._on_mute_changed
         self._dashboard     = None
@@ -2652,7 +2675,30 @@ class JarvisLive:
             f"{title} to:\n{path}\n\nSources: {count}. The local vault index has been refreshed."
         )
 
-    def _handle_router_text_command(self, text: str, turn_id: int | None = None, source: str = "text"):
+    def _maybe_reroll_for_max_effort(self, routed, effort: str, model_text: str, system: str, tools: list[dict]):
+        """The narrow, safe slice of "prompt re-roll and assessment" the
+        effort bar's Max tier actually implements (2026-09-25) -- not the
+        fuller "spin up parallel agents to validate" version discussed
+        earlier, which needs real design work of its own.
+
+        Only fires when the first response has no tool calls: comparing two
+        candidate replies by "which is more complete" is a defensible, cheap
+        heuristic (longer, non-trivial text) for plain prose, but there is no
+        equally honest way to judge which of two different *tool choices* is
+        the better one, so a tool-calling response is never rerolled --
+        it proceeds exactly as it would without Max effort.
+        """
+        if effort != "max" or routed is None or routed.tool_calls:
+            return routed
+        try:
+            second = call_with_tools(model_text, system=system, tools=tools, **_effort_call_kwargs(effort))
+        except Exception:
+            return routed
+        if second.tool_calls:
+            return routed
+        return second if len(second.text.strip()) > len(routed.text.strip()) else routed
+
+    def _handle_router_text_command(self, text: str, turn_id: int | None = None, source: str = "text", effort: str = ""):
         with self._router_turn_mutex():
             text = (text or "").strip()
             if not text:
@@ -2666,6 +2712,15 @@ class JarvisLive:
             # nothing -- but must not contradict a reply already delivered.
             answered = False
             self._record_upload_announcement(text)
+            if source != "dashboard":
+                # The dashboard's own web client already echoes its own
+                # message locally (app.html's doSend()) the instant it sends
+                # one, so broadcasting a dashboard-sourced message back here
+                # would show it twice. A voice or desktop-typed turn has no
+                # such local echo on the *dashboard* side, so without this a
+                # connected phone/browser would see JARVIS reply to a message
+                # it never saw asked.
+                self._broadcast_reply_to_dashboard(text, speaker="user")
             turn = TurnContext(turn_id=turn_id or "", source=source, user_text=text)
             turn.advance(
                 PHASE_PROCESSING,
@@ -2730,10 +2785,13 @@ class JarvisLive:
                             model_text = f"{model_text}\n\n{upload_note}"
                         routed = call_with_tools(
                             model_text,
-                            role="planner",
                             system=self._router_tool_system_prompt(),
                             tools=_router_tool_schema(text, has_upload=bool(self._active_upload_path())),
-                            timeout=120,
+                            **_effort_call_kwargs(effort),
+                        )
+                        routed = self._maybe_reroll_for_max_effort(
+                            routed, effort, model_text, self._router_tool_system_prompt(),
+                            _router_tool_schema(text, has_upload=bool(self._active_upload_path())),
                         )
                     else:
                         routed = None
@@ -2748,8 +2806,7 @@ class JarvisLive:
                         tool_results = []
                         for call in routed.tool_calls[:5]:
                             if call.name == "dev_agent":
-                                self.ui.write_log("TOOL: dev_agent (redirected to canvas plan review)")
-                                reply = self._redirect_dev_agent_to_canvas(text, turn_id)
+                                reply = self._route_dev_agent_request(text, turn_id)
                                 break
                             # Resolve the file path BEFORE classifying. The
                             # backfill used to live deep inside _execute_tool,
@@ -2865,6 +2922,7 @@ class JarvisLive:
                         )
                 self.ui.write_log(f"JARVIS: {reply[:500]}")
                 self.ui.show_content("ROUTER MODE", reply)
+                self._broadcast_reply_to_dashboard(reply)
                 turn.advance(
                     PHASE_COMMUNICATING,
                     category="router",
@@ -2982,6 +3040,49 @@ class JarvisLive:
             return str(payload.get("result", payload))
         return str(payload)
 
+    def _route_dev_agent_request(self, goal_text: str, turn_id: int | None) -> str:
+        """Dynamic router (2026-09-25): plan the request first, with no
+        writes yet, and only pay the Canvas-review cost when the real,
+        computed scope actually warrants it. A one-off single-file script
+        used to get identical treatment to a genuine multi-file project --
+        every dev_agent call was redirected to a reviewable plan, since a
+        real multi-file build (dependency installs, an iterative fix loop)
+        is never safe to run unsupervised. That blanket rule stays correct
+        for what it guards against; it just needs to stop firing on requests
+        that were never actually that.
+        """
+        from actions.dev_agent import estimate_scope
+
+        scope = estimate_scope(goal_text)
+        if not scope.get("ok") or not scope.get("is_small"):
+            return self._redirect_dev_agent_to_canvas(goal_text, turn_id)
+
+        files = (scope["plan"].get("files") or [])
+        file_info = files[0] if files else {}
+        self.ui.write_log("TOOL: dev_agent (single small file, direct via code_helper)")
+        result = code_helper(
+            parameters={
+                "action": "write",
+                "description": file_info.get("description") or goal_text,
+                "language": "python",
+                "output_path": file_info.get("path") or "",
+            },
+            player=self.ui,
+            speak=self.speak,
+        )
+        emit_process_event(
+            category="capability",
+            source="dev_agent",
+            summary="dev_agent request routed directly (small, single-file scope).",
+            state="completed",
+            turn_id=turn_id or "",
+            detail={
+                "file_count": scope.get("file_count"),
+                "dependency_count": scope.get("dependency_count"),
+            },
+        )
+        return result or "Done."
+
     def _redirect_dev_agent_to_canvas(self, goal_text: str, turn_id: int | None) -> str:
         """`dev_agent` always does real filesystem writes/process execution --
         every real call is a genuine multi-step autonomous coding task, not a
@@ -2992,6 +3093,7 @@ class JarvisLive:
         instead of executing anything."""
         from actions.canvas_plan import decompose_goal_to_canvas, propose_canvas_plan
 
+        self.ui.write_log("TOOL: dev_agent (redirected to canvas plan review)")
         try:
             decomposition = decompose_goal_to_canvas(goal_text, user_workflow_mode="development")
         except Exception as exc:
@@ -3104,6 +3206,37 @@ class JarvisLive:
         self._voice_input_block_until = 0.0
         self.ui.set_state("LISTENING" if not self.ui.muted else "MUTED")
         self.ui.write_log("SYS: Interrupted — listening...")
+
+    def _broadcast_reply_to_dashboard(self, text: str, speaker: str = "jarvis") -> None:
+        """Confirmed live (2026-09-25): the web chat interface could send a
+        command and it genuinely ran -- the desktop's own Activity Log showed
+        the "(Web):" turn and JARVIS's real reply -- but that reply never
+        reached the browser. ui.write_log() only ever updates the desktop's
+        own on-screen widget (ui.py's write_log emits a local Qt signal); the
+        dashboard's connected clients (phone or this same browser) are a
+        completely separate audience that nothing was telling. This is the
+        one choke point every turn's reply already passes through
+        (_handle_router_text_command, regardless of whether it started from
+        voice, the desktop text box, or the dashboard itself), so broadcasting
+        here gives every connected client a live mirror of the whole
+        conversation, not just replies to its own messages.
+
+        _handle_router_text_command runs off the Qt/asyncio event loop (a
+        plain background thread for voice/text, run_in_executor for
+        dashboard turns), so the broadcast coroutine has to be scheduled onto
+        the loop from here rather than awaited directly.
+        """
+        dashboard = getattr(self, "_dashboard", None)
+        loop = getattr(self, "_loop", None)
+        if not dashboard or not loop or not text:
+            return
+        try:
+            asyncio.run_coroutine_threadsafe(
+                dashboard.broadcast({"type": "log", "speaker": speaker, "text": text}),
+                loop,
+            )
+        except Exception as exc:
+            print(f"[Dashboard] Broadcast failed: {exc}")
 
     def speak(self, text: str):
         local_tts = getattr(self, "_local_tts", None) or self._get_local_tts()
@@ -3695,9 +3828,13 @@ class JarvisLive:
     async def _process_dashboard_commands(self) -> None:
         while True:
             try:
-                text = await asyncio.wait_for(
+                item = await asyncio.wait_for(
                     self._dashboard._command_queue.get(), timeout=0.5
                 )
+                # Queue items are (text, effort) as of the effort-bar wiring
+                # (2026-09-25); a bare string from an older caller still works,
+                # just with no effort signal.
+                text, effort = item if isinstance(item, tuple) else (item, "")
                 if not text:
                     continue
                 # This used to poll for up to 8 seconds waiting for a Live
@@ -3707,7 +3844,7 @@ class JarvisLive:
                 self.ui.write_log(f"[Web]: {text}")
                 turn_id = self._next_router_turn_id("dashboard")
                 await asyncio.get_event_loop().run_in_executor(
-                    None, lambda: self._handle_router_text_command(text, turn_id, "dashboard")
+                    None, lambda: self._handle_router_text_command(text, turn_id, "dashboard", effort)
                 )
             except asyncio.TimeoutError:
                 pass

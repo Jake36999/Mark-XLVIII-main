@@ -81,11 +81,18 @@ class DerivedKeywordsTests(unittest.TestCase):
 
 class ModelRoleCapabilitiesTests(unittest.TestCase):
     def test_covers_exactly_the_known_model_router_roles(self):
+        # "quick"/"main"/"reasoning"/"code" joined 2026-09-25 alongside their
+        # runtime.json provider config; "vision" deliberately never does --
+        # it's hardcoded local-only in call_vision() (core/model_router.py)
+        # so a screen/camera capture can never leave the machine as a side
+        # effect of a routing decision.
         ids = capability_schema.ids_by_kind("model_role")
-        self.assertEqual(ids, frozenset({"planner", "worker", "research", "reviewer"}))
+        self.assertEqual(
+            ids, frozenset({"planner", "worker", "research", "reviewer", "quick", "main", "reasoning", "code"})
+        )
 
     def test_model_roles_are_health_eligible(self):
-        for role_id in ("planner", "worker", "research", "reviewer"):
+        for role_id in ("planner", "worker", "research", "reviewer", "quick", "main", "reasoning", "code"):
             with self.subTest(role=role_id):
                 self.assertTrue(capability_schema.get(role_id).health_eligible)
 

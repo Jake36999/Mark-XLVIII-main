@@ -1,0 +1,463 @@
+{
+  "created_at": "2026-09-24T20:42:07Z",
+  "items": [
+    {
+      "acceptance_criteria": {
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [],
+      "description": "Create a phased research plan to identify concrete, well-scoped R&D objectives for extending the Mark-XLVIII assistant platform. This plan will be reviewed before any execution begins.",
+      "id": "overall_plan_ec8453",
+      "idempotency_key": "d16176269f10cb9ba61e6e71efed35ccdb61fcadce179a26f1ecbd20f971e7aa",
+      "inputs": {
+        "canvas_node_id": "overall_plan",
+        "canvas_role": "plan"
+      },
+      "max_attempts": 1,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "deterministic",
+      "outputs": {
+        "result": "result.overall_plan_ec8453"
+      },
+      "required_outputs": [],
+      "requires_confirmation": false,
+      "resource_class": "io",
+      "retry_safe": true,
+      "risk_tier": "T1",
+      "sequence": 1,
+      "side_effects": "none",
+      "step_type": "gate",
+      "target": "plan_milestone"
+    },
+    {
+      "acceptance_criteria": {
+        "deliverables": [
+          "Real, file-grounded takeaways about Mark-XLVIII's actual subsystems, sourced from project_operator learn_project"
+        ],
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [
+        "overall_plan_ec8453"
+      ],
+      "description": "Read the Mark-XLVIII platform's real source code read-only (project_operator learn_project) so the self-assessment step has genuine, file-grounded evidence instead of a guess.",
+      "id": "evidence_mark_platform_8146ff",
+      "idempotency_key": "9837594b2877632f3a769b09602777740bdc431725ccc16d4da1e04d23efe1d7",
+      "inputs": {
+        "canvas_node_id": "evidence_mark_platform",
+        "canvas_role": "evidence",
+        "context_injected": true,
+        "intent": "System goal: Create a phased research plan to identify concrete, well-scoped R&D objectives for extending the Mark-XLVIII assistant platform. This plan will be reviewed before any execution begins.\n\nRead the Mark-XLVIII platform's real source code read-only (project_operator learn_project) so the self-assessment step has genuine, file-grounded evidence instead of a guess.",
+        "operation": "learn_project",
+        "project_id": "mark_platform"
+      },
+      "max_attempts": 2,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "deterministic",
+      "outputs": {
+        "result": "result.evidence_mark_platform_8146ff"
+      },
+      "required_outputs": [],
+      "requires_confirmation": false,
+      "resource_class": "io",
+      "retry_safe": true,
+      "risk_tier": "T1",
+      "sequence": 2,
+      "side_effects": "local_read",
+      "step_type": "tool",
+      "target": "project_operator"
+    },
+    {
+      "acceptance_criteria": {
+        "deliverables": [
+          "Real, file-grounded takeaways about what the Resource Library actually catalogues, sourced from project_operator learn_project"
+        ],
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [
+        "overall_plan_ec8453"
+      ],
+      "description": "Read the Resource Library vault read-only (project_operator learn_project) so the source-identification step has genuine, file-grounded evidence of what is actually catalogued instead of a guess.",
+      "id": "evidence_resource_library_3ac86a",
+      "idempotency_key": "7e02288b5c8502e0ce3709a3c0711ceee3bf52b9185e1ad4c91b9d1eaea2fc64",
+      "inputs": {
+        "canvas_node_id": "evidence_resource_library",
+        "canvas_role": "evidence",
+        "context_injected": true,
+        "intent": "System goal: Create a phased research plan to identify concrete, well-scoped R&D objectives for extending the Mark-XLVIII assistant platform. This plan will be reviewed before any execution begins.\n\nRead the Resource Library vault read-only (project_operator learn_project) so the source-identification step has genuine, file-grounded evidence of what is actually catalogued instead of a guess.",
+        "operation": "learn_project",
+        "project_id": "resource_library"
+      },
+      "max_attempts": 2,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "deterministic",
+      "outputs": {
+        "result": "result.evidence_resource_library_3ac86a"
+      },
+      "required_outputs": [],
+      "requires_confirmation": false,
+      "resource_class": "io",
+      "retry_safe": true,
+      "risk_tier": "T1",
+      "sequence": 3,
+      "side_effects": "local_read",
+      "step_type": "tool",
+      "target": "project_operator"
+    },
+    {
+      "acceptance_criteria": {
+        "deliverables": [
+          "List of concrete subject areas derived directly from the code"
+        ],
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [
+        "evidence_mark_platform_8146ff",
+        "overall_plan_ec8453"
+      ],
+      "description": "Read the actual Mark-XLVIII source code (no assumptions) and enumerate its major subject areas/subsystems (e.g., model routing, cloud providers, canvas planning, capability registry, memory/retrieval, credentials, speech, etc.). Produce a concise list of these areas.\n\nDeliverables:\n- List of concrete subject areas derived directly from the code\n\n<!-- jarvis-forward-scout: do not edit below this line -->\n> **Context from `overall_plan_ec8453`:** Create a phased research plan to identify concrete, well-scoped R&D objectives for extending the Mark-XLVIII assistant platform. This plan will be reviewed before any execution begins.",
+      "id": "self_assessment_ad3289",
+      "idempotency_key": "5d3a2d1409d8ddca5a73cacd4299c38b02ff09aca8fa5b2d673bbf7c7ec242f0",
+      "inputs": {
+        "canvas_node_id": "self_assessment",
+        "canvas_role": "research",
+        "context_injected": true,
+        "evidence": [
+          {
+            "bind": {
+              "from_step": "overall_plan_ec8453",
+              "path": "result.summary"
+            }
+          },
+          {
+            "bind": {
+              "from_step": "evidence_mark_platform_8146ff",
+              "path": "result.summary"
+            }
+          }
+        ],
+        "prompt": "System goal: Create a phased research plan to identify concrete, well-scoped R&D objectives for extending the Mark-XLVIII assistant platform. This plan will be reviewed before any execution begins.\n\nRead the actual Mark-XLVIII source code (no assumptions) and enumerate its major subject areas/subsystems (e.g., model routing, cloud providers, canvas planning, capability registry, memory/retrieval, credentials, speech, etc.). Produce a concise list of these areas.\n\nDeliverables:\n- List of concrete subject areas derived directly from the code\n\n<!-- jarvis-forward-scout: do not edit below this line -->\n> **Context from `overall_plan_ec8453`:** Create a phased research plan to identify concrete, well-scoped R&D objectives for extending the Mark-XLVIII assistant platform. This plan will be reviewed before any execution begins.",
+        "role": "research"
+      },
+      "max_attempts": 2,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "cognitive",
+      "outputs": {
+        "result": "result.self_assessment_ad3289"
+      },
+      "required_outputs": [],
+      "requires_confirmation": false,
+      "resource_class": "model",
+      "retry_safe": true,
+      "risk_tier": "T1",
+      "sequence": 4,
+      "side_effects": "none",
+      "step_type": "model_reasoning",
+      "target": "reasoning"
+    },
+    {
+      "acceptance_criteria": {
+        "deliverables": [
+          "Report linking subject areas to relevant Resource Library entries"
+        ],
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [
+        "evidence_resource_library_3ac86a",
+        "self_assessment_ad3289"
+      ],
+      "description": "For each subject area identified in the self\u2011assessment, query the read\u2011only Resource Library (D:\\Resource-Library) using project_operator's learn_project/scout operations. Generate a brief report that maps each subject area to any catalogued resources that are genuinely relevant, explaining why they are on\u2011topic.\n\nDeliverables:\n- Report linking subject areas to relevant Resource Library entries",
+      "id": "source_identification_1d3f39",
+      "idempotency_key": "adde1c1b2c82b5c6fa865be7bb031b695cfadef019135ecfd9759f7ec863f0cd",
+      "inputs": {
+        "canvas_node_id": "source_identification",
+        "canvas_role": "research",
+        "context_injected": true,
+        "evidence": [
+          {
+            "bind": {
+              "from_step": "self_assessment_ad3289",
+              "path": "result.summary"
+            }
+          },
+          {
+            "bind": {
+              "from_step": "evidence_resource_library_3ac86a",
+              "path": "result.summary"
+            }
+          }
+        ],
+        "prompt": "System goal: Create a phased research plan to identify concrete, well-scoped R&D objectives for extending the Mark-XLVIII assistant platform. This plan will be reviewed before any execution begins.\n\nFor each subject area identified in the self\u2011assessment, query the read\u2011only Resource Library (D:\\Resource-Library) using project_operator's learn_project/scout operations. Generate a brief report that maps each subject area to any catalogued resources that are genuinely relevant, explaining why they are on\u2011topic.\n\nDeliverables:\n- Report linking subject areas to relevant Resource Library entries",
+        "role": "research"
+      },
+      "max_attempts": 2,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "cognitive",
+      "outputs": {
+        "result": "result.source_identification_1d3f39"
+      },
+      "required_outputs": [],
+      "requires_confirmation": false,
+      "resource_class": "model",
+      "retry_safe": true,
+      "risk_tier": "T1",
+      "sequence": 5,
+      "side_effects": "none",
+      "step_type": "model_reasoning",
+      "target": "reasoning"
+    },
+    {
+      "acceptance_criteria": {
+        "deliverables": [
+          "List of 3\u20115 concrete research objectives"
+        ],
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [
+        "source_identification_1d3f39"
+      ],
+      "description": "Combine the self\u2011assessment list and the source\u2011identification report to craft 3\u20115 concrete, individually actionable research objectives. Each objective must be specific enough to guide real research steps and must not merely restate existing functionality.\n\nDeliverables:\n- List of 3\u20115 concrete research objectives",
+      "id": "synthesize_objectives_88106c",
+      "idempotency_key": "fcf393cf249c417d173c80a52597fef167adb94d6148b3de67fe28b1fded0cfa",
+      "inputs": {
+        "canvas_node_id": "synthesize_objectives",
+        "canvas_role": "research",
+        "context_injected": true,
+        "evidence": [
+          {
+            "bind": {
+              "from_step": "source_identification_1d3f39",
+              "path": "result.summary"
+            }
+          }
+        ],
+        "prompt": "System goal: Create a phased research plan to identify concrete, well-scoped R&D objectives for extending the Mark-XLVIII assistant platform. This plan will be reviewed before any execution begins.\n\nCombine the self\u2011assessment list and the source\u2011identification report to craft 3\u20115 concrete, individually actionable research objectives. Each objective must be specific enough to guide real research steps and must not merely restate existing functionality.\n\nDeliverables:\n- List of 3\u20115 concrete research objectives",
+        "role": "research"
+      },
+      "max_attempts": 2,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "cognitive",
+      "outputs": {
+        "result": "result.synthesize_objectives_88106c"
+      },
+      "required_outputs": [],
+      "requires_confirmation": false,
+      "resource_class": "model",
+      "retry_safe": true,
+      "risk_tier": "T1",
+      "sequence": 6,
+      "side_effects": "none",
+      "step_type": "model_reasoning",
+      "target": "reasoning"
+    },
+    {
+      "acceptance_criteria": {
+        "deliverables": [
+          "Pass/fail assessment of the synthesized objectives, with reasons"
+        ],
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [
+        "synthesize_objectives_88106c"
+      ],
+      "description": "Check that the objectives produced by the synthesis step are genuinely concrete, individually actionable, non-redundant with Mark-XLVIII's existing functionality, and grounded in the real self-assessment and source-identification evidence rather than generic aspirations.\n\nDeliverables:\n- Pass/fail assessment of the synthesized objectives, with reasons",
+      "id": "review_synthesis_5556f0",
+      "idempotency_key": "9cccb53a2d38e4fd6e23f23ffc1efab1c139efba7843d8a5e146de75280bf2ea",
+      "inputs": {
+        "canvas_node_id": "review_synthesis",
+        "canvas_role": "review",
+        "context_injected": true,
+        "evidence": [
+          {
+            "bind": {
+              "from_step": "synthesize_objectives_88106c",
+              "path": "result.summary"
+            }
+          }
+        ],
+        "prompt": "System goal: Create a phased research plan to identify concrete, well-scoped R&D objectives for extending the Mark-XLVIII assistant platform. This plan will be reviewed before any execution begins.\n\nCheck that the objectives produced by the synthesis step are genuinely concrete, individually actionable, non-redundant with Mark-XLVIII's existing functionality, and grounded in the real self-assessment and source-identification evidence rather than generic aspirations.\n\nDeliverables:\n- Pass/fail assessment of the synthesized objectives, with reasons"
+      },
+      "max_attempts": 1,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "cognitive",
+      "outputs": {
+        "result": "result.review_synthesis_5556f0"
+      },
+      "required_outputs": [],
+      "requires_confirmation": false,
+      "resource_class": "model",
+      "retry_safe": true,
+      "risk_tier": "T1",
+      "sequence": 7,
+      "side_effects": "none",
+      "step_type": "review",
+      "target": "reviewer"
+    },
+    {
+      "acceptance_criteria": {
+        "deliverables": [
+          "Complete phased research plan with branch structure and step ordering"
+        ],
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [
+        "review_synthesis_5556f0",
+        "synthesize_objectives_88106c"
+      ],
+      "description": "For each research objective, break it into ordered steps, assign dependency ordering, and group objectives that can be pursued independently into separate branches (e.g., Branch A, Branch B) to allow parallel work. Produce the full phased plan ready for review.\n\nDeliverables:\n- Complete phased research plan with branch structure and step ordering",
+      "id": "phase_plan_5610f6",
+      "idempotency_key": "99095d18b857596ed144c8bc298c153be912f7465e0e62e786711e27e27c3e02",
+      "inputs": {
+        "canvas_node_id": "phase_plan",
+        "canvas_role": "research",
+        "context_injected": true,
+        "evidence": [
+          {
+            "bind": {
+              "from_step": "synthesize_objectives_88106c",
+              "path": "result.summary"
+            }
+          },
+          {
+            "bind": {
+              "from_step": "review_synthesis_5556f0",
+              "path": "result.summary"
+            }
+          }
+        ],
+        "prompt": "System goal: Create a phased research plan to identify concrete, well-scoped R&D objectives for extending the Mark-XLVIII assistant platform. This plan will be reviewed before any execution begins.\n\nFor each research objective, break it into ordered steps, assign dependency ordering, and group objectives that can be pursued independently into separate branches (e.g., Branch A, Branch B) to allow parallel work. Produce the full phased plan ready for review.\n\nDeliverables:\n- Complete phased research plan with branch structure and step ordering",
+        "role": "research"
+      },
+      "max_attempts": 2,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "cognitive",
+      "outputs": {
+        "result": "result.phase_plan_5610f6"
+      },
+      "required_outputs": [],
+      "requires_confirmation": false,
+      "resource_class": "model",
+      "retry_safe": true,
+      "risk_tier": "T1",
+      "sequence": 8,
+      "side_effects": "none",
+      "step_type": "model_reasoning",
+      "target": "reasoning"
+    },
+    {
+      "acceptance_criteria": {
+        "deliverables": [
+          "Markdown file Mark-XLVIII_Research_Plan.md containing the reviewed phased plan"
+        ],
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [
+        "phase_plan_5610f6"
+      ],
+      "description": "Specification: Mark-XLVIII Research Plan \u2013 write a markdown document containing the phased plan produced in the previous step.\n\nDeliverables:\n- Markdown file Mark-XLVIII_Research_Plan.md containing the reviewed phased plan",
+      "id": "final_document_939100",
+      "idempotency_key": "d8cd974d39801fa4260ea710b96cba3ad47bb050397e490413d4c77b0345d728",
+      "inputs": {
+        "canvas_node_id": "final_document",
+        "canvas_role": "document",
+        "content": {
+          "bind": {
+            "from_step": "phase_plan_5610f6",
+            "path": "result.text"
+          }
+        },
+        "context_injected": true,
+        "file": "Mark-XLVIII_Research_Plan.md",
+        "title": "Specification: Mark-XLVIII Research Plan \u2013 write a markdown document containing the phased plan produced in the previous step.\n\nDeliverables:\n- Markdown file Mark-XLVIII_Research_Plan.md containing th"
+      },
+      "max_attempts": 1,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "deterministic",
+      "outputs": {
+        "result": "result.final_document_939100"
+      },
+      "required_outputs": [],
+      "requires_confirmation": false,
+      "resource_class": "io",
+      "retry_safe": true,
+      "risk_tier": "T2",
+      "sequence": 9,
+      "side_effects": "local_write",
+      "step_type": "artifact",
+      "target": "vault_create_note"
+    },
+    {
+      "acceptance_criteria": {
+        "deliverables": [
+          "Pass/fail assessment of the phased plan's internal consistency, with reasons"
+        ],
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [
+        "phase_plan_5610f6"
+      ],
+      "description": "Independently check the full phased research plan for internal consistency: dependency ordering is correct, branches genuinely can run in parallel, and no phase silently depends on unstated prior work.\n\nDeliverables:\n- Pass/fail assessment of the phased plan's internal consistency, with reasons",
+      "id": "review_final_plan_57f6b5",
+      "idempotency_key": "6b47d4cfda69ecdc215e5b0c68da10c7785395e9b4fea6e6676ff8284cd114fd",
+      "inputs": {
+        "canvas_node_id": "review_final_plan",
+        "canvas_role": "review",
+        "context_injected": true,
+        "evidence": [
+          {
+            "bind": {
+              "from_step": "phase_plan_5610f6",
+              "path": "result.summary"
+            }
+          }
+        ],
+        "prompt": "System goal: Create a phased research plan to identify concrete, well-scoped R&D objectives for extending the Mark-XLVIII assistant platform. This plan will be reviewed before any execution begins.\n\nIndependently check the full phased research plan for internal consistency: dependency ordering is correct, branches genuinely can run in parallel, and no phase silently depends on unstated prior work.\n\nDeliverables:\n- Pass/fail assessment of the phased plan's internal consistency, with reasons"
+      },
+      "max_attempts": 1,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "cognitive",
+      "outputs": {
+        "result": "result.review_final_plan_57f6b5"
+      },
+      "required_outputs": [],
+      "requires_confirmation": false,
+      "resource_class": "model",
+      "retry_safe": true,
+      "risk_tier": "T1",
+      "sequence": 10,
+      "side_effects": "none",
+      "step_type": "review",
+      "target": "reviewer"
+    }
+  ],
+  "manifest_hash": "0821fc0eff3bac700c2da7cbd08070ed2f407ed815caaaf29a4a523ff54147c8",
+  "preflight": {
+    "checked_at": "2026-09-24T20:42:07Z",
+    "checks": [],
+    "ok": true
+  },
+  "preview_only": false,
+  "schema_version": "jarvis_work_manifest/v1",
+  "workflow_hash": "25e34a6ec1b2bf17a0a6a67e2f1fcd9594fc937de03e55b1875739dc5d3504cf",
+  "workflow_id": "mark_rd_scouting",
+  "workflow_version": "canvas-1"
+}

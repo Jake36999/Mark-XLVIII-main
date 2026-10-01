@@ -184,6 +184,52 @@ class DocumentRoleTests(unittest.TestCase):
         self.assertNotIsInstance(doc_step["inputs"]["content"], dict)
         self.assertTrue(str(doc_step["inputs"]["content"]).strip())
 
+    def test_a_review_gate_dependency_does_not_break_the_content_binding(self):
+        """Confirmed live (2026-09-24): a canvas critique reasonably asked for
+        a review step gating a document node -- and that second dependency
+        silently downgraded the document's live content binding to the
+        preamble fallback, putting a paraphrase in the vault instead of the
+        reviewed step's real output. A "review" node is a gate, not a content
+        source, so it must not count toward the single-dependency check.
+        """
+        payload = {
+            "nodes": [
+                _node("r", "Investigate the auth module.", role="research"),
+                _node("rev", "Review the findings.", role="review"),
+                _node("d", "Specification: Auth Module", role="document"),
+            ],
+            "edges": [_edge("e1", "r", "d"), _edge("e2", "rev", "d")],
+        }
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="doc_plan", name="Doc Plan")
+
+        doc_step = next(s for s in workflow["steps"] if s["step_type"] == "artifact")
+        research_step_id = canvas_plan.node_step_id("r")
+        self.assertEqual(
+            doc_step["inputs"]["content"],
+            {"bind": {"from_step": research_step_id, "path": "result.text"}},
+        )
+        # The review gate still orders the graph even though it is not the content source.
+        review_step_id = canvas_plan.node_step_id("rev")
+        self.assertIn(review_step_id, doc_step["depends_on"])
+
+    def test_two_real_content_dependencies_still_fall_back_to_preamble(self):
+        """The review-exclusion must not swallow the genuine ambiguity case --
+        two real (non-review) content sources still have no single obvious
+        one to bind, same as before this fix."""
+        payload = {
+            "nodes": [
+                _node("a", "Branch one.", role="research"),
+                _node("b", "Branch two.", role="research"),
+                _node("rev", "Review both.", role="review"),
+                _node("d", "Specification: Merged Findings", role="document"),
+            ],
+            "edges": [_edge("e1", "a", "d"), _edge("e2", "b", "d"), _edge("e3", "rev", "d")],
+        }
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="doc_plan", name="Doc Plan")
+
+        doc_step = next(s for s in workflow["steps"] if s["step_type"] == "artifact")
+        self.assertNotIsInstance(doc_step["inputs"]["content"], dict)
+
     def test_document_survives_real_schema_and_semantic_validation(self):
         payload = {
             "nodes": [
@@ -224,6 +270,14 @@ class DocumentRoleTests(unittest.TestCase):
     def test_review_step_evidence_is_bound_to_upstream_results(self):
         # T5: a review node must critique its upstream's real output, not
         # dispatch with only the human's review instruction and no evidence.
+        #
+        # Confirmed live (2026-09-25): binding to result.summary meant a
+        # review node only ever saw the first 500 characters of what it was
+        # reviewing (dual_orchestrator.py's model_reasoning/review dispatch
+        # truncates to that field) -- a real multi-objective deliverable
+        # failed review for looking incomplete, when it was the *binding*
+        # that was incomplete. A "research" ancestor has a real result.text
+        # to bind to instead; that is what a review node's job actually needs.
         payload = {
             "nodes": [
                 _node("r", "Research.", role="research"),
@@ -236,7 +290,46 @@ class DocumentRoleTests(unittest.TestCase):
         r_step_id = canvas_plan.node_step_id("r")
         self.assertEqual(
             rev_step["inputs"]["evidence"],
-            [{"bind": {"from_step": r_step_id, "path": "result.summary"}}],
+            [{"bind": {"from_step": r_step_id, "path": "result.text"}}],
+        )
+
+    def test_review_step_evidence_from_a_gate_or_tool_ancestor_still_uses_summary(self):
+        # "plan" and "evidence" ancestors never populate result.text at all
+        # (gate and tool dispatch respectively) -- a review node depending on
+        # either must keep the summary binding, the only value they have,
+        # rather than bind to a field that would silently resolve to None.
+        payload = {
+            "nodes": [
+                _node("p", "role: plan\n\nShip it.", role="plan"),
+                _node("ev", "role: evidence\nproject: mark_platform\n\nRead it.", role="evidence", project=None),
+                _node("rev", "Review the plan and the evidence.", role="review"),
+            ],
+            "edges": [_edge("e1", "p", "rev"), _edge("e2", "ev", "rev")],
+        }
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="revcheck2", name="RevCheck2")
+        rev_step = next(s for s in workflow["steps"] if s["step_type"] == "review")
+        paths = {b["bind"]["from_step"]: b["bind"]["path"] for b in rev_step["inputs"]["evidence"]}
+        self.assertEqual("result.summary", paths[canvas_plan.node_step_id("p")])
+        self.assertEqual("result.summary", paths[canvas_plan.node_step_id("ev")])
+
+    def test_research_step_evidence_still_uses_summary_not_text(self):
+        # The fix is scoped to "review" consumers specifically -- a research
+        # node passing evidence along a multi-hop chain keeps the compact
+        # summary binding so prompt size does not grow unboundedly with
+        # chain length. Widening this to research too is a separate decision
+        # this fix does not make.
+        payload = {
+            "nodes": [
+                _node("r1", "Research one.", role="research"),
+                _node("r2", "Research two.", role="research"),
+            ],
+            "edges": [_edge("e1", "r1", "r2")],
+        }
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="rchain", name="RChain")
+        r2_step = next(s for s in workflow["steps"] if s["description"] == "Research two.")
+        self.assertEqual(
+            r2_step["inputs"]["evidence"],
+            [{"bind": {"from_step": canvas_plan.node_step_id("r1"), "path": "result.summary"}}],
         )
 
     def test_review_step_with_no_upstream_gets_no_evidence_binding(self):
@@ -3206,3 +3299,169 @@ class ImplementationProjectTargetTests(unittest.TestCase):
             "edges": [_edge("e1", "plan1", "v1")],
         }
         canvas_plan.compile_canvas(payload, workflow_id="t")
+
+
+class AutoEvidenceInjectionTests(unittest.TestCase):
+    """Confirmed live (2026-09-24): mark_rd_scouting's "self_assessment" node
+    asked a research role to read the real source with no assumptions --
+    model_reasoning has no file access, so it confabulated a plausible but
+    entirely wrong answer and asserted it was grounded. Hand-patching that one
+    canvas with an explicit "evidence" node fixed that one plan; this is the
+    generalisation -- compile_canvas must catch the same bug class in any
+    future canvas without a human remembering to wire it by hand.
+    """
+
+    def test_reproduces_the_original_bug_case_a_bare_research_node_gets_grounded(self):
+        # This is exactly mark_rd_scouting's original self_assessment shape:
+        # a research node, a project declared only at the plan level, no
+        # hand-authored evidence node anywhere.
+        payload = {
+            "nodes": [
+                _node("plan1", "role: plan\nproject: mark_platform\n\nShip the thing.", role="plan"),
+                _node(
+                    "self_assessment",
+                    "role: research\n\nRead the actual source code (no assumptions) and list subsystems.",
+                    role="research",
+                    project=None,
+                ),
+            ],
+            "edges": [_edge("e1", "plan1", "self_assessment")],
+        }
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="t")
+
+        research_step = next(s for s in workflow["steps"] if s["target"] == "reasoning")
+        evidence_step = next(s for s in workflow["steps"] if s["target"] == "project_operator")
+        self.assertEqual("learn_project", evidence_step["inputs"]["operation"])
+        self.assertEqual("mark_platform", evidence_step["inputs"]["project_id"])
+        bound_steps = {b["bind"]["from_step"] for b in research_step["inputs"].get("evidence", [])}
+        self.assertIn(evidence_step["step_id"], bound_steps)
+
+    def test_a_hand_authored_evidence_ancestor_is_never_duplicated(self):
+        payload = {
+            "nodes": [
+                _node("plan1", "role: plan\n\nShip the thing.", role="plan"),
+                _node("ev1", "role: evidence\nproject: mark_platform\n\nRead it.", role="evidence", project=None),
+                _node("r1", "role: research\n\nSummarise.", role="research", project=None),
+            ],
+            "edges": [_edge("e1", "plan1", "ev1"), _edge("e2", "ev1", "r1")],
+        }
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="t")
+
+        tool_steps = [s for s in workflow["steps"] if s["target"] == "project_operator"]
+        self.assertEqual(1, len(tool_steps))
+
+    def test_a_research_node_with_no_resolvable_project_is_left_alone(self):
+        payload = {
+            "nodes": [
+                _node("plan1", "role: plan\n\nShip the thing.", role="plan"),
+                _node("r1", "role: research\n\nGeneral reasoning, no specific project.", role="research", project=None),
+            ],
+            "edges": [_edge("e1", "plan1", "r1")],
+        }
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="t")
+
+        self.assertFalse(any(s["target"] == "project_operator" for s in workflow["steps"]))
+
+    def test_two_research_nodes_on_the_same_project_share_one_evidence_node(self):
+        payload = {
+            "nodes": [
+                _node("plan1", "role: plan\nproject: mark_platform\n\nShip the thing.", role="plan"),
+                _node("r1", "role: research\n\nFirst angle.", role="research", project=None),
+                _node("r2", "role: research\n\nSecond angle.", role="research", project=None),
+            ],
+            "edges": [_edge("e1", "plan1", "r1"), _edge("e2", "plan1", "r2")],
+        }
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="t")
+
+        tool_steps = [s for s in workflow["steps"] if s["target"] == "project_operator"]
+        self.assertEqual(1, len(tool_steps))
+        research_steps = [s for s in workflow["steps"] if s["target"] == "reasoning"]
+        self.assertEqual(2, len(research_steps))
+        for step in research_steps:
+            bound = {b["bind"]["from_step"] for b in step["inputs"].get("evidence", [])}
+            self.assertIn(tool_steps[0]["step_id"], bound)
+
+    def test_an_existing_evidence_ancestor_for_a_different_project_still_skips_injection(self):
+        # Loose-skip rationale: a research node already handed *some* real
+        # grounding by a human should never be second-guessed with a
+        # duplicate, even if the exact project label differs -- see
+        # _auto_insert_evidence_nodes's docstring.
+        payload = {
+            "nodes": [
+                _node("plan1", "role: plan\nproject: resource_library\n\nShip the thing.", role="plan"),
+                _node("ev1", "role: evidence\nproject: mark_platform\n\nRead it.", role="evidence", project=None),
+                _node("r1", "role: research\n\nSummarise.", role="research", project=None),
+            ],
+            "edges": [_edge("e1", "plan1", "ev1"), _edge("e2", "ev1", "r1")],
+        }
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="t")
+
+        tool_steps = [s for s in workflow["steps"] if s["target"] == "project_operator"]
+        self.assertEqual(1, len(tool_steps))
+        self.assertEqual("mark_platform", tool_steps[0]["inputs"]["project_id"])
+
+
+class EvidenceRoleTests(unittest.TestCase):
+    """Confirmed live (2026-09-24): a "research" node told to read the real
+    source has no way to -- model_reasoning is a bare text completion with no
+    file access, so it confabulated a generic answer and claimed it was
+    grounded. "evidence" is the fix -- a real project_operator learn_project
+    tool call a downstream research node can bind to as genuine evidence.
+    """
+
+    def _payload(self, evidence_text: str, plan_text: str = "role: plan\n\nShip the thing."):
+        return {
+            "nodes": [
+                _node("plan1", plan_text, role="plan"),
+                _node("ev1", evidence_text, role="evidence", project=None),
+            ],
+            "edges": [_edge("e1", "plan1", "ev1")],
+        }
+
+    def test_evidence_node_compiles_to_a_real_tool_call(self):
+        payload = self._payload("role: evidence\nproject: mark_platform\n\nRead the real source.")
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="t")
+        step = next(s for s in workflow["steps"] if s["target"] == "project_operator")
+        self.assertEqual("tool", step["step_type"])
+        self.assertEqual("learn_project", step["inputs"]["operation"])
+        self.assertEqual("mark_platform", step["inputs"]["project_id"])
+        self.assertEqual("local_read", step["side_effects"])
+        self.assertFalse(step.get("requires_confirmation", False))
+
+    def test_canvas_level_project_is_inherited(self):
+        payload = self._payload(
+            "role: evidence\n\nRead the real source.",
+            plan_text="role: plan\nproject: mark_platform\n\nShip the thing.",
+        )
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="t")
+        step = next(s for s in workflow["steps"] if s["target"] == "project_operator")
+        self.assertEqual("mark_platform", step["inputs"]["project_id"])
+
+    def test_no_project_anywhere_is_a_compile_blocker(self):
+        payload = self._payload("role: evidence\n\nRead the real source.")
+        with self.assertRaises(canvas_plan.CanvasCompileError) as caught:
+            canvas_plan.compile_canvas(payload, workflow_id="t")
+        message = str(caught.exception)
+        self.assertIn("no project target", message)
+        self.assertIn("ev1", message)
+
+    def test_unregistered_project_still_blocks(self):
+        payload = self._payload("role: evidence\nproject: not_a_real_project\n\nRead the real source.")
+        with self.assertRaises(canvas_plan.CanvasCompileError) as caught:
+            canvas_plan.compile_canvas(payload, workflow_id="t")
+        self.assertIn("not registered", str(caught.exception))
+
+    def test_downstream_research_node_auto_binds_evidence_result(self):
+        payload = {
+            "nodes": [
+                _node("plan1", "role: plan\nproject: mark_platform\n\nShip the thing.", role="plan"),
+                _node("ev1", "role: evidence\n\nRead the real source.", role="evidence", project=None),
+                _node("r1", "role: research\n\nSummarise what was read.", role="research", project=None),
+            ],
+            "edges": [_edge("e1", "plan1", "ev1"), _edge("e2", "ev1", "r1")],
+        }
+        workflow = canvas_plan.compile_canvas(payload, workflow_id="t")
+        research_step = next(s for s in workflow["steps"] if s["target"] == "reasoning" and "Summarise" in s["description"])
+        evidence_step_id = next(s["step_id"] for s in workflow["steps"] if s["target"] == "project_operator")
+        bound_steps = {b["bind"]["from_step"] for b in research_step["inputs"].get("evidence", [])}
+        self.assertIn(evidence_step_id, bound_steps)

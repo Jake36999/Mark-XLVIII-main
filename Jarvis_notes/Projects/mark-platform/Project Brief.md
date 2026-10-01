@@ -4,7 +4,7 @@ title: "Project Brief - Mark Platform"
 type: "report"
 status: "complete_degraded"
 created: "2026-07-22T00:08:36Z"
-updated: "2026-07-25T16:21:10Z"
+updated: "2026-09-25T00:22:55Z"
 project_id: "jarvis_notes"
 source: "F:\\Mark-XLVIII-main"
 tags: ["project-learning", "repository", "read-only", "mark-platform", "tier/short-term"]
@@ -14,10 +14,10 @@ remember_note_id: ""
 rag_index: true
 sensitivity: "internal"
 confidence: 0.55
-valid_from: "2026-07-25T16:20:58Z"
+valid_from: "2026-09-25T00:22:46Z"
 review_after: ""
-source_version: 14
-content_hash: "fa47762610ea1b3a99797da8b209745f03aa6902d182a922b5e95ad4fdf07336"
+source_version: 20
+content_hash: "e5783dd99e35a5556bb483630f08652ff25bb7e336f5605f005820587a585432"
 supersedes: []
 contradicts: []
 depends_on: []
@@ -31,14 +31,14 @@ consumed_by: []
 related: []
 deleted: false
 deleted_at: ""
-files_read_count: 35
-inventory_file_count: 436
+files_read_count: 36
+inventory_file_count: 484
 lifecycle: "short_term"
 project_key: "mark_platform"
 project_root: "F:\\Mark-XLVIII-main"
-quality_state: "repaired"
+quality_state: "degraded"
 read_only: true
-snapshot_hash: "60f4f3ac977d0e64980ddd09f762d30c726d0693be368d377ae6fb3230288c03"
+snapshot_hash: "500ae389caff52dec53571e06f673a2ad4e53d19a55f0221702e9628c00a5fbf"
 workflow_id: "project_repository_learning/v1"
 ---
 
@@ -49,28 +49,28 @@ workflow_id: "project_repository_learning/v1"
 
 ## Executive Summary
 
-The repository contains 436 inventoried files. This brief is grounded in 35 selected text files and the repository metadata below.
+The repository contains 484 inventoried files. This brief is grounded in 36 selected text files and the repository metadata below.
 
 ## Repository Profile
 
 - Root: `F:\Mark-XLVIII-main`
-- Snapshot: `60f4f3ac977d0e64980ddd09f762d30c726d0693be368d377ae6fb3230288c03`
-- Inventoried files: 436
-- Inventoried bytes: 15787430
-- Sensitive files skipped: 3
+- Snapshot: `500ae389caff52dec53571e06f673a2ad4e53d19a55f0221702e9628c00a5fbf`
+- Inventoried files: 484
+- Inventoried bytes: 16475007
+- Sensitive files skipped: 4
 
 ### File types
 
-- `.py`: 308
+- `.py`: 342
 - `.md`: 47
+- `.json`: 25
 - `.png`: 16
-- `.json`: 14
 - `<none>`: 9
 - `.toml`: 8
 - `.ps1`: 7
+- `.txt`: 6
 - `.sh`: 5
 - `.html`: 5
-- `.txt`: 4
 - `.yml`: 3
 - `.css`: 2
 
@@ -81,7 +81,7 @@ The repository contains 436 inventoried files. This brief is grounded in 35 sele
 - `[Mark-XLVIII-main/main.py](file:///F:/Mark-XLVIII-main/Mark-XLVIII-main/main.py)`
 - `[ClawTeam-OpenClaw-main/ClawTeam-OpenClaw-main/clawteam/mcp/server.py](file:///F:/Mark-XLVIII-main/ClawTeam-OpenClaw-main/ClawTeam-OpenClaw-main/clawteam/mcp/server.py)`
 - `[Mark-XLVIII-main/config/__init__.py](file:///F:/Mark-XLVIII-main/Mark-XLVIII-main/config/__init__.py)`
-- `[Mark-XLVIII-main/tests/test_web_search.py](file:///F:/Mark-XLVIII-main/Mark-XLVIII-main/tests/test_web_search.py)`
+- `[Mark-XLVIII-main/tests/test_dual_orchestrator.py](file:///F:/Mark-XLVIII-main/Mark-XLVIII-main/tests/test_dual_orchestrator.py)`
 - `[ClawTeam-OpenClaw-main/ClawTeam-OpenClaw-main/tests/test_cli_commands.py](file:///F:/Mark-XLVIII-main/ClawTeam-OpenClaw-main/ClawTeam-OpenClaw-main/tests/test_cli_commands.py)`
 - `[Mark-XLVIII-main/actions/dual_orchestrator.py](file:///F:/Mark-XLVIII-main/Mark-XLVIII-main/actions/dual_orchestrator.py)`
 - `[ClawTeam-OpenClaw-main/ClawTeam-OpenClaw-main/docs/skills/clawteam/references/workflows.md](file:///F:/Mark-XLVIII-main/ClawTeam-OpenClaw-main/ClawTeam-OpenClaw-main/docs/skills/clawteam/references/workflows.md)`
@@ -89,28 +89,29 @@ The repository contains 436 inventoried files. This brief is grounded in 35 sele
 - `[ClawTeam-OpenClaw-main/ClawTeam-OpenClaw-main/website/src/App.jsx](file:///F:/Mark-XLVIII-main/ClawTeam-OpenClaw-main/ClawTeam-OpenClaw-main/website/src/App.jsx)`
 - `[Mark-XLVIII-main/actions/model_lifecycle.py](file:///F:/Mark-XLVIII-main/Mark-XLVIII-main/actions/model_lifecycle.py)`
 - `[ClawTeam-OpenClaw-main/ClawTeam-OpenClaw-main/website/src/main.jsx](file:///F:/Mark-XLVIII-main/ClawTeam-OpenClaw-main/ClawTeam-OpenClaw-main/website/src/main.jsx)`
-- `[Mark-XLVIII-main/docs/superpowers/plans/2026-07-06-mark-project-operator.md](file:///F:/Mark-XLVIII-main/Mark-XLVIII-main/docs/superpowers/plans/2026-07-06-mark-project-operator.md)`
+- `[Mark-XLVIII-main/docs/superpowers/plans/2026-07-23-mark-project-knowledge-cartridges.md](file:///F:/Mark-XLVIII-main/Mark-XLVIII-main/docs/superpowers/plans/2026-07-23-mark-project-knowledge-cartridges.md)`
 - `[Mark-XLVIII-main/new-jarvis-ui-components-0.1.0/jarvis-ui-components-0.1.0/jarvis_ui_components/theme.py](file:///F:/Mark-XLVIII-main/Mark-XLVIII-main/new-jarvis-ui-components-0.1.0/jarvis-ui-components-0.1.0/jarvis_ui_components/theme.py)`
 - `[ClawTeam-OpenClaw-main/ClawTeam-OpenClaw-main/CLAUDE.md](file:///F:/Mark-XLVIII-main/ClawTeam-OpenClaw-main/ClawTeam-OpenClaw-main/CLAUDE.md)`
 - `[Mark-XLVIII-main/new-jarvis-ui-components-0.1.0/jarvis-ui-components-0.1.0/pyproject.toml](file:///F:/Mark-XLVIII-main/Mark-XLVIII-main/new-jarvis-ui-components-0.1.0/jarvis-ui-components-0.1.0/pyproject.toml)`
 - `[Mark-XLVIII-main/dashboard/server.py](file:///F:/Mark-XLVIII-main/Mark-XLVIII-main/dashboard/server.py)`
 - `[ClawTeam-OpenClaw-main/ClawTeam-OpenClaw-main/clawteam/board/server.py](file:///F:/Mark-XLVIII-main/ClawTeam-OpenClaw-main/ClawTeam-OpenClaw-main/clawteam/board/server.py)`
 - `[.claude/settings.json](file:///F:/Mark-XLVIII-main/.claude/settings.json)`
-- `[Mark-XLVIII-main/tests/test_model_lifecycle.py](file:///F:/Mark-XLVIII-main/Mark-XLVIII-main/tests/test_model_lifecycle.py)`
+- `[Mark-XLVIII-main/tests/test_web_search.py](file:///F:/Mark-XLVIII-main/Mark-XLVIII-main/tests/test_web_search.py)`
 - `[ClawTeam-OpenClaw-main/ClawTeam-OpenClaw-main/tests/test_spawn_backends.py](file:///F:/Mark-XLVIII-main/ClawTeam-OpenClaw-main/ClawTeam-OpenClaw-main/tests/test_spawn_backends.py)`
 - `[Mark-XLVIII-main/actions/plan_workflow.py](file:///F:/Mark-XLVIII-main/Mark-XLVIII-main/actions/plan_workflow.py)`
 - `[ClawTeam-OpenClaw-main/ClawTeam-OpenClaw-main/clawteam/harness/orchestrator.py](file:///F:/Mark-XLVIII-main/ClawTeam-OpenClaw-main/ClawTeam-OpenClaw-main/clawteam/harness/orchestrator.py)`
-- `[Mark-XLVIII-main/core/model_router.py](file:///F:/Mark-XLVIII-main/Mark-XLVIII-main/core/model_router.py)`
 - `[ClawTeam-OpenClaw-main/ClawTeam-OpenClaw-main/website/src/styles.css](file:///F:/Mark-XLVIII-main/ClawTeam-OpenClaw-main/ClawTeam-OpenClaw-main/website/src/styles.css)`
-- `[Mark-XLVIII-main/core/__init__.py](file:///F:/Mark-XLVIII-main/Mark-XLVIII-main/core/__init__.py)`
+- `[Mark-XLVIII-main/core/tool_dispatcher.py](file:///F:/Mark-XLVIII-main/Mark-XLVIII-main/core/tool_dispatcher.py)`
+- `[Mark-XLVIII-main/core/process_events.py](file:///F:/Mark-XLVIII-main/Mark-XLVIII-main/core/process_events.py)`
+- `[Mark-XLVIII-main/core/runtime_config.py](file:///F:/Mark-XLVIII-main/Mark-XLVIII-main/core/runtime_config.py)`
 - `[ClawTeam-OpenClaw-main/ClawTeam-OpenClaw-main/docs/index.html](file:///F:/Mark-XLVIII-main/ClawTeam-OpenClaw-main/ClawTeam-OpenClaw-main/docs/index.html)`
-- `[ClawTeam-OpenClaw-main/ClawTeam-OpenClaw-main/clawteam/paths.py](file:///F:/Mark-XLVIII-main/ClawTeam-OpenClaw-main/ClawTeam-OpenClaw-main/clawteam/paths.py)`
+- `[Mark-XLVIII-main/jarvis_ui_components/models.py](file:///F:/Mark-XLVIII-main/Mark-XLVIII-main/jarvis_ui_components/models.py)`
 - `[ClawTeam-OpenClaw-main/ClawTeam-OpenClaw-main/.gitignore](file:///F:/Mark-XLVIII-main/ClawTeam-OpenClaw-main/ClawTeam-OpenClaw-main/.gitignore)`
 - `[Mark-XLVIII-main/config/model_providers.example.json](file:///F:/Mark-XLVIII-main/Mark-XLVIII-main/config/model_providers.example.json)`
+- `[ClawTeam-OpenClaw-main/ClawTeam-OpenClaw-main/tests/test_workspace_subproject_overlay.py](file:///F:/Mark-XLVIII-main/ClawTeam-OpenClaw-main/ClawTeam-OpenClaw-main/tests/test_workspace_subproject_overlay.py)`
 - `[Mark-XLVIII-main/tests/__init__.py](file:///F:/Mark-XLVIII-main/Mark-XLVIII-main/tests/__init__.py)`
+- `[Mark-XLVIII-main/core/__init__.py](file:///F:/Mark-XLVIII-main/Mark-XLVIII-main/core/__init__.py)`
 - `[Mark-XLVIII-main/memory/__init__.py](file:///F:/Mark-XLVIII-main/Mark-XLVIII-main/memory/__init__.py)`
-- `[Mark-XLVIII-main/new-jarvis-ui-components-0.1.0/jarvis-ui-components-0.1.0/requirements.txt](file:///F:/Mark-XLVIII-main/Mark-XLVIII-main/new-jarvis-ui-components-0.1.0/jarvis-ui-components-0.1.0/requirements.txt)`
-- `[ClawTeam-OpenClaw-main/ClawTeam-OpenClaw-main/clawteam/cli/__init__.py](file:///F:/Mark-XLVIII-main/ClawTeam-OpenClaw-main/ClawTeam-OpenClaw-main/clawteam/cli/__init__.py)`
 
 ## Architecture And Components
 
@@ -130,12 +131,11 @@ Use the cited entry points and configuration files for follow-up. Validate comma
 
 ## Risks, Gaps, And Questions
 
-- Repository final synthesis omitted RAG Takeaways; JARVIS repaired it from cited report sections.
-- Repository final synthesis conflict: unknown file citations: git, root.
-- Repository final synthesis conflict: section lacks a source citation: Risks, Gaps, And Questions.
+- Repository final synthesis conflict (attempt 1): section lacks a source citation: Risks, Gaps, And Questions.
+- Repository final synthesis conflict (attempt 2): section lacks a source citation: Risks, Gaps, And Questions.
 
 ## RAG Takeaways
 
 - The canonical project root is `F:\Mark-XLVIII-main`.
-- The current repository snapshot is `60f4f3ac977d0e64980ddd09f762d30c726d0693be368d377ae6fb3230288c03`.
-- JARVIS read 35 selected files and skipped 3 sensitive files.
+- The current repository snapshot is `500ae389caff52dec53571e06f673a2ad4e53d19a55f0221702e9628c00a5fbf`.
+- JARVIS read 36 selected files and skipped 4 sensitive files.

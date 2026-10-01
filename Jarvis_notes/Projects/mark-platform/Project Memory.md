@@ -4,7 +4,7 @@ title: "Project Memory - Mark Platform"
 type: "memory"
 status: "active"
 created: "2026-07-22T00:08:36Z"
-updated: "2026-07-25T16:21:10Z"
+updated: "2026-09-25T00:22:55Z"
 project_id: "jarvis_notes"
 source: "F:\\Mark-XLVIII-main\\Jarvis_notes\\Projects\\mark-platform\\Project Brief.md"
 tags: ["project-memory", "repository", "mark-platform", "tier/short-term"]
@@ -14,10 +14,10 @@ remember_note_id: ""
 rag_index: true
 sensitivity: "internal"
 confidence: 0.55
-valid_from: "2026-07-25T16:20:58Z"
+valid_from: "2026-09-25T00:22:46Z"
 review_after: ""
-source_version: 14
-content_hash: "8f3ca9a3c8c6015c05c03a28fdad773f7a90dc061379a7429903d172d704ec77"
+source_version: 20
+content_hash: "4a146ecd1a1695aca85dd909b93231d4624b63d43571cca03d7e84e97a1e7402"
 supersedes: []
 contradicts: []
 depends_on: []
@@ -34,7 +34,7 @@ deleted_at: ""
 lifecycle: "short_term"
 project_key: "mark_platform"
 project_root: "F:\\Mark-XLVIII-main"
-snapshot_hash: "60f4f3ac977d0e64980ddd09f762d30c726d0693be368d377ae6fb3230288c03"
+snapshot_hash: "500ae389caff52dec53571e06f673a2ad4e53d19a55f0221702e9628c00a5fbf"
 workflow_id: "project_repository_learning/v1"
 ---
 
@@ -46,8 +46,8 @@ workflow_id: "project_repository_learning/v1"
 ## Accepted Takeaways
 
 - The canonical project root is `F:\Mark-XLVIII-main`.
-- The current repository snapshot is `60f4f3ac977d0e64980ddd09f762d30c726d0693be368d377ae6fb3230288c03`.
-- JARVIS read 35 selected files and skipped 3 sensitive files.
+- The current repository snapshot is `500ae389caff52dec53571e06f673a2ad4e53d19a55f0221702e9628c00a5fbf`.
+- JARVIS read 36 selected files and skipped 4 sensitive files.
 
 ## Retrieval Guidance
 

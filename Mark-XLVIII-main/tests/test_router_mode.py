@@ -719,6 +719,316 @@ class RouterToolCallingTests(unittest.TestCase):
         jarvis.ui.write_log.assert_any_call("TOOL: plan_workflow")
 
 
+class DashboardReplyBroadcastTests(unittest.TestCase):
+    """Confirmed live (2026-09-25): the web chat interface could send a
+    command that genuinely ran -- the desktop's own log showed the real
+    reply -- but nothing ever pushed that reply back to the browser.
+    ui.write_log() only updates the desktop's own on-screen widget; the
+    dashboard's connected clients are a separate audience. See
+    _broadcast_reply_to_dashboard's docstring for the full story.
+    """
+
+    def _jarvis(self, *, dashboard=True, loop=True):
+        import main
+
+        jarvis = main.JarvisLive.__new__(main.JarvisLive)
+        jarvis._dashboard = mock.Mock() if dashboard else None
+        jarvis._loop = mock.Mock() if loop else None
+        return jarvis
+
+    def test_broadcasts_the_reply_with_the_shape_the_web_client_expects(self):
+        jarvis = self._jarvis()
+        with mock.patch("main.asyncio.run_coroutine_threadsafe") as schedule:
+            jarvis._broadcast_reply_to_dashboard("here is my answer")
+        schedule.assert_called_once()
+        coro = schedule.call_args.args[0]
+        self.assertEqual(jarvis._loop, schedule.call_args.args[1])
+        coro.close()  # avoid an "unawaited coroutine" warning; args are what matter
+        jarvis._dashboard.broadcast.assert_called_once_with(
+            {"type": "log", "speaker": "jarvis", "text": "here is my answer"}
+        )
+
+    def test_custom_speaker_is_forwarded(self):
+        jarvis = self._jarvis()
+        with mock.patch("main.asyncio.run_coroutine_threadsafe") as schedule:
+            jarvis._broadcast_reply_to_dashboard("what I said", speaker="user")
+        schedule.call_args.args[0].close()
+        jarvis._dashboard.broadcast.assert_called_once_with(
+            {"type": "log", "speaker": "user", "text": "what I said"}
+        )
+
+    def test_no_dashboard_is_a_silent_no_op(self):
+        jarvis = self._jarvis(dashboard=False)
+        with mock.patch("main.asyncio.run_coroutine_threadsafe") as schedule:
+            jarvis._broadcast_reply_to_dashboard("reply")
+        schedule.assert_not_called()
+
+    def test_no_event_loop_is_a_silent_no_op(self):
+        jarvis = self._jarvis(loop=False)
+        with mock.patch("main.asyncio.run_coroutine_threadsafe") as schedule:
+            jarvis._broadcast_reply_to_dashboard("reply")
+        schedule.assert_not_called()
+
+    def test_empty_text_is_a_no_op(self):
+        jarvis = self._jarvis()
+        with mock.patch("main.asyncio.run_coroutine_threadsafe") as schedule:
+            jarvis._broadcast_reply_to_dashboard("")
+        schedule.assert_not_called()
+
+    def test_scheduling_failure_is_caught_not_raised(self):
+        jarvis = self._jarvis()
+        with mock.patch("main.asyncio.run_coroutine_threadsafe", side_effect=RuntimeError("loop closed")):
+            jarvis._broadcast_reply_to_dashboard("reply")  # must not raise
+
+
+class HandleRouterTextCommandDashboardBroadcastWiringTests(unittest.TestCase):
+    """Confirms the broadcast is actually reached from a real turn, not just
+    correct in isolation."""
+
+    def _jarvis(self):
+        import main
+
+        jarvis = main.JarvisLive.__new__(main.JarvisLive)
+        jarvis.ui = mock.Mock()
+        jarvis.ui.muted = False
+        jarvis._router_system_prompt = mock.Mock(return_value="system")
+        jarvis.speak = mock.Mock()
+        jarvis._broadcast_reply_to_dashboard = mock.Mock()
+        return jarvis
+
+    def test_the_jarvis_reply_is_broadcast_for_every_source(self):
+        import main
+
+        jarvis = self._jarvis()
+        routed = SimpleNamespace(text="here is the answer", tool_calls=[])
+        with mock.patch("main.call_with_tools", return_value=routed):
+            jarvis._handle_router_text_command("hello", source="dashboard")
+        jarvis._broadcast_reply_to_dashboard.assert_any_call("here is the answer")
+
+    def test_a_dashboard_sourced_message_is_not_echoed_back(self):
+        # app.html's doSend() already appends the user's own message locally
+        # the instant it sends one -- broadcasting it back would duplicate it.
+        import main
+
+        jarvis = self._jarvis()
+        routed = SimpleNamespace(text="reply", tool_calls=[])
+        with mock.patch("main.call_with_tools", return_value=routed):
+            jarvis._handle_router_text_command("hello from the web", source="dashboard")
+        for call in jarvis._broadcast_reply_to_dashboard.call_args_list:
+            self.assertNotEqual(call, mock.call("hello from the web", speaker="user"))
+
+    def test_a_voice_sourced_message_is_echoed_so_a_phone_sees_both_sides(self):
+        import main
+
+        jarvis = self._jarvis()
+        routed = SimpleNamespace(text="reply", tool_calls=[])
+        with mock.patch("main.call_with_tools", return_value=routed):
+            jarvis._handle_router_text_command("what's the weather", source="voice")
+        jarvis._broadcast_reply_to_dashboard.assert_any_call("what's the weather", speaker="user")
+
+
+class EffortCallKwargsTests(unittest.TestCase):
+    """The effort bar (2026-09-25) is the chat interface's first real control
+    over what a plain conversational turn costs -- see _effort_call_kwargs.
+    """
+
+    def test_unset_effort_reproduces_the_exact_prior_hardcoded_default(self):
+        import main
+
+        self.assertEqual({"role": "planner", "timeout": 120}, main._effort_call_kwargs(""))
+
+    def test_balanced_is_identical_to_unset(self):
+        import main
+
+        self.assertEqual(main._effort_call_kwargs(""), main._effort_call_kwargs("balanced"))
+
+    def test_faster_routes_to_the_cheap_quick_tier(self):
+        import main
+
+        self.assertEqual({"role": "quick", "timeout": 60}, main._effort_call_kwargs("faster"))
+
+    def test_thorough_and_max_keep_planner_but_widen_the_timeout(self):
+        import main
+
+        thorough = main._effort_call_kwargs("thorough")
+        maximum = main._effort_call_kwargs("max")
+        self.assertEqual("planner", thorough["role"])
+        self.assertEqual("planner", maximum["role"])
+        self.assertGreater(thorough["timeout"], 120)
+        self.assertGreater(maximum["timeout"], thorough["timeout"])
+
+    def test_unrecognised_effort_string_falls_back_to_balanced(self):
+        import main
+
+        self.assertEqual(main._effort_call_kwargs("balanced"), main._effort_call_kwargs("garbage"))
+
+    def test_effort_string_is_case_and_whitespace_insensitive(self):
+        import main
+
+        self.assertEqual(main._effort_call_kwargs("faster"), main._effort_call_kwargs("  FASTER  "))
+
+
+class HandleRouterTextCommandEffortWiringTests(unittest.TestCase):
+    """Confirms the effort parameter actually reaches call_with_tools, not
+    just that _effort_call_kwargs computes the right dict in isolation."""
+
+    def _jarvis(self):
+        import main
+
+        jarvis = main.JarvisLive.__new__(main.JarvisLive)
+        jarvis.ui = mock.Mock()
+        jarvis.ui.muted = False
+        jarvis._router_system_prompt = mock.Mock(return_value="system")
+        jarvis.speak = mock.Mock()
+        return jarvis
+
+    def test_default_call_uses_planner_role_and_120s_timeout(self):
+        import main
+
+        jarvis = self._jarvis()
+        routed = SimpleNamespace(text="ok", tool_calls=[])
+        with mock.patch("main.call_with_tools", return_value=routed) as call_with_tools:
+            jarvis._handle_router_text_command("hello")
+        self.assertEqual("planner", call_with_tools.call_args.kwargs["role"])
+        self.assertEqual(120, call_with_tools.call_args.kwargs["timeout"])
+
+    def test_faster_effort_uses_quick_role_and_shorter_timeout(self):
+        import main
+
+        jarvis = self._jarvis()
+        routed = SimpleNamespace(text="ok", tool_calls=[])
+        with mock.patch("main.call_with_tools", return_value=routed) as call_with_tools:
+            jarvis._handle_router_text_command("hello", effort="faster")
+        self.assertEqual("quick", call_with_tools.call_args.kwargs["role"])
+        self.assertEqual(60, call_with_tools.call_args.kwargs["timeout"])
+
+
+class MaxEffortRerollTests(unittest.TestCase):
+    """The narrow, safe slice of "reroll and assess" Max effort implements --
+    see _maybe_reroll_for_max_effort's docstring for what it deliberately
+    does not attempt."""
+
+    def _jarvis(self):
+        import main
+
+        jarvis = main.JarvisLive.__new__(main.JarvisLive)
+        return jarvis
+
+    def test_non_max_effort_never_triggers_a_second_call(self):
+        jarvis = self._jarvis()
+        routed = SimpleNamespace(text="a short reply", tool_calls=[])
+        with mock.patch("main.call_with_tools") as call_with_tools:
+            result = jarvis._maybe_reroll_for_max_effort(routed, "balanced", "prompt", "system", [])
+        call_with_tools.assert_not_called()
+        self.assertIs(result, routed)
+
+    def test_a_tool_calling_first_response_is_never_rerolled(self):
+        # There is no equally honest way to judge which of two different
+        # *tool choices* is the better one, so a tool-calling response
+        # proceeds exactly as it would without Max effort.
+        jarvis = self._jarvis()
+        routed = SimpleNamespace(
+            text="", tool_calls=[SimpleNamespace(id="c1", name="web_search", arguments={})]
+        )
+        with mock.patch("main.call_with_tools") as call_with_tools:
+            result = jarvis._maybe_reroll_for_max_effort(routed, "max", "prompt", "system", [])
+        call_with_tools.assert_not_called()
+        self.assertIs(result, routed)
+
+    def test_max_effort_keeps_the_longer_of_two_plain_replies(self):
+        jarvis = self._jarvis()
+        first = SimpleNamespace(text="short", tool_calls=[])
+        second = SimpleNamespace(text="a substantially longer and more complete reply", tool_calls=[])
+        with mock.patch("main.call_with_tools", return_value=second) as call_with_tools:
+            result = jarvis._maybe_reroll_for_max_effort(first, "max", "prompt", "system", [])
+        call_with_tools.assert_called_once()
+        self.assertIs(result, second)
+
+    def test_max_effort_keeps_the_first_reply_when_it_is_already_longer(self):
+        jarvis = self._jarvis()
+        first = SimpleNamespace(text="a substantially longer and more complete reply", tool_calls=[])
+        second = SimpleNamespace(text="short", tool_calls=[])
+        with mock.patch("main.call_with_tools", return_value=second):
+            result = jarvis._maybe_reroll_for_max_effort(first, "max", "prompt", "system", [])
+        self.assertIs(result, first)
+
+    def test_second_response_choosing_a_tool_call_keeps_the_first_reply(self):
+        jarvis = self._jarvis()
+        first = SimpleNamespace(text="short", tool_calls=[])
+        second = SimpleNamespace(
+            text="", tool_calls=[SimpleNamespace(id="c1", name="web_search", arguments={})]
+        )
+        with mock.patch("main.call_with_tools", return_value=second):
+            result = jarvis._maybe_reroll_for_max_effort(first, "max", "prompt", "system", [])
+        self.assertIs(result, first)
+
+    def test_a_failed_second_call_falls_back_to_the_first_reply(self):
+        jarvis = self._jarvis()
+        first = SimpleNamespace(text="short", tool_calls=[])
+        with mock.patch("main.call_with_tools", side_effect=RuntimeError("provider down")):
+            result = jarvis._maybe_reroll_for_max_effort(first, "max", "prompt", "system", [])
+        self.assertIs(result, first)
+
+
+class DashboardCommandQueueEffortTests(unittest.TestCase):
+    """_process_dashboard_commands (2026-09-25) reads (text, effort) tuples
+    now that the dashboard's own effort bar can send one, and must still
+    accept a bare string from any caller that predates it."""
+
+    def _jarvis_with_queued(self, item):
+        import asyncio
+
+        import main
+
+        jarvis = main.JarvisLive.__new__(main.JarvisLive)
+        jarvis.ui = mock.Mock()
+        jarvis._next_router_turn_id = mock.Mock(return_value=1)
+        jarvis._handle_router_text_command = mock.Mock()
+        queue = asyncio.Queue()
+        queue.put_nowait(item)
+        jarvis._dashboard = mock.Mock()
+        jarvis._dashboard._command_queue = queue
+        return jarvis
+
+    def test_tuple_item_forwards_text_and_effort(self):
+        import asyncio
+
+        jarvis = self._jarvis_with_queued(("run the tests", "thorough"))
+
+        async def run_once():
+            task = asyncio.ensure_future(jarvis._process_dashboard_commands())
+            await asyncio.sleep(0.1)
+            task.cancel()
+            try:
+                await task
+            except asyncio.CancelledError:
+                pass
+
+        asyncio.run(run_once())
+        jarvis._handle_router_text_command.assert_called_once_with(
+            "run the tests", 1, "dashboard", "thorough"
+        )
+
+    def test_legacy_bare_string_item_still_works_with_no_effort(self):
+        import asyncio
+
+        jarvis = self._jarvis_with_queued("run the tests")
+
+        async def run_once():
+            task = asyncio.ensure_future(jarvis._process_dashboard_commands())
+            await asyncio.sleep(0.1)
+            task.cancel()
+            try:
+                await task
+            except asyncio.CancelledError:
+                pass
+
+        asyncio.run(run_once())
+        jarvis._handle_router_text_command.assert_called_once_with(
+            "run the tests", 1, "dashboard", ""
+        )
+
+
 class ToolSummaryGroundingTests(unittest.TestCase):
     """Regression coverage for a live-tested finding: a chat request to run a
     specific test file got routed to project_operator (an unrelated project's

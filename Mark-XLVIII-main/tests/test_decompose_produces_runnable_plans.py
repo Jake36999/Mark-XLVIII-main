@@ -151,6 +151,72 @@ class TheLiveCallerSuppliesWhatItNeedsTests(unittest.TestCase):
         self.assertIn("decompose_goal_to_canvas", source)
         self.assertIn("propose_canvas_plan", source)
 
+    def test_the_dynamic_router_falls_through_to_the_canvas_redirect(self):
+        """Confirmed live (2026-09-25): the blanket redirect above is still
+        correct for a genuine multi-file project -- the dynamic router must
+        keep calling it whenever estimate_scope says the request is not
+        small, not replace it outright."""
+        import inspect
+
+        import main
+
+        source = inspect.getsource(main.JarvisLive._route_dev_agent_request)
+        self.assertIn("estimate_scope", source)
+        self.assertIn("_redirect_dev_agent_to_canvas", source)
+
+    def test_the_dynamic_router_uses_code_helper_for_the_small_case(self):
+        import inspect
+
+        import main
+
+        source = inspect.getsource(main.JarvisLive._route_dev_agent_request)
+        self.assertIn("code_helper", source)
+        self.assertIn('"action": "write"', source)
+
+    def test_small_scope_dispatches_to_code_helper_not_canvas(self):
+        import main
+
+        fake_self = mock.Mock()
+        fake_self.ui = mock.Mock()
+        fake_self.speak = None
+        fake_self._redirect_dev_agent_to_canvas = mock.Mock(name="redirect")
+
+        scope = {
+            "ok": True,
+            "is_small": True,
+            "file_count": 1,
+            "dependency_count": 0,
+            "plan": {"files": [{"path": "quick.py", "description": "a quick script"}]},
+        }
+        with mock.patch("actions.dev_agent.estimate_scope", return_value=scope), mock.patch(
+            "main.code_helper", return_value="Written."
+        ) as code_helper_mock, mock.patch("main.emit_process_event"):
+            result = main.JarvisLive._route_dev_agent_request(fake_self, "write a quick script", None)
+
+        fake_self._redirect_dev_agent_to_canvas.assert_not_called()
+        code_helper_mock.assert_called_once()
+        called_params = code_helper_mock.call_args.kwargs["parameters"]
+        self.assertEqual("write", called_params["action"])
+        self.assertEqual("quick.py", called_params["output_path"])
+        self.assertEqual("Written.", result)
+
+    def test_non_small_scope_falls_through_to_canvas_redirect(self):
+        import main
+
+        fake_self = mock.Mock()
+        fake_self.ui = mock.Mock()
+        fake_self._redirect_dev_agent_to_canvas = mock.Mock(return_value="Drafted a plan.")
+
+        scope = {"ok": True, "is_small": False, "file_count": 3, "dependency_count": 0, "plan": {"files": []}}
+        with mock.patch("actions.dev_agent.estimate_scope", return_value=scope), mock.patch(
+            "main.code_helper"
+        ) as code_helper_mock:
+            result = main.JarvisLive._route_dev_agent_request(fake_self, "build a small app", None)
+
+        code_helper_mock.assert_not_called()
+        fake_self._redirect_dev_agent_to_canvas.assert_called_once_with("build a small app", None)
+        self.assertEqual("Drafted a plan.", result)
+
     def test_decompose_infers_the_hint_without_being_told(self):
         signature = __import__("inspect").signature(canvas_plan.decompose_goal_to_canvas)
         self.assertEqual(signature.parameters["project_hint"].default, "")

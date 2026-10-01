@@ -1,0 +1,23 @@
+=== run 1 ===
+status: complete_degraded | quality_state: degraded
+ - Repository final synthesis conflict (attempt 1): report denied the test suite despite 118 inventoried test files.
+ - Repository final synthesis conflict (attempt 1): section lacks a source citation: Risks, Gaps, And Questions.
+ - Repository final synthesis conflict (attempt 2): unknown file citations: Mark-XLVIII-main/config/runtime.json.
+
+=== run 2 ===
+status: complete_degraded | quality_state: degraded
+ - Repository final synthesis conflict (attempt 1): report denied the test suite despite 118 inventoried test files.
+ - Repository final synthesis conflict (attempt 1): unknown file citations: Mark-XLVIII-main/tests/test_spawn_backends.py.
+ - Repository final synthesis conflict (attempt 1): section lacks a source citation: Operational Guidance.
+ - Repository final synthesis conflict (attempt 1): section lacks a source citation: Risks, Gaps, And Questions.
+ - Repository final synthesis conflict (attempt 1): RAG takeaways contain an incomplete sentence.
+ - Repository final synthesis conflict (attempt 2): unknown file citations: Mark-XLVIII-main/config/runtime.json, Mark-XLVIII-main/tests/test_spawn_backends.py.
+ - Repository final synthesis conflict (attempt 2): section lacks a source citation: Operational Guidance.
+ - Repository final synthesis conflict (attempt 2): section lacks a source citation: Risks, Gaps, And Questions.
+ - Repository final synthesis conflict (attempt 2): RAG takeaways contain an incomplete sentence.
+
+=== run 3 ===
+status: complete_degraded | quality_state: degraded
+ - Repository final synthesis conflict (attempt 1): section lacks a source citation: Risks, Gaps, And Questions.
+ - Repository final synthesis conflict (attempt 2): section lacks a source citation: Risks, Gaps, And Questions.
+

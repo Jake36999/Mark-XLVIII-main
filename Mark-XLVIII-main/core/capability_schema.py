@@ -59,7 +59,14 @@ _WORKFLOW_DISPATCHABLE_TOOL_IDS = frozenset({"web_search", "jarvis_memory", "pro
 # resolve_settings's generic `cfg.get(f"{role}_provider")` branch to its
 # lmstudio default, the exact bug class found live the same day with the
 # "reviewer" role.
-_MODEL_ROLE_IDS = ("planner", "worker", "research", "reviewer")
+#
+# "quick"/"main"/"reasoning"/"code" joined this set on 2026-09-25 once they
+# got the same explicit config -- see runtime.json and the co-pilot
+# usability pass in Note 07. "vision" deliberately never joins: call_vision()
+# hardcodes provider="lmstudio" on purpose (core/model_router.py) so a screen
+# or camera capture can never leave the machine as a side effect of a
+# routing decision -- there is no cloud config for it to carry.
+_MODEL_ROLE_IDS = ("planner", "worker", "research", "reviewer", "quick", "main", "reasoning", "code")
 
 
 # Which canvas roles a tool capability may be offered to at all -- the same

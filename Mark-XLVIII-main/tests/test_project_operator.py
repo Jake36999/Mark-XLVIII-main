@@ -19,9 +19,24 @@ class ProjectOperatorRegistryTests(unittest.TestCase):
                 "mark_platform",
                 "network_management",
                 "archive",
+                "resource_library",
             },
             set(registry["projects"].keys()),
         )
+
+    def test_resource_library_entry_is_read_only_no_code_execution(self):
+        # Registered 2026-09-24 as the read-only substitute for a formal MCP
+        # "Reader" connection Mark-XLVIII doesn't have yet -- it must never be
+        # able to run a command or write into someone else's knowledge base.
+        from actions import project_operator
+
+        registry = project_operator.load_registry()
+        resource_library = registry["projects"]["resource_library"]
+
+        self.assertEqual(resource_library["safe_commands"], [])
+        self.assertEqual(resource_library["confirmation_commands"], [])
+        self.assertNotIn("delegate_openclaw", resource_library["safe_operations"])
+        self.assertIn("delegate_openclaw", resource_library["confirmation_operations"])
 
     def test_archive_entry_grants_no_safe_operations_by_default(self):
         # Workflow 2: the archive is registered only so graphify_query can

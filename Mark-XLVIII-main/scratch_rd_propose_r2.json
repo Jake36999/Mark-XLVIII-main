@@ -1,0 +1,11 @@
+{
+  "ok": true,
+  "changed": true,
+  "note_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\Plans\\canvas-approval-mark_rd_scouting.md",
+  "plan_version": 2,
+  "plan_fingerprint_hash": "b1d534534c14ce4c882aa6db988b72b894d52fa9d17ad01c4691d9fe49bb1c6f",
+  "workflow_hash": "155059a9fb7febee886f02da251c7085ab2524ffeda33e96b5776eefda4b2a26",
+  "manifest_hash": "d3fd693a39b1a5c197fa3dadb590dff54e5a57953fbfe56c33d5091cc705a9db",
+  "bundle_path": "F:\\Mark-XLVIII-main\\Jarvis_notes\\.jarvis\\canvas_approvals\\mark_rd_scouting\\v2",
+  "cancelled_run": "mark_rd_scouting-v1"
+}

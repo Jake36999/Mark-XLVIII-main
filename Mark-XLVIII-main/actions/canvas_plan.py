@@ -175,6 +175,26 @@ _ROLE_SPECS: dict[str, dict[str, Any]] = {
         "risk_tier": "T2",
         "side_effects": "local_write",
     },
+    # Confirmed live (2026-09-24): a "research" node told to "read the actual
+    # source, no assumptions" has no way to do that -- model_reasoning is a
+    # bare call_text() with no file access, so the model confabulated a
+    # generic platform description and asserted it was grounded. This role is
+    # the fix: a real, read-only project_operator learn_project call (already
+    # registered as a safe_operation, no confirmation) that actually reads the
+    # target project and returns genuine takeaways -- see _dispatch_tool's
+    # takeaways->summary normalisation in dual_orchestrator.py, which is what
+    # lets those takeaways flow into a downstream research node's evidence via
+    # the same result.summary binding every _RELIABLE_SUMMARY_ROLES role uses.
+    "evidence": {
+        "orchestrator": "deterministic",
+        "step_type": "tool",
+        "target": "project_operator",
+        "inputs": {"operation": "learn_project"},
+        "risk_tier": "T1",
+        "side_effects": "local_read",
+        "requires_confirmation": False,
+        "retry_policy": {"safe": True, "max_attempts": 2},
+    },
 }
 
 # The safe default for any node that does not declare (or mis-declares) a role.
@@ -344,8 +364,13 @@ def _sanitise_workflow_id(value: str, fallback: str = "canvas_plan") -> str:
 # from prose already on the canvas -- budget-capped, since this session's own
 # WS4c testing showed a longer prompt measurably hurts the local overseer.
 _PREAMBLE_FIELD_BUDGET = 220
-_CONTEXT_PREAMBLE_ROLES = frozenset({"research", "review", "implementation", "document"})
-_RELIABLE_SUMMARY_ROLES = frozenset({"research", "note", "review", "plan", "reference"})
+_CONTEXT_PREAMBLE_ROLES = frozenset({"research", "review", "implementation", "document", "evidence"})
+_RELIABLE_SUMMARY_ROLES = frozenset({"research", "note", "review", "plan", "reference", "evidence"})
+# Subset of _RELIABLE_SUMMARY_ROLES whose dispatch (model_reasoning/review,
+# dual_orchestrator.py) produces a real, untruncated result.text distinct from
+# its truncated result.summary (text[:500]) -- see the review-role evidence
+# binding in compile_canvas for why this matters.
+_FULL_TEXT_ROLES = frozenset({"research", "review", "note"})
 
 
 def _truncate(text: str, limit: int = _PREAMBLE_FIELD_BUDGET) -> str:
@@ -375,6 +400,127 @@ def _context_preamble(
     return "\n".join(lines)
 
 
+def _auto_insert_evidence_nodes(
+    nodes: list[dict[str, Any]], edges: list[dict[str, Any]]
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """Give every ungrounded "research" node a real evidence ancestor.
+
+    Confirmed live (2026-09-24): a "research" node told to "read the actual
+    source, no assumptions" has no way to -- model_reasoning is a bare text
+    completion with no file access, so it confabulated a plausible-sounding
+    generic answer and asserted it was grounded. Hand-patching one canvas
+    with an explicit "evidence" node (a real project_operator learn_project
+    call) fixed that one plan; this generalises the fix so the same
+    confabulation bug class cannot recur silently in a future canvas -- a
+    human should not have to remember to wire this every time.
+
+    A research node's target project is its own `project:` directive, or the
+    plan node's (the existing "one canvas = one plan target" convention).
+    Skip condition is deliberately loose: a research node with *any* evidence
+    ancestor at all -- not only one matching its exact resolved project -- is
+    left alone. A canvas mixing several real project targets under one plan
+    node (self-assessing platform X while also scouting library Y) breaks the
+    single-target assumption for project *matching*, but a node a human
+    already gave real grounding to should never be second-guessed or given a
+    redundant duplicate; that loose check is what keeps this idempotent on an
+    already hand-grounded canvas.
+
+    One evidence node per project is shared across every research node that
+    needs it, so N research nodes on the same project cost one real read, not
+    N duplicate ones.
+    """
+    nodes_by_id = {str(n["id"]): n for n in nodes}
+    node_ids = set(nodes_by_id)
+    incoming: dict[str, list[str]] = {nid: [] for nid in node_ids}
+    for edge in edges:
+        src, dst = str(edge.get("fromNode") or ""), str(edge.get("toNode") or "")
+        if src in node_ids and dst in node_ids and src != dst:
+            incoming[dst].append(src)
+
+    plan_node = next((n for n in nodes if _resolve_role(n) == "plan"), None)
+    canvas_project_id = _node_directives(plan_node).get("project", "") if plan_node else ""
+
+    def _resolved_project(node: dict[str, Any]) -> str:
+        return _node_directives(node).get("project") or canvas_project_id
+
+    def _has_evidence_ancestor(nid: str) -> bool:
+        seen: set[str] = set()
+        stack = list(incoming.get(nid, []))
+        while stack:
+            current = stack.pop()
+            if current in seen:
+                continue
+            seen.add(current)
+            node = nodes_by_id.get(current)
+            if node is not None and _resolve_role(node) == "evidence":
+                return True
+            stack.extend(incoming.get(current, []))
+        return False
+
+    evidence_node_by_project: dict[str, str] = {}
+    for node in nodes:
+        if _resolve_role(node) == "evidence":
+            project = _resolved_project(node)
+            if project:
+                evidence_node_by_project.setdefault(project, str(node["id"]))
+
+    new_nodes: list[dict[str, Any]] = []
+    new_edges: list[dict[str, Any]] = []
+    root_id = str(plan_node["id"]) if plan_node else None
+
+    for node in nodes:
+        if _resolve_role(node) != "research" or _has_evidence_ancestor(str(node["id"])):
+            continue
+        project = _resolved_project(node)
+        if not project:
+            continue
+        evidence_id = evidence_node_by_project.get(project)
+        if evidence_id is None:
+            slug = re.sub(r"[^a-z0-9]+", "_", project.lower()).strip("_") or "target"
+            evidence_id = f"auto_evidence_{slug}"
+            evidence_node_by_project[project] = evidence_id
+            new_nodes.append(
+                {
+                    "id": evidence_id,
+                    "type": "text",
+                    "text": (
+                        f"role: evidence\nproject: {project}\n\n"
+                        f"Auto-inserted (2026-09-24): read {project} read-only "
+                        "(project_operator learn_project) so downstream research "
+                        "nodes targeting it have genuine, file-grounded evidence "
+                        "instead of an ungrounded guess."
+                    ),
+                    "x": 0,
+                    "y": 0,
+                    "width": 420,
+                    "height": 180,
+                }
+            )
+            if root_id and root_id != evidence_id:
+                new_edges.append(
+                    {
+                        "id": f"jarvis-auto-{evidence_id}-root",
+                        "fromNode": root_id,
+                        "fromSide": "right",
+                        "toNode": evidence_id,
+                        "toSide": "left",
+                    }
+                )
+        new_edges.append(
+            {
+                "id": f"jarvis-auto-{evidence_id}-to-{node['id']}",
+                "fromNode": evidence_id,
+                "fromSide": "right",
+                "toNode": str(node["id"]),
+                "toSide": "left",
+            }
+        )
+
+    if not new_nodes and not new_edges:
+        return nodes, edges
+    return nodes + new_nodes, edges + new_edges
+
+
 def compile_canvas(
     payload: dict[str, Any],
     *,
@@ -393,6 +539,7 @@ def compile_canvas(
     edges = [e for e in (edges_raw or []) if isinstance(e, dict)]
     if not nodes:
         raise CanvasCompileError("Canvas has no usable nodes to compile.")
+    nodes, edges = _auto_insert_evidence_nodes(nodes, edges)
 
     node_ids = {str(n["id"]) for n in nodes}
     layers, cycles = _dependency_layers(nodes, edges)
@@ -477,11 +624,11 @@ def compile_canvas(
             if canvas_project_id and canvas_mode:
                 break
 
-    # Load the registry whenever any implementation node exists, not only when
-    # one already names a project -- the missing-project blocker below needs the
-    # real list of ids to tell the user what to put in the directive.
+    # Load the registry whenever any implementation or evidence node exists, not
+    # only when one already names a project -- the missing-project blocker below
+    # needs the real list of ids to tell the user what to put in the directive.
     registered_project_ids: set[str] | None = None
-    if canvas_project_id or any(_resolve_role(node) == "implementation" for node in nodes):
+    if canvas_project_id or any(_resolve_role(node) in {"implementation", "evidence"} for node in nodes):
         from actions.project_operator import load_registry
 
         registered_project_ids = set(load_registry().get("projects") or {})
@@ -637,6 +784,31 @@ def compile_canvas(
             inputs["intent"] = f"{preamble}\n\n{description}" if preamble else description
             if preamble:
                 inputs["context_injected"] = True
+        elif role == "evidence":
+            # Same blocking-not-defaulting rationale as implementation above:
+            # learn_project needs a real project_id to know what to read, and
+            # picking one automatically would silently read whichever project
+            # happened to be default. project_id is read-only here (T1, no
+            # confirmation), so this is stricter than it needs to be for
+            # safety alone, but keeps the failure mode identical and
+            # predictable across every tool-dispatched role.
+            project_id = directives.get("project") or canvas_project_id
+            if not project_id:
+                known = ", ".join(sorted(registered_project_ids)) if registered_project_ids else ""
+                raise CanvasCompileError(
+                    f"Evidence node '{nid}' has no project target. Add a `project:` directive to "
+                    f"the node, or to the canvas's plan node to set it for the whole canvas."
+                    + (f" Registered projects: {known}." if known else "")
+                )
+            if registered_project_ids is not None and project_id not in registered_project_ids:
+                raise CanvasCompileError(
+                    f"Node '{nid}' declares project '{project_id}', which is not registered. "
+                    f"Known projects: {', '.join(sorted(registered_project_ids)) or '(none registered)'}."
+                )
+            inputs["project_id"] = project_id
+            inputs["intent"] = f"{preamble}\n\n{description}" if preamble else description
+            if preamble:
+                inputs["context_injected"] = True
         elif role in {"research", "review"} and preamble:
             # WS4d: research/review dispatch reads inputs.prompt in preference
             # to the bare step description (dual_orchestrator.py's
@@ -654,12 +826,24 @@ def compile_canvas(
             # single node it depends on -- model_reasoning/review steps
             # return {"text": ...}, so this pulls their actual output, not
             # just canvas-declared context. A document node with more than
-            # one dependency has no single obvious source to bind, so it
-            # falls back to the same cross-node preamble research/review use
-            # -- real context, just not a live-resolved binding.
+            # one CONTENT-bearing dependency has no single obvious source to
+            # bind, so it falls back to the same cross-node preamble
+            # research/review use -- real context, just not a live-resolved
+            # binding.
+            #
+            # Confirmed live (2026-09-24): this used to count every
+            # dependency, including a "review" gate -- so the moment a
+            # document node got a prerequisite review (exactly the structure
+            # a canvas critique reasonably asks for), it silently lost its
+            # live binding and fell back to the weaker preamble path, putting
+            # a paraphrase in the vault instead of the reviewed step's real
+            # output. A review node is a gate, not a content source, so it is
+            # excluded from the candidate set -- a document can now depend on
+            # both its real content and a review of it without losing either.
             inputs["title"] = (description[:200] or "Untitled").strip()
-            if len(resolved_dep_nids) == 1:
-                inputs["content"] = {"bind": {"from_step": node_step_id(resolved_dep_nids[0]), "path": "result.text"}}
+            content_dep_nids = [dep for dep in resolved_dep_nids if role_by_nid.get(dep) != "review"]
+            if len(content_dep_nids) == 1:
+                inputs["content"] = {"bind": {"from_step": node_step_id(content_dep_nids[0]), "path": "result.text"}}
             elif preamble:
                 inputs["content"] = preamble
             else:
@@ -710,12 +894,35 @@ def compile_canvas(
             # None, so verification/implementation dependencies are skipped
             # here rather than wired up to a binding that silently resolves
             # to nothing).
-            reliable_deps = [
-                node_step_id(src) for src in resolved_dep_nids if role_by_nid.get(src) in _RELIABLE_SUMMARY_ROLES
-            ]
-            if reliable_deps:
+            reliable_srcs = [src for src in resolved_dep_nids if role_by_nid.get(src) in _RELIABLE_SUMMARY_ROLES]
+            if reliable_srcs:
                 step["inputs"]["evidence"] = [
-                    {"bind": {"from_step": dep, "path": "result.summary"}} for dep in reliable_deps
+                    {
+                        "bind": {
+                            "from_step": node_step_id(src),
+                            # Confirmed live (2026-09-25): a review node bound to
+                            # result.summary only ever saw the first 500 characters
+                            # of whatever it was reviewing (dual_orchestrator.py's
+                            # model_reasoning/review dispatch truncates text to
+                            # that field with text[:500]) -- correctly failing a
+                            # real multi-objective deliverable it could only see
+                            # the start of. A review node's job is to assess the
+                            # whole thing, so it binds to the untruncated field
+                            # instead, but only for ancestor roles that actually
+                            # dispatch through that same model_reasoning/review
+                            # branch and so have a real result.text to bind to --
+                            # "plan"/"reference" are gate steps and "evidence" is a
+                            # tool call, none of which ever populate result.text,
+                            # so those three keep the summary binding, the only
+                            # value they have.
+                            "path": (
+                                "result.text"
+                                if role == "review" and role_by_nid.get(src) in _FULL_TEXT_ROLES
+                                else "result.summary"
+                            ),
+                        }
+                    }
+                    for src in reliable_srcs
                 ]
         steps.append(step)
 

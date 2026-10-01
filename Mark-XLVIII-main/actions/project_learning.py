@@ -16,6 +16,17 @@ from typing import Any, Callable
 from core.evidence import neutralise
 
 
+# Confirmed live (2026-09-25): a single failed check -- one unresolved file
+# citation, one section missing its own citation, one incomplete takeaway
+# sentence -- discarded the entire model-written brief down to the thin
+# generic fallback (root path, snapshot hash, file count; no real content
+# about what the code does). The checks below (_report_quality_conflicts,
+# _report_inventory_conflicts, _missing_report_sections) are correct to
+# reject a synthesis that fails them; the missing piece was ever trying
+# again. Same prompt, fresh sampling, first attempt that clears every
+# existing check wins -- no new judge needed, since the checks already are one.
+SYNTHESIS_MAX_ATTEMPTS = 2
+
 SKIP_DIRS = {
     ".git",
     ".hg",
@@ -1114,6 +1125,8 @@ def _normalize_report_citations(report: str, mapped_files: list[str]) -> str:
             return "(deterministic inventory metadata)"
         if raw == "root_readme_excerpt":
             return "(root README excerpt)"
+        if raw == "aletheia_preview":
+            return "(Aletheia bridge preview data)"
         normalized = raw.replace("\\", "/")
         if normalized.lower().startswith("root:"):
             normalized = normalized[5:].lstrip("/")
@@ -1329,7 +1342,7 @@ def learn_repository(
                 ),
                 "aletheia_preview": bridge_preview,
             }
-            response = planner.generate_content(
+            synthesis_prompt = (
                 "Synthesize a durable Obsidian project brief from the repository profile and cited batch maps. "
                 "Required H2 sections: Executive Summary; Repository Profile; Architecture And Components; Entry Points "
                 "And Workflows; Dependencies And Tests; Operational Guidance; Risks, Gaps, And Questions; RAG Takeaways; "
@@ -1338,7 +1351,8 @@ def learn_repository(
                 "Every factual, operational, risk, and status claim must cite [file:path]. Treat the root README as the repository-level "
                 "purpose and nested documents as scoped subprojects. Treat deterministic_ground_truth as authoritative metadata. "
                 "Do not claim that tests pass or fail without supplied runtime evidence; label documented status as documentation. "
-                "Never cite profile field names such as deterministic_ground_truth or root_readme_excerpt as files. "
+                "Never cite profile field names such as deterministic_ground_truth, root_readme_excerpt, or "
+                "aletheia_preview as files. "
                 "For the Files Read section, emit only its heading and the line '- Canonical reading list inserted by JARVIS.'; JARVIS replaces it. "
                 "End every takeaway bullet with a period and finish the RAG Takeaways section before stopping. "
                 "State uncertainty, do not invent behavior, and explicitly identify stale documentation when code, config, or tests disagree.\n\n"
@@ -1346,32 +1360,40 @@ def learn_repository(
                 "Cited batch maps:\n" + "\n\n".join(map_summaries)
                 + "\n\nReturn only the final Markdown project brief with the required sections."
             )
-            report = _response_text(response)
-            if not report:
-                diagnostics.append("Repository final synthesis returned no text.")
-            else:
-                report = _normalize_report_citations(report, mapped_files)
-                missing_sections = _missing_report_sections(report)
+            for attempt in range(1, SYNTHESIS_MAX_ATTEMPTS + 1):
+                response = planner.generate_content(synthesis_prompt)
+                candidate = _response_text(response)
+                if not candidate:
+                    diagnostics.append(f"Repository final synthesis returned no text (attempt {attempt}).")
+                    continue
+                candidate = _normalize_report_citations(candidate, mapped_files)
+                missing_sections = _missing_report_sections(candidate)
+                attempt_repaired = False
                 if missing_sections == ["RAG Takeaways"]:
-                    report, repaired_takeaways = _repair_missing_takeaways(report)
+                    candidate, repaired_takeaways = _repair_missing_takeaways(candidate)
                     if repaired_takeaways:
-                        model_synthesis_repaired = True
-                        diagnostics.append(
-                            "Repository final synthesis omitted RAG Takeaways; JARVIS repaired it from cited report sections."
-                        )
-                        missing_sections = _missing_report_sections(report)
+                        attempt_repaired = True
+                        missing_sections = _missing_report_sections(candidate)
                 if missing_sections:
                     diagnostics.append(
-                        "Repository final synthesis was incomplete; missing sections: "
+                        f"Repository final synthesis was incomplete (attempt {attempt}); missing sections: "
                         + ", ".join(missing_sections)
                     )
-                    report = ""
-                else:
-                    conflicts = _report_inventory_conflicts(report, ground_truth)
-                    conflicts.extend(_report_quality_conflicts(report, mapped_files))
-                    if conflicts:
-                        diagnostics.extend(f"Repository final synthesis conflict: {item}." for item in conflicts)
-                        report = ""
+                    continue
+                conflicts = _report_inventory_conflicts(candidate, ground_truth)
+                conflicts.extend(_report_quality_conflicts(candidate, mapped_files))
+                if conflicts:
+                    diagnostics.extend(
+                        f"Repository final synthesis conflict (attempt {attempt}): {item}." for item in conflicts
+                    )
+                    continue
+                report = candidate
+                model_synthesis_repaired = attempt_repaired
+                if attempt_repaired:
+                    diagnostics.append(
+                        "Repository final synthesis omitted RAG Takeaways; JARVIS repaired it from cited report sections."
+                    )
+                break
         except Exception as exc:
             diagnostics.append(f"Repository final synthesis failed: {exc}")
 

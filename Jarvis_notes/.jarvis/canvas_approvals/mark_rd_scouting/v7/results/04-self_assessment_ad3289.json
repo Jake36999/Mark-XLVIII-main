@@ -1,0 +1,31 @@
+{
+  "schema_version": "jarvis_work_result/v1",
+  "run_id": "mark_rd_scouting-v7",
+  "item_id": "self_assessment_ad3289",
+  "verdict": "ACCEPT",
+  "defects": [],
+  "result": {
+    "ok": true,
+    "text": "Caveat: The provided evidence contains only scan metadata (a root path, a repository snapshot hash, and file read/skip counts) with no descriptive content about what the code does. Therefore, subject areas cannot be enumerated.\n\nNo subject-area list is provided because the evidence does not support any claim about the platform's actual subsystems.",
+    "summary": "Caveat: The provided evidence contains only scan metadata (a root path, a repository snapshot hash, and file read/skip counts) with no descriptive content about what the code does. Therefore, subject areas cannot be enumerated.\n\nNo subject-area list is provided because the evidence does not support any claim about the platform's actual subsystems.",
+    "model_provenance": {
+      "provider": "deepinfra",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "role": "research",
+      "fallback_reason": "",
+      "preferred_model_unavailable": false,
+      "metrics": {},
+      "recorded_at": 1790283985.2649012
+    }
+  },
+  "model_provenance": {
+    "provider": "deepinfra",
+    "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+    "role": "research",
+    "fallback_reason": "",
+    "preferred_model_unavailable": false,
+    "metrics": {},
+    "recorded_at": 1790283985.2649012
+  },
+  "completed_at": "2026-09-24T21:06:31Z"
+}

@@ -1,0 +1,274 @@
+{
+  "created_at": "2026-09-24T20:02:49Z",
+  "items": [
+    {
+      "acceptance_criteria": {
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [],
+      "description": "Create a phased research plan to identify concrete, well-scoped R&D objectives for extending the Mark-XLVIII assistant platform. This plan will be reviewed before any execution begins.",
+      "id": "overall_plan_ec8453",
+      "idempotency_key": "d16176269f10cb9ba61e6e71efed35ccdb61fcadce179a26f1ecbd20f971e7aa",
+      "inputs": {
+        "canvas_node_id": "overall_plan",
+        "canvas_role": "plan"
+      },
+      "max_attempts": 1,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "deterministic",
+      "outputs": {
+        "result": "result.overall_plan_ec8453"
+      },
+      "required_outputs": [],
+      "requires_confirmation": false,
+      "resource_class": "io",
+      "retry_safe": true,
+      "risk_tier": "T1",
+      "sequence": 1,
+      "side_effects": "none",
+      "step_type": "gate",
+      "target": "plan_milestone"
+    },
+    {
+      "acceptance_criteria": {
+        "deliverables": [
+          "List of concrete subject areas derived directly from the code"
+        ],
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [
+        "overall_plan_ec8453"
+      ],
+      "description": "Read the actual Mark-XLVIII source code (no assumptions) and enumerate its major subject areas/subsystems (e.g., model routing, cloud providers, canvas planning, capability registry, memory/retrieval, credentials, speech, etc.). Produce a concise list of these areas.\n\nDeliverables:\n- List of concrete subject areas derived directly from the code",
+      "id": "self_assessment_ad3289",
+      "idempotency_key": "631c23fec89f338e72903ce4578e909c63334c163cb2f32318fcd0097941d110",
+      "inputs": {
+        "canvas_node_id": "self_assessment",
+        "canvas_role": "research",
+        "context_injected": true,
+        "evidence": [
+          {
+            "bind": {
+              "from_step": "overall_plan_ec8453",
+              "path": "result.summary"
+            }
+          }
+        ],
+        "prompt": "System goal: Create a phased research plan to identify concrete, well-scoped R&D objectives for extending the Mark-XLVIII assistant platform. This plan will be reviewed before any execution begins.\n\nRead the actual Mark-XLVIII source code (no assumptions) and enumerate its major subject areas/subsystems (e.g., model routing, cloud providers, canvas planning, capability registry, memory/retrieval, credentials, speech, etc.). Produce a concise list of these areas.\n\nDeliverables:\n- List of concrete subject areas derived directly from the code",
+        "role": "research"
+      },
+      "max_attempts": 2,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "cognitive",
+      "outputs": {
+        "result": "result.self_assessment_ad3289"
+      },
+      "required_outputs": [],
+      "requires_confirmation": false,
+      "resource_class": "model",
+      "retry_safe": true,
+      "risk_tier": "T1",
+      "sequence": 2,
+      "side_effects": "none",
+      "step_type": "model_reasoning",
+      "target": "reasoning"
+    },
+    {
+      "acceptance_criteria": {
+        "deliverables": [
+          "Report linking subject areas to relevant Resource Library entries"
+        ],
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [
+        "self_assessment_ad3289"
+      ],
+      "description": "For each subject area identified in the self\u2011assessment, query the read\u2011only Resource Library (D:\\Resource-Library) using project_operator's learn_project/scout operations. Generate a brief report that maps each subject area to any catalogued resources that are genuinely relevant, explaining why they are on\u2011topic.\n\nDeliverables:\n- Report linking subject areas to relevant Resource Library entries",
+      "id": "source_identification_1d3f39",
+      "idempotency_key": "8326e0653db1ada46ea351918c5dd187ebe04a5ae1e12d544960ee283d8cf70d",
+      "inputs": {
+        "canvas_node_id": "source_identification",
+        "canvas_role": "research",
+        "context_injected": true,
+        "evidence": [
+          {
+            "bind": {
+              "from_step": "self_assessment_ad3289",
+              "path": "result.summary"
+            }
+          }
+        ],
+        "prompt": "System goal: Create a phased research plan to identify concrete, well-scoped R&D objectives for extending the Mark-XLVIII assistant platform. This plan will be reviewed before any execution begins.\n\nFor each subject area identified in the self\u2011assessment, query the read\u2011only Resource Library (D:\\Resource-Library) using project_operator's learn_project/scout operations. Generate a brief report that maps each subject area to any catalogued resources that are genuinely relevant, explaining why they are on\u2011topic.\n\nDeliverables:\n- Report linking subject areas to relevant Resource Library entries",
+        "role": "research"
+      },
+      "max_attempts": 2,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "cognitive",
+      "outputs": {
+        "result": "result.source_identification_1d3f39"
+      },
+      "required_outputs": [],
+      "requires_confirmation": false,
+      "resource_class": "model",
+      "retry_safe": true,
+      "risk_tier": "T1",
+      "sequence": 3,
+      "side_effects": "none",
+      "step_type": "model_reasoning",
+      "target": "reasoning"
+    },
+    {
+      "acceptance_criteria": {
+        "deliverables": [
+          "List of 3\u20115 concrete research objectives"
+        ],
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [
+        "source_identification_1d3f39"
+      ],
+      "description": "Combine the self\u2011assessment list and the source\u2011identification report to craft 3\u20115 concrete, individually actionable research objectives. Each objective must be specific enough to guide real research steps and must not merely restate existing functionality.\n\nDeliverables:\n- List of 3\u20115 concrete research objectives",
+      "id": "synthesize_objectives_88106c",
+      "idempotency_key": "fcf393cf249c417d173c80a52597fef167adb94d6148b3de67fe28b1fded0cfa",
+      "inputs": {
+        "canvas_node_id": "synthesize_objectives",
+        "canvas_role": "research",
+        "context_injected": true,
+        "evidence": [
+          {
+            "bind": {
+              "from_step": "source_identification_1d3f39",
+              "path": "result.summary"
+            }
+          }
+        ],
+        "prompt": "System goal: Create a phased research plan to identify concrete, well-scoped R&D objectives for extending the Mark-XLVIII assistant platform. This plan will be reviewed before any execution begins.\n\nCombine the self\u2011assessment list and the source\u2011identification report to craft 3\u20115 concrete, individually actionable research objectives. Each objective must be specific enough to guide real research steps and must not merely restate existing functionality.\n\nDeliverables:\n- List of 3\u20115 concrete research objectives",
+        "role": "research"
+      },
+      "max_attempts": 2,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "cognitive",
+      "outputs": {
+        "result": "result.synthesize_objectives_88106c"
+      },
+      "required_outputs": [],
+      "requires_confirmation": false,
+      "resource_class": "model",
+      "retry_safe": true,
+      "risk_tier": "T1",
+      "sequence": 4,
+      "side_effects": "none",
+      "step_type": "model_reasoning",
+      "target": "reasoning"
+    },
+    {
+      "acceptance_criteria": {
+        "deliverables": [
+          "Complete phased research plan with branch structure and step ordering"
+        ],
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [
+        "synthesize_objectives_88106c"
+      ],
+      "description": "For each research objective, break it into ordered steps, assign dependency ordering, and group objectives that can be pursued independently into separate branches (e.g., Branch A, Branch B) to allow parallel work. Produce the full phased plan ready for review.\n\nDeliverables:\n- Complete phased research plan with branch structure and step ordering",
+      "id": "phase_plan_5610f6",
+      "idempotency_key": "10ed2f01d9af00c35b4e4e3966bb22b72263c7a35df7c5b16dd7df9b7e552dfb",
+      "inputs": {
+        "canvas_node_id": "phase_plan",
+        "canvas_role": "research",
+        "context_injected": true,
+        "evidence": [
+          {
+            "bind": {
+              "from_step": "synthesize_objectives_88106c",
+              "path": "result.summary"
+            }
+          }
+        ],
+        "prompt": "System goal: Create a phased research plan to identify concrete, well-scoped R&D objectives for extending the Mark-XLVIII assistant platform. This plan will be reviewed before any execution begins.\n\nFor each research objective, break it into ordered steps, assign dependency ordering, and group objectives that can be pursued independently into separate branches (e.g., Branch A, Branch B) to allow parallel work. Produce the full phased plan ready for review.\n\nDeliverables:\n- Complete phased research plan with branch structure and step ordering",
+        "role": "research"
+      },
+      "max_attempts": 2,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "cognitive",
+      "outputs": {
+        "result": "result.phase_plan_5610f6"
+      },
+      "required_outputs": [],
+      "requires_confirmation": false,
+      "resource_class": "model",
+      "retry_safe": true,
+      "risk_tier": "T1",
+      "sequence": 5,
+      "side_effects": "none",
+      "step_type": "model_reasoning",
+      "target": "reasoning"
+    },
+    {
+      "acceptance_criteria": {
+        "deliverables": [
+          "Markdown file Mark-XLVIII_Research_Plan.md containing the reviewed phased plan"
+        ],
+        "required": true
+      },
+      "compensation": "",
+      "depends_on": [
+        "phase_plan_5610f6"
+      ],
+      "description": "Specification: Mark-XLVIII Research Plan \u2013 write a markdown document containing the phased plan produced in the previous step.\n\nDeliverables:\n- Markdown file Mark-XLVIII_Research_Plan.md containing the reviewed phased plan",
+      "id": "final_document_939100",
+      "idempotency_key": "d8cd974d39801fa4260ea710b96cba3ad47bb050397e490413d4c77b0345d728",
+      "inputs": {
+        "canvas_node_id": "final_document",
+        "canvas_role": "document",
+        "content": {
+          "bind": {
+            "from_step": "phase_plan_5610f6",
+            "path": "result.text"
+          }
+        },
+        "context_injected": true,
+        "file": "Mark-XLVIII_Research_Plan.md",
+        "title": "Specification: Mark-XLVIII Research Plan \u2013 write a markdown document containing the phased plan produced in the previous step.\n\nDeliverables:\n- Markdown file Mark-XLVIII_Research_Plan.md containing th"
+      },
+      "max_attempts": 1,
+      "negative_constraints": [],
+      "on_failure": "halt",
+      "orchestrator": "deterministic",
+      "outputs": {
+        "result": "result.final_document_939100"
+      },
+      "required_outputs": [],
+      "requires_confirmation": false,
+      "resource_class": "io",
+      "retry_safe": true,
+      "risk_tier": "T2",
+      "sequence": 6,
+      "side_effects": "local_write",
+      "step_type": "artifact",
+      "target": "vault_create_note"
+    }
+  ],
+  "manifest_hash": "06441409dd20b0f93ef513899306e4256475c3c4dabb463130f919241c3e0ae8",
+  "preflight": {
+    "checked_at": "2026-09-24T20:02:49Z",
+    "checks": [],
+    "ok": true
+  },
+  "preview_only": false,
+  "schema_version": "jarvis_work_manifest/v1",
+  "workflow_hash": "8a020c5b7b50e47c4c51772d668ccbb2894244937d44acbd07e733d338aea1da",
+  "workflow_id": "mark_rd_scouting",
+  "workflow_version": "canvas-1"
+}
